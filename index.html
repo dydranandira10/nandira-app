@@ -442,6 +442,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
     <button class="nav-item" onclick="openNavCustomizer()"><span class="icon">📱</span> Customise tabs</button>
     <button class="nav-item" onclick="closeDrawer();openBabySettings()"><span class="icon">👶</span> Baby profile</button>
     <button class="nav-item" onclick="closeDrawer();showFamilyCode()"><span class="icon">🔗</span> Family sync code</button>
+    <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon">📊</span> Export to Google Sheets</button>
   </div>
   <div style="height:20px"></div>
 </div>
@@ -548,37 +549,41 @@ async function syncFromCloud() {
   setSyncStatus('syncing');
   try {
     const remote = await fbRead('/families/' + fid + '/state');
-    if (!remote) { setSyncStatus('synced'); return; }
-    const hash = JSON.stringify(remote).length + '';
+    // If nothing in Firebase yet, push local state up
+    if (!remote) {
+      await fbWrite('/families/' + fid + '/state', state);
+      setSyncStatus('synced');
+      return;
+    }
+    // Use remote state length as change indicator
+    const remoteStr = JSON.stringify(remote);
+    const hash = remoteStr.length + '_' + (remote.mumName||'') + (remote.edd||'');
     if (hash === _lastSyncHash) { setSyncStatus('synced'); return; }
     _lastSyncHash = hash;
-    // Merge remote into local — remote wins for shared data
+    // Remote wins — merge into local state
     const merged = deepMerge(state, remote);
+    const prevPage = _currentPage;
     state = merged;
     saveLocal();
     updateSubtitles();
-    // Re-render current page
-    const cur = document.querySelector('.page.active');
-    if (cur) {
-      const pid = cur.id.replace('page-','');
-      if (PAGES[pid]) PAGES[pid](cur);
-    }
+    // Re-render current page smoothly (only if content changed)
+    const cur = document.getElementById('page-' + prevPage);
+    if (cur && PAGES[prevPage]) PAGES[prevPage](cur);
     setSyncStatus('synced');
-  } catch(e) { setSyncStatus('error'); }
+  } catch(e) {
+    setSyncStatus('error');
+  }
 }
 
 function deepMerge(local, remote) {
-  const result = {...local};
+  // Remote (Firebase) is source of truth — overrides local completely
+  // This ensures both devices stay in sync
+  if (!remote || typeof remote !== 'object') return local;
+  const result = {...local, ...remote};
+  // For nested objects (vaccines, milestones, foods etc) do deep merge
   for (const key of Object.keys(remote)) {
-    if (Array.isArray(remote[key])) {
-      // For arrays: take the longer one (more data = better)
-      if (!Array.isArray(local[key]) || remote[key].length >= local[key].length) {
-        result[key] = remote[key];
-      }
-    } else if (typeof remote[key] === 'object' && remote[key] !== null) {
-      result[key] = deepMerge(local[key] || {}, remote[key]);
-    } else if (remote[key] !== null && remote[key] !== undefined) {
-      result[key] = remote[key];
+    if (remote[key] && typeof remote[key] === 'object' && !Array.isArray(remote[key])) {
+      result[key] = {...(local[key]||{}), ...remote[key]};
     }
   }
   return result;
@@ -607,6 +612,8 @@ let state = {
   mumName: '', dadName: '',
   babyName: null, babyGender: null, babyDOB: null,
   edd: '2026-06-19',
+  caesarianDate: null,  // planned C-section date if different from EDD
+  lmpDate: null,        // last menstrual period — overrides EDD for week calc if set
   numberOfBabies: 1,    // 1=singleton, 2=twins, 3=triplets...
   babies: [],           // [{name,gender,dob,emoji}] — populated when numberOfBabies>1
   // Customizable lists
@@ -1069,20 +1076,19 @@ function getDefaultInventory(n=1) {
 
 function getDefaultKeyDates(edd) {
   if (!edd) edd = '2026-06-19';
-  const base = new Date(edd);
   const addDays = (d, n) => {
-    const r = new Date(d); r.setDate(r.getDate() + n);
+    const r = new Date(d + 'T00:00:00'); r.setDate(r.getDate() + n);
     return r.toISOString().split('T')[0];
   };
   const subDays = (d, n) => addDays(d, -n);
   return [
-    {id:uid(), label:'Estimated Due Date', date: edd},
-    {id:uid(), label:'C-Section (planned)', date: edd},
+    {id:uid(), label:'Estimated Due Date (EDD)', date: edd},
+    {id:uid(), label:'C-Section / Delivery (planned)', date: state.caesarianDate || edd},
     {id:uid(), label:'Pre-admission / pre-op', date: subDays(edd, 9)},
     {id:uid(), label:'Hospital bag ready by', date: subDays(edd, 21)},
     {id:uid(), label:'Pediatrician visit 1', date: addDays(edd, 7)},
     {id:uid(), label:'1-month check', date: addDays(edd, 30)},
-    {id:uid(), label:'HepB + BCG vaccines', date: edd},
+    {id:uid(), label:'HepB + BCG vaccines', date: state.caesarianDate || edd},
     {id:uid(), label:'6-week OBGYN check', date: addDays(edd, 42)},
   ];
 }
@@ -1093,10 +1099,25 @@ function getDefaultKeyDates(edd) {
 function today() { return new Date().toISOString().split('T')[0]; }
 function formatDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+  try {
+    return new Date(d + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  } catch(e) { return d; }
 }
 function getEDD() { return state.edd || '2026-06-19'; }
-function getDueDate() { return new Date(getEDD()); }
+function getDueDate() { return new Date(getEDD() + 'T00:00:00'); }
+function getCaesarianDate() { return state.caesarianDate || null; }
+// Pregnancy week: calculated from LMP (EDD = LMP + 280 days, so LMP = EDD - 280)
+function getPregWeek() {
+  let lmp;
+  if (state.lmpDate) {
+    lmp = new Date(state.lmpDate + 'T00:00:00');
+  } else {
+    const edd = getDueDate();
+    lmp = new Date(edd.getTime() - 280 * 86400000);
+  }
+  const days = Math.floor((new Date() - lmp) / 86400000);
+  return Math.max(1, Math.min(43, Math.floor(days / 7)));
+}
 function daysOld() {
   if (!state.babyDOB) return null;
   return Math.max(0, Math.floor((new Date() - new Date(state.babyDOB)) / 86400000));
@@ -1196,6 +1217,7 @@ function updateSubtitles() {
   let subText;
   const dueDate = getDueDate();
   const daysLeft = Math.max(0, Math.round((dueDate-new Date())/86400000));
+  const pregWk = getPregWeek();
   if (state.babyDOB) {
     if (isMultiples()) {
       const babies = getBabies();
@@ -1205,7 +1227,7 @@ function updateSubtitles() {
     }
   } else {
     const pregWk = Math.max(1,Math.min(40,Math.round(40-daysLeft/7)));
-    subText = 'Week '+pregWk+' · '+daysLeft+'d to EDD';
+    subText = 'Week '+pregWk+' · '+daysLeft+'d to go';
   }
   ['top-bar-sub-text','drawer-sub','sidebar-sub'].forEach(id => {
     const el = document.getElementById(id);
@@ -1502,15 +1524,23 @@ function openBabySettings() {
   document.getElementById('bs-nbabies').addEventListener('change', renderBsProfiles);
   renderBsProfiles();
 
-  // DOB + EDD
-  const df = document.createElement('div');
-  df.className = 'form-field';
-  df.innerHTML = '<label>Date of birth (all babies)</label><input type="date" id="bs-dob" value="'+(state.babyDOB||'')+'">';
-  sheet.appendChild(df);
+  // EDD + Caesarian + DOB
   const ef = document.createElement('div');
   ef.className = 'form-field';
-  ef.innerHTML = '<label>Estimated due date</label><input type="date" id="bs-edd" value="'+getEDD()+'">';
+  ef.innerHTML = '<label>Estimated due date (EDD)</label><input type="date" id="bs-edd" value="'+getEDD()+'">';
   sheet.appendChild(ef);
+  const cf = document.createElement('div');
+  cf.className = 'form-field';
+  cf.innerHTML = '<label>C-section / planned delivery date <span style="opacity:.6">(if different from EDD)</span></label><input type="date" id="bs-csec" value="'+(state.caesarianDate||'')+'">';
+  sheet.appendChild(cf);
+  const lf = document.createElement('div');
+  lf.className = 'form-field';
+  lf.innerHTML = '<label>Last menstrual period <span style="opacity:.6">(for accurate week calc)</span></label><input type="date" id="bs-lmp" value="'+(state.lmpDate||'')+'">';
+  sheet.appendChild(lf);
+  const df = document.createElement('div');
+  df.className = 'form-field';
+  df.innerHTML = '<label>Baby date of birth <span style="opacity:.6">(fill when baby arrives)</span></label><input type="date" id="bs-dob" value="'+(state.babyDOB||'')+'">';
+  sheet.appendChild(df);
 
   // Parents
   const pf = document.createElement('div');
@@ -1551,11 +1581,16 @@ async function saveBabyProfile() {
   const n = parseInt(document.getElementById('bs-nbabies')?.value||'1');
   const dob=document.getElementById('bs-dob')?.value||null;
   const edd=document.getElementById('bs-edd')?.value||getEDD();
+  const csec=document.getElementById('bs-csec')?.value||null;
+  const lmp=document.getElementById('bs-lmp')?.value||null;
   const mum=(document.getElementById('bs-mum')?.value||'').trim();
   const dad=(document.getElementById('bs-dad')?.value||'').trim();
   state.numberOfBabies = n;
   state.edd = edd;
+  if (csec !== null) state.caesarianDate = csec || null;
+  if (lmp !== null) state.lmpDate = lmp || null;
   if (dob) state.babyDOB = dob;
+  else if (dob === '') state.babyDOB = null; // allow clearing
   if (mum) state.mumName = mum;
   if (dad) state.dadName = dad;
   if (n === 1) {
@@ -1984,7 +2019,7 @@ PAGES['dashboard'] = function(el) {
   const due = getDueDate();
   const daysLeft = Math.max(0,Math.round((due-new Date())/86400000));
   const weeksLeft = Math.max(0,Math.floor(daysLeft/7));
-  const pregWk = Math.max(1,Math.min(40,Math.round(40-daysLeft/7)));
+  const pregWk = getPregWeek();
   const tri = pregWk<=13?'1st':pregWk<=26?'2nd':'3rd';
   const hasBaby = !!state.babyDOB;
   const bag = state.hospitalBagItems||[];
@@ -2300,6 +2335,10 @@ PAGES['csection'] = function(el) {
   window.addCsecTask = (phase) => openCsecModal(null, phase, render);
   window.editCsecTask = (id) => { const t=(state.csectionTasks||[]).find(x=>x.id===id); if(t) openCsecModal(t,'',render); };
   window.delCsecTask = (id) => { state.csectionTasks=(state.csectionTasks||[]).filter(x=>x.id!==id); saveState('csectionTasks'); render(); };
+  window.updateCsecTask = (id, field, val) => {
+    const t=(state.csectionTasks||[]).find(x=>x.id===id); if(t) t[field]=val;
+    saveState('csectionTasks');
+  };
   render();
 };
 function openCsecModal(task, defPhase, onSave) {
@@ -2357,11 +2396,21 @@ PAGES['preg-tasks'] = function(el) {
       catTasks.forEach(t => {
         html += `<div class="checklist-item ${t.done?'done':''}">
           <div class="check-box" onclick="togglePT('${t.id}')">${t.done?'✓':''}</div>
-          <div style="flex:1" onclick="togglePT('${t.id}')">
-            <div class="item-text">${t.task}</div>
-            <div class="item-meta">${t.week} · ${priTag(t.pri)}</div>
+          <div style="flex:1">
+            <input type="text" value="${t.task}" onchange="updatePT('${t.id}','task',this.value)"
+              style="font-size:13px;border:none;border-bottom:1px solid transparent;background:transparent;width:100%;padding:1px 0;${t.done?'text-decoration:line-through;color:#aaa':'color:#222'}"
+              onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='transparent'"
+              onclick="event.stopPropagation()">
+            <div class="item-meta" style="margin-top:4px">
+              <select onchange="updatePT('${t.id}','week',this.value)" onclick="event.stopPropagation()" style="font-size:10px;padding:2px 5px;border:1px solid #ddd;border-radius:4px">
+                ${['W34','W35','W36','W37','W38','W39','W40'].map(w=>'<option '+(t.week===w?'selected':'')+'>'+w+'</option>').join('')}
+              </select>
+              <select onchange="updatePT('${t.id}','pri',this.value)" onclick="event.stopPropagation()" style="font-size:10px;padding:2px 5px;border:1px solid #ddd;border-radius:4px">
+                ${['Essential','High','Medium','Low'].map(p=>'<option '+(t.pri===p?'selected':'')+'>'+p+'</option>').join('')}
+              </select>
+            </div>
           </div>
-          <button onclick="delPT('${t.id}')" class="del-btn">✕</button>
+          <button onclick="delPT('${t.id}')" class="del-btn" style="flex-shrink:0">✕</button>
         </div>`;
       });
       html += `</div>`;
@@ -2371,6 +2420,10 @@ PAGES['preg-tasks'] = function(el) {
   window.filterPT = (w) => { filterWk=w; render(); };
   window.togglePT = (id) => { const t=(state.pregTasks||[]).find(x=>x.id===id); if(t) t.done=!t.done; saveState('pregTasks'); render(); };
   window.delPT = (id) => { state.pregTasks=(state.pregTasks||[]).filter(x=>x.id!==id); saveState('pregTasks'); render(); };
+  window.updatePT = (id, field, val) => {
+    const t=(state.pregTasks||[]).find(x=>x.id===id); if(t) t[field]=val;
+    saveState('pregTasks');
+  };
   window.addPregTask = (wk) => {
     let m=document.getElementById('pt-modal');
     if(!m){m=document.createElement('div');m.className='modal-overlay';m.id='pt-modal';document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});}
@@ -2424,25 +2477,25 @@ PAGES['inventory'] = function(el) {
       </div>
       <div class="card" style="padding:0;overflow:hidden;margin-bottom:4px">`;
       catItems.forEach(item => {
-        html += `<div style="display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid #f5f5f5">
-          <input type="checkbox" ${item.purchased?'checked':''} onchange="toggleInv('${item.id}')" style="width:18px;height:18px;cursor:pointer;flex-shrink:0">
-          <div style="flex:1;${item.purchased?'opacity:.55':''}">
-            <div style="font-size:13px;font-weight:500">${item.item}</div>
-            <div style="font-size:11px;color:#888;margin-top:1px">${priTag(item.pri)}</div>
+        html += `<div style="padding:10px 12px;border-bottom:1px solid #f5f5f5">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <input type="checkbox" ${item.purchased?'checked':''} onchange="toggleInv('${item.id}')" style="width:18px;height:18px;cursor:pointer;flex-shrink:0;accent-color:var(--green)">
+            <input type="text" value="${item.item}" onchange="updateInv('${item.id}','item',this.value)"
+              style="flex:1;font-size:13px;font-weight:500;border:none;border-bottom:1px solid transparent;background:transparent;padding:2px 0;${item.purchased?'text-decoration:line-through;color:#aaa':'color:#222'}"
+              onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='transparent'">
+            <button onclick="delInv('${item.id}')" class="del-btn" style="flex-shrink:0">✕</button>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
-            <div style="display:flex;align-items:center;gap:4px">
-              <span style="font-size:10px;color:#888">Qty:</span>
-              <input type="number" value="${item.qty||1}" min="1" oninput="updateInv('${item.id}','qty',this.value)" 
-                style="width:44px;font-size:12px;padding:3px 6px;border:1px solid #ddd;border-radius:5px;text-align:center">
-            </div>
-            <div style="display:flex;align-items:center;gap:4px">
-              <span style="font-size:10px;color:#888">Rp</span>
-              <input type="number" value="${item.cost||0}" oninput="updateInv('${item.id}','cost',this.value)"
-                style="width:80px;font-size:12px;padding:3px 6px;border:1px solid #ddd;border-radius:5px">
-            </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select onchange="updateInv('${item.id}','pri',this.value)" style="font-size:11px;padding:3px 7px;border:1px solid #e0e0e0;border-radius:6px;background:#fafafa">
+              ${['Essential','High','Medium','Low'].map(p=>'<option '+(item.pri===p?'selected':'')+'>'+p+'</option>').join('')}
+            </select>
+            <label style="font-size:11px;color:#888">Qty</label>
+            <input type="number" value="${item.qty||1}" min="1" onchange="updateInv('${item.id}','qty',this.value)"
+              style="width:48px;font-size:12px;padding:4px 6px;border:1px solid #e0e0e0;border-radius:6px;text-align:center">
+            <label style="font-size:11px;color:#888">Rp</label>
+            <input type="number" value="${item.cost||0}" onchange="updateInv('${item.id}','cost',this.value)"
+              style="width:90px;font-size:12px;padding:4px 6px;border:1px solid #e0e0e0;border-radius:6px">
           </div>
-          <button onclick="delInv('${item.id}')" class="del-btn">✕</button>
         </div>`;
       });
       html += `</div>`;
@@ -2486,362 +2539,608 @@ PAGES['inventory'] = function(el) {
 // ══════════════════════════════════════════════════════════════════════════════
 // FEEDING LOG — with recommendations + charts
 // ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+// CHART ENGINE — shared by all log pages
+// ══════════════════════════════════════════════════════════════════════════════
+function getCanvasCtx(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return null;
+  const parent = canvas.parentElement;
+  canvas.width = parent ? parent.clientWidth - 28 : 320;
+  canvas.height = 160;
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  return {canvas, ctx: canvas.getContext('2d'), w: canvas.width, h: canvas.height};
+}
+
+function drawBar(id, labels, datasets, yLabel) {
+  const cc = getCanvasCtx(id); if (!cc) return;
+  const {ctx, w, h} = cc;
+  const pad = {t:18, r:8, b:32, l:36};
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  const maxVal = Math.max(...datasets.flatMap(d => d.data), 1);
+  const nBars = labels.length;
+  const groupW = cw / nBars;
+  const barsPerGroup = datasets.length;
+  const barW = Math.max(3, groupW * 0.7 / barsPerGroup);
+  const gap = groupW * 0.15;
+
+  // Background
+  ctx.fillStyle = '#f8f9fa';
+  ctx.fillRect(0, 0, w, h);
+
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ch * (1 - i/4);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y);
+    ctx.strokeStyle = i === 0 ? '#dee2e6' : '#e9ecef';
+    ctx.lineWidth = i === 0 ? 1.5 : 1;
+    ctx.stroke();
+    if (i > 0) {
+      const val = Math.round(maxVal * i / 4 * 10) / 10;
+      ctx.fillStyle = '#868e96'; ctx.font = '9px -apple-system,sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(val, pad.l - 3, y + 3);
+    }
+  }
+
+  // Bars
+  datasets.forEach((ds, di) => {
+    ds.data.forEach((val, i) => {
+      const barH = Math.max(0, (val / maxVal) * ch);
+      const x = pad.l + i * groupW + gap + di * (barW + 1);
+      const y = pad.t + ch - barH;
+      ctx.fillStyle = ds.color + 'dd';
+      if (ctx.roundRect) {
+        ctx.beginPath(); ctx.roundRect(x, y, barW, barH, [3, 3, 0, 0]); ctx.fill();
+      } else {
+        ctx.fillRect(x, y, barW, barH);
+      }
+      if (val > 0 && barH > 14) {
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 8px -apple-system,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(Math.round(val * 10) / 10, x + barW/2, y + 10);
+      }
+    });
+  });
+
+  // X labels
+  labels.forEach((lbl, i) => {
+    ctx.fillStyle = '#495057'; ctx.font = '9px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    const x = pad.l + i * groupW + groupW/2;
+    ctx.fillText(String(lbl).substring(0, 8), x, h - 6);
+  });
+
+  // Legend
+  if (datasets.length > 1) {
+    let lx = pad.l;
+    datasets.forEach(ds => {
+      ctx.fillStyle = ds.color; ctx.fillRect(lx, 4, 10, 8);
+      ctx.fillStyle = '#495057'; ctx.font = '9px -apple-system,sans-serif';
+      ctx.textAlign = 'left'; ctx.fillText(ds.label, lx + 13, 11);
+      lx += 13 + ctx.measureText(ds.label).width + 12;
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TARGET HELPER — returns daily targets per baby age
+// ══════════════════════════════════════════════════════════════════════════════
+function getDailyTargets() {
+  const rec = getRecommendations();
+  if (!rec) return null;
+  return {
+    feedsMin: 8, feedsMax: 12,
+    breastMin: rec.feedFreq?.includes('8') ? 8 : 6,
+    sleepHrsMin: parseFloat(rec.sleep?.match(/(\d+)/)?.[1] || 14),
+    sleepHrsMax: parseFloat(rec.sleep?.match(/–(\d+)/)?.[1] || 17),
+    wetNappies: rec.wetTarget || 6,
+    dirtyNappies: 2,
+    readingMins: 15,
+    phase: rec.phase,
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEEDING LOG
+// ══════════════════════════════════════════════════════════════════════════════
 PAGES['feeding'] = function(el) {
   let chartView = 'daily';
+  let showForm = false;
+
+  function getChartData(view) {
+    if (view === 'hourly') {
+      const hrs = Array(24).fill(0);
+      state.feedingLog.filter(l => l.date === today()).forEach(l => {
+        const h = parseInt(l.time?.split(':')[0] || 0);
+        if (h >= 0 && h < 24) hrs[h]++;
+      });
+      return {
+        labels: Array.from({length:24}, (_,i) => i+'h'),
+        datasets: [{label:'Feeds', data: hrs, color:'#2D8F8F'}]
+      };
+    } else if (view === 'daily') {
+      const days = Array.from({length:7}, (_,i) => {
+        const d = new Date(); d.setDate(d.getDate() - 6 + i);
+        return d.toISOString().split('T')[0];
+      });
+      return {
+        labels: days.map(d => d.slice(5).replace('-','/')),
+        datasets: [
+          {label:'Feeds', data: days.map(d => state.feedingLog.filter(l=>l.date===d).length), color:'#2D8F8F'},
+          {label:'Formula ml/10', data: days.map(d => Math.round(state.feedingLog.filter(l=>l.date===d).reduce((a,l)=>a+(parseInt(l.formulaMl)||0),0)/10)), color:'#534AB7'},
+        ]
+      };
+    } else {
+      const weeks = Array.from({length:4}, (_,i) => {
+        const d = new Date(); d.setDate(d.getDate() - 21 + i*7);
+        return d.toISOString().split('T')[0];
+      });
+      return {
+        labels: ['4w ago','3w ago','2w ago','This wk'],
+        datasets: [{label:'Total feeds', data: weeks.map(wS => {
+          const wE = new Date(wS); wE.setDate(wE.getDate()+7);
+          return state.feedingLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]).length;
+        }), color:'#2D8F8F'}]
+      };
+    }
+  }
+
   function render() {
     const rec = getRecommendations();
+    const targets = getDailyTargets();
     const todayLogs = state.feedingLog.filter(l=>l.date===today());
-    const totalFeeds = todayLogs.length;
-    const totalLeft = todayLogs.reduce((a,l)=>a+(parseInt(l.leftMin)||0),0);
-    const totalRight = todayLogs.reduce((a,l)=>a+(parseInt(l.rightMin)||0),0);
-    const totalFormula = todayLogs.reduce((a,l)=>a+(parseInt(l.formulaMl)||0),0);
-    const totalPumped = todayLogs.reduce((a,l)=>a+(parseInt(l.pumpedMl)||0),0);
+    const tf = todayLogs.length;
+    const tl = todayLogs.reduce((a,l)=>a+(parseInt(l.leftMin)||0),0);
+    const tr = todayLogs.reduce((a,l)=>a+(parseInt(l.rightMin)||0),0);
+    const tfo = todayLogs.reduce((a,l)=>a+(parseInt(l.formulaMl)||0),0);
+    const tp = todayLogs.reduce((a,l)=>a+(parseInt(l.pumpedMl)||0),0);
+    const feedOk = targets ? (tf >= targets.feedsMin ? 'good' : tf >= targets.feedsMin-2 ? 'ok' : 'low') : 'none';
+    const statusColor = {good:'#0F6E56', ok:'#854F0B', low:'#C0392B', none:'#888'}[feedOk];
+    const statusIcon = {good:'✓', ok:'~', low:'⚠', none:''}[feedOk];
 
     el.innerHTML = `
-      <div class="page-header"><h2>🍼 Feeding Log</h2><p>Today: ${totalFeeds} feeds · ${totalLeft+totalRight}min breast · ${totalFormula}ml formula</p></div>
-      <div class="grid-4" style="margin-bottom:12px">
-        <div class="stat-card" style="background:#0F6E56"><div class="val">${totalFeeds}</div><div class="lbl">Feeds today</div></div>
-        <div class="stat-card" style="background:#2D8F8F"><div class="val">${totalLeft+totalRight}m</div><div class="lbl">Breast</div></div>
-        <div class="stat-card" style="background:#534AB7"><div class="val">${totalFormula}ml</div><div class="lbl">Formula</div></div>
-        <div class="stat-card" style="background:#854F0B"><div class="val">${totalPumped}ml</div><div class="lbl">Pumped</div></div>
+      <div class="page-header">
+        <h2>🍼 Feeding Log</h2>
+        <p>Today: ${tf} feeds · ${tl+tr}min breast · ${tfo}ml formula${rec?' · '+rec.phase:''}</p>
       </div>
 
+      <!-- Stats row -->
+      <div class="grid-4" style="margin-bottom:12px">
+        <div class="stat-card" style="background:#0F6E56">
+          <div class="val">${tf}</div>
+          <div class="lbl">Feeds today</div>
+          ${targets?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${targets.feedsMin}–${targets.feedsMax}</div>`:''}
+        </div>
+        <div class="stat-card" style="background:#2D8F8F">
+          <div class="val">${tl+tr}m</div>
+          <div class="lbl">Breast total</div>
+        </div>
+        <div class="stat-card" style="background:#534AB7">
+          <div class="val">${tfo}ml</div>
+          <div class="lbl">Formula</div>
+          ${rec?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">${rec.feedAmt}/feed</div>`:''}
+        </div>
+        <div class="stat-card" style="background:${statusColor}">
+          <div class="val">${statusIcon||'—'}</div>
+          <div class="lbl">${feedOk==='good'?'On track':feedOk==='ok'?'Getting there':feedOk==='low'?'Below target':'No target'}</div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
       ${rec ? `<div class="rec-box">
-        <h4>📋 Recommendations for ${rec.phase}</h4>
+        <h4>📋 ${rec.phase}</h4>
         <div class="rec-item"><span class="rec-label">Feeding frequency</span><span class="rec-val">${rec.feedFreq}</span></div>
         <div class="rec-item"><span class="rec-label">Amount per feed</span><span class="rec-val">${rec.feedAmt}</span></div>
-        <div class="rec-item"><span class="rec-label">Today's feeds</span><span class="rec-val" style="color:${totalFeeds>=8?'#0F6E56':totalFeeds>=6?'#854F0B':'#C0392B'}">${totalFeeds} ${totalFeeds>=8?'✓ Good':totalFeeds>=6?'OK':'⚠ Low'}</span></div>
+        <div class="rec-item"><span class="rec-label">Today's feeds</span><span class="rec-val" style="color:${statusColor}">${tf} ${statusIcon}</span></div>
         <div style="font-size:11px;color:#555;margin-top:6px;line-height:1.5">${rec.feeding}</div>
-      </div>` : ''}
+      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666">
+        Set baby's date of birth in Baby Profile to see age-based feeding targets.
+      </div>`}
 
-      <div class="card">
+      <!-- Quick log -->
+      <div class="card" style="margin-bottom:10px">
         <div class="card-title">Quick log</div>
-        ${isMultiples()?renderBabySelector(0,'setQuickFeedBaby')+'<input type="hidden" id="qf-baby" value="0">':''}
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          ${['L 5min','L 10min','L 15min','R 5min','R 10min','R 15min','60ml','90ml','120ml'].map(l=>{
-            const isLeft = l.startsWith('L'); const isRight = l.startsWith('R');
-            const ml = !isLeft&&!isRight?parseInt(l):0;
-            const min = isLeft||isRight?parseInt(l.split(' ')[1]):0;
-            const type = isLeft?'left':isRight?'right':'formula';
-            return `<button class="btn btn-outline btn-sm" onclick="quickFeed('${type}',${isLeft||isRight?min:ml})">${l}</button>`;
+        ${isMultiples() ? renderBabySelector(0,'setQFBaby')+'<input type="hidden" id="qf-baby" value="0">' : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          ${['L 5m','L 10m','L 15m','L 20m','R 5m','R 10m','R 15m','R 20m'].map(l=>{
+            const side=l[0]==='L'?'left':'right'; const min=parseInt(l.split(' ')[1]);
+            return `<button class="btn btn-outline btn-sm" onclick="quickFeed('${side}',${min})">${l}</button>`;
           }).join('')}
+          ${['60ml','90ml','120ml','150ml'].map(ml=>`<button class="btn btn-outline btn-sm" onclick="quickFeed('formula',${parseInt(ml)})">${ml}</button>`).join('')}
         </div>
-        <button class="btn btn-outline btn-block btn-sm" onclick="toggleEl('full-feed-form')" id="feed-form-toggle">+ Full entry</button>
+        <button class="btn btn-outline btn-block btn-sm" id="feed-toggle" onclick="toggleEl('feed-full-form');this.textContent=document.getElementById('feed-full-form').style.display==='none'?'+ Full entry':'− Hide form'">+ Full entry</button>
       </div>
 
-      <div class="card" id="full-feed-form" style="display:none">
-        <div class="card-title">Full feed entry</div>
-        ${isMultiples()?renderBabySelector(0,'setFeedBaby')+'<input type="hidden" id="f-baby" value="0">':''}
+      <!-- Full form -->
+      <div class="card" id="feed-full-form" style="display:none;margin-bottom:10px">
+        <div class="card-title">Log a feed</div>
+        ${isMultiples() ? renderBabySelector(0,'setFFBaby')+'<input type="hidden" id="ff-baby" value="0">' : ''}
         <div class="form-row">
-          <div><label>Date</label><input type="date" id="f-date" value="${today()}"></div>
-          <div><label>Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}"></div>
+          <div class="form-field"><label>Date</label><input type="date" id="f-date" value="${today()}"></div>
+          <div class="form-field"><label>Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}"></div>
         </div>
         <div class="form-row">
-          <div><label>Left breast (min)</label><input type="number" id="f-left" min="0" placeholder="0" inputmode="numeric"></div>
-          <div><label>Right breast (min)</label><input type="number" id="f-right" min="0" placeholder="0" inputmode="numeric"></div>
+          <div class="form-field"><label>Left breast (min)</label><input type="number" id="f-left" min="0" placeholder="0" inputmode="numeric"></div>
+          <div class="form-field"><label>Right breast (min)</label><input type="number" id="f-right" min="0" placeholder="0" inputmode="numeric"></div>
         </div>
         <div class="form-row">
-          <div><label>Formula (ml)</label><input type="number" id="f-formula" min="0" placeholder="0" inputmode="numeric"></div>
-          <div><label>Pumped (ml)</label><input type="number" id="f-pump" min="0" placeholder="0" inputmode="numeric"></div>
+          <div class="form-field"><label>Formula (ml)</label><input type="number" id="f-formula" min="0" placeholder="0" inputmode="numeric"></div>
+          <div class="form-field"><label>Pumped (ml)</label><input type="number" id="f-pump" min="0" placeholder="0" inputmode="numeric"></div>
         </div>
         <div class="form-field"><label>Notes</label><input type="text" id="f-notes" placeholder="Latch quality, side started..."></div>
         <button class="btn btn-teal btn-block" onclick="addFeed()">Add feed</button>
       </div>
 
-      <div class="chart-wrap">
-        <div class="card-title">Trends</div>
-        <div class="chart-tabs">
-          <button class="chart-tab ${chartView==='hourly'?'active':''}" onclick="setFeedChart('hourly')">Today (hourly)</button>
-          <button class="chart-tab ${chartView==='daily'?'active':''}" onclick="setFeedChart('daily')">7 days</button>
-          <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setFeedChart('weekly')">Weeks</button>
+      <!-- Chart -->
+      <div class="card" style="margin-bottom:10px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="card-title" style="margin:0">Trends</div>
+          <div class="chart-tabs" style="margin:0">
+            <button class="chart-tab ${chartView==='hourly'?'active':''}" onclick="setFeedChart('hourly')">Hourly</button>
+            <button class="chart-tab ${chartView==='daily'?'active':''}" onclick="setFeedChart('daily')">7 days</button>
+            <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setFeedChart('weekly')">Weekly</button>
+          </div>
         </div>
-        <canvas id="feed-chart" height="140"></canvas>
+        <canvas id="feed-chart" height="160"></canvas>
       </div>
 
+      <!-- History -->
       <div class="card">
-        <div class="card-title">Feed history</div>
-        ${state.feedingLog.slice().reverse().slice(0,30).map((l,ri)=>{
-          const i=state.feedingLog.length-1-ri;
-          const summary=[l.leftMin?'L:'+l.leftMin+'m':'',l.rightMin?'R:'+l.rightMin+'m':'',l.formulaMl?l.formulaMl+'ml formula':'',l.pumpedMl?l.pumpedMl+'ml pumped':''].filter(Boolean).join(' · ')||'—';
-          return `<div class="log-row">
-            <span style="font-size:11px;color:#888;min-width:90px;flex-shrink:0">${l.date} ${l.time||''}</span>
-            ${isMultiples()&&l.babyIdx!=null?`<span class="badge" style="background:#E6F5F5;color:#2D8F8F;flex-shrink:0">${babyLabel(l.babyIdx)}</span>`:''}
-            <span style="flex:1;font-size:12px">${summary}</span>
-            ${l.notes?`<span style="font-size:11px;color:#aaa;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.notes}</span>`:''}
-            <button onclick="delFeed(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;flex-shrink:0">×</button>
-          </div>`;
-        }).join('')||'<div class="empty-state">No feeds logged yet</div>'}
+        <div class="card-title">History (most recent first)</div>
+        ${state.feedingLog.length === 0 ? '<div class="empty-state">No feeds logged yet</div>' :
+          state.feedingLog.slice().reverse().slice(0,50).map((l,ri) => {
+            const i = state.feedingLog.length-1-ri;
+            const parts = [l.leftMin?'L:'+l.leftMin+'m':'', l.rightMin?'R:'+l.rightMin+'m':'',
+              l.formulaMl?l.formulaMl+'ml':'', l.pumpedMl?'Pumped:'+l.pumpedMl+'ml':''].filter(Boolean);
+            return `<div class="log-row">
+              <span style="font-size:11px;color:#888;min-width:95px;flex-shrink:0">${l.date} ${l.time||''}</span>
+              ${isMultiples()&&l.babyIdx!=null?`<span class="badge" style="background:#E6F5F5;color:#2D8F8F;flex-shrink:0">${babyLabel(l.babyIdx)}</span>`:''}
+              <span style="flex:1;font-size:12px">${parts.join(' · ')||'—'}</span>
+              ${l.notes?`<span style="font-size:11px;color:#aaa;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.notes}</span>`:''}
+              <button onclick="delFeed(${i})" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;flex-shrink:0;padding:0 4px">×</button>
+            </div>`;
+          }).join('')
+        }
       </div>
     `;
-    drawFeedChart(chartView);
+    // Draw chart after DOM renders
+    requestAnimationFrame(() => {
+      const cd = getChartData(chartView);
+      drawBar('feed-chart', cd.labels, cd.datasets);
+    });
   }
 
-  function drawFeedChart(view) {
-    const canvas = document.getElementById('feed-chart'); if(!canvas) return;
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.parentElement.offsetWidth - 28;
-    canvas.height = 140;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    let labels=[], data=[];
-    if (view==='hourly') {
-      labels = Array.from({length:24},(_,i)=>i+':00');
-      const counts = Array(24).fill(0);
-      state.feedingLog.filter(l=>l.date===today()).forEach(l=>{ const h=parseInt(l.time?.split(':')[0]||0); if(h>=0&&h<24) counts[h]++; });
-      data = counts;
-    } else if (view==='daily') {
-      const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split('T')[0]; });
-      labels = days.map(d=>d.slice(5).replace('-','/'));
-      data = days.map(d=>state.feedingLog.filter(l=>l.date===d).length);
-    } else {
-      const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return d.toISOString().split('T')[0]; });
-      labels = weeks.map((_,i)=>'Week '+(i+1));
-      data = weeks.map(wStart=>{ const wEnd=new Date(wStart); wEnd.setDate(wEnd.getDate()+7); return state.feedingLog.filter(l=>l.date>=wStart&&l.date<wEnd.toISOString().split('T')[0]).length; });
-    }
-    drawBarChart(ctx, canvas.width, canvas.height, labels, data, '#2D8F8F', 'Feeds');
-  }
-
-  window.setFeedChart = (v) => { chartView=v; drawFeedChart(v); document.querySelectorAll('.chart-tab').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(v.slice(0,4)))); };
-  window.setFeedBaby = (i) => { const h=document.getElementById('f-baby'); if(h) h.value=i; renderBabySelectorActive('f-baby-sel',i,'setFeedBaby'); };
-  window.setQuickFeedBaby = (i) => { const h=document.getElementById('qf-baby'); if(h) h.value=i; renderBabySelectorActive('qf-baby-sel',i,'setQuickFeedBaby'); };
+  window.setFeedChart = (v) => { chartView = v; render(); };
+  window.setQFBaby = (i) => { const h=document.getElementById('qf-baby'); if(h) h.value=i; };
+  window.setFFBaby = (i) => { const h=document.getElementById('ff-baby'); if(h) h.value=i; };
   window.addFeed = () => {
-    const babyIdx = parseInt(document.getElementById('f-baby')?.value||'0');
-    state.feedingLog.push({date:document.getElementById('f-date').value,time:document.getElementById('f-time').value,leftMin:parseInt(document.getElementById('f-left').value)||0,rightMin:parseInt(document.getElementById('f-right').value)||0,formulaMl:parseInt(document.getElementById('f-formula').value)||0,pumpedMl:parseInt(document.getElementById('f-pump').value)||0,notes:document.getElementById('f-notes').value,babyIdx});
-    saveState('feedingLog'); render(); toast((isMultiples()?babyLabel(babyIdx)+': ':'')+' Feed logged!');
+    const bi = parseInt(document.getElementById('ff-baby')?.value||'0');
+    state.feedingLog.push({
+      date: document.getElementById('f-date')?.value||today(),
+      time: document.getElementById('f-time')?.value||'',
+      leftMin: parseInt(document.getElementById('f-left')?.value)||0,
+      rightMin: parseInt(document.getElementById('f-right')?.value)||0,
+      formulaMl: parseInt(document.getElementById('f-formula')?.value)||0,
+      pumpedMl: parseInt(document.getElementById('f-pump')?.value)||0,
+      notes: document.getElementById('f-notes')?.value||'',
+      babyIdx: bi,
+    });
+    saveState('feedingLog'); render(); toast('Feed logged! 🍼');
   };
-  window.quickFeed = (type,amount) => {
-    const now=new Date(); const babyIdx=parseInt(document.getElementById('qf-baby')?.value||'0');
-    const entry={date:today(),time:now.toTimeString().slice(0,5),leftMin:0,rightMin:0,formulaMl:0,pumpedMl:0,notes:'Quick',babyIdx};
-    if(type==='left') entry.leftMin=amount; else if(type==='right') entry.rightMin=amount; else entry.formulaMl=amount;
-    state.feedingLog.push(entry); saveState('feedingLog'); render();
-    toast((isMultiples()?babyLabel(babyIdx)+': ':'')+( type==='formula'?amount+'ml logged!':type+' '+amount+'min logged!'));
+  window.quickFeed = (type, amt) => {
+    const bi = parseInt(document.getElementById('qf-baby')?.value||'0');
+    const e = {date:today(), time:new Date().toTimeString().slice(0,5), leftMin:0, rightMin:0, formulaMl:0, pumpedMl:0, notes:'Quick', babyIdx:bi};
+    if (type==='left') e.leftMin=amt; else if (type==='right') e.rightMin=amt; else e.formulaMl=amt;
+    state.feedingLog.push(e); saveState('feedingLog'); render();
+    toast((isMultiples()?babyLabel(bi)+': ':'')+(type==='formula'?amt+'ml':type==='left'?'L '+amt+'m':'R '+amt+'m')+' logged!');
   };
   window.delFeed = (i) => { state.feedingLog.splice(i,1); saveState('feedingLog'); render(); };
   render();
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// SLEEP LOG — with recommendations + charts
+// SLEEP LOG
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['sleep'] = function(el) {
-  let chartView='daily';
+  let chartView = 'daily';
+
+  function calcDur(l) {
+    if (!l.start || !l.end) return 0;
+    return Math.max(0, (new Date(l.date+'T'+l.end) - new Date(l.date+'T'+l.start)) / 3600000);
+  }
+
+  function getChartData(view) {
+    if (view === 'hourly') {
+      const hrs = Array(24).fill(0);
+      state.sleepLog.filter(l=>l.date===today()).forEach(l => {
+        const h = parseInt(l.start?.split(':')[0]||0);
+        if (h>=0&&h<24) hrs[h] += calcDur(l);
+      });
+      return {labels: Array.from({length:24},(_,i)=>i+'h'), datasets:[{label:'Hrs', data:hrs.map(v=>Math.round(v*10)/10), color:'#185FA5'}]};
+    } else if (view === 'daily') {
+      const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split('T')[0]; });
+      const night = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&l.type==='Night').reduce((a,l)=>a+calcDur(l),0)*10)/10);
+      const naps = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&l.type!=='Night').reduce((a,l)=>a+calcDur(l),0)*10)/10);
+      return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[{label:'Night',data:night,color:'#1B3A6B'},{label:'Naps',data:naps,color:'#534AB7'}]};
+    } else {
+      const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return d.toISOString().split('T')[0]; });
+      return {labels:['4w ago','3w ago','2w ago','This wk'], datasets:[{label:'Avg hrs/day', data:weeks.map(wS=>{
+        const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEStr=wE.toISOString().split('T')[0];
+        const total=state.sleepLog.filter(l=>l.date>=wS&&l.date<wEStr).reduce((a,l)=>a+calcDur(l),0);
+        return Math.round(total/7*10)/10;
+      }), color:'#185FA5'}]};
+    }
+  }
+
   function render() {
     const rec = getRecommendations();
+    const targets = getDailyTargets();
     const todayLogs = state.sleepLog.filter(l=>l.date===today());
-    const totalHrs = todayLogs.reduce((a,l)=>{ if(!l.start||!l.end) return a; return a+Math.max(0,(new Date(l.date+'T'+l.end)-new Date(l.date+'T'+l.start))/3600000); },0);
-    const longest = todayLogs.reduce((max,l)=>{ if(!l.start||!l.end) return max; return Math.max(max,Math.max(0,(new Date(l.date+'T'+l.end)-new Date(l.date+'T'+l.start))/3600000)); },0);
+    const totalHrs = todayLogs.reduce((a,l)=>a+calcDur(l),0);
+    const longest = todayLogs.reduce((max,l)=>Math.max(max,calcDur(l)),0);
+    const sessions = todayLogs.length;
+    const sleepOk = targets ? (totalHrs >= targets.sleepHrsMin ? 'good' : totalHrs >= targets.sleepHrsMin-2 ? 'ok' : 'low') : 'none';
+    const statusColor = {good:'#0F6E56',ok:'#854F0B',low:'#C0392B',none:'#888'}[sleepOk];
 
     el.innerHTML = `
-      <div class="page-header"><h2>😴 Sleep Log</h2><p>Today: ${totalHrs.toFixed(1)}hrs · Longest: ${longest.toFixed(1)}hrs</p></div>
+      <div class="page-header">
+        <h2>😴 Sleep Log</h2>
+        <p>Today: ${totalHrs.toFixed(1)}hrs total · ${sessions} sessions · Longest: ${longest.toFixed(1)}hrs</p>
+      </div>
+
       <div class="grid-3" style="margin-bottom:12px">
-        <div class="stat-card" style="background:#185FA5"><div class="val">${totalHrs.toFixed(1)}h</div><div class="lbl">Total today</div></div>
-        <div class="stat-card" style="background:#534AB7"><div class="val">${longest.toFixed(1)}h</div><div class="lbl">Longest</div></div>
-        <div class="stat-card" style="background:#2D8F8F"><div class="val">${todayLogs.length}</div><div class="lbl">Sessions</div></div>
+        <div class="stat-card" style="background:#185FA5">
+          <div class="val">${totalHrs.toFixed(1)}h</div>
+          <div class="lbl">Total today</div>
+          ${targets?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${targets.sleepHrsMin}–${targets.sleepHrsMax}h</div>`:''}
+        </div>
+        <div class="stat-card" style="background:#534AB7">
+          <div class="val">${longest.toFixed(1)}h</div>
+          <div class="lbl">Longest stretch</div>
+          ${rec?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target: ${rec.sleepStretch}</div>`:''}
+        </div>
+        <div class="stat-card" style="background:${statusColor}">
+          <div class="val">${sleepOk==='good'?'✓':sleepOk==='ok'?'~':'⚠'}</div>
+          <div class="lbl">${sleepOk==='good'?'On track':sleepOk==='ok'?'Getting there':sleepOk==='low'?'Below target':'No target'}</div>
+        </div>
       </div>
 
       ${rec ? `<div class="rec-box">
-        <h4>📋 Sleep — ${rec.phase}</h4>
-        <div class="rec-item"><span class="rec-label">Total sleep/day</span><span class="rec-val">${rec.sleep}</span></div>
+        <h4>📋 ${rec.phase}</h4>
+        <div class="rec-item"><span class="rec-label">Total sleep / day</span><span class="rec-val">${rec.sleep}</span></div>
         <div class="rec-item"><span class="rec-label">Longest stretch</span><span class="rec-val">${rec.sleepStretch}</span></div>
-        <div class="rec-item"><span class="rec-label">Today total</span><span class="rec-val" style="color:${totalHrs>=14?'#0F6E56':totalHrs>=10?'#854F0B':'#C0392B'}">${totalHrs.toFixed(1)}h ${totalHrs>=14?'✓ Good':totalHrs>=10?'OK':'⚠ Low'}</span></div>
-      </div>` : ''}
+        <div class="rec-item"><span class="rec-label">Today total</span><span class="rec-val" style="color:${statusColor}">${totalHrs.toFixed(1)}h</span></div>
+      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666">Set baby's date of birth to see sleep targets.</div>`}
 
-      <div class="card">
-        <div class="card-title">Quick sleep log</div>
-        ${isMultiples()?renderBabySelector(0,'setSleepBaby')+'<input type="hidden" id="s-baby" value="0">':''}
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          ${['30m nap','45m nap','1.5h nap','2h nap','3h night','4h night','5h night','6h night'].map(l=>{
-            const isNight=l.includes('night'); const min=l.includes('h')?parseFloat(l)*60:parseInt(l);
-            return `<button class="btn btn-outline btn-sm" onclick="quickSleep(${Math.round(min)},'${isNight?'Night':'Day nap'}')">${l}</button>`;
-          }).join('')}
+      <div class="card" style="margin-bottom:10px">
+        <div class="card-title">Quick log</div>
+        ${isMultiples()?renderBabySelector(0,'setSBaby')+'<input type="hidden" id="s-baby" value="0">':''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          ${[['30m nap',30,'Day nap'],['45m nap',45,'Day nap'],['1h nap',60,'Day nap'],['1.5h nap',90,'Day nap'],
+             ['2h night',120,'Night'],['3h night',180,'Night'],['4h night',240,'Night'],['5h night',300,'Night'],['6h night',360,'Night']].map(([l,m,t])=>
+            `<button class="btn btn-outline btn-sm" onclick="quickSleep(${m},'${t}')">${l}</button>`).join('')}
         </div>
-        <button class="btn btn-outline btn-block btn-sm" onclick="toggleEl('full-sleep-form')">+ Set exact times</button>
+        <button class="btn btn-outline btn-block btn-sm" onclick="toggleEl('sleep-full-form');this.textContent=document.getElementById('sleep-full-form').style.display==='none'?'+ Set exact times':'− Hide'">+ Set exact times</button>
       </div>
 
-      <div class="card" id="full-sleep-form" style="display:none">
+      <div class="card" id="sleep-full-form" style="display:none;margin-bottom:10px">
+        <div class="card-title">Log exact sleep</div>
         <div class="form-row">
-          <div><label>Date</label><input type="date" id="s-date" value="${today()}"></div>
-          <div><label>Type</label><select id="s-type"><option>Night</option><option>Day nap</option></select></div>
+          <div class="form-field"><label>Date</label><input type="date" id="s-date" value="${today()}"></div>
+          <div class="form-field"><label>Type</label><select id="s-type"><option>Night</option><option>Day nap</option></select></div>
         </div>
         <div class="form-row">
-          <div><label>Start</label><input type="time" id="s-start"></div>
-          <div><label>End</label><input type="time" id="s-end"></div>
+          <div class="form-field"><label>Start</label><input type="time" id="s-start"></div>
+          <div class="form-field"><label>End</label><input type="time" id="s-end"></div>
         </div>
         <div class="form-row">
-          <div><label>Quality</label><select id="s-qual"><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option></select></div>
-          <div><label>Notes</label><input type="text" id="s-notes" placeholder="e.g. Settled quickly"></div>
+          <div class="form-field"><label>Quality</label><select id="s-qual"><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option></select></div>
+          <div class="form-field"><label>Notes</label><input type="text" id="s-notes" placeholder="Settled quickly..."></div>
         </div>
         <button class="btn btn-teal btn-block" onclick="addSleep()">Log sleep</button>
       </div>
 
-      <div class="chart-wrap">
-        <div class="card-title">Sleep trends</div>
-        <div class="chart-tabs">
-          <button class="chart-tab ${chartView==='hourly'?'active':''}" onclick="setSleepChart('hourly')">Today</button>
-          <button class="chart-tab ${chartView==='daily'?'active':''}" onclick="setSleepChart('daily')">7 days</button>
-          <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setSleepChart('weekly')">Weeks</button>
+      <div class="card" style="margin-bottom:10px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="card-title" style="margin:0">Trends</div>
+          <div class="chart-tabs" style="margin:0">
+            <button class="chart-tab ${chartView==='hourly'?'active':''}" onclick="setSleepChart('hourly')">Today</button>
+            <button class="chart-tab ${chartView==='daily'?'active':''}" onclick="setSleepChart('daily')">7 days</button>
+            <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setSleepChart('weekly')">Weekly</button>
+          </div>
         </div>
-        <canvas id="sleep-chart" height="140"></canvas>
+        <canvas id="sleep-chart" height="160"></canvas>
       </div>
 
       <div class="card">
-        <div class="card-title">Sleep history</div>
-        ${state.sleepLog.slice().reverse().slice(0,30).map((l,ri)=>{
-          const i=state.sleepLog.length-1-ri;
-          const dur=l.start&&l.end?Math.max(0,(new Date(l.date+'T'+l.end)-new Date(l.date+'T'+l.start))/3600000):0;
-          return `<div class="log-row">
-            <span style="font-size:11px;color:#888;min-width:80px;flex-shrink:0">${l.date}</span>
-            ${isMultiples()&&l.babyIdx!=null?`<span class="badge" style="background:#E6F5F5;color:#2D8F8F;flex-shrink:0">${babyLabel(l.babyIdx)}</span>`:''}
-            <span style="font-size:12px;min-width:100px;flex-shrink:0">${l.start||'?'} → ${l.end||'?'}</span>
-            <span style="font-size:12px;font-weight:700;color:#185FA5;min-width:40px">${dur.toFixed(1)}h</span>
-            <span class="badge" style="background:${l.type==='Night'?'#E6EFF8':'#EEEDFE'};color:${l.type==='Night'?'#1B3A6B':'#534AB7'}">${l.type}</span>
-            <span style="font-size:11px;color:#888">${l.quality||''}</span>
-            <button onclick="delSleep(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;flex-shrink:0">×</button>
-          </div>`;
-        }).join('')||'<div class="empty-state">No sleep logged yet</div>'}
+        <div class="card-title">History</div>
+        ${state.sleepLog.length===0 ? '<div class="empty-state">No sleep logged yet</div>' :
+          state.sleepLog.slice().reverse().slice(0,40).map((l,ri)=>{
+            const i=state.sleepLog.length-1-ri;
+            const dur=calcDur(l);
+            return `<div class="log-row">
+              <span style="font-size:11px;color:#888;min-width:75px;flex-shrink:0">${l.date}</span>
+              ${isMultiples()&&l.babyIdx!=null?`<span class="badge" style="background:#E6F5F5;color:#2D8F8F;flex-shrink:0">${babyLabel(l.babyIdx)}</span>`:''}
+              <span style="font-size:12px;min-width:95px;flex-shrink:0">${l.start||'?'}→${l.end||'?'}</span>
+              <span style="font-size:12px;font-weight:700;color:#185FA5;min-width:36px">${dur.toFixed(1)}h</span>
+              <span class="badge" style="background:${l.type==='Night'?'#E6EFF8':'#EEEDFE'};color:${l.type==='Night'?'#1B3A6B':'#534AB7'}">${l.type==='Night'?'Night':'Nap'}</span>
+              ${l.quality?`<span class="badge" style="background:#f5f5f5;color:#666">${l.quality}</span>`:''}
+              <button onclick="delSleep(${i})" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;margin-left:auto;flex-shrink:0">×</button>
+            </div>`;
+          }).join('')
+        }
       </div>
     `;
-    drawSleepChart(chartView);
+    requestAnimationFrame(() => {
+      const cd = getChartData(chartView);
+      drawBar('sleep-chart', cd.labels, cd.datasets);
+    });
   }
 
-  function drawSleepChart(view) {
-    const canvas=document.getElementById('sleep-chart'); if(!canvas) return;
-    const ctx=canvas.getContext('2d');
-    canvas.width=canvas.parentElement.offsetWidth-28; canvas.height=140;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    let labels=[],data=[];
-    if(view==='hourly'){
-      labels=Array.from({length:24},(_,i)=>i+':00');
-      const hrs=Array(24).fill(0);
-      state.sleepLog.filter(l=>l.date===today()).forEach(l=>{ if(l.start&&l.end){const h=parseInt(l.start.split(':')[0]||0); if(h>=0&&h<24) hrs[h]+=Math.max(0,(new Date(l.date+'T'+l.end)-new Date(l.date+'T'+l.start))/3600000);} });
-      data=hrs;
-    } else if(view==='daily'){
-      const days=Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split('T')[0]; });
-      labels=days.map(d=>d.slice(5).replace('-','/'));
-      data=days.map(d=>state.sleepLog.filter(l=>l.date===d).reduce((a,l)=>a+(l.start&&l.end?Math.max(0,(new Date(l.date+'T'+l.end)-new Date(l.date+'T'+l.start))/3600000):0),0));
-    } else {
-      const weeks=Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return d.toISOString().split('T')[0]; });
-      labels=weeks.map((_,i)=>'Week '+(i+1));
-      data=weeks.map(wStart=>{ const wEnd=new Date(wStart); wEnd.setDate(wEnd.getDate()+7); return state.sleepLog.filter(l=>l.date>=wStart&&l.date<wEnd.toISOString().split('T')[0]).reduce((a,l)=>a+(l.start&&l.end?Math.max(0,(new Date(l.date+'T'+l.end)-new Date(l.date+'T'+l.start))/3600000):0),0); });
-    }
-    drawBarChart(ctx,canvas.width,canvas.height,labels,data,'#185FA5','Hours');
-  }
-
-  window.setSleepChart=(v)=>{chartView=v;drawSleepChart(v);document.querySelectorAll('.chart-tab').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(v.slice(0,3))));};
-  window.setSleepBaby = (i) => { const h=document.getElementById('s-baby'); if(h) h.value=i; };
-  window.addSleep=()=>{const babyIdx=parseInt(document.getElementById('s-baby')?.value||'0');state.sleepLog.push({date:document.getElementById('s-date').value,start:document.getElementById('s-start').value,end:document.getElementById('s-end').value,type:document.getElementById('s-type').value,quality:document.getElementById('s-qual').value,notes:document.getElementById('s-notes').value,babyIdx});saveState('sleepLog');render();toast((isMultiples()?babyLabel(babyIdx)+': ':'')+' Sleep logged!');};
-  window.quickSleep=(mins,type)=>{const now=new Date();const end=now.toTimeString().slice(0,5);const st=new Date(now-mins*60000);const start=st.toTimeString().slice(0,5);const babyIdx=parseInt(document.getElementById('s-baby')?.value||'0');state.sleepLog.push({date:today(),start,end,type,quality:'Good',notes:'Quick',babyIdx});saveState('sleepLog');render();toast((isMultiples()?babyLabel(babyIdx)+': ':'')+( mins>=60?Math.floor(mins/60)+'h '+(mins%60||'')+(mins%60?'m ':''):mins+'min')+' logged!');};
-  window.delSleep=(i)=>{state.sleepLog.splice(i,1);saveState('sleepLog');render();};
+  window.setSleepChart = (v) => { chartView=v; render(); };
+  window.setSBaby = (i) => { const h=document.getElementById('s-baby'); if(h) h.value=i; };
+  window.addSleep = () => {
+    const bi=parseInt(document.getElementById('s-baby')?.value||'0');
+    state.sleepLog.push({date:document.getElementById('s-date')?.value||today(),start:document.getElementById('s-start')?.value,end:document.getElementById('s-end')?.value,type:document.getElementById('s-type')?.value||'Night',quality:document.getElementById('s-qual')?.value||'Good',notes:document.getElementById('s-notes')?.value||'',babyIdx:bi});
+    saveState('sleepLog'); render(); toast('Sleep logged! 😴');
+  };
+  window.quickSleep = (mins,type) => {
+    const bi=parseInt(document.getElementById('s-baby')?.value||'0');
+    const now=new Date(); const end=now.toTimeString().slice(0,5);
+    const st=new Date(now-mins*60000); const start=st.toTimeString().slice(0,5);
+    state.sleepLog.push({date:today(),start,end,type,quality:'Good',notes:'Quick',babyIdx:bi});
+    saveState('sleepLog'); render();
+    toast((isMultiples()?babyLabel(bi)+': ':'')+(mins>=60?Math.floor(mins/60)+'h'+(mins%60?mins%60+'m':''):mins+'m')+' '+type.toLowerCase()+' logged!');
+  };
+  window.delSleep = (i) => { state.sleepLog.splice(i,1); saveState('sleepLog'); render(); };
   render();
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// DIAPER LOG — with recommendations + quick buttons + charts
+// DIAPER LOG
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['diaper'] = function(el) {
-  let chartView='daily';
-  const COLORS=['Black/Tarry (Meconium)','Dark Green (Transitional)','Mustard Yellow','Green Frothy','Orange/Red','White/Grey','Blood-tinged','N/A'];
+  let chartView = 'daily';
+  const COLORS = ['Black/Tarry (Meconium)','Dark Green (Transitional)','Mustard Yellow','Green Frothy','Orange/Red','White/Grey','Blood-tinged','N/A'];
+
+  function getChartData(view) {
+    if (view === 'hourly') {
+      const wet=Array(24).fill(0), dirty=Array(24).fill(0);
+      state.diaperLog.filter(l=>l.date===today()).forEach(l=>{
+        const h=parseInt(l.time?.split(':')[0]||0); if(h>=0&&h<24){if(l.wet)wet[h]++;if(l.dirty)dirty[h]++;}
+      });
+      return {labels:Array.from({length:24},(_,i)=>i+'h'), datasets:[{label:'Wet',data:wet,color:'#185FA5'},{label:'Dirty',data:dirty,color:'#0F6E56'}]};
+    } else if (view === 'daily') {
+      const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
+      return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[
+        {label:'Wet',data:days.map(d=>state.diaperLog.filter(l=>l.date===d&&l.wet).length),color:'#185FA5'},
+        {label:'Dirty',data:days.map(d=>state.diaperLog.filter(l=>l.date===d&&l.dirty).length),color:'#0F6E56'},
+      ]};
+    } else {
+      const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
+      return {labels:['4w ago','3w ago','2w ago','This wk'], datasets:[
+        {label:'Wet/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.wet).length;}),color:'#185FA5'},
+        {label:'Dirty/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.dirty).length;}),color:'#0F6E56'},
+      ]};
+    }
+  }
+
   function render() {
-    const rec=getRecommendations();
-    const todayLogs=state.diaperLog.filter(l=>l.date===today());
-    const wet=todayLogs.filter(l=>l.wet).length;
-    const dirty=todayLogs.filter(l=>l.dirty).length;
-    const wetTarget=rec?.wetTarget||6;
+    const rec = getRecommendations();
+    const targets = getDailyTargets();
+    const todayLogs = state.diaperLog.filter(l=>l.date===today());
+    const wet = todayLogs.filter(l=>l.wet).length;
+    const dirty = todayLogs.filter(l=>l.dirty).length;
+    const wetTarget = targets?.wetNappies || rec?.wetTarget || 6;
+    const wetOk = wet >= wetTarget ? 'good' : wet >= wetTarget-2 ? 'ok' : 'low';
+    const statusColor = {good:'#0F6E56',ok:'#854F0B',low:'#C0392B'}[wetOk];
 
-    el.innerHTML=`
-      <div class="page-header"><h2>💧 Diaper Log</h2><p>Today: ${wet} wet · ${dirty} dirty</p></div>
+    el.innerHTML = `
+      <div class="page-header">
+        <h2>💧 Diaper Log</h2>
+        <p>Today: ${wet} wet · ${dirty} dirty · Target: ${wetTarget}+ wet per day</p>
+      </div>
+
       <div class="grid-3" style="margin-bottom:12px">
-        <div class="stat-card" style="background:#185FA5"><div class="val">${wet}</div><div class="lbl">Wet today</div></div>
-        <div class="stat-card" style="background:#0F6E56"><div class="val">${dirty}</div><div class="lbl">Dirty today</div></div>
-        <div class="stat-card" style="background:${wet>=wetTarget?'#0F6E56':'#C0392B'}"><div class="val">${wet>=wetTarget?'✓':'⚠'}</div><div class="lbl">Wet target (${wetTarget}+)</div></div>
+        <div class="stat-card" style="background:#185FA5">
+          <div class="val">${wet}</div>
+          <div class="lbl">Wet today</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${wetTarget}+</div>
+        </div>
+        <div class="stat-card" style="background:#0F6E56">
+          <div class="val">${dirty}</div>
+          <div class="lbl">Dirty today</div>
+        </div>
+        <div class="stat-card" style="background:${statusColor}">
+          <div class="val">${wetOk==='good'?'✓':wetOk==='ok'?'~':'⚠'}</div>
+          <div class="lbl">${wetOk==='good'?'On track':wetOk==='ok'?'Getting there':'Below target'}</div>
+        </div>
       </div>
 
-      ${rec?`<div class="rec-box">
-        <h4>📋 Nappy guide — ${rec.phase}</h4>
-        <div class="rec-item"><span class="rec-label">Wet nappies</span><span class="rec-val">${rec.diaper?.split('.')[0]||'6+ per day'}</span></div>
+      ${rec ? `<div class="rec-box">
+        <h4>📋 ${rec.phase}</h4>
+        <div class="rec-item"><span class="rec-label">Wet nappies target</span><span class="rec-val">${wetTarget}+ per day</span></div>
         <div class="rec-item"><span class="rec-label">Expected stool colour</span><span class="rec-val">${rec.color}</span></div>
-        <div class="rec-item"><span class="rec-label">Today's wet count</span><span class="rec-val" style="color:${wet>=wetTarget?'#0F6E56':'#C0392B'}">${wet}/${wetTarget}+ ${wet>=wetTarget?'✓ Good':'⚠ Low'}</span></div>
-      </div>`:''}
+        <div class="rec-item"><span class="rec-label">Today wet count</span><span class="rec-val" style="color:${statusColor}">${wet} / ${wetTarget} ${wetOk==='good'?'✓':''}</span></div>
+        <div style="font-size:11px;color:#555;margin-top:6px;line-height:1.5">${rec.diaper||''}</div>
+      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666">Set baby's date of birth to see diaper targets.</div>`}
 
-      <div class="card">
+      <div class="card" style="margin-bottom:10px">
         <div class="card-title">Quick log</div>
-        ${isMultiples()?renderBabySelector(0,'setDiaperBaby')+'<input type="hidden" id="d-baby" value="0">':''}
+        ${isMultiples()?renderBabySelector(0,'setDBaby')+'<input type="hidden" id="d-baby" value="0">':''}
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
-          <button onclick="quickDiaper('wet')" style="padding:12px 6px;border-radius:10px;border:2px solid #B3D9F2;background:#E6F1FB;font-size:13px;font-weight:700;color:#185FA5;cursor:pointer;font-family:var(--font)"><div style="font-size:20px;margin-bottom:3px">💧</div>Wet</button>
-          <button onclick="quickDiaper('dirty')" style="padding:12px 6px;border-radius:10px;border:2px solid #9FE1CB;background:#E1F5EE;font-size:13px;font-weight:700;color:#0F6E56;cursor:pointer;font-family:var(--font)"><div style="font-size:20px;margin-bottom:3px">💩</div>Dirty</button>
-          <button onclick="quickDiaper('both')" style="padding:12px 6px;border-radius:10px;border:2px solid #F0C060;background:#FFF9E6;font-size:13px;font-weight:700;color:#854F0B;cursor:pointer;font-family:var(--font)"><div style="font-size:20px;margin-bottom:3px">🔄</div>Both</button>
+          <button onclick="quickDiaper('wet')" style="padding:12px 6px;border-radius:10px;border:2px solid #B3D9F2;background:#E6F1FB;font-size:13px;font-weight:700;color:#185FA5;cursor:pointer;font-family:var(--font)"><div style="font-size:20px;margin-bottom:2px">💧</div>Wet</button>
+          <button onclick="quickDiaper('dirty')" style="padding:12px 6px;border-radius:10px;border:2px solid #9FE1CB;background:#E1F5EE;font-size:13px;font-weight:700;color:#0F6E56;cursor:pointer;font-family:var(--font)"><div style="font-size:20px;margin-bottom:2px">💩</div>Dirty</button>
+          <button onclick="quickDiaper('both')" style="padding:12px 6px;border-radius:10px;border:2px solid #F0C060;background:#FFF9E6;font-size:13px;font-weight:700;color:#854F0B;cursor:pointer;font-family:var(--font)"><div style="font-size:20px;margin-bottom:2px">🔄</div>Both</button>
         </div>
-        <button class="btn btn-outline btn-block btn-sm" onclick="toggleEl('full-diaper-form')">+ Add colour / notes</button>
+        <button class="btn btn-outline btn-block btn-sm" onclick="toggleEl('diaper-full-form');this.textContent=document.getElementById('diaper-full-form').style.display==='none'?'+ Add colour / notes':'− Hide'">+ Add colour / notes</button>
       </div>
 
-      <div class="card" id="full-diaper-form" style="display:none">
+      <div class="card" id="diaper-full-form" style="display:none;margin-bottom:10px">
         <div class="form-row">
-          <div><label>Date</label><input type="date" id="d-date" value="${today()}"></div>
-          <div><label>Time</label><input type="time" id="d-time" value="${new Date().toTimeString().slice(0,5)}"></div>
+          <div class="form-field"><label>Date</label><input type="date" id="d-date" value="${today()}"></div>
+          <div class="form-field"><label>Time</label><input type="time" id="d-time" value="${new Date().toTimeString().slice(0,5)}"></div>
         </div>
         <div class="form-row">
-          <div><label>Wet?</label><select id="d-wet"><option>Yes</option><option>No</option></select></div>
-          <div><label>Dirty?</label><select id="d-dirty"><option>No</option><option>Yes</option></select></div>
+          <div class="form-field"><label>Wet?</label><select id="d-wet"><option>Yes</option><option>No</option></select></div>
+          <div class="form-field"><label>Dirty?</label><select id="d-dirty"><option>No</option><option>Yes</option></select></div>
         </div>
         <div class="form-field"><label>Stool colour</label><select id="d-color">${COLORS.map(c=>`<option>${c}</option>`).join('')}</select></div>
         <div class="form-field"><label>Notes</label><input type="text" id="d-notes" placeholder="Observations..."></div>
         <button class="btn btn-teal btn-block" onclick="addDiaper()">Log diaper</button>
       </div>
 
-      <div class="chart-wrap">
-        <div class="card-title">Nappy trends</div>
-        <div class="chart-tabs">
-          <button class="chart-tab ${chartView==='hourly'?'active':''}" onclick="setDiaperChart('hourly')">Today</button>
-          <button class="chart-tab ${chartView==='daily'?'active':''}" onclick="setDiaperChart('daily')">7 days</button>
-          <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setDiaperChart('weekly')">Weeks</button>
+      <div class="card" style="margin-bottom:10px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="card-title" style="margin:0">Trends</div>
+          <div class="chart-tabs" style="margin:0">
+            <button class="chart-tab ${chartView==='hourly'?'active':''}" onclick="setDiaperChart('hourly')">Today</button>
+            <button class="chart-tab ${chartView==='daily'?'active':''}" onclick="setDiaperChart('daily')">7 days</button>
+            <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setDiaperChart('weekly')">Weekly</button>
+          </div>
         </div>
-        <canvas id="diaper-chart" height="140"></canvas>
+        <canvas id="diaper-chart" height="160"></canvas>
       </div>
 
       <div class="card">
-        <div class="card-title">Nappy history</div>
-        ${state.diaperLog.slice().reverse().slice(0,30).map((l,ri)=>{
-          const i=state.diaperLog.length-1-ri;
-          return `<div class="log-row">
-            <span style="font-size:11px;color:#888;min-width:90px;flex-shrink:0">${l.date} ${l.time||''}</span>
-            ${isMultiples()&&l.babyIdx!=null?`<span class="badge" style="background:#E6F5F5;color:#2D8F8F;flex-shrink:0">${babyLabel(l.babyIdx)}</span>`:''}
-            <span class="badge" style="background:${l.wet?'#E6F1FB':'#f5f5f5'};color:${l.wet?'#185FA5':'#aaa'}">Wet:${l.wet?'Yes':'No'}</span>
-            <span class="badge" style="background:${l.dirty?'#E1F5EE':'#f5f5f5'};color:${l.dirty?'#0F6E56':'#aaa'}">Dirty:${l.dirty?'Yes':'No'}</span>
-            ${l.dirty&&l.color&&l.color!=='N/A'?`<span style="font-size:11px;color:#555">${l.color}</span>`:''}
-            <button onclick="delDiaper(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;margin-left:auto">×</button>
-          </div>`;
-        }).join('')||'<div class="empty-state">No diapers logged yet</div>'}
+        <div class="card-title">History</div>
+        ${state.diaperLog.length===0 ? '<div class="empty-state">No diapers logged yet</div>' :
+          state.diaperLog.slice().reverse().slice(0,40).map((l,ri)=>{
+            const i=state.diaperLog.length-1-ri;
+            return `<div class="log-row">
+              <span style="font-size:11px;color:#888;min-width:90px;flex-shrink:0">${l.date} ${l.time||''}</span>
+              ${isMultiples()&&l.babyIdx!=null?`<span class="badge" style="background:#E6F5F5;color:#2D8F8F;flex-shrink:0">${babyLabel(l.babyIdx)}</span>`:''}
+              <span class="badge" style="background:${l.wet?'#E6F1FB':'#f5f5f5'};color:${l.wet?'#185FA5':'#aaa'}">💧${l.wet?'Yes':'No'}</span>
+              <span class="badge" style="background:${l.dirty?'#E1F5EE':'#f5f5f5'};color:${l.dirty?'#0F6E56':'#aaa'}">💩${l.dirty?'Yes':'No'}</span>
+              ${l.dirty&&l.color&&l.color!=='N/A'?`<span style="font-size:11px;color:#555">${l.color}</span>`:''}
+              <button onclick="delDiaper(${i})" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;margin-left:auto;flex-shrink:0">×</button>
+            </div>`;
+          }).join('')
+        }
       </div>
     `;
-    drawDiaperChart(chartView);
+    requestAnimationFrame(() => {
+      const cd = getChartData(chartView);
+      drawBar('diaper-chart', cd.labels, cd.datasets);
+    });
   }
-  function drawDiaperChart(view) {
-    const canvas=document.getElementById('diaper-chart'); if(!canvas) return;
-    const ctx=canvas.getContext('2d');
-    canvas.width=canvas.parentElement.offsetWidth-28; canvas.height=140;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    let labels=[],wet=[],dirty=[];
-    if(view==='hourly'){
-      labels=Array.from({length:24},(_,i)=>i+'h');
-      wet=Array(24).fill(0); dirty=Array(24).fill(0);
-      state.diaperLog.filter(l=>l.date===today()).forEach(l=>{const h=parseInt(l.time?.split(':')[0]||0);if(h>=0&&h<24){if(l.wet)wet[h]++;if(l.dirty)dirty[h]++;}});
-    } else if(view==='daily'){
-      const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
-      labels=days.map(d=>d.slice(5).replace('-','/'));
-      wet=days.map(d=>state.diaperLog.filter(l=>l.date===d&&l.wet).length);
-      dirty=days.map(d=>state.diaperLog.filter(l=>l.date===d&&l.dirty).length);
-    } else {
-      const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
-      labels=weeks.map((_,i)=>'W'+(i+1));
-      wet=weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.wet).length;});
-      dirty=weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.dirty).length;});
-    }
-    drawGroupedBarChart(ctx,canvas.width,canvas.height,labels,wet,dirty,'#185FA5','#0F6E56','Wet','Dirty');
-  }
-  window.setDiaperChart=(v)=>{chartView=v;drawDiaperChart(v);document.querySelectorAll('.chart-tab').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(v.slice(0,3))));};
-  window.setDiaperBaby=(i)=>{const h=document.getElementById('d-baby');if(h)h.value=i;};
-  window.addDiaper=()=>{const babyIdx=parseInt(document.getElementById('d-baby')?.value||'0');state.diaperLog.push({date:document.getElementById('d-date').value,time:document.getElementById('d-time').value,wet:document.getElementById('d-wet').value==='Yes',dirty:document.getElementById('d-dirty').value==='Yes',color:document.getElementById('d-color').value,notes:document.getElementById('d-notes').value,babyIdx});saveState('diaperLog');render();toast((isMultiples()?babyLabel(babyIdx)+': ':'')+' Diaper logged!');};
-  window.quickDiaper=(type)=>{const now=new Date();const babyIdx=parseInt(document.getElementById('d-baby')?.value||'0');state.diaperLog.push({date:today(),time:now.toTimeString().slice(0,5),wet:type==='wet'||type==='both',dirty:type==='dirty'||type==='both',color:type==='dirty'||type==='both'?'Mustard Yellow':'N/A',notes:'Quick',babyIdx});saveState('diaperLog');render();toast((isMultiples()?babyLabel(babyIdx)+': ':'')+( type==='wet'?'💧 Wet':type==='dirty'?'💩 Dirty':'🔄 Both')+' logged!');};
-  window.delDiaper=(i)=>{state.diaperLog.splice(i,1);saveState('diaperLog');render();};
+
+  window.setDiaperChart = (v) => { chartView=v; render(); };
+  window.setDBaby = (i) => { const h=document.getElementById('d-baby'); if(h) h.value=i; };
+  window.addDiaper = () => {
+    const bi=parseInt(document.getElementById('d-baby')?.value||'0');
+    state.diaperLog.push({date:document.getElementById('d-date')?.value||today(),time:document.getElementById('d-time')?.value||'',wet:document.getElementById('d-wet')?.value==='Yes',dirty:document.getElementById('d-dirty')?.value==='Yes',color:document.getElementById('d-color')?.value||'N/A',notes:document.getElementById('d-notes')?.value||'',babyIdx:bi});
+    saveState('diaperLog'); render(); toast('Diaper logged! 💧');
+  };
+  window.quickDiaper = (type) => {
+    const bi=parseInt(document.getElementById('d-baby')?.value||'0');
+    const now=new Date();
+    state.diaperLog.push({date:today(),time:now.toTimeString().slice(0,5),wet:type==='wet'||type==='both',dirty:type==='dirty'||type==='both',color:type==='dirty'||type==='both'?'Mustard Yellow':'N/A',notes:'Quick',babyIdx:bi});
+    saveState('diaperLog'); render();
+    toast((isMultiples()?babyLabel(bi)+': ':'')+(type==='wet'?'💧 Wet':type==='dirty'?'💩 Dirty':'🔄 Both')+' logged!');
+  };
+  window.delDiaper = (i) => { state.diaperLog.splice(i,1); saveState('diaperLog'); render(); };
   render();
 };
 
@@ -2849,86 +3148,137 @@ PAGES['diaper'] = function(el) {
 // READING LOG
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['reading'] = function(el) {
+  let chartView = 'daily';
+
+  function getChartData(view) {
+    if (view === 'daily') {
+      const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
+      return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[
+        {label:'Min',data:days.map(d=>state.readingLog.filter(l=>l.date===d).reduce((a,l)=>a+(parseInt(l.minutes)||0),0)),color:'#185FA5'},
+      ]};
+    } else if (view === 'weekly') {
+      const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
+      return {labels:['4w ago','3w ago','2w ago','This wk'], datasets:[
+        {label:'Min/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.readingLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]).reduce((a,l)=>a+(parseInt(l.minutes)||0),0);}),color:'#185FA5'},
+      ]};
+    }
+    return {labels:[], datasets:[]};
+  }
+
   function render() {
-    const logs = state.readingLog||[];
-    const todayLogs = logs.filter(l=>l.date===today());
+    const readingLogs = state.readingLog||[];
+    const todayLogs = readingLogs.filter(l=>l.date===today());
     const todayMins = todayLogs.reduce((a,l)=>a+(parseInt(l.minutes)||0),0);
-    const totalSessions = logs.length;
-    const allBooks = [...new Set(logs.map(l=>l.book).filter(Boolean))];
-    const totalBooks = allBooks.length;
-    el.innerHTML=`
-      <div class="page-header"><h2>📚 Reading Log</h2><p>Today: ${todayMins} min · ${todayLogs.length} sessions · ${totalBooks} books total</p></div>
+    const TARGET_MINS = 15;
+    const allBooks = [...new Set(readingLogs.map(l=>l.book).filter(Boolean))];
+    const readOk = todayMins>=TARGET_MINS?'good':todayMins>=8?'ok':'low';
+    const statusColor = {good:'#0F6E56',ok:'#854F0B',low:'#C0392B'}[readOk];
+
+    el.innerHTML = `
+      <div class="page-header">
+        <h2>📚 Reading Log</h2>
+        <p>Today: ${todayMins} min · ${todayLogs.length} sessions · ${allBooks.length} books total · Target: ${TARGET_MINS} min/day</p>
+      </div>
+
       <div class="grid-3" style="margin-bottom:12px">
-        <div class="stat-card" style="background:#185FA5"><div class="val">${todayMins}</div><div class="lbl">Min today</div></div>
-        <div class="stat-card" style="background:#0F6E56"><div class="val">${totalSessions}</div><div class="lbl">Total sessions</div></div>
-        <div class="stat-card" style="background:#534AB7"><div class="val">${totalBooks}</div><div class="lbl">Books read</div></div>
+        <div class="stat-card" style="background:#185FA5">
+          <div class="val">${todayMins}</div>
+          <div class="lbl">Min today</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${TARGET_MINS} min</div>
+        </div>
+        <div class="stat-card" style="background:#534AB7">
+          <div class="val">${readingLogs.length}</div>
+          <div class="lbl">Total sessions</div>
+        </div>
+        <div class="stat-card" style="background:${statusColor}">
+          <div class="val">${readOk==='good'?'✓':readOk==='ok'?'~':'⚠'}</div>
+          <div class="lbl">${readOk==='good'?'On track':readOk==='ok'?'Getting there':'Read more today'}</div>
+        </div>
       </div>
-      <div class="card" style="background:#E6F5F5;border:1px solid #9FE1CB;padding:10px 14px;margin-bottom:12px;font-size:12px">
-        <b style="color:#0F6E56">Evidence:</b> Children exposed to 5 books/day from birth hear ~1.4 million more words by kindergarten. Reading aloud is the single highest-leverage language activity — start from day one.
+
+      <div class="rec-box" style="margin-bottom:12px">
+        <h4>📖 Why reading matters</h4>
+        <div class="rec-item"><span class="rec-label">Daily target</span><span class="rec-val">${TARGET_MINS} min / day</span></div>
+        <div class="rec-item"><span class="rec-label">Sessions today</span><span class="rec-val" style="color:${statusColor}">${todayMins} min ${readOk==='good'?'✓':''}</span></div>
+        <div style="font-size:11px;color:#555;margin-top:6px;line-height:1.5">5 books/day from birth = 1.4M more words by kindergarten. Start from day one in both languages.</div>
       </div>
-      <div class="card">
-        <div class="card-title">Log a reading session</div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div class="card-title">Log a session</div>
         <div class="form-row">
-          <div><label>Date</label><input type="date" id="rl-date" value="${today()}"></div>
-          <div><label>Duration (min)</label><input type="number" id="rl-min" placeholder="10" min="1" inputmode="numeric"></div>
+          <div class="form-field"><label>Date</label><input type="date" id="rl-date" value="${today()}"></div>
+          <div class="form-field"><label>Duration (min)</label><input type="number" id="rl-min" placeholder="10" min="1" inputmode="numeric"></div>
         </div>
-        <div class="form-field"><label>Book title</label><input type="text" id="rl-book" placeholder="e.g. Goodnight Moon" list="book-suggestions">
-          <datalist id="book-suggestions">${allBooks.map(b=>'<option value="'+b+'">').join('')}</datalist>
+        <div class="form-field">
+          <label>Book title</label>
+          <input type="text" id="rl-book" placeholder="e.g. Goodnight Moon" list="book-list">
+          <datalist id="book-list">${allBooks.map(b=>`<option value="${b}">`).join('')}</datalist>
         </div>
         <div class="form-row">
-          <div><label>Language</label><select id="rl-lang"><option>Indonesian</option><option>English</option><option>Both</option></select></div>
-          <div><label>Baby's response</label><select id="rl-resp"><option>Loved it</option><option>Engaged</option><option>Distracted</option><option>Fell asleep</option><option>Neutral</option></select></div>
+          <div class="form-field"><label>Language</label><select id="rl-lang"><option>Indonesian</option><option>English</option><option>Both</option></select></div>
+          <div class="form-field"><label>Baby's response</label><select id="rl-resp"><option>Loved it</option><option>Engaged</option><option>Distracted</option><option>Fell asleep</option><option>Neutral</option></select></div>
         </div>
-        <div class="form-field"><label>Notes</label><input type="text" id="rl-notes" placeholder="e.g. Pointed at pictures, laughed at..."></div>
         <button class="btn btn-teal btn-block" onclick="addReading()">Log session</button>
       </div>
-      ${allBooks.length>0?`<div class="card">
-        <div class="card-title">Books read (${totalBooks})</div>
+
+      <div class="card" style="margin-bottom:10px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="card-title" style="margin:0">Reading trends</div>
+          <div class="chart-tabs" style="margin:0">
+            <button class="chart-tab ${chartView==='daily'?'active':''}" onclick="setReadChart('daily')">7 days</button>
+            <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setReadChart('weekly')">Weekly</button>
+          </div>
+        </div>
+        <canvas id="reading-chart" height="140"></canvas>
+      </div>
+
+      ${allBooks.length>0?`<div class="card" style="margin-bottom:10px">
+        <div class="card-title">Books read (${allBooks.length})</div>
         ${allBooks.map(book=>{
-          const bookLogs=logs.filter(l=>l.book===book);
-          const totalMin=bookLogs.reduce((a,l)=>a+(parseInt(l.minutes)||0),0);
-          const lastRead=bookLogs[bookLogs.length-1]?.date||'';
-          const emoji = bookLogs[0]?.lang==='Indonesian'?'🇮🇩':bookLogs[0]?.lang==='English'?'🇬🇧':'📚';
-          return `<div class="book-card">
-            <div class="book-emoji">${emoji}</div>
-            <div class="book-info">
-              <div class="book-title">${book}</div>
-              <div class="book-meta">${bookLogs.length} session${bookLogs.length!==1?'s':''} · ${totalMin} min · Last: ${formatDate(lastRead)}</div>
-            </div>
+          const bLogs=readingLogs.filter(l=>l.book===book);
+          const mins=bLogs.reduce((a,l)=>a+(parseInt(l.minutes)||0),0);
+          const lang=bLogs[bLogs.length-1]?.lang||'';
+          return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5">
+            <span style="font-size:20px">${lang==='Indonesian'?'🇮🇩':lang==='English'?'🇬🇧':'📚'}</span>
+            <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${book}</div><div style="font-size:11px;color:#888">${bLogs.length} session${bLogs.length!==1?'s':''} · ${mins} min total</div></div>
           </div>`;
         }).join('')}
-      </div>`:``}
+      </div>`:''}
+
       <div class="card">
         <div class="card-title">Session history</div>
-        ${logs.slice().reverse().slice(0,30).map((l,ri)=>{
-          const i=logs.length-1-ri;
-          return `<div class="log-row">
-            <span style="font-size:11px;color:#888;min-width:80px;flex-shrink:0">${l.date}</span>
-            <span style="font-size:13px;flex:1;font-weight:500">${l.book||'(no title)'}</span>
-            <span class="badge" style="background:#E6F1FB;color:#185FA5">${l.minutes||0} min</span>
-            <span class="badge" style="background:#f5f5f5;color:#555">${l.lang||'EN'}</span>
-            <span style="font-size:11px;color:#888">${l.response||''}</span>
-            <button onclick="delReading(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;flex-shrink:0">×</button>
-          </div>`;
-        }).join('')||'<div class="empty-state">No reading sessions yet</div>'}
+        ${readingLogs.length===0?'<div class="empty-state">No reading sessions yet</div>':
+          readingLogs.slice().reverse().slice(0,30).map((l,ri)=>{
+            const i=readingLogs.length-1-ri;
+            return `<div class="log-row">
+              <span style="font-size:11px;color:#888;min-width:75px;flex-shrink:0">${l.date}</span>
+              <span style="flex:1;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.book||'(no title)'}</span>
+              <span class="badge" style="background:#E6F1FB;color:#185FA5">${l.minutes||0}m</span>
+              <span class="badge" style="background:#f5f5f5;color:#555">${l.lang==='Indonesian'?'🇮🇩':l.lang==='English'?'🇬🇧':'🌏'}</span>
+              <button onclick="delReading(${i})" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;flex-shrink:0">×</button>
+            </div>`;
+          }).join('')
+        }
       </div>
     `;
+    requestAnimationFrame(() => {
+      const cd = getChartData(chartView);
+      if (cd.labels.length) drawBar('reading-chart', cd.labels, cd.datasets);
+    });
   }
-  window.addReading=()=>{
-    const book=document.getElementById('rl-book')?.value?.trim();
+
+  window.setReadChart = (v) => { chartView=v; render(); };
+  window.addReading = () => {
     const mins=parseInt(document.getElementById('rl-min')?.value)||0;
     if(!mins){toast('Please enter duration');return;}
     if(!state.readingLog) state.readingLog=[];
-    state.readingLog.push({date:document.getElementById('rl-date').value,minutes:mins,book,lang:document.getElementById('rl-lang').value,response:document.getElementById('rl-resp').value,notes:document.getElementById('rl-notes').value});
-    saveState('readingLog');render();toast('📚 Reading logged!');
+    state.readingLog.push({date:document.getElementById('rl-date')?.value||today(),minutes:mins,book:document.getElementById('rl-book')?.value?.trim()||'',lang:document.getElementById('rl-lang')?.value||'',response:document.getElementById('rl-resp')?.value||'',notes:''});
+    saveState('readingLog'); render(); toast('📚 Reading logged!');
   };
-  window.delReading=(i)=>{state.readingLog.splice(i,1);saveState('readingLog');render();};
+  window.delReading = (i) => { state.readingLog.splice(i,1); saveState('readingLog'); render(); };
   render();
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
-// VACCINES — card layout
-// ══════════════════════════════════════════════════════════════════════════════
 PAGES['vaccines'] = function(el) {
   if(!state.customVaccines) state.customVaccines=[];
   function render() {
@@ -2993,93 +3343,250 @@ PAGES['vaccines'] = function(el) {
 // 100 FOODS
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['foods'] = function(el) {
-  let filterMode='all',searchQ='',selectedFood=null;
+  let filterMode='all', searchQ='', selectedFood=null;
   const expandedGroups={};
   Object.keys(GROUP_META).forEach(g=>expandedGroups[g]=true);
 
-  function render() {
-    const foodsDone=FOODS_ALL.filter((_,i)=>state.foods[i]?.tried).length;
-    const allergensDone=FOODS_ALL.filter((f,i)=>f[5]&&state.foods[i]?.tried).length;
-    const allergensTotal=FOODS_ALL.filter(f=>f[5]).length;
-    const concerns=FOODS_ALL.filter((f,i)=>state.foods[i]?.tried&&!['None','Loved it','Liked it','Neutral',''].includes(state.foods[i]?.reaction||'None')).length;
-    const filtered=FOODS_ALL.filter((f,i)=>{
-      const q=searchQ.toLowerCase();
-      if(q&&!f[1].toLowerCase().includes(q)&&!f[2].toLowerCase().includes(q))return false;
-      if(filterMode==='tried')return state.foods[i]?.tried;
-      if(filterMode==='untried')return !state.foods[i]?.tried;
-      if(filterMode==='allergen')return f[5];
-      if(filterMode==='concern')return state.foods[i]?.tried&&!['None','Loved it','Liked it','Neutral',''].includes(state.foods[i]?.reaction||'None');
-      return true;
-    });
-    const byGroup={};
-    filtered.forEach(f=>{if(!byGroup[f[2]])byGroup[f[2]]=[];byGroup[f[2]].push(f);});
-    let html=`
-      <div class="page-header"><h2>🥣 100 Foods Before 1 Year</h2><p>Indonesia-optimised · ${foodsDone}/100 tried</p></div>
-      <div class="grid-4" style="margin-bottom:12px">
-        <div class="stat-card" style="background:#1B3A6B"><div class="val">${foodsDone}</div><div class="lbl">Tried</div></div>
-        <div class="stat-card" style="background:#2D8F8F"><div class="val">${100-foodsDone}</div><div class="lbl">Remaining</div></div>
+  // ── STATIC SHELL — rendered once, never wiped ──────────────────────────────
+  el.innerHTML = `
+    <div class="page-header"><h2>🥣 100 Foods Before 1 Year</h2><p id="foods-subhead">Indonesia-optimised</p></div>
+    <div id="foods-stats" style="margin-bottom:12px"></div>
+    <div id="foods-progress-card" class="card" style="padding:10px 14px;margin-bottom:12px"></div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center" id="foods-filter-row">
+      <button class="tab-btn active" data-filter="all" onclick="setFoodFilter('all')">All</button>
+      <button class="tab-btn" data-filter="tried" onclick="setFoodFilter('tried')">Tried ✓</button>
+      <button class="tab-btn" data-filter="untried" onclick="setFoodFilter('untried')">Not tried</button>
+      <button class="tab-btn" data-filter="allergen" onclick="setFoodFilter('allergen')">Allergens</button>
+      <button class="tab-btn" data-filter="concern" onclick="setFoodFilter('concern')">Concerns</button>
+      <input type="text" id="foods-search" placeholder="Search foods..."
+        style="flex:1;min-width:110px;max-width:180px;padding:6px 10px;font-size:12px"
+        oninput="foodSearch(this.value)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <div id="foods-detail"></div>
+    <div id="foods-list"></div>
+  `;
+
+  // ── RENDER STATS (non-destructive updates) ──────────────────────────────────
+  function renderStats() {
+    const done = FOODS_ALL.filter((_,i)=>state.foods[i]?.tried).length;
+    const allergensDone = FOODS_ALL.filter((f,i)=>f[5]&&state.foods[i]?.tried).length;
+    const allergensTotal = FOODS_ALL.filter(f=>f[5]).length;
+    const concerns = FOODS_ALL.filter((f,i)=>state.foods[i]?.tried&&!['None','Loved it','Liked it','Neutral',''].includes(state.foods[i]?.reaction||'None')).length;
+
+    const statsEl = document.getElementById('foods-stats');
+    const subEl = document.getElementById('foods-subhead');
+    if (subEl) subEl.textContent = 'Indonesia-optimised · '+done+'/100 tried';
+    if (statsEl) statsEl.innerHTML = `
+      <div class="grid-4">
+        <div class="stat-card" style="background:#1B3A6B"><div class="val">${done}</div><div class="lbl">Tried</div></div>
+        <div class="stat-card" style="background:#2D8F8F"><div class="val">${100-done}</div><div class="lbl">Remaining</div></div>
         <div class="stat-card" style="background:#C0392B"><div class="val">${allergensDone}/${allergensTotal}</div><div class="lbl">Allergens</div></div>
         <div class="stat-card" style="background:#854F0B"><div class="val">${concerns}</div><div class="lbl">Watch</div></div>
-      </div>
-      <div class="card" style="padding:10px 14px;margin-bottom:12px">
-        ${pctBar(foodsDone,'#2D8F8F',8)}
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px">
-          ${Object.keys(GROUP_META).map(g=>{const t=FOODS_ALL.filter(f=>f[2]===g).length;const d=FOODS_ALL.filter((f,i)=>f[2]===g&&state.foods[i]?.tried).length;const{color}=GROUP_META[g];return`<div style="cursor:pointer;padding:4px 6px;border-radius:6px;border:1.5px solid ${filterMode===g?color:'#eee'}" onclick="setFoodFilter('${g}')"><div style="font-size:9px;font-weight:600;color:${color}">${g.split(' ')[0]==='Protein'?'Protein':g}</div><div style="font-size:10px;color:#888">${d}/${t}</div>${pctBar(t?d/t*100:0,color,3)}</div>`;}).join('')}
-        </div>
-      </div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
-        ${[['all','All'],['tried','Tried'],['untried','Not tried'],['allergen','Allergens'],['concern','Concerns']].map(([v,l])=>`<button class="tab-btn ${filterMode===v?'active':''}" onclick="setFoodFilter('${v}')">${l}</button>`).join('')}
-        <input type="text" placeholder="Search..." value="${searchQ}" oninput="foodSearch(this.value)" style="flex:1;min-width:100px;max-width:160px;padding:6px 10px;font-size:12px">
-      </div>
-    `;
-    if(selectedFood!==null){
-      const f=FOODS_ALL[selectedFood];const s=state.foods[selectedFood]||{};
-      const gm=GROUP_META[f[2]]||{color:'#888',bg:'#eee'};const am=AGE_META[f[3]]||{};
-      html+=`<div class="card" style="margin-bottom:12px;border-left:4px solid ${gm.color}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-          <div>
-            <div style="font-size:16px;font-weight:700">${f[0]}. ${f[1]}</div>
-            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
-              <span class="badge" style="background:${gm.bg};color:${gm.color}">${f[2]}</span>
-              <span class="badge" style="background:${am.bg||'#f0f0f0'};color:${am.color||'#888'}">${f[3]}</span>
-              ${f[5]?'<span class="badge" style="background:#FCEBEB;color:#C0392B">⚠ Allergen</span>':''}
-            </div>
-          </div>
-          <button onclick="selectedFood=null;renderFoods()" style="background:none;border:none;font-size:18px;color:#aaa;cursor:pointer">✕</button>
-        </div>
-        <div class="detail-panel" style="margin-bottom:10px"><div class="dp-title">How to prepare (Indonesian kitchen)</div>${f[6]}</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:${s.tried?'10px':'0'}">
-          <button class="btn ${s.tried?'btn-green':'btn-teal'} btn-sm" onclick="toggleFood(${selectedFood})">${s.tried?'✓ Tried':'Mark as tried'}</button>
-          ${s.tried?`<input type="text" placeholder="Age tried (e.g. 7 months)" value="${s.ageTried||''}" oninput="setFoodAge(${selectedFood},this.value)" style="flex:1;min-width:130px;font-size:13px">`:''}
-        </div>
-        ${s.tried?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">${['None','Loved it','Liked it','Neutral','Refused','Mild rash','Hives','Vomiting','Diarrhea','Watch again'].map(r=>`<button onclick="setFoodReaction(${selectedFood},'${r}')" style="padding:5px 9px;border-radius:10px;border:1.5px solid ${(s.reaction||'None')===r?gm.color:'#ddd'};background:${(s.reaction||'None')===r?gm.bg:'#fff'};color:${(s.reaction||'None')===r?gm.color:'#555'};font-size:11px;cursor:pointer;font-family:var(--font)">${r}</button>`).join('')}</div><textarea placeholder="Notes..." rows="2" oninput="setFoodNotes(${selectedFood},this.value)" style="width:100%;resize:none;font-size:13px;padding:8px;border:1.5px solid #ddd;border-radius:8px;font-family:var(--font)">${s.notes||''}</textarea>`:''}
       </div>`;
+
+    const progEl = document.getElementById('foods-progress-card');
+    if (progEl) {
+      const done2 = FOODS_ALL.filter((_,i)=>state.foods[i]?.tried).length;
+      progEl.innerHTML = pctBar(done2, '#2D8F8F', 8) +
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px">' +
+        Object.keys(GROUP_META).map(g => {
+          const t = FOODS_ALL.filter(f=>f[2]===g).length;
+          const d = FOODS_ALL.filter((f,i)=>f[2]===g&&state.foods[i]?.tried).length;
+          const {color} = GROUP_META[g];
+          const isActive = filterMode === g;
+          return `<div style="cursor:pointer;padding:4px 6px;border-radius:6px;border:1.5px solid ${isActive?color:'#eee'};background:${isActive?color+'18':'transparent'}" onclick="setFoodFilter('${g}')">
+            <div style="font-size:9px;font-weight:700;color:${color}">${g.includes('Protein')?'Protein':g}</div>
+            <div style="font-size:10px;color:#888">${d}/${t}</div>
+            ${pctBar(t?d/t*100:0, color, 3)}
+          </div>`;
+        }).join('') + '</div>';
     }
-    Object.keys(GROUP_META).forEach(g=>{
-      const gFoods=byGroup[g]; if(!gFoods||!gFoods.length)return;
-      const{color}=GROUP_META[g];const total=FOODS_ALL.filter(f=>f[2]===g).length;const done=FOODS_ALL.filter((f,i)=>f[2]===g&&state.foods[i]?.tried).length;const exp=expandedGroups[g]!==false;
-      html+=`<div style="margin-bottom:8px"><div onclick="expandedGroups['${g}']=!exp;renderFoods()" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:${color};border-radius:8px;cursor:pointer;margin-bottom:${exp?'6px':'0'}"><span style="font-size:13px;font-weight:600;color:#fff;flex:1">${g}</span><span style="font-size:11px;color:rgba(255,255,255,.8)">${done}/${total}</span><div style="width:50px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;overflow:hidden"><div style="height:4px;width:${total?Math.round(done/total*100):0}%;background:rgba(255,255,255,.85)"></div></div><span style="color:rgba(255,255,255,.7)">${exp?'▾':'▸'}</span></div>`;
-      if(exp){html+=`<div class="food-grid">`;gFoods.forEach(f=>{const i=f[0]-1;const s=state.foods[i]||{};const am=AGE_META[f[3]]||{};const hC=s.tried&&!['None','Loved it','Liked it','Neutral',''].includes(s.reaction||'None');html+=`<div class="food-card ${s.tried?'tried':''} ${hC?'concern':''}" onclick="selectFood(${i})" style="border-color:${selectedFood===i?color:''}"><span style="position:absolute;top:5px;right:7px;font-size:9px;color:#bbb">${f[0]}</span><div style="font-size:12px;font-weight:700;color:#222;margin-bottom:3px;padding-right:18px;line-height:1.3">${f[1]}</div><span style="font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:${am.bg||'#f0f0f0'};color:${am.color||'#888'}">${f[3]}</span>${f[5]?'<span class="badge" style="background:#FCEBEB;color:#C0392B;font-size:9px;margin-left:2px">allergen</span>':''}${s.tried?`<div style="font-size:10px;font-weight:600;color:${hC?'#854F0B':'#0F6E56'};margin-top:3px">${s.reaction&&s.reaction!=='None'?s.reaction:'✓'}${s.ageTried?' · '+s.ageTried:''}</div>`:''}</div>`;});html+=`</div>`;}
-      html+=`</div>`;
-    });
-    const cont=document.getElementById('foods-content');
-    if(cont)cont.innerHTML=html;
-    else el.innerHTML=`<div id="foods-content">${html}</div>`;
   }
-  window.setFoodFilter=(f)=>{filterMode=f;selectedFood=null;render();};
-  window.foodSearch=(q)=>{searchQ=q;render();};
-  window.selectFood=(i)=>{selectedFood=selectedFood===i?null:i;render();};
-  window.toggleFood=(i)=>{if(!state.foods[i])state.foods[i]={};state.foods[i].tried=!state.foods[i].tried;if(!state.foods[i].tried)state.foods[i].reaction='None';saveState('foods');render();};
-  window.setFoodReaction=(i,r)=>{if(!state.foods[i])state.foods[i]={};state.foods[i].reaction=r;saveState('foods');render();};
-  window.setFoodAge=(i,v)=>{if(!state.foods[i])state.foods[i]={};state.foods[i].ageTried=v;saveState('foods');};
-  window.setFoodNotes=(i,v)=>{if(!state.foods[i])state.foods[i]={};state.foods[i].notes=v;saveState('foods');};
-  window.renderFoods=render;
-  el.innerHTML=`<div id="foods-content"></div>`;render();
+
+  // ── RENDER DETAIL PANEL ────────────────────────────────────────────────────
+  function renderDetail() {
+    const detailEl = document.getElementById('foods-detail');
+    if (!detailEl) return;
+    if (selectedFood === null) { detailEl.innerHTML = ''; return; }
+    const f = FOODS_ALL[selectedFood];
+    const s = state.foods[selectedFood] || {};
+    const gm = GROUP_META[f[2]] || {color:'#888', bg:'#eee'};
+    const am = AGE_META[f[3]] || {};
+    detailEl.innerHTML = `<div class="card" style="margin-bottom:12px;border-left:4px solid ${gm.color}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#1a1a1a">${f[0]}. ${f[1]}</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px">
+            <span class="badge" style="background:${gm.bg};color:${gm.color}">${f[2]}</span>
+            <span class="badge" style="background:${am.bg||'#f0f0f0'};color:${am.color||'#888'}">${f[3]}</span>
+            ${f[5]?'<span class="badge" style="background:#FCEBEB;color:#C0392B">⚠ Top allergen</span>':''}
+          </div>
+        </div>
+        <button onclick="closeDetail()" style="background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;padding:0;line-height:1;flex-shrink:0">✕</button>
+      </div>
+      <div class="detail-panel" style="margin-bottom:12px">
+        <div class="dp-title">How to prepare (Indonesian kitchen)</div>
+        ${f[6]}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:${s.tried?'10px':'0'}">
+        <button class="btn ${s.tried?'btn-green':'btn-teal'} btn-sm" onclick="toggleFood(${selectedFood})">${s.tried?'✓ Tried':'Mark as tried'}</button>
+        ${s.tried?`<input type="text" placeholder="Age tried (e.g. 7 months)" value="${s.ageTried||''}" oninput="setFoodAge(${selectedFood},this.value)" style="flex:1;min-width:130px;font-size:13px;padding:8px 10px">`:``}
+      </div>
+      ${s.tried?`
+        <div style="font-size:11px;font-weight:600;color:#777;margin:10px 0 6px">Baby's reaction</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
+          ${['None','Loved it','Liked it','Neutral','Refused','Mild rash','Hives','Vomiting','Diarrhea','Watch again'].map(r=>
+            `<button onclick="setFoodReaction(${selectedFood},'${r}')" style="padding:4px 10px;border-radius:12px;border:1.5px solid ${(s.reaction||'None')===r?gm.color:'#ddd'};background:${(s.reaction||'None')===r?gm.bg:'#fff'};color:${(s.reaction||'None')===r?gm.color:'#555'};font-size:11px;cursor:pointer;font-family:var(--font)">${r}</button>`
+          ).join('')}
+        </div>
+        <textarea placeholder="Notes — taste, texture, baby's response..." rows="2" oninput="setFoodNotes(${selectedFood},this.value)"
+          style="width:100%;resize:none;font-size:12px;padding:8px;border:1.5px solid #ddd;border-radius:8px;font-family:var(--font)">${s.notes||''}</textarea>
+      `:''}
+    </div>`;
+  }
+
+  // ── RENDER FOOD LIST ────────────────────────────────────────────────────────
+  function renderList() {
+    const listEl = document.getElementById('foods-list');
+    if (!listEl) return;
+    const q = searchQ.toLowerCase();
+    const filtered = FOODS_ALL.filter((f,i) => {
+      if (q && !f[1].toLowerCase().includes(q) && !f[2].toLowerCase().includes(q)) return false;
+      if (filterMode === 'tried') return state.foods[i]?.tried;
+      if (filterMode === 'untried') return !state.foods[i]?.tried;
+      if (filterMode === 'allergen') return f[5];
+      if (filterMode === 'concern') return state.foods[i]?.tried && !['None','Loved it','Liked it','Neutral',''].includes(state.foods[i]?.reaction||'None');
+      // Group filter
+      const groups = Object.keys(GROUP_META);
+      if (groups.includes(filterMode)) return f[2] === filterMode;
+      return true;
+    });
+
+    const byGroup = {};
+    filtered.forEach(f => { if (!byGroup[f[2]]) byGroup[f[2]]=[];  byGroup[f[2]].push(f); });
+
+    let html = '';
+    if (filtered.length === 0) {
+      html = '<div class="empty-state" style="padding:32px 0">No foods match your search</div>';
+    }
+    Object.keys(GROUP_META).forEach(g => {
+      const gFoods = byGroup[g];
+      if (!gFoods || !gFoods.length) return;
+      const {color, bg} = GROUP_META[g];
+      const total = FOODS_ALL.filter(f=>f[2]===g).length;
+      const done = FOODS_ALL.filter((f,i)=>f[2]===g&&state.foods[i]?.tried).length;
+      const exp = expandedGroups[g] !== false;
+      html += `<div style="margin-bottom:8px">
+        <div onclick="toggleFoodGroup('${g}')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:${color};border-radius:8px;cursor:pointer;user-select:none;margin-bottom:${exp?'5px':'0'}">
+          <span style="font-size:13px;font-weight:600;color:#fff;flex:1">${g}</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.8)">${done}/${total}</span>
+          <div style="width:44px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;overflow:hidden"><div style="height:4px;width:${total?Math.round(done/total*100):0}%;background:rgba(255,255,255,.85)"></div></div>
+          <span style="color:rgba(255,255,255,.7)">${exp?'▾':'▸'}</span>
+        </div>
+        ${exp ? `<div class="food-grid">
+          ${gFoods.map(f => {
+            const i = f[0]-1;
+            const s = state.foods[i]||{};
+            const am = AGE_META[f[3]]||{};
+            const hasConcern = s.tried && !['None','Loved it','Liked it','Neutral',''].includes(s.reaction||'None');
+            const isSelected = selectedFood === i;
+            return `<div class="food-card ${s.tried?'tried':''} ${hasConcern?'concern':''}" onclick="selectFood(${i})"
+              style="${isSelected?'border-color:'+color+';border-width:2px;':''}" >
+              <span style="position:absolute;top:5px;right:8px;font-size:9px;color:#bbb">${f[0]}</span>
+              <div style="font-size:12px;font-weight:700;color:#222;margin-bottom:4px;padding-right:18px;line-height:1.3">${f[1]}</div>
+              <div><span class="fage" style="background:${am.bg||'#f0f0f0'};color:${am.color||'#888'}">${f[3]}</span>${f[5]?` <span class="badge" style="background:#FCEBEB;color:#C0392B;font-size:9px">allergen</span>`:''}</div>
+              ${s.tried?`<div style="font-size:10px;font-weight:600;color:${hasConcern?'#854F0B':'#0F6E56'};margin-top:4px">${s.reaction&&s.reaction!=='None'?s.reaction:'✓ Tried'}${s.ageTried?' · '+s.ageTried:''}</div>`:''}
+            </div>`;
+          }).join('')}
+        </div>` : ''}
+      </div>`;
+    });
+    listEl.innerHTML = html;
+  }
+
+  // ── FILTER TAB ACTIVE STATE ─────────────────────────────────────────────────
+  function updateFilterTabs() {
+    document.querySelectorAll('#foods-filter-row .tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === filterMode);
+    });
+    // search input: keep focus
+    const si = document.getElementById('foods-search');
+    if (si && si.value !== searchQ) si.value = searchQ;
+  }
+
+  // ── MAIN RENDER — never destroys the search input ──────────────────────────
+  function render() {
+    renderStats();
+    renderDetail();
+    renderList();
+    updateFilterTabs();
+  }
+
+  // ── EXPOSED FUNCTIONS ───────────────────────────────────────────────────────
+  window.setFoodFilter = (f) => {
+    filterMode = f;
+    selectedFood = null;
+    // If filtering to a group, auto-expand that group
+    if (Object.keys(GROUP_META).includes(f)) {
+      Object.keys(expandedGroups).forEach(g => expandedGroups[g] = g === f);
+    } else {
+      Object.keys(expandedGroups).forEach(g => expandedGroups[g] = true);
+    }
+    renderStats(); renderDetail(); renderList(); updateFilterTabs();
+    // Scroll list into view
+    const listEl = document.getElementById('foods-list');
+    if (listEl) listEl.scrollIntoView({behavior:'smooth', block:'start'});
+  };
+  window.foodSearch = (q) => {
+    searchQ = q;
+    filterMode = q ? 'all' : filterMode;
+    Object.keys(expandedGroups).forEach(g => expandedGroups[g] = true);
+    renderList(); // ONLY re-render list, NOT the search input or shell
+    updateFilterTabs();
+    // Restore focus to search input
+    const si = document.getElementById('foods-search');
+    if (si && document.activeElement !== si) si.focus();
+  };
+  window.closeDetail = () => { selectedFood = null; renderDetail(); renderList(); };
+  window.selectFood = (i) => {
+    selectedFood = selectedFood === i ? null : i;
+    renderDetail(); renderList();
+    // Scroll detail into view
+    if (selectedFood !== null) {
+      const d = document.getElementById('foods-detail');
+      if (d) d.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  };
+  window.toggleFoodGroup = (g) => {
+    expandedGroups[g] = !expandedGroups[g];
+    renderList();
+  };
+  window.toggleFood = (i) => {
+    if (!state.foods[i]) state.foods[i]={};
+    state.foods[i].tried = !state.foods[i].tried;
+    if (!state.foods[i].tried) state.foods[i].reaction = 'None';
+    saveState('foods'); renderStats(); renderDetail(); renderList();
+  };
+  window.setFoodReaction = (i, r) => {
+    if (!state.foods[i]) state.foods[i]={};
+    state.foods[i].reaction = r;
+    saveState('foods'); renderDetail(); renderList();
+  };
+  window.setFoodAge = (i, v) => {
+    if (!state.foods[i]) state.foods[i]={};
+    state.foods[i].ageTried = v;
+    saveState('foods');
+  };
+  window.setFoodNotes = (i, v) => {
+    if (!state.foods[i]) state.foods[i]={};
+    state.foods[i].notes = v;
+    saveState('foods');
+  };
+  window.renderFoods = render;
+
+  render();
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
-// BUDGET
-// ══════════════════════════════════════════════════════════════════════════════
 PAGES['budget'] = function(el) {
   if(!state.budgetItems) state.budgetItems=[];
   function render() {
@@ -3128,63 +3635,9 @@ PAGES['budget'] = function(el) {
 // ══════════════════════════════════════════════════════════════════════════════
 // CHART HELPERS (vanilla canvas — no library needed)
 // ══════════════════════════════════════════════════════════════════════════════
-function drawBarChart(ctx, w, h, labels, data, color, yLabel) {
-  const pad={t:10,r:10,b:28,l:30};
-  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
-  const maxVal=Math.max(...data,1);
-  const barW=Math.max(4,(cw/data.length)*0.6);
-  const gap=(cw/data.length)*(1-0.6)/2;
-  ctx.fillStyle='#f5f5f5';
-  ctx.beginPath();ctx.roundRect(0,0,w,h,8);ctx.fill();
-  // Grid lines
-  ctx.strokeStyle='#e0e0e0';ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){
-    const y=pad.t+ch*(1-i/4);
-    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
-    ctx.fillStyle='#aaa';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='right';
-    ctx.fillText(Math.round(maxVal*i/4),pad.l-3,y+3);
-  }
-  // Bars
-  data.forEach((val,i)=>{
-    const x=pad.l+i*(cw/data.length)+gap;
-    const barH=(val/maxVal)*ch;
-    const y=pad.t+ch-barH;
-    ctx.fillStyle=color+'cc';
-    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(x,y,barW,barH,3);ctx.fill();}
-    else{ctx.fillRect(x,y,barW,barH);}
-    // Label
-    ctx.fillStyle='#888';ctx.font='8px -apple-system,sans-serif';ctx.textAlign='center';
-    const lbl=(labels[i]||'').split(':')[0];
-    ctx.fillText(lbl,x+barW/2,h-pad.b+11);
-    // Value on bar
-    if(val>0){ctx.fillStyle='#555';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';ctx.fillText(Math.round(val*10)/10,x+barW/2,y-3);}
-  });
-}
+// drawBarChart replaced by drawBar above
 
-function drawGroupedBarChart(ctx,w,h,labels,data1,data2,color1,color2,label1,label2){
-  const pad={t:20,r:10,b:28,l:30};
-  const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
-  const maxVal=Math.max(...data1,...data2,1);
-  const groupW=cw/labels.length;const barW=groupW*0.35;
-  ctx.fillStyle='#f5f5f5';ctx.beginPath();ctx.roundRect(0,0,w,h,8);ctx.fill();
-  // Legend
-  ctx.fillStyle=color1;ctx.fillRect(pad.l,4,10,8);ctx.fillStyle='#555';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='left';ctx.fillText(label1,pad.l+13,11);
-  ctx.fillStyle=color2;ctx.fillRect(pad.l+45,4,10,8);ctx.fillStyle='#555';ctx.fillText(label2,pad.l+58,11);
-  // Grid
-  ctx.strokeStyle='#e0e0e0';ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){const y=pad.t+ch*(1-i/4);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.fillStyle='#aaa';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='right';ctx.fillText(Math.round(maxVal*i/4),pad.l-3,y+3);}
-  // Bars
-  labels.forEach((_,i)=>{
-    const x0=pad.l+i*groupW+groupW*0.1;
-    [data1,data2].forEach((data,di)=>{
-      const val=data[i];const barH=(val/maxVal)*ch;const y=pad.t+ch-barH;
-      ctx.fillStyle=(di===0?color1:color2)+'cc';const x=x0+di*(barW+2);
-      if(ctx.roundRect){ctx.beginPath();ctx.roundRect(x,y,barW,barH,3);ctx.fill();}else{ctx.fillRect(x,y,barW,barH);}
-    });
-    ctx.fillStyle='#888';ctx.font='8px -apple-system,sans-serif';ctx.textAlign='center';
-    ctx.fillText(labels[i],x0+barW,h-pad.b+11);
-  });
-}
+// drawGroupedBarChart replaced by drawBar above
 
 // ══════════════════════════════════════════════════════════════════════════════
 // UTILITY
@@ -3193,6 +3646,133 @@ function toggleEl(id) {
   const el=document.getElementById(id); if(!el) return;
   const open=el.style.display==='none'||!el.style.display;
   el.style.display=open?'block':'none';
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// GOOGLE SHEETS EXPORT
+// ══════════════════════════════════════════════════════════════════════════════
+function escCSV(v) {
+  if (v===null||v===undefined) return '';
+  const s=String(v);
+  if (s.includes(',')||s.includes('"')||s.includes('\n')) return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+function rowCSV(arr){ return arr.map(escCSV).join(','+'\n'); }
+
+function exportToSheets() {
+  const now = new Date().toISOString().split('T')[0];
+  const sheets = {};
+
+  // Hospital Bag
+  let csv = rowCSV(['Category','Item','Qty','Priority','Section','Packed']);
+  (state.hospitalBagItems||[]).forEach(i => {
+    csv += rowCSV([i.cat,i.item,i.qty,i.pri,i.section,i.packed?'Yes':'No']);
+  });
+  sheets['Hospital Bag'] = csv;
+
+  // C-Section Tasks
+  csv = rowCSV(['Phase','Task','Owner','Target','Done']);
+  (state.csectionTasks||[]).forEach(t => csv += rowCSV([t.phase,t.task,t.owner,t.target,t.done?'Yes':'No']));
+  sheets['C-Section'] = csv;
+
+  // Pregnancy Tasks
+  csv = rowCSV(['Week','Category','Task','Priority','Done']);
+  (state.pregTasks||[]).forEach(t => csv += rowCSV([t.week,t.cat,t.task,t.pri,t.done?'Yes':'No']));
+  sheets['Preg Tasks'] = csv;
+
+  // Inventory
+  csv = rowCSV(['Category','Item','Qty','Priority','Purchased','Cost (Rp)']);
+  (state.inventoryItems||[]).forEach(i => csv += rowCSV([i.cat,i.item,i.qty,i.pri,i.purchased?'Yes':'No',i.cost||0]));
+  sheets['Inventory'] = csv;
+
+  // Feeding Log
+  csv = rowCSV(['Date','Time','Baby','Left (min)','Right (min)','Formula (ml)','Pumped (ml)','Notes']);
+  (state.feedingLog||[]).forEach(l => csv += rowCSV([l.date,l.time||'',isMultiples()?babyLabel(l.babyIdx||0):'',l.leftMin||0,l.rightMin||0,l.formulaMl||0,l.pumpedMl||0,l.notes||'']));
+  sheets['Feeding Log'] = csv;
+
+  // Sleep Log
+  csv = rowCSV(['Date','Baby','Start','End','Duration (hrs)','Type','Quality','Notes']);
+  (state.sleepLog||[]).forEach(l => {
+    const dur = l.start&&l.end ? Math.max(0,(new Date(l.date+'T'+l.end)-new Date(l.date+'T'+l.start))/3600000).toFixed(2) : '';
+    csv += rowCSV([l.date,isMultiples()?babyLabel(l.babyIdx||0):'',l.start||'',l.end||'',dur,l.type||'',l.quality||'',l.notes||'']);
+  });
+  sheets['Sleep Log'] = csv;
+
+  // Diaper Log
+  csv = rowCSV(['Date','Time','Baby','Wet','Dirty','Colour','Notes']);
+  (state.diaperLog||[]).forEach(l => csv += rowCSV([l.date,l.time||'',isMultiples()?babyLabel(l.babyIdx||0):'',l.wet?'Yes':'No',l.dirty?'Yes':'No',l.color||'',l.notes||'']));
+  sheets['Diaper Log'] = csv;
+
+  // Reading Log
+  csv = rowCSV(['Date','Book','Duration (min)','Language','Response','Notes']);
+  (state.readingLog||[]).forEach(l => csv += rowCSV([l.date,l.book||'',l.minutes||0,l.lang||'',l.response||'',l.notes||'']));
+  sheets['Reading Log'] = csv;
+
+  // 100 Foods
+  csv = rowCSV(['#','Food','Group','Rec Age','Allergen','Tried','Age Tried','Reaction','Notes']);
+  FOODS_ALL.forEach((f,i) => {
+    const s=state.foods[i]||{};
+    csv += rowCSV([f[0],f[1],f[2],f[3],f[5]?'Yes':'No',s.tried?'Yes':'No',s.ageTried||'',s.reaction||'',s.notes||'']);
+  });
+  sheets['100 Foods'] = csv;
+
+  // Vaccines
+  csv = rowCSV(['Vaccine','Rec Age','Due Date','Given','Date Given']);
+  const allVax=[...VACCINES,...(state.customVaccines||[])];
+  allVax.forEach((v,i) => {
+    const s=state.vaccines[i]||{};
+    const due = v.daysFromBirth!=null&&state.babyDOB ? formatDate(new Date(new Date(state.babyDOB+'T00:00:00').getTime()+v.daysFromBirth*86400000)) : v.dueDate||'';
+    csv += rowCSV([v.name,v.age,due,s.given?'Yes':'No',s.date||'']);
+  });
+  sheets['Vaccines'] = csv;
+
+  // Milestones
+  csv = rowCSV(['Age','Domain','Milestone','Achieved','Date Achieved','Red Flag']);
+  MILESTONES.forEach((m,i) => {
+    const s=state.milestones[i]||{};
+    csv += rowCSV([m[0],m[3],m[2],s.achieved?'Yes':'No',s.date||'',m[5]?'Yes':'No']);
+  });
+  sheets['Milestones'] = csv;
+
+  // Budget
+  csv = rowCSV(['Item','Category','Amount (Rp)','Date']);
+  (state.budgetItems||[]).forEach(b => csv += rowCSV([b.name,b.cat,b.actual||0,b.date||'']));
+  sheets['Budget'] = csv;
+
+  // Build HTML exporter
+  const names = Object.keys(sheets);
+  const csvData = names.map(n => JSON.stringify(sheets[n].replace(/\/n/g,'\n')));
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Baby OS Export '+now+'</title>'+
+    '<style>body{font-family:-apple-system,sans-serif;padding:20px;background:#f5f5f5}'+
+    '.card{background:#fff;border-radius:12px;padding:20px;max-width:900px;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,.1)}'+
+    'h1{color:#1B3A6B;margin-bottom:4px}p{color:#666;font-size:13px;margin-bottom:16px}'+
+    '.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}'+
+    '.tab{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;background:#eee}'+
+    '.tab.active{background:#1B3A6B;color:#fff}'+
+    '.actions{display:flex;gap:8px;margin-bottom:8px}'+
+    '.btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600}'+
+    'textarea{width:100%;height:280px;font-family:monospace;font-size:11px;border:1px solid #ddd;border-radius:6px;padding:8px}</style></head>'+
+    '<body><div class="card"><h1>🍼 Baby OS Export — '+now+'</h1>'+
+    '<p>'+names.length+' sheets · Use "Download CSV" or paste into Google Sheets</p>'+
+    '<div class="tabs">'+names.map((n,i)=>'<button class="tab '+(i===0?'active':'')+'" onclick="show('+i+')">'+n+'</button>').join('')+'</div>'+
+    names.map((n,i)=>'<div id="p'+i+'" style="display:'+(i===0?'block':'none')+'">'+
+      '<div class="actions">'+
+      '<button class="btn" style="background:#2D8F8F;color:#fff" onclick="copy('+i+')">Copy CSV</button>'+
+    '<button class="btn" style="background:#0F6E56;color:#fff" onclick="dl('+JSON.stringify(n)+','+i+')">Download CSV</button></div>'+
+      '<textarea id="t'+i+'" readonly></textarea></div>').join('')+
+    '</div><script>const D=['+csvData.join(',')+']; D.forEach((d,i)=>{const t=document.getElementById("t"+i);if(t)t.value=d;});'+
+    'function show(i){document.querySelectorAll("[id^=\"p\"]").forEach((e,j)=>e.style.display=j===i?"block":"none");'+
+    'document.querySelectorAll(".tab").forEach((t,j)=>t.classList.toggle("active",j===i));}'+
+    'function copy(i){navigator.clipboard.writeText(D[i]).then(()=>alert("Copied! Paste into Google Sheets cell A1")).catch(()=>{const t=document.getElementById("t"+i);t.select();document.execCommand("copy");alert("Copied!");});}'+
+    'function dl(n,i){const b=new Blob([D[i]],{type:"text/csv"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="BabyOS_"+n.replace(/[^a-z0-9]/gi,"_")+"_'+now+'.csv";a.click();URL.revokeObjectURL(u);}'+
+    '<\/script></body></html>';
+
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'BabyOS_Export_'+now+'.html'; a.click();
+  URL.revokeObjectURL(url);
+  toast('📊 Export ready! Open the downloaded file.');
 }
 
 // Baby selector widget — returns HTML string for n-baby tab selector
@@ -4128,21 +4708,24 @@ PAGES['signs'] = function(el) {
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:80px">
         ${BABY_SIGNS.map((s,i) => {
           const isLearned = state.signs[i]?.learned;
-          const visual = SIGN_VISUALS[s[0]] || '';
+          const visual = SIGN_VISUALS[s.sign] || SIGN_VISUALS[s.eng] || '';
           return `<div class="card" style="padding:12px;border:2px solid ${isLearned?'#9FE1CB':'#eee'};background:${isLearned?'#F0FFF8':'#fff'}">
             <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
               <div style="flex:1">
-                <div style="font-size:14px;font-weight:700;color:#222">${s[0]}</div>
-                <div style="font-size:11px;color:#2D8F8F;font-weight:600;margin-top:1px">${s[1]}</div>
-                <div style="font-size:10px;color:#888;font-style:italic;margin-top:1px">${s[2]}</div>
+                <div style="font-size:13px;font-weight:700;color:#222">${s.sign}</div>
+                <div style="font-size:11px;color:#2D8F8F;font-weight:600;margin-top:1px">Introduce: ${s.age}</div>
               </div>
-              <button onclick="toggleSign(${i})" style="padding:5px 10px;border-radius:8px;border:1.5px solid ${isLearned?'#0F6E56':'#ddd'};background:${isLearned?'#E1F5EE':'#fff'};color:${isLearned?'#0F6E56':'#888'};font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap">
-                ${isLearned?'✓ Know it':'Mark learned'}
+              <button onclick="toggleSign(${i})" style="padding:5px 9px;border-radius:8px;border:1.5px solid ${isLearned?'#0F6E56':'#ddd'};background:${isLearned?'#E1F5EE':'#fff'};color:${isLearned?'#0F6E56':'#888'};font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">
+                ${isLearned?'✓ Learned':'Mark learned'}
               </button>
             </div>
-            ${visual ? `<div style="display:flex;justify-content:center;margin:8px 0 4px">${visual}</div>` : ''}
-            <div style="font-size:11px;color:#555;background:#f8f8f8;border-radius:6px;padding:7px 9px;line-height:1.5;margin-top:6px">${s[3]}</div>
-            ${s[4] ? `<div style="font-size:10px;color:#888;margin-top:5px;padding:5px 8px;background:#FFF9E6;border-radius:5px;line-height:1.4">💡 ${s[4]}</div>` : ''}
+            <div style="display:flex;gap:5px;margin-bottom:8px">
+              <span class="badge" style="background:#E1F5EE;color:#0F6E56">🇮🇩 ${s.indo}</span>
+              <span class="badge" style="background:#E6F1FB;color:#185FA5">🇬🇧 ${s.eng}</span>
+            </div>
+            ${visual ? '<div style="display:flex;justify-content:center;margin:6px 0">'+visual+'</div>' : ''}
+            <div style="font-size:11px;color:#555;background:#f8f8f8;border-radius:6px;padding:7px 9px;line-height:1.5"><b>How:</b> ${s.how}</div>
+            <div style="font-size:11px;color:#777;margin-top:6px;line-height:1.5"><b>Use when:</b> ${s.use}</div>
           </div>`;
         }).join('')}
       </div>
@@ -4675,7 +5258,7 @@ function resetNavSlots() {
 const _origShowPage = showPage;
 // showPage already defined below — patch after
 
-saveState();
+loadLocal();
 // Update sidebar subtitle
 // ── BABY IDENTITY HELPERS ──────────────────────────────────────────────────
 function babyName() { return state.babyName || null; }
@@ -4703,7 +5286,7 @@ navTo('dashboard');
 
 // Enhance signs page with visual SVG guides
 const SIGN_VISUALS = {
-  'Milk / Feed': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'MILK / SUSU': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#E6F5F5"/>
     <text x="40" y="30" text-anchor="middle" font-size="11" fill="#2D8F8F" font-weight="600">MILK</text>
     <!-- Fist squeezing motion -->
@@ -4714,7 +5297,7 @@ const SIGN_VISUALS = {
     <path d="M58 50 L53 50" stroke="#2D8F8F" stroke-width="2" stroke-linecap="round"/>
     <text x="40" y="74" text-anchor="middle" font-size="9" fill="#555">squeeze fist</text>
   </svg>`,
-  'More': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'MORE / LAGI': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#EEEDFE"/>
     <text x="40" y="14" text-anchor="middle" font-size="11" fill="#534AB7" font-weight="600">MORE</text>
     <!-- Two hands with fingertips touching -->
@@ -4724,7 +5307,7 @@ const SIGN_VISUALS = {
     <text x="40" y="68" text-anchor="middle" font-size="9" fill="#555">tap fingertips</text>
     <text x="40" y="78" text-anchor="middle" font-size="9" fill="#555">together</text>
   </svg>`,
-  'All done / Finished': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'ALL DONE / SELESAI': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#E1F5EE"/>
     <text x="40" y="14" text-anchor="middle" font-size="10" fill="#0F6E56" font-weight="600">ALL DONE</text>
     <!-- Two open hands turning outward -->
@@ -4735,7 +5318,7 @@ const SIGN_VISUALS = {
     <text x="40" y="70" text-anchor="middle" font-size="9" fill="#555">flip both hands</text>
     <text x="40" y="79" text-anchor="middle" font-size="9" fill="#555">palms down→up</text>
   </svg>`,
-  'Eat / Food': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'EAT / MAKAN': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#FAEEDA"/>
     <text x="40" y="14" text-anchor="middle" font-size="11" fill="#854F0B" font-weight="600">EAT</text>
     <!-- Hand moving to mouth -->
@@ -4745,7 +5328,7 @@ const SIGN_VISUALS = {
     <text x="40" y="72" text-anchor="middle" font-size="9" fill="#555">flat hand taps</text>
     <text x="40" y="80" text-anchor="middle" font-size="9" fill="#555">mouth</text>
   </svg>`,
-  'Water / Drink': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'WATER / AIR': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#E6F1FB"/>
     <text x="40" y="14" text-anchor="middle" font-size="10" fill="#185FA5" font-weight="600">WATER</text>
     <!-- W handshape at chin -->
@@ -4755,7 +5338,7 @@ const SIGN_VISUALS = {
     <path d="M48 54 L48 60" stroke="#185FA5" stroke-width="2" stroke-linecap="round"/>
     <text x="40" y="74" text-anchor="middle" font-size="9" fill="#555">W shape at chin</text>
   </svg>`,
-  'Sleep / Tired': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'SLEEP / TIDUR': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#E6EFF8"/>
     <text x="40" y="14" text-anchor="middle" font-size="11" fill="#1B3A6B" font-weight="600">SLEEP</text>
     <!-- Hand resting cheek on tilted head -->
@@ -4766,7 +5349,7 @@ const SIGN_VISUALS = {
     <text x="40" y="71" text-anchor="middle" font-size="9" fill="#555">cheek on hand</text>
     <text x="40" y="79" text-anchor="middle" font-size="9" fill="#555">eyes close</text>
   </svg>`,
-  'Mummy / Mama': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'MOM / MAMA': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#FCE8F4"/>
     <text x="40" y="14" text-anchor="middle" font-size="10" fill="#993556" font-weight="600">MAMA</text>
     <!-- Open hand tapping chin -->
@@ -4777,7 +5360,7 @@ const SIGN_VISUALS = {
     <text x="40" y="72" text-anchor="middle" font-size="9" fill="#555">open hand taps</text>
     <text x="40" y="80" text-anchor="middle" font-size="9" fill="#555">chin (M=chin)</text>
   </svg>`,
-  'Daddy / Papa': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'DAD / PAPA': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#EEF0FD"/>
     <text x="40" y="14" text-anchor="middle" font-size="10" fill="#534AB7" font-weight="600">PAPA</text>
     <!-- Open hand tapping forehead -->
@@ -4787,7 +5370,7 @@ const SIGN_VISUALS = {
     <text x="40" y="72" text-anchor="middle" font-size="9" fill="#555">open hand taps</text>
     <text x="40" y="80" text-anchor="middle" font-size="9" fill="#555">forehead (D=head)</text>
   </svg>`,
-  'Help': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'HELP / TOLONG': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#FEF9EC"/>
     <text x="40" y="14" text-anchor="middle" font-size="11" fill="#854F0B" font-weight="600">HELP</text>
     <!-- Fist on flat palm, lift together -->
@@ -4797,7 +5380,7 @@ const SIGN_VISUALS = {
     <path d="M34 64 L40 68 L46 64" stroke="#854F0B" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     <text x="40" y="78" text-anchor="middle" font-size="9" fill="#555">lift fist on palm↑</text>
   </svg>`,
-  'Please': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'PLEASE / TOLONG': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#F0FFF8"/>
     <text x="40" y="14" text-anchor="middle" font-size="11" fill="#0F6E56" font-weight="600">PLEASE</text>
     <!-- Flat hand circles on chest -->
@@ -4805,7 +5388,7 @@ const SIGN_VISUALS = {
     <path d="M40 45 Q55 50 40 60 Q25 70 40 75" stroke="#0F6E56" stroke-width="2" fill="none" stroke-linecap="round"/>
     <text x="40" y="78" text-anchor="middle" font-size="9" fill="#555">rub chest in circles</text>
   </svg>`,
-  'Thank you': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'THANK YOU / TERIMA KASIH': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#E1F5EE"/>
     <text x="40" y="12" text-anchor="middle" font-size="9" fill="#0F6E56" font-weight="600">THANK YOU</text>
     <!-- Flat hand from lips, forward -->
@@ -4816,7 +5399,7 @@ const SIGN_VISUALS = {
     <text x="40" y="68" text-anchor="middle" font-size="9" fill="#555">flat hand from</text>
     <text x="40" y="77" text-anchor="middle" font-size="9" fill="#555">lips, move forward</text>
   </svg>`,
-  'Hot': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'HOT / PANAS': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#FAECE7"/>
     <text x="40" y="14" text-anchor="middle" font-size="11" fill="#993C1D" font-weight="600">HOT</text>
     <text x="40" y="44" text-anchor="middle" font-size="26" fill="#FF6B35">🔥</text>
@@ -4824,7 +5407,7 @@ const SIGN_VISUALS = {
     <text x="40" y="72" text-anchor="middle" font-size="9" fill="#555">claw hand, pull</text>
     <text x="40" y="80" text-anchor="middle" font-size="9" fill="#555">away from mouth</text>
   </svg>`,
-  'Cold': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'COLD': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#E6F1FB"/>
     <text x="40" y="14" text-anchor="middle" font-size="11" fill="#185FA5" font-weight="600">COLD</text>
     <text x="40" y="44" text-anchor="middle" font-size="26" fill="#185FA5">❄️</text>
@@ -4832,7 +5415,7 @@ const SIGN_VISUALS = {
     <text x="40" y="68" text-anchor="middle" font-size="9" fill="#555">hunch shoulders,</text>
     <text x="40" y="77" text-anchor="middle" font-size="9" fill="#555">arms close, shiver</text>
   </svg>`,
-  'Pain / Hurt': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'HURT / SAKIT': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#FCEBEB"/>
     <text x="40" y="14" text-anchor="middle" font-size="11" fill="#C0392B" font-weight="600">HURT</text>
     <!-- Two index fingers touching -->
@@ -4843,7 +5426,7 @@ const SIGN_VISUALS = {
     <text x="40" y="71" text-anchor="middle" font-size="9" fill="#555">fingers, tap tips</text>
     <text x="40" y="79" text-anchor="middle" font-size="9" fill="#555">together twice</text>
   </svg>`,
-  'I love you': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
+  'BIRD / BURUNG': `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px">
     <rect width="80" height="80" rx="10" fill="#FCE4F0"/>
     <text x="40" y="12" text-anchor="middle" font-size="9" fill="#993556" font-weight="600">I LOVE YOU</text>
     <text x="40" y="52" text-anchor="middle" font-size="36">🤟</text>
