@@ -335,8 +335,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <div id="landing-step2" class="landing-card" style="display:none">
     <div class="landing-step">Step 1 of 2 — Your family</div>
     <div>
-      <label>Mum's name *</label>
-      <input type="text" id="l-mum" placeholder="e.g. Sarah">
+      <label>Mom's name *</label>
+      <input type="text" id="l-mom" placeholder="e.g. Sarah">
     </div>
     <div>
       <label>Dad's name *</label>
@@ -557,7 +557,7 @@ async function syncFromCloud() {
     }
     // Use remote state length as change indicator
     const remoteStr = JSON.stringify(remote);
-    const hash = remoteStr.length + '_' + (remote.mumName||'') + (remote.edd||'');
+    const hash = remoteStr.length + '_' + (remote.momName||'') + (remote.edd||'');
     if (hash === _lastSyncHash) { setSyncStatus('synced'); return; }
     _lastSyncHash = hash;
     // Remote wins — merge into local state
@@ -609,7 +609,7 @@ function setSyncStatus(status) {
 const LOCAL_KEY = 'babyos_v2';
 let state = {
   familyId: null, familyCode: null,
-  mumName: '', dadName: '',
+  momName: '', dadName: '',
   babyName: null, babyGender: null, babyDOB: null,
   edd: '2026-06-19',
   caesarianDate: null,  // planned C-section date if different from EDD
@@ -674,7 +674,7 @@ function generateFamilyId() {
   return Math.random().toString(36).substr(2,6).toUpperCase() + Date.now().toString(36).substr(-3).toUpperCase();
 }
 
-function generateFamilyCode(mumName, dadName, edd) {
+function generateFamilyCode(momName, dadName, edd) {
   // Create a memorable code from names + due year
   const part1 = (dadName || 'FAMILY').substring(0,4).toUpperCase().replace(/[^A-Z]/g,'');
   const year = edd ? edd.split('-')[0].substr(2) : '26';
@@ -700,10 +700,10 @@ async function joinFamily() {
 }
 
 async function completeLandingSetup() {
-  const mumName = (document.getElementById('l-mum')?.value || '').trim();
+  const momName = (document.getElementById('l-mom')?.value || '').trim();
   const dadName = (document.getElementById('l-dad')?.value || '').trim();
   const edd = document.getElementById('l-edd')?.value || '2026-06-19';
-  if (!mumName || !dadName) { landingToast('Please enter both parents\' names'); return; }
+  if (!momName || !dadName) { landingToast('Please enter both parents\' names'); return; }
   const n = _landingNBabies || 1;
   const babyDOB = document.getElementById('l-dob')?.value || null;
   // Build babies array
@@ -716,12 +716,12 @@ async function completeLandingSetup() {
   }
   if (n===1) { babyName=babies[0]?.name||null; babyGender=babies[0]?.gender||'surprise'; }
   const familyId = generateFamilyId();
-  const familyCode = generateFamilyCode(dadName, mumName, edd);
+  const familyCode = generateFamilyCode(dadName, momName, edd);
   
   // Set default lists — adjust inventory + bag for multiples
   state = {
     ...state, familyId, familyCode,
-    mumName, dadName, edd, babyName, babyDOB,
+    momName, dadName, edd, babyName, babyDOB,
     babyGender, numberOfBabies: n, babies,
     hospitalBagItems: getDefaultHospitalBag(n),
     csectionTasks: getDefaultCsectionTasks(n),
@@ -873,26 +873,26 @@ function uid() { return '_' + Math.random().toString(36).substr(2,9); }
 
 function getDefaultHospitalBag(n=1) {
   const items = [
-    // Mother
-    ['👩 Mother — Clothing','Front-opening nightgown',2,'Essential','Mother'],
-    ['👩 Mother — Clothing','Loose button-down pyjamas',1,'Essential','Mother'],
-    ['👩 Mother — Clothing','Maternity underwear (high waist, post C-section)',5,'Essential','Mother'],
-    ['👩 Mother — Clothing','Non-slip hospital socks / slippers',1,'Essential','Mother'],
-    ['👩 Mother — Clothing','Supportive nursing bra',2,'Essential','Mother'],
-    ['👩 Mother — Clothing','Comfortable going-home outfit (loose)',1,'Essential','Mother'],
-    ['👩 Mother — Toiletries','Shampoo & conditioner (travel size)',1,'High','Mother'],
-    ['👩 Mother — Toiletries','Shower gel / body wash',1,'High','Mother'],
-    ['👩 Mother — Toiletries','Toothbrush, toothpaste, mouthwash',1,'Essential','Mother'],
-    ['👩 Mother — Toiletries','Face wash, moisturiser, lip balm',1,'High','Mother'],
-    ['👩 Mother — Toiletries','Hair ties / headband',3,'High','Mother'],
-    ['👩 Mother — Recovery','Postpartum mesh underwear (extras)',5,'Essential','Mother'],
-    ['👩 Mother — Recovery','Postpartum pads (heavy flow, long)',10,'Essential','Mother'],
-    ['👩 Mother — Recovery','C-section scar silicone gel or tape',1,'High','Mother'],
-    ['👩 Mother — Recovery','Abdominal binder / postpartum wrap',1,'Essential','Mother'],
-    ['👩 Mother — Recovery','Nipple cream (Lansinoh)',1,'Essential','Mother'],
-    ['👩 Mother — Recovery','Nursing pads (disposable)',10,'High','Mother'],
-    ['👩 Mother — Breastfeeding','Haaka / manual breast pump',1,'High','Mother'],
-    ['👩 Mother — Breastfeeding','Breast milk storage bags',10,'Medium','Mother'],
+    // Mom
+    ['👩 Mom — Clothing','Front-opening nightgown',2,'Essential','Mom'],
+    ['👩 Mom — Clothing','Loose button-down pyjamas',1,'Essential','Mom'],
+    ['👩 Mom — Clothing','Maternity underwear (high waist, post C-section)',5,'Essential','Mom'],
+    ['👩 Mom — Clothing','Non-slip hospital socks / slippers',1,'Essential','Mom'],
+    ['👩 Mom — Clothing','Supportive nursing bra',2,'Essential','Mom'],
+    ['👩 Mom — Clothing','Comfortable going-home outfit (loose)',1,'Essential','Mom'],
+    ['👩 Mom — Toiletries','Shampoo & conditioner (travel size)',1,'High','Mom'],
+    ['👩 Mom — Toiletries','Shower gel / body wash',1,'High','Mom'],
+    ['👩 Mom — Toiletries','Toothbrush, toothpaste, mouthwash',1,'Essential','Mom'],
+    ['👩 Mom — Toiletries','Face wash, moisturiser, lip balm',1,'High','Mom'],
+    ['👩 Mom — Toiletries','Hair ties / headband',3,'High','Mom'],
+    ['👩 Mom — Recovery','Postpartum mesh underwear (extras)',5,'Essential','Mom'],
+    ['👩 Mom — Recovery','Postpartum pads (heavy flow, long)',10,'Essential','Mom'],
+    ['👩 Mom — Recovery','C-section scar silicone gel or tape',1,'High','Mom'],
+    ['👩 Mom — Recovery','Abdominal binder / postpartum wrap',1,'Essential','Mom'],
+    ['👩 Mom — Recovery','Nipple cream (Lansinoh)',1,'Essential','Mom'],
+    ['👩 Mom — Recovery','Nursing pads (disposable)',10,'High','Mom'],
+    ['👩 Mom — Breastfeeding','Haaka / manual breast pump',1,'High','Mom'],
+    ['👩 Mom — Breastfeeding','Breast milk storage bags',10,'Medium','Mom'],
     // Baby
     ['👶 Baby — Clothing','Newborn onesie / romper',4,'Essential','Baby'],
     ['👶 Baby — Clothing','Going-home outfit (special)',1,'Essential','Baby'],
@@ -904,12 +904,12 @@ function getDefaultHospitalBag(n=1) {
     ['👶 Baby — Care','Baby wipes (fragrance-free)',2,'Essential','Baby'],
     ['👶 Baby — Care','Barrier cream (Sudocrem)',1,'High','Baby'],
     ['👶 Baby — Care','Nasal aspirator',1,'High','Baby'],
-    // Father
-    ['👨 Father','Change of clothes (3 days)',3,'Essential','Father'],
-    ['👨 Father','Phone charger + power bank',2,'Essential','Father'],
-    ['👨 Father','Snacks',1,'High','Father'],
-    ['👨 Father','Cash Rp 500k–1M',1,'Essential','Father'],
-    ['👨 Father','Multiple bank cards',2,'Essential','Father'],
+    // Dad
+    ['👨 Dad','Change of clothes (3 days)',3,'Essential','Dad'],
+    ['👨 Dad','Phone charger + power bank',2,'Essential','Dad'],
+    ['👨 Dad','Snacks',1,'High','Dad'],
+    ['👨 Dad','Cash Rp 500k–1M',1,'Essential','Dad'],
+    ['👨 Dad','Multiple bank cards',2,'Essential','Dad'],
     // Documents
     ['📄 Documents','KTP (National ID Card)',1,'Essential','Documents'],
     ['📄 Documents','KK (Kartu Keluarga)',1,'Essential','Documents'],
@@ -931,31 +931,31 @@ function getDefaultHospitalBag(n=1) {
 function getDefaultCsectionTasks(n=1) {
   const tasks = [
     ['📋 Pre-Surgery — Medical','Schedule C-section date with OBGYN','Both','Week 34'],
-    ['📋 Pre-Surgery — Medical','Pre-admission bloodwork (CBC, blood type, coagulation)','Mother','Week 36'],
-    ['📋 Pre-Surgery — Medical','Anesthesia consultation','Mother','Week 36'],
-    ['📋 Pre-Surgery — Medical','Discuss pain management plan with OBGYN','Mother','Week 37'],
-    ['📋 Pre-Surgery — Medical','Complete hospital pre-registration forms','Father','Week 37'],
-    ['💰 Pre-Surgery — Financial','Confirm hospital payment deposit amount','Father','Week 36'],
-    ['💰 Pre-Surgery — Financial','Prepare cash + multiple bank cards','Father','Week 37'],
-    ['💰 Pre-Surgery — Financial','Check insurance pre-authorization','Father','Week 35'],
-    ['🏠 Pre-Surgery — Home Setup','Prepare recovery room (bed height, easy access)','Father','Week 36'],
-    ['🏠 Pre-Surgery — Home Setup','Move essentials to waist height (no bending)','Father','Week 37'],
-    ['🏠 Pre-Surgery — Home Setup','Stock pantry with nutritious foods','Father','Week 38'],
-    ['🏠 Pre-Surgery — Home Setup','Set up nursing station','Father','Week 38'],
+    ['📋 Pre-Surgery — Medical','Pre-admission bloodwork (CBC, blood type, coagulation)','Mom','Week 36'],
+    ['📋 Pre-Surgery — Medical','Anesthesia consultation','Mom','Week 36'],
+    ['📋 Pre-Surgery — Medical','Discuss pain management plan with OBGYN','Mom','Week 37'],
+    ['📋 Pre-Surgery — Medical','Complete hospital pre-registration forms','Dad','Week 37'],
+    ['💰 Pre-Surgery — Financial','Confirm hospital payment deposit amount','Dad','Week 36'],
+    ['💰 Pre-Surgery — Financial','Prepare cash + multiple bank cards','Dad','Week 37'],
+    ['💰 Pre-Surgery — Financial','Check insurance pre-authorization','Dad','Week 35'],
+    ['🏠 Pre-Surgery — Home Setup','Prepare recovery room (bed height, easy access)','Dad','Week 36'],
+    ['🏠 Pre-Surgery — Home Setup','Move essentials to waist height (no bending)','Dad','Week 37'],
+    ['🏠 Pre-Surgery — Home Setup','Stock pantry with nutritious foods','Dad','Week 38'],
+    ['🏠 Pre-Surgery — Home Setup','Set up nursing station','Dad','Week 38'],
     ['🏠 Pre-Surgery — Home Setup','Arrange postpartum help (family, baby nurse)','Both','Week 34'],
-    ['🏥 Day of Surgery','Shower with antibacterial soap — night before & morning','Mother','Day of'],
-    ['🏥 Day of Surgery','Remove nail polish and jewelry','Mother','Day of'],
+    ['🏥 Day of Surgery','Shower with antibacterial soap — night before & morning','Mom','Day of'],
+    ['🏥 Day of Surgery','Remove nail polish and jewelry','Mom','Day of'],
     ['🏥 Day of Surgery','Arrive at hospital per admission time','Both','Day of'],
     ['🏥 Day of Surgery','Baby delivered — immediate skin-to-skin','Both','Day of'],
-    ['🛏️ Hospital Stay','First walk (supported) — critical for recovery','Mother','Day 1–2'],
+    ['🛏️ Hospital Stay','First walk (supported) — critical for recovery','Mom','Day 1–2'],
     ['🛏️ Hospital Stay','Initiate breastfeeding within 1 hour','Both','Day 0–1'],
     ['🛏️ Hospital Stay','Request lactation consultant visit','Both','Day 1'],
-    ['🛏️ Hospital Stay','Begin Akta Kelahiran (birth certificate) process','Father','Day 2–3'],
-    ['🏃 Week 1 Recovery','No lifting anything heavier than baby','Mother','Ongoing'],
-    ['🏃 Week 1 Recovery','Wound care: keep incision dry and clean','Mother','Daily'],
+    ['🛏️ Hospital Stay','Begin Akta Kelahiran (birth certificate) process','Dad','Day 2–3'],
+    ['🏃 Week 1 Recovery','No lifting anything heavier than baby','Mom','Ongoing'],
+    ['🏃 Week 1 Recovery','Wound care: keep incision dry and clean','Mom','Daily'],
     ['🏃 Week 1 Recovery','Monitor for fever >38°C','Both','Daily'],
-    ['📅 Weeks 2–6','Scar massage with oil (after wound fully closed)','Mother','Week 3+'],
-    ['📅 Weeks 2–6','6-week postpartum OBGYN check-up','Mother','Week 6'],
+    ['📅 Weeks 2–6','Scar massage with oil (after wound fully closed)','Mom','Week 3+'],
+    ['📅 Weeks 2–6','6-week postpartum OBGYN check-up','Mom','Week 6'],
     ['🚨 Red Flags','Fever above 38.5°C — call doctor immediately','Both','Any time'],
     ['🚨 Red Flags','Incision site: redness, swelling, discharge','Both','Any time'],
     ['🚨 Red Flags','Heavy vaginal bleeding (soaking pad in <1 hour)','Both','Any time'],
@@ -965,9 +965,9 @@ function getDefaultCsectionTasks(n=1) {
     const extra = [
       ['📋 Pre-Surgery — Medical','Discuss NICU readiness with hospital (multiples have higher NICU admission rate)','Both','Week 34'],
       ['📋 Pre-Surgery — Medical','Arrange paediatric team to be present at delivery','Medical','Week 35'],
-      ['💰 Pre-Surgery — Financial','Budget for potential NICU stay','Father','Week 34'],
-      ['🏠 Pre-Surgery — Home Setup','Set up '+n+' separate sleeping areas (safe sleep = each baby has own surface)','Father','Week 36'],
-      ['🏠 Pre-Surgery — Home Setup','Purchase twin/triplet feeding pillow for tandem nursing','Father','Week 35'],
+      ['💰 Pre-Surgery — Financial','Budget for potential NICU stay','Dad','Week 34'],
+      ['🏠 Pre-Surgery — Home Setup','Set up '+n+' separate sleeping areas (safe sleep = each baby has own surface)','Dad','Week 36'],
+      ['🏠 Pre-Surgery — Home Setup','Purchase twin/triplet feeding pillow for tandem nursing','Dad','Week 35'],
       ['🏠 Pre-Surgery — Home Setup','Arrange additional postnatal support — multiples need 2+ caregivers around the clock','Both','Week 34'],
     ];
     extra.forEach(([phase,task,owner,target])=>tasks.push([phase,task,owner,target]));
@@ -1104,7 +1104,14 @@ function formatDate(d) {
   } catch(e) { return d; }
 }
 function getEDD() { return state.edd || '2026-06-19'; }
-function getDueDate() { return new Date(getEDD() + 'T00:00:00'); }
+function getDeliveryDate() {
+  // Use caesarian date if set, otherwise EDD
+  return state.caesarianDate || state.edd || '2026-06-19';
+}
+function getDueDate() {
+  // For countdown purposes, use delivery date (caesarian if set)
+  return new Date(getDeliveryDate() + 'T00:00:00');
+}
 function getCaesarianDate() { return state.caesarianDate || null; }
 // Pregnancy week: calculated from LMP (EDD = LMP + 280 days, so LMP = EDD - 280)
 function getPregWeek() {
@@ -1112,7 +1119,8 @@ function getPregWeek() {
   if (state.lmpDate) {
     lmp = new Date(state.lmpDate + 'T00:00:00');
   } else {
-    const edd = getDueDate();
+    // Always base on EDD (not C-section date): LMP = EDD - 280 days
+    const edd = new Date(getEDD() + 'T00:00:00');
     lmp = new Date(edd.getTime() - 280 * 86400000);
   }
   const days = Math.floor((new Date() - lmp) / 86400000);
@@ -1227,7 +1235,12 @@ function updateSubtitles() {
     }
   } else {
     const pregWk = Math.max(1,Math.min(40,Math.round(40-daysLeft/7)));
-    subText = 'Week '+pregWk+' · '+daysLeft+'d to go';
+    if (state.caesarianDate) {
+      const csecDays = Math.max(0, Math.round((new Date(state.caesarianDate+'T00:00:00')-new Date())/86400000));
+      subText = 'Week '+pregWk+' · C-Section in '+csecDays+'d';
+    } else {
+      subText = 'Week '+pregWk+' · '+(state.caesarianDate?'C-Section: '+formatDate(state.caesarianDate):'EDD: '+formatDate(getEDD()));
+    }
   }
   ['top-bar-sub-text','drawer-sub','sidebar-sub'].forEach(id => {
     const el = document.getElementById(id);
@@ -1236,7 +1249,7 @@ function updateSubtitles() {
 
   // Update parents display in drawer header
   const drawerSub = document.getElementById('drawer-sub');
-  if (drawerSub && state.mumName) drawerSub.textContent = state.mumName + ' & ' + state.dadName;
+  if (drawerSub && state.momName) drawerSub.textContent = state.momName + ' & ' + state.dadName;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1547,7 +1560,7 @@ function openBabySettings() {
   // Parents
   const pf = document.createElement('div');
   pf.className = 'form-row';
-  pf.innerHTML = '<div><label>Mum name</label><input type="text" id="bs-mum" value="'+(state.mumName||'')+'" placeholder="Mum"></div>' +
+  pf.innerHTML = '<div><label>Mom name</label><input type="text" id="bs-mom" value="'+(state.momName||'')+'" placeholder="Mom"></div>' +
     '<div><label>Dad name</label><input type="text" id="bs-dad" value="'+(state.dadName||'')+'" placeholder="Dad"></div>';
   sheet.appendChild(pf);
 
@@ -1585,7 +1598,7 @@ async function saveBabyProfile() {
   const edd=document.getElementById('bs-edd')?.value||getEDD();
   const csec=document.getElementById('bs-csec')?.value||null;
   const lmp=document.getElementById('bs-lmp')?.value||null;
-  const mum=(document.getElementById('bs-mum')?.value||'').trim();
+  const mom=(document.getElementById('bs-mom')?.value||'').trim();
   const dad=(document.getElementById('bs-dad')?.value||'').trim();
   state.numberOfBabies = n;
   state.edd = edd;
@@ -1593,7 +1606,7 @@ async function saveBabyProfile() {
   if (lmp !== null) state.lmpDate = lmp || null;
   if (dob) state.babyDOB = dob;
   else if (dob === '') state.babyDOB = null; // allow clearing
-  if (mum) state.mumName = mum;
+  if (mom) state.momName = mom;
   if (dad) state.dadName = dad;
   if (n === 1) {
     const name = (document.getElementById('bs-name-0')?.value||'').trim()||null;
@@ -1815,7 +1828,7 @@ const VACCINES = [
   {name:"Hepatitis A (dose 2)",age:"2.5 years",daysFromBirth:913,notes:"Second dose of Hepatitis A series."},
   {name:"DPT (booster 2)",age:"5 years",daysFromBirth:1825,notes:"Pre-school booster."},
   {name:"Polio (booster)",age:"5 years",daysFromBirth:1825,notes:"Final childhood polio booster."},
-  {name:"MMR",age:"5–6 years",daysFromBirth:1825,notes:"Measles, Mumps, Rubella booster."},
+  {name:"MMR",age:"5–6 years",daysFromBirth:1825,notes:"Measles, Momps, Rubella booster."},
 ];
 
 const MILESTONES = [
@@ -1895,8 +1908,8 @@ const BABY_SIGNS = [
   {num:5,sign:"SLEEP / TIDUR",age:"6–8 months",how:"Place palm flat against cheek and tilt head to the side, like a pillow.",indo:"Tidur / Bobo",eng:"Sleep",use:"During sleep routine — builds routine predictability.",why:"Powerful signal for sleep routine start."},
   {num:6,sign:"ALL DONE / SELESAI",age:"6–8 months",how:"Hold both hands up, palms facing in, then rotate outward to palms facing out.",indo:"Selesai / Sudah",eng:"All done / Finished",use:"End of meals, activities, bath.",why:"Reduces food refusal fights. Baby can communicate 'done'."},
   {num:7,sign:"HELP / TOLONG",age:"8–10 months",how:"Make fist with thumb up (A handshape), place on flat open palm, lift both upward.",indo:"Tolong",eng:"Help",use:"When baby is struggling or frustrated.",why:"Transforms frustration into a request. Huge reduction in tantrum triggers."},
-  {num:8,sign:"MOM / MAMA",age:"4–6 months",how:"Open hand, fingers spread, tap chin twice with thumb.",indo:"Mama / Ibu",eng:"Mom / Mama",use:"When talking about or to mother.",why:"Attachment sign — emotional significance beyond communication."},
-  {num:9,sign:"DAD / PAPA",age:"4–6 months",how:"Open hand, fingers spread, tap forehead twice with thumb.",indo:"Papa / Ayah",eng:"Dad / Papa",use:"When talking about or to father.",why:"Attachment sign — reinforces parent–child bond."},
+  {num:8,sign:"MOM / MAMA",age:"4–6 months",how:"Open hand, fingers spread, tap chin twice with thumb.",indo:"Mama / Ibu",eng:"Mom / Mama",use:"When talking about or to mom.",why:"Attachment sign — emotional significance beyond communication."},
+  {num:9,sign:"DAD / PAPA",age:"4–6 months",how:"Open hand, fingers spread, tap forehead twice with thumb.",indo:"Papa / Ayah",eng:"Dad / Papa",use:"When talking about or to dad.",why:"Attachment sign — reinforces parent–child bond."},
   {num:10,sign:"BOOK / BUKU",age:"7–9 months",how:"Place palms together (like closed book), then open outward like opening a book.",indo:"Buku",eng:"Book",use:"Before reading time. Baby can REQUEST books.",why:"Creates lifelong positive association: I can request reading."},
   {num:11,sign:"PLEASE / TOLONG",age:"9–12 months",how:"Open flat hand, rub in circular motion on chest.",indo:"Tolong / Minta",eng:"Please",use:"Pair with any request before receiving something.",why:"Social communication foundation. Begins turn-taking."},
   {num:12,sign:"THANK YOU / TERIMA KASIH",age:"10–14 months",how:"Flat hand, fingers together, touch chin and bring hand forward and down.",indo:"Terima kasih",eng:"Thank you",use:"After receiving food, help, items. Model consistently.",why:"Social reciprocity foundation. Builds gratitude habit."},
@@ -1976,7 +1989,7 @@ const SITUATIONS = [
   ],dont:"Do NOT over-schedule enrichment. Do NOT interrupt absorption/flow states. Do NOT always resolve conflicts for children."},
   {title:"Screen time",lead:"Dev Science",steps:[
     {phi:"Dev Science",color:"#185FA5",text:"Under 18–24 months: no passive screens. AAP consensus. Video calls with family are the only exception."},
-    {phi:"Authoritative",color:"#993C1D",text:"Ages 2–5: 1 hour/day maximum, high-quality content, parent co-viewing. Set consistent family rules."},
+    {phi:"Authoritative",color:"#993C1D",text:"Ages 2–5: 1 hour/day maximom, high-quality content, parent co-viewing. Set consistent family rules."},
     {phi:"Montessori",color:"#534AB7",text:"Offer compelling alternatives: water play, practical life activities, outdoor time, art. Screen loses when environment is rich."},
     {phi:"RIE",color:"#0F6E56",text:"Don't use screens as reward or punishment. This creates an artificial hierarchy that makes screens more desirable."},
   ],dont:"Do NOT use screens as babysitter habit. Do NOT put screens in bedrooms. Do NOT allow background TV."},
@@ -1989,8 +2002,8 @@ const FIRST_100_DAYS = [
   {week:"Week 4\n(22–28 days)",baby:"1-month milestone: social smiles confirmed. Holds head briefly. Cooing beginning.",feeding:"May cluster feed in evenings (normal). Growth spurt at 4 weeks is common.",sleep:"Total 14–17 hrs. Night 3–4 hr stretches possible. Begin gentle bedtime routine.",parent:"1-month pediatrician check. Vaccines due. Begin bedtime routine: bath, feed, dark, quiet.",recovery:"6-week check approaching. Baby blues vs postnatal depression — know the difference.",safety:"Never cover baby's face. Introduce pacifier if desired."},
   {week:"Weeks 5–6\n(29–42 days)",baby:"Crying peaks at 6 weeks (PURPLE crying period). Social smiles more consistent.",feeding:"Feeds may space to every 2.5–3 hrs. Introduce bottle of expressed milk if needed.",sleep:"Circadian rhythm emerging. Still 2–3 night wakings normal.",parent:"6-week OBGYN check. Acknowledge this is the hardest phase.",recovery:"6-week clearance: incision, pelvic floor, mood assessment. Restart gentle walks.",safety:"PURPLE crying: Peaks around 6 weeks, Unexpected, Resists soothing, Pain-like face, Long lasting, Evening. Normal."},
   {week:"Weeks 7–8\n(43–56 days)",baby:"More interactive: laughs, coos, responds to faces. Tummy time strength growing.",feeding:"If EBF: supply regulated by now. Feed every 2.5–3 hrs.",sleep:"Night 4–5 hr stretch possible. Total 14–16 hrs.",parent:"DPT/HiB/Polio vaccine at 2 months. More structured tummy time (5–10 min, 3x/day).",recovery:"Gentle yoga/postpartum exercise can begin. Mental health check-in.",safety:"Never leave on elevated surfaces. Baby rolling is coming — use floor more."},
-  {week:"Weeks 9–12\n(57–84 days)",baby:"Laughing out loud begins. Head control strengthening. Reaches for objects.",feeding:"Feeds every 3 hrs approx. Pumping efficiency increasing.",sleep:"Night 5–6 hr stretch possible. Nap schedule emerging (3–4 naps).",parent:"Talk constantly — language development is building neural pathways. Read board books daily.",recovery:"Most mothers cleared for more exercise. Career planning conversation.",safety:"Begin stroller outings. Sun protection (shade, not sunscreen until 6 months)."},
-  {week:"Weeks 13–14\n(85–100 days)",baby:"3-month milestone: full social engagement. Hand batting, bear weight on legs, mini push-ups.",feeding:"May begin 4-month sleep regression signals. Solids NOT yet (too early).",sleep:"Some babies achieve 6 hr night stretch. Naps: 3x/day (45–90 min).",parent:"Drowsy-but-awake sleep training can begin. Enjoy — hardest phase is over.",recovery:"Physical recovery largely complete. Mental health priority now.",safety:"No solids until 6 months minimum. Continue tummy time. Safe sleep still essential."},
+  {week:"Weeks 9–12\n(57–84 days)",baby:"Laughing out loud begins. Head control strengthening. Reaches for objects.",feeding:"Feeds every 3 hrs approx. Pumping efficiency increasing.",sleep:"Night 5–6 hr stretch possible. Nap schedule emerging (3–4 naps).",parent:"Talk constantly — language development is building neural pathways. Read board books daily.",recovery:"Most moms cleared for more exercise. Career planning conversation.",safety:"Begin stroller outings. Sun protection (shade, not sunscreen until 6 months)."},
+  {week:"Weeks 13–14\n(85–100 days)",baby:"3-month milestone: full social engagement. Hand batting, bear weight on legs, mini push-ups.",feeding:"May begin 4-month sleep regression signals. Solids NOT yet (too early).",sleep:"Some babies achieve 6 hr night stretch. Naps: 3x/day (45–90 min).",parent:"Drowsy-but-awake sleep training can begin. Enjoy — hardest phase is over.",recovery:"Physical recovery largely complete. Mental health priority now.",safety:"No solids until 6 months minimom. Continue tummy time. Safe sleep still essential."},
 ];
 
 const BILINGUAL = {
@@ -2002,7 +2015,7 @@ const BILINGUAL = {
     "Assign one parent as primary English speaker — all interaction, play, reading in English. Other parent speaks Indonesian exclusively.",
   ],
   targets: [
-    {label:"Minimum English for functional bilingualism",value:"20–30% of waking hours"},
+    {label:"Minimom English for functional bilingualism",value:"20–30% of waking hours"},
     {label:"Recommended target",value:"40% English / 60% Indonesian"},
     {label:"Below this → Indonesian dominates",value:"<20% English"},
     {label:"Third language: introduce after",value:"Age 4–5, when both are established"},
@@ -2059,7 +2072,9 @@ PAGES['dashboard'] = function(el) {
 
     ${!hasBaby?`
     <div class="grid-4" style="margin-bottom:12px">
-      <div class="stat-card" style="background:#1B3A6B"><div class="val">${daysLeft}</div><div class="lbl">Days to EDD</div></div>
+      <div class="stat-card" style="background:#1B3A6B">
+          ${state.caesarianDate ? '<div class="val">'+Math.max(0,Math.round((new Date(state.caesarianDate+"T00:00:00")-new Date())/86400000))+'</div><div class="lbl">Days to C-Section</div>' : '<div class="val">'+daysLeft+'</div><div class="lbl">Days to EDD</div>'}
+        </div>
       <div class="stat-card" style="background:#2D8F8F"><div class="val">${weeksLeft}</div><div class="lbl">Weeks left</div></div>
       <div class="stat-card" style="background:#534AB7"><div class="val">${pregWk}</div><div class="lbl">Preg week</div></div>
       <div class="stat-card" style="background:#993C1D"><div class="val">${tri}</div><div class="lbl">Trimester</div></div>
@@ -2201,34 +2216,50 @@ PAGES['keyDates'] = function(el) {
 // HOSPITAL BAG — fully editable
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['hospital-bag'] = function(el) {
-  let filterSection = 'Mother';
+  let filterSection = 'Mom';
+
   function render() {
+    window._bagFilterSection = filterSection;
     const items = state.hospitalBagItems||[];
     const sections = [...new Set(items.map(i=>i.section))];
     const filteredItems = filterSection==='all' ? items : items.filter(i=>i.section===filterSection);
     const cats = [...new Set(filteredItems.map(i=>i.cat))];
     const totalDone = items.filter(i=>i.packed).length;
     const pct = items.length ? Math.round(totalDone/items.length*100) : 0;
-    let html = `
+
+    // Build shell + progress — only update list area to preserve tab state
+    const sectionTabs = ['Mom','Baby','Dad','Documents','all'];
+
+    el.innerHTML = `
       <div class="page-header"><h2>🎒 Hospital Bag</h2><p>${totalDone}/${items.length} packed · ${pct}%</p></div>
       <div class="card" style="padding:10px 14px;margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <span style="font-size:11px;font-weight:700;color:#777;text-transform:uppercase">Packing progress</span>
           <span style="font-size:18px;font-weight:700;color:#0F6E56">${pct}%</span>
         </div>
         ${pctBar(pct,'#0F6E56',8)}
       </div>
-      <div class="tab-scroll"><div class="tabs">
-        ${['Mother','Baby','Father','Documents','all'].map(s=>`<button class="tab-btn ${filterSection===s?'active':''}" onclick="setBagFilter('${s}',this)">${s==='Mother'?'👩 Mum':s==='Baby'?'👶 Baby':s==='Father'?'👨 Dad':s==='Documents'?'📄 Docs':'All'}</button>`).join('')}
+      <div class="tab-scroll" style="margin-bottom:12px"><div class="tabs" style="flex-wrap:nowrap">
+        ${sectionTabs.map(s=>`<button class="tab-btn ${filterSection===s?'active':''}" onclick="bagTab('${s}')">${s==='Mom'?'👩 Mom':s==='Baby'?'👶 Baby':s==='Dad'?'👨 Dad':s==='Documents'?'📄 Docs':'All'}</button>`).join('')}
       </div></div>
+      <div id="bag-list-content"></div>
     `;
+    renderBagList();
+  }
+
+  function renderBagList() {
+    const items = state.hospitalBagItems||[];
+    const filteredItems = filterSection==='all' ? items : items.filter(i=>i.section===filterSection);
+    const cats = [...new Set(filteredItems.map(i=>i.cat))];
+    let html = '';
+
     cats.forEach(cat => {
       const catItems = filteredItems.filter(i=>i.cat===cat);
       html += `<div class="section-hdr" style="background:#1B3A6B;margin-bottom:4px">
         <span>${cat}</span>
-        <button onclick="addBagItem('${cat}','${catItems[0]?.section||filterSection}')" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;padding:3px 10px;font-size:11px">+ Add</button>
+        <button onclick="addBagItem('${cat.replace(/'/g,"\'")}','${(catItems[0]?.section||filterSection)}'); return false;" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;padding:3px 10px;font-size:11px">+ Add</button>
       </div>
-      <div class="card" style="padding:0 0 4px;margin-bottom:4px">`;
+      <div class="card" style="padding:0 0 4px;margin-bottom:6px">`;
       catItems.forEach(item => {
         html += `<div class="checklist-item ${item.packed?'done':''}">
           <div class="check-box" onclick="toggleBagItem('${item.id}')" style="cursor:pointer">${item.packed?'✓':''}</div>
@@ -2242,66 +2273,109 @@ PAGES['hospital-bag'] = function(el) {
       });
       html += `</div>`;
     });
-    html += `<button class="btn btn-teal btn-block" onclick="addBagItem('',filterSection||'Mother')" style="margin-bottom:80px">+ Add custom item</button>`;
-    el.innerHTML = html;
+
+    if (filteredItems.length === 0) {
+      html += '<div class="empty-state">No items in this section</div>';
+    }
+
+    html += `<button class="btn btn-teal btn-block" onclick="addBagItem('Custom', window._bagFilterSection||'Mom')" style="margin-bottom:80px">+ Add custom item</button>`;
+
+    const listEl = document.getElementById('bag-list-content');
+    if (listEl) listEl.innerHTML = html;
   }
-  window.setBagFilter = (s,btn) => { filterSection=s; render(); };
-  window.toggleBagItem = (id) => {
-    const item = (state.hospitalBagItems||[]).find(i=>i.id===id); if(item) item.packed=!item.packed;
-    saveState('hospitalBagItems'); render();
+
+  window.bagTab = (s) => {
+    filterSection = s;
+    window._bagFilterSection = s;
+    // Update tab buttons without re-rendering whole page
+    el.querySelectorAll('.tab-btn').forEach(b => {
+      const tabS = b.getAttribute('onclick')?.match(/bagTab\('([^']+)'\)/)?.[1];
+      b.classList.toggle('active', tabS === s);
+    });
+    renderBagList();
   };
-  window.addBagItem = (cat, section) => openBagModal(null, cat, section, render);
+
+  window.toggleBagItem = (id) => {
+    const item = (state.hospitalBagItems||[]).find(i=>i.id===id);
+    if (item) item.packed = !item.packed;
+    saveState('hospitalBagItems');
+    // Update just the checkbox without re-rendering or changing tab
+    renderBagList();
+  };
+
+  window.addBagItem = (cat, section) => openBagModal(null, cat, section, renderBagList);
   window.editBagItem = (id) => {
-    const item=(state.hospitalBagItems||[]).find(i=>i.id===id);
-    if(item) openBagModal(item, item.cat, item.section, render);
+    const item = (state.hospitalBagItems||[]).find(i=>i.id===id);
+    if (item) openBagModal(item, item.cat, item.section, renderBagList);
   };
   window.delBagItem = (id) => {
     state.hospitalBagItems = (state.hospitalBagItems||[]).filter(i=>i.id!==id);
-    saveState('hospitalBagItems'); render();
+    saveState('hospitalBagItems'); renderBagList();
   };
+
   render();
 };
 
 function openBagModal(item, defCat, defSection, onSave) {
   let m = document.getElementById('bag-item-modal');
-  if(!m){m=document.createElement('div');m.className='modal-overlay';m.id='bag-item-modal';document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});}
-  const sections = ['Mother','Baby','Father','Documents'];
-  const cats = [...new Set((state.hospitalBagItems||[]).map(i=>i.cat)),defCat||'Custom'].filter(Boolean);
-  m.innerHTML = `<div class="modal-sheet"><div class="modal-handle"></div>
+  if (!m) {
+    m = document.createElement('div');
+    m.className = 'modal-overlay';
+    m.id = 'bag-item-modal';
+    document.body.appendChild(m);
+    m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+  }
+  const sections = ['Mom','Baby','Dad','Documents'];
+  m.innerHTML = `<div class="modal-sheet">
+    <div class="modal-handle"></div>
     <div class="modal-title">${item?'✏️ Edit Item':'➕ Add Item'}</div>
     <div class="form-field"><label>Item name *</label><input type="text" id="bi-name" value="${item?.item||''}" placeholder="e.g. Nursing bra"></div>
     <div class="form-row">
-      <div><label>Qty</label><input type="number" id="bi-qty" value="${item?.qty||1}" min="1" inputmode="numeric"></div>
-      <div><label>Priority</label><select id="bi-pri">${['Essential','High','Medium','Low'].map(p=>`<option ${item?.pri===p?'selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="form-field"><label>Qty</label><input type="number" id="bi-qty" value="${item?.qty||1}" min="1" inputmode="numeric"></div>
+      <div class="form-field"><label>Priority</label><select id="bi-pri">${['Essential','High','Medium','Low'].map(p=>`<option ${item?.pri===p?'selected':''}>${p}</option>`).join('')}</select></div>
     </div>
     <div class="form-row">
-      <div><label>Section</label><select id="bi-section">${sections.map(s=>`<option ${(item?.section||defSection)===s?'selected':''}>${s}</option>`).join('')}</select></div>
-      <div><label>Category</label><input type="text" id="bi-cat" value="${item?.cat||defCat||''}" placeholder="e.g. 👩 Mother — Clothing"></div>
+      <div class="form-field"><label>Section</label><select id="bi-section">${sections.map(s=>`<option ${(item?.section||defSection)===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="form-field"><label>Category</label><input type="text" id="bi-cat" value="${item?.cat||defCat||''}" placeholder="e.g. 👩 Mom — Clothing"></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="document.getElementById('bag-item-modal').classList.remove('open')">Cancel</button>
       <button class="btn btn-teal" onclick="saveBagItem('${item?.id||''}')">Save</button>
-    </div></div>`;
+    </div>
+  </div>`;
   m.classList.add('open');
   window._bagOnSave = onSave;
 }
+
 function saveBagItem(existingId) {
-  const name = document.getElementById('bi-name')?.value?.trim(); if(!name){toast('Name required');return;}
-  if(!state.hospitalBagItems) state.hospitalBagItems=[];
-  if(existingId) {
+  const name = document.getElementById('bi-name')?.value?.trim();
+  if (!name) { toast('Name required'); return; }
+  if (!state.hospitalBagItems) state.hospitalBagItems = [];
+  if (existingId) {
     const item = state.hospitalBagItems.find(i=>i.id===existingId);
-    if(item){item.item=name;item.qty=parseInt(document.getElementById('bi-qty')?.value)||1;item.pri=document.getElementById('bi-pri')?.value;item.section=document.getElementById('bi-section')?.value;item.cat=document.getElementById('bi-cat')?.value||item.cat;}
+    if (item) {
+      item.item = name;
+      item.qty = parseInt(document.getElementById('bi-qty')?.value)||1;
+      item.pri = document.getElementById('bi-pri')?.value;
+      item.section = document.getElementById('bi-section')?.value;
+      item.cat = document.getElementById('bi-cat')?.value||item.cat;
+    }
   } else {
-    state.hospitalBagItems.push({id:uid(),item:name,qty:parseInt(document.getElementById('bi-qty')?.value)||1,pri:document.getElementById('bi-pri')?.value,section:document.getElementById('bi-section')?.value,cat:document.getElementById('bi-cat')?.value||'Custom',packed:false});
+    state.hospitalBagItems.push({
+      id: uid(), item: name,
+      qty: parseInt(document.getElementById('bi-qty')?.value)||1,
+      pri: document.getElementById('bi-pri')?.value||'Essential',
+      section: document.getElementById('bi-section')?.value||'Mom',
+      cat: document.getElementById('bi-cat')?.value||'Custom',
+      packed: false
+    });
   }
   saveState('hospitalBagItems');
   document.getElementById('bag-item-modal').classList.remove('open');
-  toast('Saved!'); if(window._bagOnSave) window._bagOnSave();
+  toast('Saved! ✓');
+  if (window._bagOnSave) window._bagOnSave();
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// C-SECTION PREP — fully editable
-// ══════════════════════════════════════════════════════════════════════════════
 PAGES['csection'] = function(el) {
   function render() {
     const tasks = state.csectionTasks||[];
@@ -2352,7 +2426,7 @@ function openCsecModal(task, defPhase, onSave) {
     <div class="form-field"><label>Task *</label><textarea id="ct-task" rows="2" style="resize:none;font-size:14px;padding:10px;border:1.5px solid #ddd;border-radius:8px;width:100%;font-family:var(--font)">${task?.task||''}</textarea></div>
     <div class="form-field"><label>Phase</label><input type="text" id="ct-phase" value="${task?.phase||defPhase||''}" placeholder="e.g. 📋 Pre-Surgery — Medical"></div>
     <div class="form-row">
-      <div><label>Owner</label><select id="ct-owner"><option ${task?.owner==='Both'?'selected':''}>Both</option><option ${task?.owner==='Mother'?'selected':''}>Mother</option><option ${task?.owner==='Father'?'selected':''}>Father</option><option ${task?.owner==='Medical'?'selected':''}>Medical</option></select></div>
+      <div><label>Owner</label><select id="ct-owner"><option ${task?.owner==='Both'?'selected':''}>Both</option><option ${task?.owner==='Mom'?'selected':''}>Mom</option><option ${task?.owner==='Dad'?'selected':''}>Dad</option><option ${task?.owner==='Medical'?'selected':''}>Medical</option></select></div>
       <div><label>Target timing</label><input type="text" id="ct-target" value="${task?.target||''}" placeholder="Week 36"></div>
     </div>
     <div class="modal-actions">
@@ -2548,82 +2622,123 @@ function getCanvasCtx(id) {
   const canvas = document.getElementById(id);
   if (!canvas) return null;
   const parent = canvas.parentElement;
-  canvas.width = parent ? parent.clientWidth - 28 : 320;
-  canvas.height = 160;
-  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-  return {canvas, ctx: canvas.getContext('2d'), w: canvas.width, h: canvas.height};
+  const dpr = window.devicePixelRatio || 1;
+  const logicalW = parent ? parent.clientWidth - 28 : 320;
+  const logicalH = parseInt(canvas.getAttribute('height')) || 160;
+  canvas.width = Math.round(logicalW * dpr);
+  canvas.height = Math.round(logicalH * dpr);
+  canvas.style.width = logicalW + 'px';
+  canvas.style.height = logicalH + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, logicalW, logicalH);
+  return {canvas, ctx, w: logicalW, h: logicalH};
 }
 
 function drawBar(id, labels, datasets, yLabel) {
   const cc = getCanvasCtx(id); if (!cc) return;
   const {ctx, w, h} = cc;
-  const pad = {t:18, r:8, b:32, l:36};
+  const isHourly = labels.length >= 20; // 24-hour view
+  const pad = {t:20, r:10, b:isHourly?26:34, l:32};
   const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
   const maxVal = Math.max(...datasets.flatMap(d => d.data), 1);
   const nBars = labels.length;
   const groupW = cw / nBars;
   const barsPerGroup = datasets.length;
-  const barW = Math.max(3, groupW * 0.7 / barsPerGroup);
-  const gap = groupW * 0.15;
+  // For hourly: thin bars; for others: thicker
+  const barW = Math.max(2, groupW * (isHourly?0.62:0.66) / barsPerGroup);
+  const gap = (groupW - barW * barsPerGroup) / 2;
 
-  // Background
-  ctx.fillStyle = '#f8f9fa';
-  ctx.fillRect(0, 0, w, h);
+  // Clean white background (no grey fill)
+  ctx.clearRect(0, 0, w, h);
 
-  // Grid lines
-  for (let i = 0; i <= 4; i++) {
-    const y = pad.t + ch * (1 - i/4);
+  // Horizontal grid lines (subtle)
+  const gridSteps = 4;
+  for (let i = 0; i <= gridSteps; i++) {
+    const y = pad.t + ch * (1 - i/gridSteps);
     ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y);
-    ctx.strokeStyle = i === 0 ? '#dee2e6' : '#e9ecef';
-    ctx.lineWidth = i === 0 ? 1.5 : 1;
+    ctx.strokeStyle = i === 0 ? '#e9ecef' : '#f1f3f5';
+    ctx.lineWidth = 1;
     ctx.stroke();
     if (i > 0) {
-      const val = Math.round(maxVal * i / 4 * 10) / 10;
-      ctx.fillStyle = '#868e96'; ctx.font = '9px -apple-system,sans-serif';
+      const val = Math.round(maxVal * i / gridSteps * 10) / 10;
+      ctx.fillStyle = '#adb5bd'; ctx.font = '9px -apple-system,sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(val, pad.l - 3, y + 3);
+      ctx.fillText(val % 1 === 0 ? val : val.toFixed(1), pad.l - 5, y + 3);
     }
   }
 
-  // Bars
+  // Bars with rounded tops
   datasets.forEach((ds, di) => {
     ds.data.forEach((val, i) => {
       const barH = Math.max(0, (val / maxVal) * ch);
-      const x = pad.l + i * groupW + gap + di * (barW + 1);
+      const x = pad.l + i * groupW + gap + di * (barW + (isHourly?0.5:1));
       const y = pad.t + ch - barH;
-      ctx.fillStyle = ds.color + 'dd';
-      if (ctx.roundRect) {
-        ctx.beginPath(); ctx.roundRect(x, y, barW, barH, [3, 3, 0, 0]); ctx.fill();
-      } else {
-        ctx.fillRect(x, y, barW, barH);
-      }
-      if (val > 0 && barH > 14) {
-        ctx.fillStyle = '#fff'; ctx.font = 'bold 8px -apple-system,sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(Math.round(val * 10) / 10, x + barW/2, y + 10);
+      if (barH > 0) {
+        // Gradient fill for depth
+        const grad = ctx.createLinearGradient(0, y, 0, y + barH);
+        grad.addColorStop(0, ds.color);
+        grad.addColorStop(1, ds.color + 'bb');
+        ctx.fillStyle = grad;
+        const r = Math.min(barW/2, 3);
+        if (ctx.roundRect) {
+          ctx.beginPath(); ctx.roundRect(x, y, barW, barH, [r, r, 0, 0]); ctx.fill();
+        } else {
+          ctx.fillRect(x, y, barW, barH);
+        }
+        // Value label on top (only for non-hourly or tall bars)
+        if (!isHourly && val > 0 && barH > 12) {
+          ctx.fillStyle = '#495057'; ctx.font = 'bold 9px -apple-system,sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(Math.round(val*10)/10, x + barW/2, y - 3);
+        }
       }
     });
   });
 
-  // X labels
-  labels.forEach((lbl, i) => {
-    ctx.fillStyle = '#495057'; ctx.font = '9px -apple-system,sans-serif';
-    ctx.textAlign = 'center';
-    const x = pad.l + i * groupW + groupW/2;
-    ctx.fillText(String(lbl).substring(0, 8), x, h - 6);
-  });
+  // X-axis labels
+  ctx.fillStyle = '#868e96'; ctx.font = (isHourly?'7.5px':'9px')+' -apple-system,sans-serif';
+  ctx.textAlign = 'center';
+  if (isHourly) {
+    // Show all 24 hours but compactly: label every 2 hours for legibility
+    labels.forEach((lbl, i) => {
+      const x = pad.l + i * groupW + groupW/2;
+      // Show even hours only as numbers; tick marks for all
+      if (i % 2 === 0) {
+        ctx.fillStyle = '#868e96';
+        ctx.fillText(String(i), x, h - 8);
+      }
+      // Small tick mark for every hour
+      ctx.strokeStyle = '#dee2e6'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, pad.t + ch); ctx.lineTo(x, pad.t + ch + 2); ctx.stroke();
+    });
+    // "hour" axis caption
+    ctx.fillStyle = '#adb5bd'; ctx.font = '8px -apple-system,sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('hour →', w - pad.r, h - 1);
+  } else {
+    labels.forEach((lbl, i) => {
+      if (!lbl) return;
+      const x = pad.l + i * groupW + groupW/2;
+      ctx.fillText(String(lbl).substring(0, 9), x, h - 8);
+    });
+  }
 
-  // Legend
+  // Legend (top, compact)
   if (datasets.length > 1) {
     let lx = pad.l;
+    ctx.font = '9px -apple-system,sans-serif';
     datasets.forEach(ds => {
-      ctx.fillStyle = ds.color; ctx.fillRect(lx, 4, 10, 8);
-      ctx.fillStyle = '#495057'; ctx.font = '9px -apple-system,sans-serif';
-      ctx.textAlign = 'left'; ctx.fillText(ds.label, lx + 13, 11);
-      lx += 13 + ctx.measureText(ds.label).width + 12;
+      ctx.fillStyle = ds.color;
+      if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(lx, 3, 9, 9, 2); ctx.fill(); }
+      else ctx.fillRect(lx, 3, 9, 9);
+      ctx.fillStyle = '#495057'; ctx.textAlign = 'left';
+      ctx.fillText(ds.label, lx + 12, 11);
+      lx += 12 + ctx.measureText(ds.label).width + 12;
     });
   }
 }
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TARGET HELPER — returns daily targets per baby age
@@ -2658,7 +2773,7 @@ PAGES['feeding'] = function(el) {
         if (h >= 0 && h < 24) hrs[h]++;
       });
       return {
-        labels: Array.from({length:24}, (_,i) => i+'h'),
+        labels: Array.from({length:24}, (_,i) => String(i)),
         datasets: [{label:'Feeds', data: hrs, color:'#2D8F8F'}]
       };
     } else if (view === 'daily') {
@@ -2679,7 +2794,7 @@ PAGES['feeding'] = function(el) {
         return d.toISOString().split('T')[0];
       });
       return {
-        labels: ['4w ago','3w ago','2w ago','This wk'],
+        labels: ['4 wks ago','3 wks ago','2 wks ago','This week'],
         datasets: [{label:'Total feeds', data: weeks.map(wS => {
           const wE = new Date(wS); wE.setDate(wE.getDate()+7);
           return state.feedingLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]).length;
@@ -2736,8 +2851,9 @@ PAGES['feeding'] = function(el) {
         <div class="rec-item"><span class="rec-label">Amount per feed</span><span class="rec-val">${rec.feedAmt}</span></div>
         <div class="rec-item"><span class="rec-label">Today's feeds</span><span class="rec-val" style="color:${statusColor}">${tf} ${statusIcon}</span></div>
         <div style="font-size:11px;color:#555;margin-top:6px;line-height:1.5">${rec.feeding}</div>
-      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666">
-        Set baby's date of birth in Baby Profile to see age-based feeding targets.
+      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <span style="font-size:12px;color:#666">Set baby's birth date to see feeding targets</span>
+        <button onclick="openBabySettings()" class="btn btn-teal btn-sm" style="flex-shrink:0;font-size:12px">Set birth date</button>
       </div>`}
 
       <!-- Quick log -->
@@ -2758,9 +2874,9 @@ PAGES['feeding'] = function(el) {
       <div class="card" id="feed-full-form" style="display:none;margin-bottom:10px">
         <div class="card-title">Log a feed</div>
         ${isMultiples() ? renderBabySelector(0,'setFFBaby')+'<input type="hidden" id="ff-baby" value="0">' : ''}
-        <div class="form-row">
-          <div class="form-field"><label>Date</label><input type="date" id="f-date" value="${today()}"></div>
-          <div class="form-field"><label>Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}"></div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-end">
+          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="f-date" value="${today()}" style="font-size:13px;padding:8px 10px"></div>
+          <div style="width:100px"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" style="font-size:13px;padding:8px 10px"></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>Left breast (min)</label><input type="number" id="f-left" min="0" placeholder="0" inputmode="numeric"></div>
@@ -2859,7 +2975,7 @@ PAGES['sleep'] = function(el) {
         const h = parseInt(l.start?.split(':')[0]||0);
         if (h>=0&&h<24) hrs[h] += calcDur(l);
       });
-      return {labels: Array.from({length:24},(_,i)=>i+'h'), datasets:[{label:'Hrs', data:hrs.map(v=>Math.round(v*10)/10), color:'#185FA5'}]};
+      return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:'Hrs', data:hrs.map(v=>Math.round(v*10)/10), color:'#185FA5'}]};
     } else if (view === 'daily') {
       const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split('T')[0]; });
       const night = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&l.type==='Night').reduce((a,l)=>a+calcDur(l),0)*10)/10);
@@ -2867,7 +2983,7 @@ PAGES['sleep'] = function(el) {
       return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[{label:'Night',data:night,color:'#1B3A6B'},{label:'Naps',data:naps,color:'#534AB7'}]};
     } else {
       const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return d.toISOString().split('T')[0]; });
-      return {labels:['4w ago','3w ago','2w ago','This wk'], datasets:[{label:'Avg hrs/day', data:weeks.map(wS=>{
+      return {labels:['4 wks ago','3 wks ago','2 wks ago','This week'], datasets:[{label:'Avg hrs/day', data:weeks.map(wS=>{
         const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEStr=wE.toISOString().split('T')[0];
         const total=state.sleepLog.filter(l=>l.date>=wS&&l.date<wEStr).reduce((a,l)=>a+calcDur(l),0);
         return Math.round(total/7*10)/10;
@@ -2913,7 +3029,10 @@ PAGES['sleep'] = function(el) {
         <div class="rec-item"><span class="rec-label">Total sleep / day</span><span class="rec-val">${rec.sleep}</span></div>
         <div class="rec-item"><span class="rec-label">Longest stretch</span><span class="rec-val">${rec.sleepStretch}</span></div>
         <div class="rec-item"><span class="rec-label">Today total</span><span class="rec-val" style="color:${statusColor}">${totalHrs.toFixed(1)}h</span></div>
-      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666">Set baby's date of birth to see sleep targets.</div>`}
+      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <span style="font-size:12px;color:#666">Set baby's birth date to see sleep targets</span>
+        <button onclick="openBabySettings()" class="btn btn-teal btn-sm" style="flex-shrink:0;font-size:12px">Set birth date</button>
+      </div>`}
 
       <div class="card" style="margin-bottom:10px">
         <div class="card-title">Quick log</div>
@@ -2928,13 +3047,13 @@ PAGES['sleep'] = function(el) {
 
       <div class="card" id="sleep-full-form" style="display:none;margin-bottom:10px">
         <div class="card-title">Log exact sleep</div>
-        <div class="form-row">
-          <div class="form-field"><label>Date</label><input type="date" id="s-date" value="${today()}"></div>
-          <div class="form-field"><label>Type</label><select id="s-type"><option>Night</option><option>Day nap</option></select></div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:2"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="s-date" value="${today()}" style="font-size:13px;padding:8px 10px"></div>
+          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Type</label><select id="s-type" style="font-size:13px;padding:8px 10px"><option>Night</option><option>Day nap</option></select></div>
         </div>
-        <div class="form-row">
-          <div class="form-field"><label>Start</label><input type="time" id="s-start"></div>
-          <div class="form-field"><label>End</label><input type="time" id="s-end"></div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Start</label><input type="time" id="s-start" style="font-size:13px;padding:8px 10px"></div>
+          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">End</label><input type="time" id="s-end" style="font-size:13px;padding:8px 10px"></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>Quality</label><select id="s-qual"><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option></select></div>
@@ -3012,7 +3131,7 @@ PAGES['diaper'] = function(el) {
       state.diaperLog.filter(l=>l.date===today()).forEach(l=>{
         const h=parseInt(l.time?.split(':')[0]||0); if(h>=0&&h<24){if(l.wet)wet[h]++;if(l.dirty)dirty[h]++;}
       });
-      return {labels:Array.from({length:24},(_,i)=>i+'h'), datasets:[{label:'Wet',data:wet,color:'#185FA5'},{label:'Dirty',data:dirty,color:'#0F6E56'}]};
+      return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:'Wet',data:wet,color:'#185FA5'},{label:'Dirty',data:dirty,color:'#0F6E56'}]};
     } else if (view === 'daily') {
       const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
       return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[
@@ -3021,7 +3140,7 @@ PAGES['diaper'] = function(el) {
       ]};
     } else {
       const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
-      return {labels:['4w ago','3w ago','2w ago','This wk'], datasets:[
+      return {labels:['4 wks ago','3 wks ago','2 wks ago','This week'], datasets:[
         {label:'Wet/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.wet).length;}),color:'#185FA5'},
         {label:'Dirty/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.dirty).length;}),color:'#0F6E56'},
       ]};
@@ -3066,7 +3185,10 @@ PAGES['diaper'] = function(el) {
         <div class="rec-item"><span class="rec-label">Expected stool colour</span><span class="rec-val">${rec.color}</span></div>
         <div class="rec-item"><span class="rec-label">Today wet count</span><span class="rec-val" style="color:${statusColor}">${wet} / ${wetTarget} ${wetOk==='good'?'✓':''}</span></div>
         <div style="font-size:11px;color:#555;margin-top:6px;line-height:1.5">${rec.diaper||''}</div>
-      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666">Set baby's date of birth to see diaper targets.</div>`}
+      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <span style="font-size:12px;color:#666">Set baby's birth date to see nappy targets</span>
+        <button onclick="openBabySettings()" class="btn btn-teal btn-sm" style="flex-shrink:0;font-size:12px">Set birth date</button>
+      </div>`}
 
       <div class="card" style="margin-bottom:10px">
         <div class="card-title">Quick log</div>
@@ -3080,9 +3202,9 @@ PAGES['diaper'] = function(el) {
       </div>
 
       <div class="card" id="diaper-full-form" style="display:none;margin-bottom:10px">
-        <div class="form-row">
-          <div class="form-field"><label>Date</label><input type="date" id="d-date" value="${today()}"></div>
-          <div class="form-field"><label>Time</label><input type="time" id="d-time" value="${new Date().toTimeString().slice(0,5)}"></div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="d-date" value="${today()}" style="font-size:13px;padding:8px 10px"></div>
+          <div style="width:100px"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Time</label><input type="time" id="d-time" value="${new Date().toTimeString().slice(0,5)}" style="font-size:13px;padding:8px 10px"></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>Wet?</label><select id="d-wet"><option>Yes</option><option>No</option></select></div>
@@ -3160,7 +3282,7 @@ PAGES['reading'] = function(el) {
       ]};
     } else if (view === 'weekly') {
       const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
-      return {labels:['4w ago','3w ago','2w ago','This wk'], datasets:[
+      return {labels:['4 wks ago','3 wks ago','2 wks ago','This week'], datasets:[
         {label:'Min/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.readingLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]).reduce((a,l)=>a+(parseInt(l.minutes)||0),0);}),color:'#185FA5'},
       ]};
     }
@@ -3875,28 +3997,30 @@ PAGES['milestones'] = function(el) {
       const total = MILESTONES.filter(m => m[0] === age).length;
       const done = MILESTONES.filter((m,i) => m[0] === age && state.milestones[i]?.achieved).length;
       html += `<div class="section-hdr" style="background:#1B3A6B">${age} <span style="font-size:11px;opacity:.7;margin-left:6px">${done}/${total} achieved</span></div>
-        <div class="card" style="padding:4px 0;margin-bottom:6px">
+        <div class="card" style="padding:0;margin-bottom:8px;overflow:hidden">
         ${ageMils.map(m => {
           const i = MILESTONES.indexOf(m);
           const s = state.milestones[i] || {};
           const color = DOMAIN_COLORS[m[3]] || '#888';
-          return `<div class="milestone-row ${s.achieved?'achieved':''}">
-            <div class="domain-dot" style="background:${color}"></div>
-            <div style="flex:1">
-              <div class="mtext" style="font-size:13px;line-height:1.4;${m[5]?'font-weight:600;color:#C0392B':''}">${m[2]}${m[5]?' 🚨':''}</div>
-              <div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap">
-                <span class="badge" style="background:${color}22;color:${color}">${m[3]}</span>
-                ${s.date ? `<span style="font-size:10px;color:#888">Achieved: ${s.date}</span>` : ''}
-                ${m[4] ? `<span style="font-size:10px;color:#aaa;font-style:italic">${m[4].substring(0,60)}${m[4].length>60?'…':''}</span>` : ''}
+          return `<div style="padding:12px 14px;border-bottom:1px solid #f0f0f0;${s.achieved?'opacity:.6':''}">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;margin-top:4px"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:600;line-height:1.4;color:${m[5]?'#C0392B':s.achieved?'#aaa':'#1a1a1a'};${s.achieved?'text-decoration:line-through':''}">${m[2]}${m[5]?' 🚨':''}</div>
+                <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;align-items:center">
+                  <span class="badge" style="background:${color}22;color:${color};font-size:10px">${m[3]}</span>
+                  ${s.date ? `<span style="font-size:10px;color:#0F6E56">✓ ${s.date}</span>` : ''}
+                </div>
+                ${m[4] ? `<div style="font-size:11px;color:#aaa;font-style:italic;margin-top:4px;line-height:1.4">${m[4].substring(0,80)}${m[4].length>80?'…':''}</div>` : ''}
               </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;margin-left:8px">
-              <button onclick="toggleMilestone(${i})" style="padding:4px 10px;border-radius:10px;border:1.5px solid ${s.achieved?'#0F6E56':'#ddd'};background:${s.achieved?'#E1F5EE':'transparent'};color:${s.achieved?'#0F6E56':'#888'};font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">
-                ${s.achieved?'✓ Done':'Mark done'}
-              </button>
-              <button onclick="toggleConcern(${i})" style="padding:3px 8px;border-radius:10px;border:1.5px solid ${s.concern?'#C0392B':'#ddd'};background:${s.concern?'#FCEBEB':'transparent'};color:${s.concern?'#C0392B':'#aaa'};font-size:10px;cursor:pointer;font-family:inherit">
-                ${s.concern?'⚠ Flagged':'Flag concern'}
-              </button>
+              <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:4px">
+                <button onclick="toggleMilestone(${i})" style="padding:5px 11px;border-radius:8px;border:1.5px solid ${s.achieved?'#0F6E56':'#ddd'};background:${s.achieved?'#E1F5EE':'#fff'};color:${s.achieved?'#0F6E56':'#666'};font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">
+                  ${s.achieved?'✓ Done':'Mark done'}
+                </button>
+                <button onclick="toggleConcern(${i})" style="padding:4px 10px;border-radius:8px;border:1.5px solid ${s.concern?'#C0392B':'#eee'};background:${s.concern?'#FCEBEB':'#fff'};color:${s.concern?'#C0392B':'#aaa'};font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap">
+                  ${s.concern?'⚠ Flagged':'Flag'}
+                </button>
+              </div>
             </div>
           </div>`;
         }).join('')}
@@ -3908,7 +4032,7 @@ PAGES['milestones'] = function(el) {
   // Custom milestones
   const customMils = state.customMilestones || [];
   if (customMils.length > 0 && filterAchieved !== 'concern') {
-    html += `<div class="section-hdr" style="background:#534AB7">⭐ Custom Milestones & Notes</div><div class="card" style="padding:4px 0;margin-bottom:6px">`;
+    html += `<div class="section-hdr" style="background:#534AB7">⭐ Custom Milestones & Notes</div><div class="card" style="padding:0;margin-bottom:8px;overflow:hidden">`;
     customMils.forEach((m, ci) => {
       const idx = MILESTONES.length + ci;
       const s = state.milestones[idx] || {};
@@ -4177,8 +4301,8 @@ PAGES['bilingual'] = function(el) {
       <div class="card">
         <div class="card-title">Implementation</div>
         ${[
-          ['Father role','Speaks Indonesian exclusively with baby'],
-          ['Mother role','Speaks English exclusively with baby'],
+          ['Dad role','Speaks Indonesian exclusively with baby'],
+          ['Mom role','Speaks English exclusively with baby'],
           ['Together','Each parent maintains their language — baby hears natural code-switching'],
           ['Supplement','English-only bedtime reading if OPOL not possible'],
           ['3rd language','Introduce after age 4–5 when both languages are established'],
@@ -4323,7 +4447,7 @@ PAGES['montessori'] = function(el) {
     {age:"9–12 Months",env:"Low open shelves with 4–6 items. Weaning table and chair. Art area (safe materials). Climbing triangle (Pikler).",activities:"Shape sorters. Nesting cups. Push walker. Simple puzzles (1–3 pieces). Crayons on paper. Real household objects.",toys:"Rotate every 7–10 days. Include 1 challenging item per rotation. Store rest out of sight.",independence:"Dress/undress with participation. 'Can you hold this?' Simple choices: 'Red cup or blue cup?'",parent:"Show, don't tell. Demonstrate slowly and completely. Let them try and try again."},
     {age:"1–2 Years",env:"Practical life shelf: dressing frames, pouring practice, spooning. Child-height hooks, shoe rack. Independent access to water.",activities:"Dressing frames. Pouring water. Spooning dry goods. Simple puzzles 4–6 pieces. Painting, playdough.",toys:"Introduce practical life activities weekly. Keep art materials accessible. Rotate 5–7 items.",independence:"Set own shoes out. Water own plant. Wipe spills. Pour own drink. Clear own plate. Choose clothes from 2 options.",parent:"Teach how, then step back. Prepare environment so success is possible. Never redo what child did."},
     {age:"2–3 Years",env:"Full practical life area: sweeping, mopping, food prep. Art corner. Reading nook at child height. Nature table.",activities:"Sweeping. Washing dishes. Folding laundry. Chopping soft foods (safe knife). Watercolour. Clay.",toys:"One new practical life activity per week. Allow repetition — toddlers repeat to master. Don't interrupt activity cycles.",independence:"Set own breakfast. Wipe own table. Dress independently. Wash hands alone. Participate in meal prep daily.",parent:"Prepare before presenting. Show step-by-step without words when possible. Follow child's chosen activity."},
-    {age:"3–5 Years",env:"Reading and math materials (sandpaper letters, number rods). Map / globe. Art studio. Cooking participation. Garden access.",activities:"Sandpaper letters → moveable alphabet. Number rods. Maps. Cooking (simple recipes). Sewing cards. Real instruments.",toys:"Follow child's interest trajectory. Introduce cultural materials. Allow long uninterrupted work periods (60–90 min).",independence:"Full morning routine independently. Pack own bag. Help cook simple meals. Write letters to family. Care for pets.",parent:"Guardian of the environment. Minimum intervention. Long uninterrupted work periods. Observe and note interests."},
+    {age:"3–5 Years",env:"Reading and math materials (sandpaper letters, number rods). Map / globe. Art studio. Cooking participation. Garden access.",activities:"Sandpaper letters → moveable alphabet. Number rods. Maps. Cooking (simple recipes). Sewing cards. Real instruments.",toys:"Follow child's interest trajectory. Introduce cultural materials. Allow long uninterrupted work periods (60–90 min).",independence:"Full morning routine independently. Pack own bag. Help cook simple meals. Write letters to family. Care for pets.",parent:"Guardian of the environment. Minimom intervention. Long uninterrupted work periods. Observe and note interests."},
   ];
 
   el.innerHTML = `
@@ -4387,8 +4511,8 @@ PAGES['rie'] = function(el) {
 
 PAGES['knowledge'] = function(el) {
   const sections = [
-    {title:"🚨 Emergency Contacts",fields:['AMBULANCE (national)','Fire (113)','Police (110)','OBGYN primary','OBGYN backup','Pediatrician primary','Nearest ER (hospital 1)','Nearest ER (hospital 2)','Nearest Puskesmas','Father\'s mother / Nenek','Mother\'s mother','Baby nurse / Suster bayi']},
-    {title:"🏥 Medical Records",fields:['Mother blood type','Father blood type','Mother allergies','Mother current medications','Mother BPJS number','Mother private insurance','Baby BPJS (after registration)','Baby blood type (once known)','Baby allergies (to update)','Pediatrician clinic address']},
+    {title:"🚨 Emergency Contacts",fields:['AMBULANCE (national)','Fire (113)','Police (110)','OBGYN primary','OBGYN backup','Pediatrician primary','Nearest ER (hospital 1)','Nearest ER (hospital 2)','Nearest Puskesmas','Dad\'s mom / Nenek','Mom\'s mom','Baby nurse / Suster bayi']},
+    {title:"🏥 Medical Records",fields:['Mom blood type','Dad blood type','Mom allergies','Mom current medications','Mom BPJS number','Mom private insurance','Baby BPJS (after registration)','Baby blood type (once known)','Baby allergies (to update)','Pediatrician clinic address']},
     {title:"📋 Caregiver Instructions",fields:['Baby feeding schedule','Breast milk storage (room temp)','Breast milk storage (fridge)','Breast milk storage (freezer)','Safe sleep rule','Bathing temperature','Umbilical cord care','When to call doctor','Night feeding protocol','Visitor policy']},
     {title:"📄 Documents Checklist",fields:['Akta Kelahiran (birth certificate)','Kartu Keluarga update (add baby)','BPJS Kesehatan registration','Private insurance registration','Passport (if travel planned)','Wills / guardianship update']},
   ];
@@ -4763,7 +4887,7 @@ document.addEventListener('DOMContentLoaded', () => {
   injectLandingCodeStep();
 
   // If already set up, skip landing entirely
-  if (state.familyId && state.mumName) {
+  if (state.familyId && state.momName) {
     proceedToApp();
   }
   // Else show landing — already visible by default
