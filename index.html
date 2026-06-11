@@ -4675,7 +4675,7 @@ function resetNavSlots() {
 const _origShowPage = showPage;
 // showPage already defined below — patch after
 
-loadState();
+saveState();
 // Update sidebar subtitle
 // ── BABY IDENTITY HELPERS ──────────────────────────────────────────────────
 function babyName() { return state.babyName || null; }
