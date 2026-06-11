@@ -2,6 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* ============================================================
+   🔧 BABY OS CONFIG — edit only this line:
+   Replace with your own Firebase Realtime Database URL.
+   Get it from: console.firebase.google.com
+   → your project → Realtime Database → the URL at the top
+   ============================================================ */
+const FB_URL = 'https://babyos-sync-default-rtdb.firebaseio.com';
+// ↑↑↑ REPLACE THIS URL with your own Firebase project URL ↑↑↑
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Baby OS</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -278,6 +288,27 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 </head>
 <body>
 
+<script>
+/* ============================================================
+   🔧 BABY OS CONFIG — EDIT THIS SECTION ONLY
+   ============================================================
+   Replace the URL below with your own Firebase Realtime
+   Database URL. Get it from:
+   console.firebase.google.com → your project →
+   Realtime Database → copy the URL shown at the top.
+
+   It looks like:
+   https://YOUR-PROJECT-NAME-default-rtdb.firebaseio.com
+   OR
+   https://YOUR-PROJECT-NAME-default-rtdb.REGION.firebasedatabase.app
+   ============================================================ */
+
+
+/* ============================================================
+   END OF CONFIG — do not edit below this line
+   ============================================================ */
+</script>
+
 <!-- ══════════════════════════════════════════════════════════════════════════
      LANDING PAGE
 ══════════════════════════════════════════════════════════════════════════ -->
@@ -462,7 +493,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 // ══════════════════════════════════════════════════════════════════════════════
 // FIREBASE REALTIME DATABASE — Free sync between devices
 // ══════════════════════════════════════════════════════════════════════════════
-const FB_URL = 'https://nandira-app-default-rtdb.firebaseio.com/';
+
 
 async function fbRead(path) {
   try {
@@ -474,22 +505,30 @@ async function fbRead(path) {
 
 async function fbWrite(path, data) {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
     const r = await fetch(FB_URL + path + '.json', {
       method: 'PUT',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     return r.ok;
   } catch(e) { return false; }
 }
 
 async function fbPatch(path, data) {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
     const r = await fetch(FB_URL + path + '.json', {
       method: 'PATCH',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     return r.ok;
   } catch(e) { return false; }
 }
@@ -606,20 +645,19 @@ function saveLocal() {
   try { localStorage.setItem(LOCAL_KEY, JSON.stringify(state)); } catch(e) {}
 }
 
-async function saveState(changedKey) {
+function saveState(changedKey) {
+  // Always save locally first — instant, never fails
   saveLocal();
-  if (changedKey) await pushToCloud(changedKey, state[changedKey]);
-  else {
-    const fid = state.familyId;
-    if (fid) {
-      setSyncStatus('syncing');
-      const ok = await fbPatch('/families/' + fid + '/state', state);
-      setSyncStatus(ok ? 'synced' : 'error');
+  // Push to Firebase in background — never block the UI
+  const fid = state.familyId;
+  if (fid) {
+    setSyncStatus('syncing');
+    if (changedKey) {
+      pushToCloud(changedKey, state[changedKey]).then(ok => setSyncStatus(ok?'synced':'error'));
+    } else {
+      fbPatch('/families/' + fid + '/state', state).then(ok => setSyncStatus(ok?'synced':'error'));
     }
   }
-  // Show save indicator
-  const si = document.getElementById('save-ind');
-  if (si) { si.style.opacity='1'; setTimeout(()=>si.style.opacity='0',1200); }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -650,13 +688,8 @@ async function joinFamily() {
   if (!foundId) { landingToast('Family code not found. Check and try again.'); return; }
   state = {...state, ...foundData, familyId: foundId};
   saveLocal();
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('app').style.display = '';
-  updateSubtitles();
-  renderBottomNav('dashboard');
-  navTo('dashboard');
-  startSync();
-  toast('Joined family! ' + (state.babyName || 'Baby') + ' 👶');
+  proceedToApp();
+  toast('Joined! Welcome to ' + (state.babyName || 'Baby') + '’s family 👶');
 }
 
 async function completeLandingSetup() {
@@ -690,26 +723,35 @@ async function completeLandingSetup() {
     keyDates: getDefaultKeyDates(edd),
   };
   saveLocal();
-  
-  // Push to Firebase
-  setSyncStatus('syncing');
-  const ok = await fbWrite('/families/' + familyId + '/state', state);
-  setSyncStatus(ok ? 'synced' : 'error');
-  
-  // Show family code
+
+  // Show family code IMMEDIATELY (don't wait for Firebase)
   const codeEl = document.getElementById('family-code-display');
+  const codeRep = document.getElementById('code-repeat');
   if (codeEl) codeEl.textContent = familyCode;
-  document.getElementById('landing-step3').style.display = 'none';
-  document.getElementById('landing-code-step').style.display = 'block';
+  if (codeRep) codeRep.textContent = familyCode;
+  const step3 = document.getElementById('landing-step3');
+  if (step3) step3.style.display = 'none';
+  const codeStep = document.getElementById('landing-code-step');
+  if (codeStep) codeStep.style.display = 'block';
+
+  // Push to Firebase in background — don't block the UI
+  setSyncStatus('syncing');
+  fbWrite('/families/' + familyId + '/state', state).then(ok => {
+    setSyncStatus(ok ? 'synced' : 'error');
+    if (!ok) console.warn('Firebase write failed — data saved locally, will retry on next save');
+  });
 }
 
 function proceedToApp() {
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('app').style.display = '';
+  const landing = document.getElementById('landing');
+  const app = document.getElementById('app');
+  if (landing) landing.style.display = 'none';
+  if (app) app.style.display = '';
   updateSubtitles();
   renderBottomNav('dashboard');
   navTo('dashboard');
-  startSync();
+  // Start sync in background after a short delay
+  setTimeout(() => startSync(), 1000);
 }
 
 let _landingGender = 'surprise';
@@ -4845,28 +4887,12 @@ function injectLandingCodeStep() {
 document.addEventListener('DOMContentLoaded', () => {
   loadLocal();
   injectLandingCodeStep();
-  
-  // Patch completeLandingSetup to update code display
-  const _orig = window.completeLandingSetup;
-  window.completeLandingSetup = async function() {
-    await _orig();
-    // Update code display elements
-    const codeEl = document.getElementById('family-code-display');
-    const codeRep = document.getElementById('code-repeat');
-    if (codeEl) codeEl.textContent = state.familyCode || '—';
-    if (codeRep) codeRep.textContent = state.familyCode || '—';
-  };
 
-  // If already set up, skip landing
+  // If already set up, skip landing entirely
   if (state.familyId && state.mumName) {
-    document.getElementById('landing').style.display = 'none';
-    document.getElementById('app').style.display = '';
-    updateSubtitles();
-    renderBottomNav('dashboard');
-    navTo('dashboard');
-    startSync();
+    proceedToApp();
   }
-  // Else show landing
+  // Else show landing — already visible by default
 });
 </script>
 </body>
