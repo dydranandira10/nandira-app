@@ -1521,7 +1521,9 @@ function openBabySettings() {
     }
     babiesContainer.innerHTML = html;
   }
-  document.getElementById('bs-nbabies').addEventListener('change', renderBsProfiles);
+  // Use direct reference — sheet not in DOM yet so getElementById won't work
+  const nbSelect = nbf.querySelector('select');
+  if (nbSelect) nbSelect.addEventListener('change', renderBsProfiles);
   renderBsProfiles();
 
   // EDD + Caesarian + DOB
@@ -3791,11 +3793,9 @@ function renderBabySelector(activeIdx, onClickFn, includeAll=false) {
   html += '</div>';
   return html;
 }
-</script>
 
-<script>
 
-// ──────────────────────────────────────────────────────────────
+
 PAGES['first100'] = function(el) {
   el.innerHTML = `
     <div class="page-header">
@@ -3828,471 +3828,7 @@ PAGES['first100'] = function(el) {
 };
 
 // ── 100 FOODS ─────────────────────────────────────────────────────────────────
-PAGES['foods'] = function(el) {
-  const foodsDone = FOODS_ALL.filter((_,i) => state.foods[i]?.tried).length;
-  const allergensDone = FOODS_ALL.filter((f,i) => f[5] && state.foods[i]?.tried).length;
-  const allergensTotal = FOODS_ALL.filter(f => f[5]).length;
-  const concerns = FOODS_ALL.filter((f,i) => state.foods[i]?.tried &&
-    !['None','Loved it','Liked it','Neutral',''].includes(state.foods[i]?.reaction || 'None')).length;
-  let selectedFood = null;
-  let filterMode = 'all';
-  let searchQ = '';
-  let expandedGroups = Object.fromEntries(Object.keys(GROUP_META).map(g => [g, true]));
 
-  function render() {
-    const foodsDone = FOODS_ALL.filter((_,i) => state.foods[i]?.tried).length;
-    const pct = Math.round(foodsDone);
-
-    const filtered = FOODS_ALL.filter((f, i) => {
-      const q = searchQ.toLowerCase();
-      if (q && !f[1].toLowerCase().includes(q) && !f[2].toLowerCase().includes(q)) return false;
-      if (filterMode === 'tried') return state.foods[i]?.tried;
-      if (filterMode === 'untried') return !state.foods[i]?.tried;
-      if (filterMode === 'allergen') return f[5];
-      if (filterMode === 'concern') return state.foods[i]?.tried && !['None','Loved it','Liked it','Neutral',''].includes(state.foods[i]?.reaction || 'None');
-      return true;
-    });
-
-    const byGroup = {};
-    filtered.forEach(f => { if (!byGroup[f[2]]) byGroup[f[2]] = []; byGroup[f[2]].push(f); });
-
-    let html = `
-      <div class="grid-4" style="margin-bottom:14px">
-        <div class="stat-card" style="background:#1B3A6B"><div class="val">${foodsDone}</div><div class="lbl">Foods tried</div></div>
-        <div class="stat-card" style="background:#2D8F8F"><div class="val">${100-foodsDone}</div><div class="lbl">Remaining</div></div>
-        <div class="stat-card" style="background:#C0392B"><div class="val">${allergensDone}/${allergensTotal}</div><div class="lbl">Allergens tried</div></div>
-        <div class="stat-card" style="background:#854F0B"><div class="val">${concerns}</div><div class="lbl">Watch reactions</div></div>
-      </div>
-      <div class="card" style="margin-bottom:14px;padding:12px 16px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:12px;font-weight:600;color:#555">Progress: ${foodsDone}/100 foods</span>
-          <span style="font-size:12px;font-weight:700;color:#2D8F8F">${pct}%</span>
-        </div>
-        ${pctBar(pct,'#2D8F8F',8)}
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px">
-          ${Object.keys(GROUP_META).map(g => {
-            const t = FOODS_ALL.filter(f => f[2]===g).length;
-            const d = FOODS_ALL.filter((f,i) => f[2]===g && state.foods[i]?.tried).length;
-            const {color} = GROUP_META[g];
-            return `<div onclick="setFoodFilter('${g}')" style="cursor:pointer;padding:5px 8px;border-radius:6px;border:1.5px solid ${filterMode===g?color:'#eee'}">
-              <div style="font-size:11px;font-weight:600;color:${color}">${g.split(' ')[0] === 'Protein' ? 'Protein' : g}</div>
-              <div style="font-size:10px;color:#888">${d}/${t}</div>
-              ${pctBar(t?d/t*100:0,color,3)}
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-        ${[['all','All'],['tried','Tried ✓'],['untried','Not tried'],['allergen','Allergens'],['concern','Concerns']].map(([v,l]) =>
-          `<button class="tab-btn ${filterMode===v?'active':''}" onclick="setFoodFilter('${v}')">${l}</button>`
-        ).join('')}
-        <input type="text" placeholder="Search foods..." value="${searchQ}" oninput="foodSearch(this.value)"
-          style="flex:1;min-width:130px;max-width:220px;padding:6px 10px;font-size:12px">
-      </div>
-    `;
-
-    if (selectedFood !== null) {
-      const f = FOODS_ALL[selectedFood];
-      const s = state.foods[selectedFood] || {};
-      const gm = GROUP_META[f[2]];
-      const am = AGE_META[f[3]] || {};
-      html += `<div class="card" style="margin-bottom:14px;border-left:4px solid ${gm.color}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-          <div>
-            <div style="font-size:16px;font-weight:700;color:#1a1a1a">${f[0]}. ${f[1]}</div>
-            <div style="display:flex;gap:6px;margin-top:5px;flex-wrap:wrap">
-              <span class="badge" style="background:${gm.bg};color:${gm.color}">${f[2]}</span>
-              <span class="badge" style="background:${am.bg||'#f0f0f0'};color:${am.color||'#888'}">${f[3]}</span>
-              ${f[4] ? `<span class="badge" style="background:#fff5f5;color:#888">Texture: ${f[4]}</span>` : ''}
-              ${f[5] ? '<span class="badge" style="background:#FCEBEB;color:#C0392B">⚠ Top allergen — watch 48hrs</span>' : ''}
-            </div>
-          </div>
-          <button onclick="selectedFood=null;renderFoods()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#aaa">✕</button>
-        </div>
-        <div class="detail-panel" style="margin-bottom:12px">
-          <div class="dp-title">How to prepare (Indonesian kitchen)</div>
-          ${f[6]}
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:${s.tried?'12px':'0'}">
-          <button class="btn ${s.tried?'btn-green':'btn-teal'}" onclick="toggleFood(${selectedFood})">${s.tried?'✓ Tried':'Mark as tried'}</button>
-          ${s.tried ? `<input type="text" placeholder="Age tried (e.g. 7 months)" value="${s.ageTried||''}" oninput="setFoodAge(${selectedFood},this.value)" style="width:160px">` : ''}
-        </div>
-        ${s.tried ? `
-          <div style="font-size:11px;font-weight:600;color:#777;margin-bottom:6px">Baby's reaction</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
-            ${['None','Loved it','Liked it','Neutral','Refused','Mild rash','Hives','Vomiting','Diarrhea','Watch again'].map(r =>
-              `<button onclick="setFoodReaction(${selectedFood},'${r}')" style="padding:4px 10px;border-radius:12px;border:1.5px solid ${(s.reaction||'None')===r?'#2D8F8F':'#ddd'};background:${(s.reaction||'None')===r?'#E1F5EE':'#fff'};color:${(s.reaction||'None')===r?'#0F6E56':'#555'};font-size:11px;cursor:pointer;font-family:inherit">${r}</button>`
-            ).join('')}
-          </div>
-          <textarea placeholder="Notes — taste, texture, how prepared, baby's response..." rows="2" oninput="setFoodNotes(${selectedFood},this.value)"
-            style="width:100%;resize:none;font-size:12px;padding:8px;border:1px solid #ddd;border-radius:6px;font-family:inherit">${s.notes||''}</textarea>
-        ` : ''}
-      </div>`;
-    }
-
-    Object.keys(GROUP_META).forEach(g => {
-      const gFoods = byGroup[g];
-      if (!gFoods || !gFoods.length) return;
-      const {color, bg} = GROUP_META[g];
-      const total = FOODS_ALL.filter(f => f[2]===g).length;
-      const done = FOODS_ALL.filter((f,i) => f[2]===g && state.foods[i]?.tried).length;
-      const exp = expandedGroups[g] !== false;
-      html += `
-        <div style="margin-bottom:10px">
-          <div onclick="toggleFoodGroup('${g}')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:${color};border-radius:8px;cursor:pointer;user-select:none;margin-bottom:${exp?'6px':'0'}">
-            <span style="font-size:13px;font-weight:600;color:#fff;flex:1">${g}</span>
-            <span style="font-size:11px;color:rgba(255,255,255,.8)">${done}/${total}</span>
-            <div style="width:50px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;overflow:hidden"><div style="height:4px;width:${total?Math.round(done/total*100):0}%;background:rgba(255,255,255,.85)"></div></div>
-            <span style="color:rgba(255,255,255,.7);font-size:12px">${exp?'▾':'▸'}</span>
-          </div>
-          ${exp ? `<div class="food-grid">
-            ${gFoods.map(f => {
-              const i = f[0] - 1;
-              const s = state.foods[i] || {};
-              const am = AGE_META[f[3]] || {};
-              const hasConcern = s.tried && !['None','Loved it','Liked it','Neutral',''].includes(s.reaction||'None');
-              return `<div class="food-card ${s.tried?'tried':''} ${hasConcern?'concern':''}" onclick="selectFood(${i})"
-                style="border-color:${selectedFood===i?color:''}">
-                <span class="fnum">${f[0]}</span>
-                <div class="fname">${f[1]}</div>
-                <div><span class="fage" style="background:${am.bg||'#f0f0f0'};color:${am.color||'#888'}">${f[3]}</span>${f[5]?` <span class="badge" style="background:#FCEBEB;color:#C0392B;font-size:9px">allergen</span>`:''}</div>
-                <div class="ftxt">${f[4]}</div>
-                ${s.tried ? `<div style="font-size:10px;font-weight:600;color:${hasConcern?'#854F0B':'#0F6E56'};margin-top:4px">${s.reaction && s.reaction!=='None' ? s.reaction : '✓ Tried'}${s.ageTried?` · ${s.ageTried}`:''}</div>` : ''}
-              </div>`;
-            }).join('')}
-          </div>` : ''}
-        </div>
-      `;
-    });
-
-    const container = document.getElementById('foods-content');
-    if (container) container.innerHTML = html;
-    else el.innerHTML = `<div class="page-header"><h2>🥣 100 Foods Before 1 Year</h2><p>Indonesia-optimised · ${foodsDone}/100 foods tried</p></div><div id="foods-content">${html}</div>`;
-  }
-
-  window.setFoodFilter = (f) => { filterMode = f; selectedFood = null; render(); };
-  window.foodSearch = (q) => { searchQ = q; render(); };
-  window.selectFood = (i) => { selectedFood = selectedFood === i ? null : i; render(); };
-  window.toggleFood = (i) => { if (!state.foods[i]) state.foods[i] = {}; state.foods[i].tried = !state.foods[i].tried; if (!state.foods[i].tried) { state.foods[i].reaction = 'None'; } saveState(); render(); };
-  window.setFoodReaction = (i, r) => { if (!state.foods[i]) state.foods[i] = {}; state.foods[i].reaction = r; saveState(); render(); };
-  window.setFoodAge = (i, v) => { if (!state.foods[i]) state.foods[i] = {}; state.foods[i].ageTried = v; saveState(); };
-  window.setFoodNotes = (i, v) => { if (!state.foods[i]) state.foods[i] = {}; state.foods[i].notes = v; saveState(); };
-  window.toggleFoodGroup = (g) => { expandedGroups[g] = !expandedGroups[g]; render(); };
-  window.renderFoods = render;
-
-  el.innerHTML = `<div class="page-header"><h2>🥣 100 Foods Before 1 Year</h2><p>Indonesia-optimised · ${foodsDone}/100 foods tried</p></div><div id="foods-content"></div>`;
-  render();
-};
-
-// ── FEEDING LOG ───────────────────────────────────────────────────────────────
-PAGES['feeding'] = function(el) {
-  function render() {
-    const todayLogs = state.feedingLog.filter(l => l.date === today());
-    const totalFeeds = todayLogs.length;
-    const totalLeft = todayLogs.reduce((a,l) => a + (parseInt(l.leftMin)||0), 0);
-    const totalRight = todayLogs.reduce((a,l) => a + (parseInt(l.rightMin)||0), 0);
-    const totalFormula = todayLogs.reduce((a,l) => a + (parseInt(l.formulaMl)||0), 0);
-    const totalPumped = todayLogs.reduce((a,l) => a + (parseInt(l.pumpedMl)||0), 0);
-
-    el.innerHTML = `
-      <div class="page-header"><h2>🍼 Feeding Log</h2><p>Today: ${totalFeeds} feeds · ${totalLeft+totalRight}min breast · ${totalFormula}ml formula</p></div>
-      <div class="grid-4" style="margin-bottom:14px">
-        <div class="stat-card" style="background:#0F6E56"><div class="val">${totalFeeds}</div><div class="lbl">Feeds today</div></div>
-        <div class="stat-card" style="background:#2D8F8F"><div class="val">${totalLeft+totalRight}m</div><div class="lbl">Breast</div></div>
-        <div class="stat-card" style="background:#534AB7"><div class="val">${totalFormula}ml</div><div class="lbl">Formula</div></div>
-        <div class="stat-card" style="background:#854F0B"><div class="val">${totalPumped}ml</div><div class="lbl">Pumped</div></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Quick log</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('left',5)">L 5min</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('left',10)">L 10min</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('left',15)">L 15min</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('right',5)">R 5min</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('right',10)">R 10min</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('right',15)">R 15min</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('formula',60)">60ml formula</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('formula',90)">90ml formula</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFeed('formula',120)">120ml formula</button>
-        </div>
-        <button class="btn btn-outline btn-block btn-sm" onclick="toggleFeedForm()" id="feed-form-toggle">+ Full log entry</button>
-      </div>
-
-      <div class="card" id="feed-form-card" style="display:none">
-        <div class="card-title">Full feed entry</div>
-        <div class="log-input">
-          <div><label>Date</label><input type="date" id="f-date" value="${today()}"></div>
-          <div><label>Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}"></div>
-          <div><label>Left breast (min)</label><input type="number" id="f-left" min="0" placeholder="0" inputmode="numeric"></div>
-          <div><label>Right breast (min)</label><input type="number" id="f-right" min="0" placeholder="0" inputmode="numeric"></div>
-          <div><label>Formula (ml)</label><input type="number" id="f-formula" min="0" placeholder="0" inputmode="numeric"></div>
-          <div><label>Pumped (ml)</label><input type="number" id="f-pump" min="0" placeholder="0" inputmode="numeric"></div>
-        </div>
-        <textarea id="f-notes" placeholder="Notes (which side started, latch quality...)" rows="2"
-          style="width:100%;resize:none;font-size:14px;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-family:inherit;margin-bottom:10px"></textarea>
-        <button class="btn btn-teal btn-block" onclick="addFeed()">Add feed entry</button>
-      </div>
-      <div class="card">
-        <div class="card-title">Feed history (most recent first)</div>
-        ${state.feedingLog.slice().reverse().slice(0,40).map((l,ri) => {
-          const i = state.feedingLog.length - 1 - ri;
-          return `<div class="log-row">
-            <span style="font-size:11px;color:#888;min-width:90px">${l.date} ${l.time}</span>
-            <span class="log-cell" style="font-size:12px">${[
-              l.leftMin ? `L:${l.leftMin}m` : '',
-              l.rightMin ? `R:${l.rightMin}m` : '',
-              l.formulaMl ? `Formula:${l.formulaMl}ml` : '',
-              l.pumpedMl ? `Pumped:${l.pumpedMl}ml` : '',
-            ].filter(Boolean).join(' · ') || '—'}</span>
-            ${l.notes ? `<span style="font-size:11px;color:#888;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.notes}</span>` : ''}
-            <button onclick="delFeed(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;padding:0 4px">×</button>
-          </div>`;
-        }).join('') || '<div style="padding:12px;color:#aaa;text-align:center;font-size:13px">No feeds logged yet</div>'}
-      </div>
-    `;
-  }
-
-  window.addFeed = () => {
-    state.feedingLog.push({
-      date: document.getElementById('f-date').value,
-      time: document.getElementById('f-time').value,
-      leftMin: parseInt(document.getElementById('f-left').value)||0,
-      rightMin: parseInt(document.getElementById('f-right').value)||0,
-      formulaMl: parseInt(document.getElementById('f-formula').value)||0,
-      pumpedMl: parseInt(document.getElementById('f-pump').value)||0,
-      notes: document.getElementById('f-notes').value,
-    });
-    saveState(); render(); toast('Feed logged!');
-  };
-  window.quickFeed = (type, amount) => {
-    const now = new Date();
-    const entry = {
-      date: today(),
-      time: now.toTimeString().slice(0,5),
-      leftMin: 0, rightMin: 0, formulaMl: 0, pumpedMl: 0,
-      notes: 'Quick log',
-    };
-    if (type==='left') entry.leftMin = amount;
-    else if (type==='right') entry.rightMin = amount;
-    else if (type==='formula') entry.formulaMl = amount;
-    else if (type==='pump') entry.pumpedMl = amount;
-    state.feedingLog.push(entry);
-    saveState(); render(); toast(type==='formula' ? amount+'ml formula logged!' : (type==='left'?'L ':type==='right'?'R ':'Pump ')+amount+(type==='pump'?'ml':' min')+' logged!');
-  };
-  window.toggleFeedForm = () => {
-    const card = document.getElementById('feed-form-card');
-    const btn = document.getElementById('feed-form-toggle');
-    if (card) { 
-      const open = card.style.display === 'none';
-      card.style.display = open ? 'block' : 'none';
-      if (btn) btn.textContent = open ? '− Hide form' : '+ Full log entry';
-    }
-  };
-  window.delFeed = (i) => { state.feedingLog.splice(i,1); saveState(); render(); };
-  render();
-};
-
-// ── SLEEP LOG ─────────────────────────────────────────────────────────────────
-PAGES['sleep'] = function(el) {
-  function render() {
-    const todayLogs = state.sleepLog.filter(l => l.date === today());
-    const totalHrs = todayLogs.reduce((a,l) => {
-      if (!l.start || !l.end) return a;
-      const s = new Date(`${l.date}T${l.start}`);
-      const e = new Date(`${l.date}T${l.end}`);
-      return a + Math.max(0, (e - s) / 3600000);
-    }, 0);
-    const longestStretch = todayLogs.reduce((max, l) => {
-      if (!l.start || !l.end) return max;
-      const h = Math.max(0, (new Date(`${l.date}T${l.end}`) - new Date(`${l.date}T${l.start}`)) / 3600000);
-      return Math.max(max, h);
-    }, 0);
-
-    el.innerHTML = `
-      <div class="page-header"><h2>😴 Sleep Log</h2><p>Today: ${totalHrs.toFixed(1)}hrs total · Longest stretch: ${longestStretch.toFixed(1)}hrs</p></div>
-      <div class="grid-3" style="margin-bottom:14px">
-        <div class="stat-card" style="background:#185FA5"><div class="val">${totalHrs.toFixed(1)}h</div><div class="lbl">Total sleep today</div></div>
-        <div class="stat-card" style="background:#534AB7"><div class="val">${longestStretch.toFixed(1)}h</div><div class="lbl">Longest stretch</div></div>
-        <div class="stat-card" style="background:#2D8F8F"><div class="val">${todayLogs.length}</div><div class="lbl">Sleep sessions</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Quick sleep log</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-          <button class="btn btn-outline btn-sm" onclick="quickSleep(30,'Day nap')">30min nap</button>
-          <button class="btn btn-outline btn-sm" onclick="quickSleep(45,'Day nap')">45min nap</button>
-          <button class="btn btn-outline btn-sm" onclick="quickSleep(90,'Day nap')">1.5hr nap</button>
-          <button class="btn btn-outline btn-sm" onclick="quickSleep(180,'Night')">3hr night</button>
-          <button class="btn btn-outline btn-sm" onclick="quickSleep(240,'Night')">4hr night</button>
-          <button class="btn btn-outline btn-sm" onclick="quickSleep(360,'Night')">6hr night</button>
-        </div>
-        <button class="btn btn-outline btn-block btn-sm" onclick="toggleSleepForm()" id="sleep-form-toggle">+ Set exact times</button>
-      </div>
-      <div class="card" id="sleep-form-card" style="display:none">
-        <div class="card-title">Full sleep entry</div>
-        <div class="log-input">
-          <div><label>Date</label><input type="date" id="s-date" value="${today()}"></div>
-          <div><label>Type</label><select id="s-type"><option>Night</option><option>Day nap</option></select></div>
-          <div><label>Sleep start</label><input type="time" id="s-start"></div>
-          <div><label>Sleep end</label><input type="time" id="s-end"></div>
-          <div><label>Quality</label><select id="s-qual"><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option></select></div>
-        </div>
-        <input type="text" id="s-notes" placeholder="Notes (settled quickly, woke for feed...)" style="width:100%;margin-bottom:10px;padding:10px;font-size:14px">
-        <button class="btn btn-teal btn-block" onclick="addSleep()">Log sleep</button>
-      </div>
-      <div class="card">
-        <div class="card-title">Sleep history</div>
-        ${state.sleepLog.slice().reverse().slice(0,30).map((l,ri) => {
-          const i = state.sleepLog.length - 1 - ri;
-          let dur = '';
-          if (l.start && l.end) {
-            const h = Math.max(0, (new Date(`${l.date}T${l.end}`) - new Date(`${l.date}T${l.start}`)) / 3600000);
-            dur = `${h.toFixed(1)}hrs`;
-          }
-          return `<div class="log-row">
-            <span style="font-size:11px;color:#888;min-width:80px">${l.date}</span>
-            <span style="font-size:12px;min-width:120px">${l.start||'?'} → ${l.end||'?'}</span>
-            <span style="font-size:12px;font-weight:600;color:#185FA5;min-width:50px">${dur}</span>
-            <span class="badge" style="background:${l.type==='Night'?'#E6EFF8':'#EEEDFE'};color:${l.type==='Night'?'#1B3A6B':'#534AB7'}">${l.type}</span>
-            <span style="font-size:11px;color:#888">${l.quality}</span>
-            ${l.notes ? `<span style="font-size:11px;color:#aaa;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.notes}</span>` : ''}
-            <button onclick="delSleep(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:16px">×</button>
-          </div>`;
-        }).join('') || '<div style="padding:12px;color:#aaa;text-align:center;font-size:13px">No sleep logged yet</div>'}
-      </div>
-    `;
-  }
-
-  window.addSleep = () => {
-    state.sleepLog.push({
-      date: document.getElementById('s-date').value,
-      start: document.getElementById('s-start').value,
-      end: document.getElementById('s-end').value,
-      type: document.getElementById('s-type').value,
-      quality: document.getElementById('s-qual').value,
-      notes: document.getElementById('s-notes').value,
-    });
-    saveState(); render(); toast('Sleep logged!');
-  };
-  window.quickSleep = (mins, type) => {
-    const now = new Date();
-    const end = now.toTimeString().slice(0,5);
-    const startD = new Date(now - mins*60000);
-    const start = startD.toTimeString().slice(0,5);
-    state.sleepLog.push({ date: today(), start, end, type, quality: 'Good', notes: 'Quick log' });
-    saveState(); render(); toast(mins >= 60 ? Math.floor(mins/60)+'hr '+(mins%60?mins%60+'min ':'')+(type)+' logged!' : mins+'min '+type+' logged!');
-  };
-  window.toggleSleepForm = () => {
-    const card = document.getElementById('sleep-form-card');
-    const btn = document.getElementById('sleep-form-toggle');
-    if (card) {
-      const open = card.style.display === 'none';
-      card.style.display = open ? 'block' : 'none';
-      if (btn) btn.textContent = open ? '− Hide form' : '+ Set exact times';
-    }
-  };
-  window.delSleep = (i) => { state.sleepLog.splice(i,1); saveState(); render(); };
-  render();
-};
-
-// ── DIAPER LOG ────────────────────────────────────────────────────────────────
-PAGES['diaper'] = function(el) {
-  const COLORS = ['Black/Tarry (Meconium)','Dark Green (Transitional)','Mustard Yellow','Green Frothy','Orange/Red','White/Grey','Blood-tinged','N/A'];
-  function render() {
-    const todayLogs = state.diaperLog.filter(l => l.date === today());
-    const wet = todayLogs.filter(l => l.wet).length;
-    const dirty = todayLogs.filter(l => l.dirty).length;
-
-    el.innerHTML = `
-      <div class="page-header"><h2>💧 Diaper Log</h2><p>Today: ${wet} wet · ${dirty} dirty · Target: 6+ wet diapers/day by Day 4</p></div>
-      <div class="grid-3" style="margin-bottom:14px">
-        <div class="stat-card" style="background:#185FA5"><div class="val">${wet}</div><div class="lbl">Wet today</div></div>
-        <div class="stat-card" style="background:#0F6E56"><div class="val">${dirty}</div><div class="lbl">Dirty today</div></div>
-        <div class="stat-card" style="background:${wet>=6?'#0F6E56':'#C0392B'}"><div class="val">${wet>=6?'✓ Good':'⚠ Low'}</div><div class="lbl">Wet target (6+)</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Quick diaper log</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
-          <button onclick="quickDiaper('wet')" style="padding:14px 8px;border-radius:10px;border:2px solid #B3D9F2;background:#E6F1FB;font-size:13px;font-weight:600;color:#185FA5;cursor:pointer;font-family:inherit">
-            💧 Wet only
-          </button>
-          <button onclick="quickDiaper('dirty')" style="padding:14px 8px;border-radius:10px;border:2px solid #9FE1CB;background:#E1F5EE;font-size:13px;font-weight:600;color:#0F6E56;cursor:pointer;font-family:inherit">
-            💩 Dirty only
-          </button>
-          <button onclick="quickDiaper('both')" style="padding:14px 8px;border-radius:10px;border:2px solid #F0C060;background:#FFF9E6;font-size:13px;font-weight:600;color:#854F0B;cursor:pointer;font-family:inherit">
-            🔄 Both
-          </button>
-        </div>
-        <button class="btn btn-outline btn-block btn-sm" onclick="toggleDiaperForm()" id="diaper-form-toggle" style="margin-top:10px">+ Add colour / notes</button>
-      </div>
-      <div class="card" id="diaper-form-card" style="display:none">
-        <div class="card-title">Full diaper entry</div>
-        <div class="log-input">
-          <div><label>Date</label><input type="date" id="d-date" value="${today()}"></div>
-          <div><label>Time</label><input type="time" id="d-time" value="${new Date().toTimeString().slice(0,5)}"></div>
-          <div><label>Wet?</label><select id="d-wet"><option>Yes</option><option>No</option></select></div>
-          <div><label>Dirty?</label><select id="d-dirty"><option>No</option><option>Yes</option></select></div>
-          <div style="grid-column:1/-1"><label>Stool colour</label><select id="d-color">${COLORS.map(c=>`<option>${c}</option>`).join('')}</select></div>
-        </div>
-        <input type="text" id="d-notes" placeholder="Notes..." style="width:100%;margin-bottom:10px;padding:10px;font-size:14px">
-        <button class="btn btn-teal btn-block" onclick="addDiaper()">Log diaper</button>
-      </div>
-      <div class="card">
-        <div class="card-title">Diaper history</div>
-        ${state.diaperLog.slice().reverse().slice(0,30).map((l,ri) => {
-          const i = state.diaperLog.length - 1 - ri;
-          return `<div class="log-row">
-            <span style="font-size:11px;color:#888;min-width:90px">${l.date} ${l.time||''}</span>
-            <span class="badge" style="background:${l.wet?'#E6F1FB':'#f5f5f5'};color:${l.wet?'#185FA5':'#aaa'}">Wet: ${l.wet?'Yes':'No'}</span>
-            <span class="badge" style="background:${l.dirty?'#E1F5EE':'#f5f5f5'};color:${l.dirty?'#0F6E56':'#aaa'}">Dirty: ${l.dirty?'Yes':'No'}</span>
-            ${l.dirty && l.color !== 'N/A' ? `<span style="font-size:11px;color:#555">${l.color}</span>` : ''}
-            ${l.notes ? `<span style="font-size:11px;color:#aaa;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.notes}</span>` : ''}
-            <button onclick="delDiaper(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:16px">×</button>
-          </div>`;
-        }).join('') || '<div style="padding:12px;color:#aaa;text-align:center;font-size:13px">No diapers logged yet</div>'}
-      </div>
-    `;
-  }
-
-  window.addDiaper = () => {
-    state.diaperLog.push({
-      date: document.getElementById('d-date').value,
-      time: document.getElementById('d-time').value,
-      wet: document.getElementById('d-wet').value === 'Yes',
-      dirty: document.getElementById('d-dirty').value === 'Yes',
-      color: document.getElementById('d-color').value,
-      notes: document.getElementById('d-notes').value,
-    });
-    saveState(); render(); toast('Diaper logged!');
-  };
-  window.quickDiaper = (type) => {
-    const now = new Date();
-    state.diaperLog.push({
-      date: today(), time: now.toTimeString().slice(0,5),
-      wet: type==='wet'||type==='both',
-      dirty: type==='dirty'||type==='both',
-      color: type==='dirty'||type==='both' ? 'Mustard Yellow' : 'N/A',
-      notes: 'Quick log',
-    });
-    saveState(); render();
-    toast(type==='wet'?'💧 Wet diaper logged!':type==='dirty'?'💩 Dirty diaper logged!':'🔄 Wet + dirty logged!');
-  };
-  window.toggleDiaperForm = () => {
-    const card = document.getElementById('diaper-form-card');
-    const btn = document.getElementById('diaper-form-toggle');
-    if (card) {
-      const open = card.style.display === 'none';
-      card.style.display = open ? 'block' : 'none';
-      if (btn) btn.textContent = open ? '− Hide form' : '+ Add colour / notes';
-    }
-  };
-  window.delDiaper = (i) => { state.diaperLog.splice(i,1); saveState(); render(); };
-  render();
-};
-
-// ── MILESTONES ────────────────────────────────────────────────────────────────
-
-// ──────────────────────────────────────────────────────────────
 PAGES['milestones'] = function(el) {
   const ageGroups = [...new Set(MILESTONES.map(m => m[0]))];
   let filterDomain = 'all';
@@ -4468,127 +4004,7 @@ PAGES['milestones'] = function(el) {
 };
 
 // ── VACCINES ──────────────────────────────────────────────────────────────────
-PAGES['vaccines'] = function(el) {
-  if (!state.customVaccines) state.customVaccines = [];
 
-  function render() {
-    const allVax = [...VACCINES, ...state.customVaccines];
-    const givenCount = allVax.filter((_,i) => state.vaccines[i]?.given).length;
-
-    let cardsHTML = allVax.map((v,i) => {
-      const s = state.vaccines[i] || {};
-      const isCustom = i >= VACCINES.length;
-      const dueDate = v.daysFromBirth != null
-        ? new Date(DUE_DATE.getTime() + v.daysFromBirth * 86400000)
-        : (v.dueDate ? new Date(v.dueDate) : null);
-      const overdue = !s.given && dueDate && dueDate < new Date();
-      return `<div class="vax-card ${s.given?'given':''} ${overdue?'overdue':''}">
-        <div class="vax-card-top">
-          <div class="vax-check ${s.given?'given':''}" onclick="toggleVax(${i})">${s.given?'✓':''}</div>
-          <div style="flex:1">
-            <div class="vax-name">${v.name}${isCustom?' <span style="font-size:9px;background:#EEEDFE;color:#534AB7;padding:1px 5px;border-radius:4px">Custom</span>':''}</div>
-            <div class="vax-meta">
-              <span class="vax-pill" style="background:#E6F1FB;color:#185FA5">${v.age}</span>
-              ${dueDate ? `<span class="vax-pill" style="background:${overdue?'#FCEBEB':'#F0F0F0'};color:${overdue?'#C0392B':'#666'}">${overdue?'⚠ Overdue: ':'Due: '}${formatDate(dueDate)}</span>` : ''}
-              ${s.given ? `<span class="vax-pill" style="background:#E1F5EE;color:#0F6E56">✓ Given ${s.date ? formatDate(s.date) : ''}</span>` : ''}
-            </div>
-            ${v.notes ? `<div class="vax-notes">${v.notes}</div>` : ''}
-          </div>
-          ${isCustom ? `<button onclick="delCustomVax(${i})" class="del-btn" style="flex-shrink:0">✕</button>` : ''}
-        </div>
-        <div class="vax-date-row">
-          <label>Date given:</label>
-          <input type="date" value="${s.date||''}" onchange="setVaxDate(${i},this.value)">
-        </div>
-      </div>`;
-    }).join('');
-
-    el.innerHTML = `
-      <div class="page-header">
-        <h2>💉 Vaccination Schedule</h2>
-        <p>Indonesia (Kemenkes + IDAI 2024) · ${givenCount}/${allVax.length} vaccines given</p>
-      </div>
-      <div class="card" style="background:#FFF9E6;border:1px solid #F0C060;margin-bottom:14px;padding:10px 14px;font-size:12px">
-        <b>Evidence note:</b> All vaccines are recommended by Kemenkes & IDAI. Discuss concerns with your pediatrician — do not delay without medical advice.
-      </div>
-      <div style="margin-bottom:16px">${cardsHTML}</div>
-      <button class="btn btn-teal btn-block" onclick="openAddVaxModal()" style="margin-bottom:80px">
-        + Add custom vaccine
-      </button>
-    `;
-  }
-
-  // Add vaccine modal
-  window.openAddVaxModal = () => {
-    let m = document.getElementById('add-vax-modal');
-    if (!m) {
-      m = document.createElement('div');
-      m.className = 'modal-overlay';
-      m.id = 'add-vax-modal';
-      m.innerHTML = `<div class="modal-sheet">
-        <div class="modal-handle"></div>
-        <div class="modal-title">➕ Add Custom Vaccine</div>
-        <div class="modal-field"><label>Vaccine name *</label><input type="text" id="av-name" placeholder="e.g. Varicella (Chickenpox)"></div>
-        <div class="modal-field"><label>Recommended age</label><input type="text" id="av-age" placeholder="e.g. 12 months"></div>
-        <div class="modal-field"><label>Due date</label><input type="date" id="av-due"></div>
-        <div class="modal-field"><label>Notes / clinic</label><input type="text" id="av-notes" placeholder="e.g. Private clinic, optional"></div>
-        <div class="modal-actions">
-          <button class="btn btn-outline" onclick="document.getElementById('add-vax-modal').classList.remove('open')">Cancel</button>
-          <button class="btn btn-teal" onclick="saveCustomVax()">Add vaccine</button>
-        </div>
-      </div>`;
-      document.body.appendChild(m);
-      m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
-    }
-    m.classList.add('open');
-  };
-
-  window.saveCustomVax = () => {
-    const name = document.getElementById('av-name').value.trim();
-    if (!name) { toast('Please enter a vaccine name'); return; }
-    if (!state.customVaccines) state.customVaccines = [];
-    state.customVaccines.push({
-      name,
-      age: document.getElementById('av-age').value || 'Custom',
-      dueDate: document.getElementById('av-due').value || null,
-      daysFromBirth: null,
-      notes: document.getElementById('av-notes').value || 'Custom vaccine',
-    });
-    saveState();
-    document.getElementById('add-vax-modal').classList.remove('open');
-    toast('Vaccine added!');
-    render();
-  };
-
-  window.delCustomVax = (i) => {
-    const ci = i - VACCINES.length;
-    if (ci >= 0 && confirm('Remove this custom vaccine?')) {
-      state.customVaccines.splice(ci, 1);
-      saveState(); render();
-    }
-  };
-
-  render();
-};
-
-function toggleVax(i) {
-  if (!state.vaccines[i]) state.vaccines[i] = {};
-  state.vaccines[i].given = !state.vaccines[i].given;
-  if (state.vaccines[i].given && !state.vaccines[i].date) state.vaccines[i].date = today();
-  saveState();
-  // Re-render without full page reload
-  const el = document.getElementById('page-vaccines');
-  if (el) PAGES['vaccines'](el);
-}
-function setVaxDate(i, v) {
-  if (!state.vaccines[i]) state.vaccines[i] = {};
-  state.vaccines[i].date = v;
-  saveState();
-}
-
-// ── LANGUAGE ──────────────────────────────────────────────────────────────────
-
-// ──────────────────────────────────────────────────────────────
 PAGES['language'] = function(el) {
   const stages = ['0–3 Months','3–6 Months','6–9 Months','9–12 Months','12–18 Months','18–24 Months','2–3 Years','3–4 Years','4–5 Years'];
   const stageData = {
@@ -4697,48 +4113,47 @@ PAGES['language'] = function(el) {
 PAGES['signs'] = function(el) {
   function render() {
     const learned = BABY_SIGNS.filter((_,i) => state.signs[i]?.learned).length;
-    el.innerHTML = `
-      <div class="page-header">
-        <h2>🤟 Baby Sign Language</h2>
-        <p>15 essential signs · ${learned}/${BABY_SIGNS.length} learned · Always speak + sign together</p>
-      </div>
-      <div class="card" style="background:#FFF9E6;border:1px solid #F0C060;margin-bottom:12px;padding:10px 14px;font-size:12px">
-        <b>Evidence:</b> Baby signing does NOT delay speech. It reduces frustration (4–12 months) and strengthens bonding. Pair every sign with spoken Indonesian + English word.
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:80px">
-        ${BABY_SIGNS.map((s,i) => {
-          const isLearned = state.signs[i]?.learned;
-          const visual = SIGN_VISUALS[s.sign] || SIGN_VISUALS[s.eng] || '';
-          return `<div class="card" style="padding:12px;border:2px solid ${isLearned?'#9FE1CB':'#eee'};background:${isLearned?'#F0FFF8':'#fff'}">
-            <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
-              <div style="flex:1">
-                <div style="font-size:13px;font-weight:700;color:#222">${s.sign}</div>
-                <div style="font-size:11px;color:#2D8F8F;font-weight:600;margin-top:1px">Introduce: ${s.age}</div>
-              </div>
-              <button onclick="toggleSign(${i})" style="padding:5px 9px;border-radius:8px;border:1.5px solid ${isLearned?'#0F6E56':'#ddd'};background:${isLearned?'#E1F5EE':'#fff'};color:${isLearned?'#0F6E56':'#888'};font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">
-                ${isLearned?'✓ Learned':'Mark learned'}
-              </button>
-            </div>
-            <div style="display:flex;gap:5px;margin-bottom:8px">
-              <span class="badge" style="background:#E1F5EE;color:#0F6E56">🇮🇩 ${s.indo}</span>
-              <span class="badge" style="background:#E6F1FB;color:#185FA5">🇬🇧 ${s.eng}</span>
-            </div>
-            ${visual ? '<div style="display:flex;justify-content:center;margin:6px 0">'+visual+'</div>' : ''}
-            <div style="font-size:11px;color:#555;background:#f8f8f8;border-radius:6px;padding:7px 9px;line-height:1.5"><b>How:</b> ${s.how}</div>
-            <div style="font-size:11px;color:#777;margin-top:6px;line-height:1.5"><b>Use when:</b> ${s.use}</div>
-          </div>`;
-        }).join('')}
-      </div>
-    `;
+    let cardsHTML = '';
+    BABY_SIGNS.forEach((s,i) => {
+      const isLearned = state.signs[i]?.learned;
+      cardsHTML += '<div class="card" style="padding:12px;border:2px solid '+(isLearned?'#9FE1CB':'#eee')+';background:'+(isLearned?'#F0FFF8':'#fff')+'">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-size:13px;font-weight:700;color:#222">'+s.sign+'</div>' +
+            '<div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap">' +
+              '<span class="badge" style="background:#E1F5EE;color:#0F6E56">🇮🇩 '+s.indo+'</span>' +
+              '<span class="badge" style="background:#E6F1FB;color:#185FA5">🇬🇧 '+s.eng+'</span>' +
+            '</div>' +
+          '</div>' +
+          '<button onclick="toggleSign('+i+')" style="padding:5px 9px;border-radius:8px;border:1.5px solid '+(isLearned?'#0F6E56':'#ddd')+';background:'+(isLearned?'#E1F5EE':'#fff')+';color:'+(isLearned?'#0F6E56':'#888')+';font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;margin-left:8px">' +
+            (isLearned?'✓ Learned':'Mark learned') +
+          '</button>' +
+        '</div>' +
+        '<div style="font-size:11px;color:#555;background:#f8f8f8;border-radius:6px;padding:7px 9px;line-height:1.5;margin-bottom:6px"><b>How:</b> '+s.how+'</div>' +
+        '<div style="font-size:11px;color:#777;line-height:1.4"><b>When:</b> '+s.use+'</div>' +
+        '<div style="font-size:10px;color:#aaa;margin-top:4px">Introduce: '+s.age+'</div>' +
+      '</div>';
+    });
+
+    el.innerHTML =
+      '<div class="page-header"><h2>🤟 Baby Sign Language</h2>' +
+      '<p>15 essential signs · '+learned+'/'+BABY_SIGNS.length+' learned · Speak + sign together</p></div>' +
+      '<div class="card" style="background:#FFF9E6;border:1px solid #F0C060;margin-bottom:12px;padding:10px 14px;font-size:12px">' +
+        '<b>Evidence:</b> Baby signing does NOT delay speech. Reduces frustration from 4–12 months. Always say the word in both languages while signing.' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding-bottom:80px">' +
+        cardsHTML +
+      '</div>';
   }
   render();
 };
+
 function toggleSign(i) {
-  if(!state.signs[i]) state.signs[i]={};
-  state.signs[i].learned=!state.signs[i].learned;
+  if (!state.signs[i]) state.signs[i] = {};
+  state.signs[i].learned = !state.signs[i].learned;
   saveState('signs');
-  const el=document.getElementById('page-signs');
-  if(el) PAGES['signs'](el);
+  const el = document.getElementById('page-signs');
+  if (el) PAGES['signs'](el);
 }
 
 PAGES['bilingual'] = function(el) {
@@ -4969,131 +4384,7 @@ PAGES['rie'] = function(el) {
 };
 
 // ── BUDGET ────────────────────────────────────────────────────────────────────
-PAGES['budget'] = function(el) {
-  const totalBudgeted = 45000000;
-  const totalSpent = NEWBORN_INVENTORY.reduce((a,_,i) =>
-    a + (state.inventory[i]?.purchased ? (state.inventory[i]?.cost || 0) : 0), 0);
 
-  // Custom budget items
-  if (!state.budgetItems) state.budgetItems = [];
-
-  const allBudgetRef = [
-            ['Hospital','C-Section room (1–3 days, mid-range private)','5,000,000–15,000,000','Varies by hospital class'],
-            ['Hospital','Surgeon fee (OBGYN)','3,000,000–10,000,000','Varies by hospital'],
-            ['Hospital','Anesthesiologist fee','2,000,000–5,000,000',''],
-            ['Hospital','Medications & supplies','2,000,000','Post-op meds, IV etc.'],
-            ['Hospital','Lab tests (pre-op + newborn)','1,500,000',''],
-            ['Hospital','Birth registration (Akta Kelahiran)','Free','At Dukcapil'],
-            ['Monthly','Diapers (~200/month)','800,000',''],
-            ['Monthly','Baby wipes (4–5 packs)','300,000',''],
-            ['Monthly','Baby care products','300,000','Lotion, wash, cream'],
-            ['Monthly','Pediatrician visits','500,000','Each visit ~Rp 200–500K'],
-            ['Monthly','Vaccines not covered by BPJS','1,000,000','PCV, Rotavirus etc.'],
-            ['Monthly','Baby nurse / suster bayi (optional)','3,000,000','Highly recommended first 3 months'],
-            ['Annual','BPJS Kesehatan (baby)','100,000/month','Register within 28 days'],
-            ['Annual','Private health insurance (baby)','500,000/month','Estimate'],
-  ];
-
-  const customTotal = state.budgetItems.reduce((a,b) => a + (parseInt(b.actual)||0), 0);
-  const totalActual = totalSpent + customTotal;
-
-  el.innerHTML = `
-    <div class="page-header"><h2>💰 Baby Budget</h2><p>Track delivery costs, gear, and ongoing expenses · IDR</p></div>
-    <div class="grid-3" style="margin-bottom:14px">
-      <div class="stat-card" style="background:#0F6E56"><div class="val">Rp ${Math.round(totalActual/1000000*10)/10}M</div><div class="lbl">Total spent</div></div>
-      <div class="stat-card" style="background:#1B3A6B"><div class="val">Rp ${Math.round(totalBudgeted/1000000)}M</div><div class="lbl">Est. budget</div></div>
-      <div class="stat-card" style="background:#993C1D"><div class="val">Rp ${Math.round((totalBudgeted-totalActual)/1000000*10)/10}M</div><div class="lbl">Remaining</div></div>
-    </div>
-
-    ${state.budgetItems.length > 0 ? `
-    <div class="card">
-      <div class="card-title">My expense log</div>
-      ${state.budgetItems.map((item,i) => `
-        <div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f5f5f5">
-          <div style="flex:1">
-            <div style="font-size:13px;font-weight:500">${item.name}</div>
-            <div style="font-size:11px;color:#888">${item.cat} · ${item.date||''}</div>
-          </div>
-          <div style="font-size:13px;font-weight:700;color:#1B3A6B">Rp ${parseInt(item.actual||0).toLocaleString('id-ID')}</div>
-          <button onclick="delBudget(${i})" class="del-btn">✕</button>
-        </div>
-      `).join('')}
-      <div style="padding:10px 0 0;font-size:13px;font-weight:700;color:#0F6E56;text-align:right">
-        Total logged: Rp ${customTotal.toLocaleString('id-ID')}
-      </div>
-    </div>` : ''}
-
-    <button class="btn btn-teal btn-block" onclick="openAddBudgetModal()" style="margin-bottom:14px">+ Log an expense</button>
-
-    <div class="card">
-      <div class="card-title">Cost reference guide (IDR)</div>
-      ${allBudgetRef.map(([cat,item,cost,notes]) => `
-        <div style="padding:10px 0;border-bottom:1px solid #f5f5f5">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-            <div style="flex:1">
-              <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${cat==='Hospital'?'#FCEBEB':cat==='Monthly'?'#FAEEDA':'#E6F1FB'};color:${cat==='Hospital'?'#C0392B':cat==='Monthly'?'#854F0B':'#185FA5'}">${cat}</span>
-              <div style="font-size:13px;font-weight:500;margin-top:4px">${item}</div>
-              ${notes ? `<div style="font-size:11px;color:#888;margin-top:2px">${notes}</div>` : ''}
-            </div>
-            <div style="font-size:13px;font-weight:700;color:#1B3A6B;white-space:nowrap;flex-shrink:0">${cost}</div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-
-  window.openAddBudgetModal = () => {
-    let m = document.getElementById('add-budget-modal');
-    if (!m) {
-      m = document.createElement('div');
-      m.className = 'modal-overlay';
-      m.id = 'add-budget-modal';
-      m.innerHTML = `<div class="modal-sheet">
-        <div class="modal-handle"></div>
-        <div class="modal-title">💰 Log an Expense</div>
-        <div class="modal-field"><label>Item / description *</label><input type="text" id="bu-name" placeholder="e.g. Spectra S1 breast pump"></div>
-        <div class="modal-field"><label>Category</label>
-          <select id="bu-cat"><option>Hospital</option><option>Baby Gear</option><option>Monthly</option><option>Feeding</option><option>Medical</option><option>Clothing</option><option>Other</option></select>
-        </div>
-        <div class="modal-field"><label>Amount (Rp) *</label><input type="number" id="bu-amount" placeholder="0" inputmode="numeric"></div>
-        <div class="modal-field"><label>Date</label><input type="date" id="bu-date" value="${today()}"></div>
-        <div class="modal-actions">
-          <button class="btn btn-outline" onclick="document.getElementById('add-budget-modal').classList.remove('open')">Cancel</button>
-          <button class="btn btn-teal" onclick="saveBudgetItem()">Save expense</button>
-        </div>
-      </div>`;
-      document.body.appendChild(m);
-      m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
-    }
-    m.classList.add('open');
-  };
-
-  window.saveBudgetItem = () => {
-    const name = document.getElementById('bu-name').value.trim();
-    const amount = document.getElementById('bu-amount').value;
-    if (!name || !amount) { toast('Please enter item and amount'); return; }
-    if (!state.budgetItems) state.budgetItems = [];
-    state.budgetItems.push({
-      name, actual: parseInt(amount)||0,
-      cat: document.getElementById('bu-cat').value,
-      date: document.getElementById('bu-date').value,
-    });
-    saveState();
-    document.getElementById('add-budget-modal').classList.remove('open');
-    toast('Expense logged!');
-    showPage('budget');
-  };
-
-  window.delBudget = (i) => {
-    if (!state.budgetItems) return;
-    state.budgetItems.splice(i, 1);
-    saveState(); showPage('budget');
-  };
-};
-
-// ── KNOWLEDGE BASE ────────────────────────────────────────────────────────────
-
-// ──────────────────────────────────────────────────────────────
 PAGES['knowledge'] = function(el) {
   const sections = [
     {title:"🚨 Emergency Contacts",fields:['AMBULANCE (national)','Fire (113)','Police (110)','OBGYN primary','OBGYN backup','Pediatrician primary','Nearest ER (hospital 1)','Nearest ER (hospital 2)','Nearest Puskesmas','Father\'s mother / Nenek','Mother\'s mother','Baby nurse / Suster bayi']},
