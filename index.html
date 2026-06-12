@@ -13,6 +13,8 @@ const FB_URL = 'https://nandira-app-default-rtdb.firebaseio.com';
 // ↑↑↑ REPLACE THIS URL with your own Firebase project URL ↑↑↑
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%270%200%20100%20100%27%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20%3E%3Cdefs%3E%3CradialGradient%20id%3D%27bodyG%27%20cx%3D%2750%25%27%20cy%3D%2740%25%27%20r%3D%2765%25%27%3E%3Cstop%20offset%3D%270%25%27%20stop-color%3D%27%23FFE375%27/%3E%3Cstop%20offset%3D%27100%25%27%20stop-color%3D%27%23FFC93C%27/%3E%3C/radialGradient%3E%3C/defs%3E%3Cellipse%20cx%3D%2750%27%20cy%3D%2788%27%20rx%3D%2730%27%20ry%3D%276%27%20fill%3D%27%23000%27%20opacity%3D%270.06%27/%3E%3Cpath%20d%3D%27M22%2064%20Q20%2050%2028%2044%20L72%2044%20Q80%2050%2078%2064%20Z%27%20fill%3D%27%23FFF6E9%27/%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2742%27%20r%3D%2726%27%20fill%3D%27url%28%23bodyG%29%27/%3E%3Cpath%20d%3D%27M44%2017%20Q47%208%2050%2016%20Q53%208%2056%2017%20Z%27%20fill%3D%27%23FFC93C%27/%3E%3Ccircle%20cx%3D%2742%27%20cy%3D%2740%27%20r%3D%273.6%27%20fill%3D%27%233A2E2A%27/%3E%3Ccircle%20cx%3D%2758%27%20cy%3D%2740%27%20r%3D%273.6%27%20fill%3D%27%233A2E2A%27/%3E%3Ccircle%20cx%3D%2743.2%27%20cy%3D%2738.8%27%20r%3D%271.2%27%20fill%3D%27%23fff%27/%3E%3Ccircle%20cx%3D%2759.2%27%20cy%3D%2738.8%27%20r%3D%271.2%27%20fill%3D%27%23fff%27/%3E%3Cpath%20d%3D%27M46%2047%20L54%2047%20L50%2052%20Z%27%20fill%3D%27%23FF9E3D%27/%3E%3Ccircle%20cx%3D%2733%27%20cy%3D%2747%27%20r%3D%274%27%20fill%3D%27%23FFB3B3%27%20opacity%3D%270.6%27/%3E%3Ccircle%20cx%3D%2767%27%20cy%3D%2747%27%20r%3D%274%27%20fill%3D%27%23FFB3B3%27%20opacity%3D%270.6%27/%3E%3Cpath%20d%3D%27M20%2062%20L26%2056%20L32%2062%20L38%2056%20L44%2062%20L50%2056%20L56%2062%20L62%2056%20L68%2062%20L74%2056%20L80%2062%20L80%2078%20Q80%2084%2074%2084%20L26%2084%20Q20%2084%2020%2078%20Z%27%20fill%3D%27%23FFFFFF%27%20stroke%3D%27%23EFE7D6%27%20stroke-width%3D%271%27/%3E%3Cpath%20d%3D%27M34%2058%20Q42%2054%2050%2058%27%20fill%3D%27none%27%20stroke%3D%27%23FFE0AA%27%20stroke-width%3D%271.5%27%20opacity%3D%270.5%27/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%270%200%20100%20100%27%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20%3E%3Cdefs%3E%3CradialGradient%20id%3D%27bodyG%27%20cx%3D%2750%25%27%20cy%3D%2740%25%27%20r%3D%2765%25%27%3E%3Cstop%20offset%3D%270%25%27%20stop-color%3D%27%23FFE375%27/%3E%3Cstop%20offset%3D%27100%25%27%20stop-color%3D%27%23FFC93C%27/%3E%3C/radialGradient%3E%3C/defs%3E%3Cellipse%20cx%3D%2750%27%20cy%3D%2788%27%20rx%3D%2730%27%20ry%3D%276%27%20fill%3D%27%23000%27%20opacity%3D%270.06%27/%3E%3Cpath%20d%3D%27M22%2064%20Q20%2050%2028%2044%20L72%2044%20Q80%2050%2078%2064%20Z%27%20fill%3D%27%23FFF6E9%27/%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2742%27%20r%3D%2726%27%20fill%3D%27url%28%23bodyG%29%27/%3E%3Cpath%20d%3D%27M44%2017%20Q47%208%2050%2016%20Q53%208%2056%2017%20Z%27%20fill%3D%27%23FFC93C%27/%3E%3Ccircle%20cx%3D%2742%27%20cy%3D%2740%27%20r%3D%273.6%27%20fill%3D%27%233A2E2A%27/%3E%3Ccircle%20cx%3D%2758%27%20cy%3D%2740%27%20r%3D%273.6%27%20fill%3D%27%233A2E2A%27/%3E%3Ccircle%20cx%3D%2743.2%27%20cy%3D%2738.8%27%20r%3D%271.2%27%20fill%3D%27%23fff%27/%3E%3Ccircle%20cx%3D%2759.2%27%20cy%3D%2738.8%27%20r%3D%271.2%27%20fill%3D%27%23fff%27/%3E%3Cpath%20d%3D%27M46%2047%20L54%2047%20L50%2052%20Z%27%20fill%3D%27%23FF9E3D%27/%3E%3Ccircle%20cx%3D%2733%27%20cy%3D%2747%27%20r%3D%274%27%20fill%3D%27%23FFB3B3%27%20opacity%3D%270.6%27/%3E%3Ccircle%20cx%3D%2767%27%20cy%3D%2747%27%20r%3D%274%27%20fill%3D%27%23FFB3B3%27%20opacity%3D%270.6%27/%3E%3Cpath%20d%3D%27M20%2062%20L26%2056%20L32%2062%20L38%2056%20L44%2062%20L50%2056%20L56%2062%20L62%2056%20L68%2062%20L74%2056%20L80%2062%20L80%2078%20Q80%2084%2074%2084%20L26%2084%20Q20%2084%2020%2078%20Z%27%20fill%3D%27%23FFFFFF%27%20stroke%3D%27%23EFE7D6%27%20stroke-width%3D%271%27/%3E%3Cpath%20d%3D%27M34%2058%20Q42%2054%2050%2058%27%20fill%3D%27none%27%20stroke%3D%27%23FFE0AA%27%20stroke-width%3D%271.5%27%20opacity%3D%270.5%27/%3E%3C/svg%3E">
 <title>Baby OS</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,10 +30,22 @@ const FB_URL = 'https://nandira-app-default-rtdb.firebaseio.com';
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --r:12px;--rs:8px;--shadow:0 1px 4px rgba(0,0,0,.09);
   --bar:60px;
+  /* Gender theme (defaults = pale yellow / neutral) */
+  --theme-bg:#FFFFA7;
+  --theme-topbar:#FFF06A;
+  --theme-accent:#B89530;
+  --theme-card-tint:#FFFFD6;
+  --theme-text:#2A2A33;
+  --theme-text-dim:rgba(40,40,55,.55);
+  --theme-drawer-bg:#FFFEF2;
+  --theme-nav-text:#5C541F;
+  --theme-nav-dim:rgba(92,84,31,.65);
+  --theme-active-bg:#FFF06A;
+  --theme-active-text:#4A4420;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
-body{font-family:var(--font);font-size:14px;background:#F0F2F5;color:#1a1a1a;min-height:100vh;padding-bottom:var(--bar);}
+body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a1a1a;min-height:100vh;padding-bottom:var(--bar);transition:background .4s ease;}
 
 /* ── LANDING ── */
 #landing{position:fixed;inset:0;background:linear-gradient(160deg,#1B3A6B 0%,#2D8F8F 100%);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;overflow-y:auto;}
@@ -68,10 +82,10 @@ body{font-family:var(--font);font-size:14px;background:#F0F2F5;color:#1a1a1a;min
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* ── TOP BAR ── */
-.top-bar{position:sticky;top:0;z-index:50;background:var(--navy);padding:12px 16px 10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.top-bar{position:sticky;top:0;z-index:50;background:var(--theme-topbar);transition:background .4s ease;padding:12px 16px 10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2);}
 .top-bar-left{flex:1;cursor:pointer;}
-.top-bar-title{font-size:17px;font-weight:700;color:#fff;letter-spacing:-.2px;}
-.top-bar-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px;display:flex;align-items:center;gap:4px;}
+.top-bar-title{font-size:17px;font-weight:700;color:var(--theme-text);letter-spacing:-.2px;}
+.top-bar-sub{font-size:11px;color:var(--theme-text-dim);margin-top:1px;display:flex;align-items:center;gap:4px;}
 .top-bar-menu{background:none;border:none;color:rgba(255,255,255,.8);font-size:22px;cursor:pointer;padding:4px;}
 
 /* ── BOTTOM NAV ── */
@@ -86,20 +100,20 @@ body{font-family:var(--font);font-size:14px;background:#F0F2F5;color:#1a1a1a;min
 /* ── DRAWER ── */
 .drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;}
 .drawer-overlay.open{display:block;}
-.drawer{position:fixed;left:0;top:0;bottom:0;width:280px;z-index:201;background:var(--navy);overflow-y:auto;transform:translateX(-100%);transition:transform .25s ease;}
+.drawer{position:fixed;left:0;top:0;bottom:0;width:280px;z-index:201;background:var(--theme-drawer-bg);overflow-y:auto;transform:translateX(-100%);transition:transform .25s ease,background .4s ease;}
 .drawer.open{transform:translateX(0);}
-.drawer-header{padding:18px 16px 12px;border-bottom:1px solid rgba(255,255,255,.1);}
-.drawer-header h1{font-size:16px;font-weight:700;color:#fff;}
-.drawer-header p{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
-.drawer-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;}
-.drawer-section{padding:10px 8px 2px;font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.07em;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:2px 6px;border-radius:var(--rs);cursor:pointer;color:rgba(255,255,255,.7);font-size:13px;border:none;background:transparent;font-family:var(--font);width:calc(100% - 12px);text-align:left;transition:background .1s;}
-.nav-item:hover,.nav-item:active{background:rgba(255,255,255,.1);color:#fff;}
-.nav-item.active{background:var(--teal);color:#fff;font-weight:600;}
+.drawer-header{padding:18px 16px 14px;background:var(--theme-topbar);border-bottom:1px solid rgba(0,0,0,.06);transition:background .4s ease;}
+.drawer-header h1{font-size:16px;font-weight:700;color:var(--theme-text);}
+.drawer-header p{font-size:11px;color:var(--theme-text-dim);margin-top:3px;}
+.drawer-close{background:none;border:none;color:var(--theme-text);font-size:20px;cursor:pointer;}
+.drawer-section{padding:12px 16px 4px;font-size:10px;font-weight:700;color:var(--theme-nav-dim);text-transform:uppercase;letter-spacing:.07em;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;margin:2px 8px;border-radius:10px;cursor:pointer;color:var(--theme-nav-text);font-size:13px;font-weight:500;border:none;background:transparent;font-family:var(--font);width:calc(100% - 16px);text-align:left;transition:background .12s,color .12s;}
+.nav-item:hover,.nav-item:active{background:rgba(0,0,0,.05);color:var(--theme-nav-text);}
+.nav-item.active{background:var(--theme-active-bg);color:var(--theme-active-text);font-weight:700;}
 .nav-item .icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
 
 /* ── DESKTOP SIDEBAR ── */
-.desktop-sidebar{display:none;width:230px;background:var(--navy);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;flex-direction:column;}
+.desktop-sidebar{display:none;width:230px;background:var(--theme-drawer-bg);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;flex-direction:column;transition:background .4s ease;}
 
 /* ── MAIN ── */
 .app{display:block;}
@@ -169,7 +183,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 .btn-block{width:100%;text-align:center;}
 
 /* ── TABS ── */
-.tab-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;margin-bottom:12px;}
+.tab-scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;padding:3px 0 4px;margin-bottom:12px;}
 .tabs{display:flex;gap:5px;flex-wrap:nowrap;}
 .tab-btn{padding:6px 13px;border-radius:16px;border:1.5px solid #ddd;background:#fff;font-size:12px;cursor:pointer;font-family:var(--font);color:var(--dgray);white-space:nowrap;transition:all .15s;}
 .tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
@@ -313,7 +327,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
      LANDING PAGE
 ══════════════════════════════════════════════════════════════════════════ -->
 <div id="landing">
-  <h1>🍼 Baby OS</h1>
+  <h1><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</h1>
   <p class="sub">Your complete parenting operating system</p>
 
   <!-- Step 1: New or returning -->
@@ -392,20 +406,20 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 
 <div class="top-bar">
   <div class="top-bar-left" onclick="navTo('dashboard')">
-    <div class="top-bar-title" id="top-bar-title">🍼 Baby OS</div>
+    <div class="top-bar-title" id="top-bar-title"><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</div>
     <div class="top-bar-sub" id="top-bar-sub">
       <span class="sync-dot synced" id="sync-dot"></span>
       <span id="top-bar-sub-text">Loading...</span>
     </div>
   </div>
-  <button class="top-bar-menu" onclick="openDrawer()">☰</button>
+  <button class="top-bar-menu" onclick="openDrawer()" style="color:var(--theme-text)">☰</button>
 </div>
 
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header" style="display:flex;align-items:flex-start;justify-content:space-between">
     <div>
-      <h1 id="drawer-title">🍼 Baby OS</h1>
+      <h1 id="drawer-title"><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</h1>
       <p id="drawer-sub">Loading...</p>
     </div>
     <button class="drawer-close" onclick="closeDrawer()">✕</button>
@@ -449,7 +463,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 
 <nav class="desktop-sidebar">
   <div class="drawer-header">
-    <h1 id="sidebar-title" style="font-size:16px;font-weight:700;color:#fff">🍼 Baby OS</h1>
+    <h1 id="sidebar-title" style="font-size:16px;font-weight:700;color:var(--theme-text)"><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</h1>
     <p id="sidebar-sub" style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px"></p>
   </div>
   <div class="drawer-section">Overview</div>
@@ -652,10 +666,23 @@ function loadLocal() {
 function migrateData() {
   if (state.hospitalBagItems) {
     state.hospitalBagItems.forEach(item => {
-      if (item.section === 'Mother') item.section = 'Mom';
-      if (item.section === 'Father') item.section = 'Dad';
+      // Normalize cat text
       if (item.cat) item.cat = item.cat.replace(/Mother/g,'Mom').replace(/Father/g,'Dad').replace(/Mum/g,'Mom');
+      // Normalize section
+      if (item.section === 'Mother' || item.section === 'Mum') item.section = 'Mom';
+      if (item.section === 'Father') item.section = 'Dad';
+      // If section missing or unrecognized, derive from cat
+      const validSections = ['Mom','Baby','Dad','Documents'];
+      if (!item.section || !validSections.includes(item.section)) {
+        const cat = (item.cat||'').toLowerCase();
+        if (cat.includes('mom') || cat.includes('👩')) item.section = 'Mom';
+        else if (cat.includes('baby') || cat.includes('👶')) item.section = 'Baby';
+        else if (cat.includes('dad') || cat.includes('👨')) item.section = 'Dad';
+        else if (cat.includes('doc') || cat.includes('📄')) item.section = 'Documents';
+        else item.section = 'Mom';
+      }
     });
+    saveLocal();
   }
 }
 
@@ -1221,7 +1248,49 @@ function toast(msg) {
 // ══════════════════════════════════════════════════════════════════════════════
 // SUBTITLES + TOP BAR
 // ══════════════════════════════════════════════════════════════════════════════
+function getThemeGender() {
+  // Returns 'boy' | 'girl' | 'neutral'
+  const babies = getBabies();
+  const genders = babies.map(b => b.gender).filter(g => g === 'boy' || g === 'girl');
+  if (genders.length === 0) return 'neutral';
+  const allBoy = genders.every(g => g === 'boy');
+  const allGirl = genders.every(g => g === 'girl');
+  if (allBoy) return 'boy';
+  if (allGirl) return 'girl';
+  return 'neutral'; // mixed twins → neutral pale yellow
+}
+
+function applyTheme() {
+  const theme = getThemeGender();
+  const root = document.documentElement;
+  const themes = {
+    boy:     { bg:'#b6e9ff', topbar:'#7FCDEC', accent:'#4A95C4', cardTint:'#E3F5FE', text:'#143B4D', dim:'rgba(20,59,77,.6)' },
+    girl:    { bg:'#FFC5D3', topbar:'#FF9FB5', accent:'#C75E7E', cardTint:'#FFE2EA', text:'#5A2435', dim:'rgba(90,36,53,.6)' },
+    neutral: { bg:'#FFFFA7', topbar:'#FFF06A', accent:'#B89530', cardTint:'#FFFFD6', text:'#4A4420', dim:'rgba(74,68,32,.6)' },
+  };
+  // Drawer styling per theme: soft tinted bg, pill-shaped active state in theme color
+  const drawerThemes = {
+    boy:     { drawerBg:'#F2FBFF', navText:'#2C5266', navDim:'rgba(44,82,102,.62)', activeBg:'#B6E9FF', activeText:'#0E3344' },
+    girl:    { drawerBg:'#FFF6F9', navText:'#6E2E42', navDim:'rgba(110,46,66,.62)', activeBg:'#FFC5D3', activeText:'#5A2435' },
+    neutral: { drawerBg:'#FFFEF2', navText:'#5C541F', navDim:'rgba(92,84,31,.65)', activeBg:'#FFF06A', activeText:'#4A4420' },
+  };
+  const t = themes[theme] || themes.neutral;
+  const dt = drawerThemes[theme] || drawerThemes.neutral;
+  root.style.setProperty('--theme-bg', t.bg);
+  root.style.setProperty('--theme-topbar', t.topbar);
+  root.style.setProperty('--theme-accent', t.accent);
+  root.style.setProperty('--theme-card-tint', t.cardTint);
+  root.style.setProperty('--theme-text', t.text);
+  root.style.setProperty('--theme-text-dim', t.dim);
+  root.style.setProperty('--theme-drawer-bg', dt.drawerBg);
+  root.style.setProperty('--theme-nav-text', dt.navText);
+  root.style.setProperty('--theme-nav-dim', dt.navDim);
+  root.style.setProperty('--theme-active-bg', dt.activeBg);
+  root.style.setProperty('--theme-active-text', dt.activeText);
+}
+
 function updateSubtitles() {
+  applyTheme();
   const name = babyName(); const emoji = babyEmoji();
   const titleEl = document.getElementById('top-bar-title');
   const sideTitle = document.getElementById('sidebar-title');
@@ -2233,7 +2302,17 @@ PAGES['hospital-bag'] = function(el) {
     window._bagFilterSection = filterSection;
     const items = state.hospitalBagItems||[];
     const sections = [...new Set(items.map(i=>i.section))];
-    const filteredItems = filterSection==='all' ? items : items.filter(i=>i.section===filterSection);
+    const normSec = (it) => {
+      const validSections = ['Mom','Baby','Dad','Documents'];
+      if (validSections.includes(it.section)) return it.section;
+      const cat = (it.cat||'').toLowerCase();
+      if (cat.includes('mom')||cat.includes('👩')) return 'Mom';
+      if (cat.includes('baby')||cat.includes('👶')) return 'Baby';
+      if (cat.includes('dad')||cat.includes('👨')) return 'Dad';
+      if (cat.includes('doc')||cat.includes('📄')) return 'Documents';
+      return 'Mom';
+    };
+    const filteredItems = filterSection==='all' ? items : items.filter(i=>normSec(i)===filterSection);
     const cats = [...new Set(filteredItems.map(i=>i.cat))];
     const totalDone = items.filter(i=>i.packed).length;
     const pct = items.length ? Math.round(totalDone/items.length*100) : 0;
@@ -2460,86 +2539,169 @@ function saveCsecTask(existingId) {
 // PREGNANCY TASKS — editable
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['preg-tasks'] = function(el) {
-  let filterWk = 'W34';
+  let filterWk = 'all';
+  let hideCompleted = false;
+
+  function currentPregWeek() {
+    const w = getPregWeek();
+    return w;
+  }
+
   function render() {
+    window._ptFilterWk = filterWk;
     const tasks = state.pregTasks||[];
     const weeks = [...new Set(tasks.map(t=>t.week))].sort();
-    const filteredTasks = filterWk==='all' ? tasks : tasks.filter(t=>t.week===filterWk);
+    const curWk = currentPregWeek();
+
+    // Determine which weeks to show (hide fully-completed past weeks if toggled)
+    const isWeekPast = (w) => { const n = parseInt(String(w).replace('W','')); return !isNaN(n) && n < curWk; };
+    const isWeekFullyDone = (w) => { const wt = tasks.filter(t=>t.week===w); return wt.length>0 && wt.every(t=>t.done); };
+
+    let visibleWeeks = weeks;
+    if (hideCompleted) visibleWeeks = weeks.filter(w => !(isWeekPast(w) && isWeekFullyDone(w)));
+
+    let filteredTasks;
+    if (filterWk === 'all') {
+      filteredTasks = hideCompleted ? tasks.filter(t => visibleWeeks.includes(t.week)) : tasks;
+    } else {
+      filteredTasks = tasks.filter(t=>t.week===filterWk);
+    }
+
     const cats = [...new Set(filteredTasks.map(t=>t.cat))];
     const catColors = {Medical:'#2D8F8F',Admin:'#534AB7',Finance:'#0F6E56',Home:'#993C1D',Mental:'#854F0B',Relationship:'#993556'};
     const done = tasks.filter(t=>t.done).length;
+    const hiddenCount = weeks.filter(w => isWeekPast(w) && isWeekFullyDone(w)).length;
+
     let html = `
-      <div class="page-header"><h2>✅ Pregnancy Tasks</h2><p>${done}/${tasks.length} completed</p></div>
+      <div class="page-header"><h2>✅ Pregnancy Tasks</h2><p>${done}/${tasks.length} completed · You're in week ${curWk}</p></div>
+      ${hiddenCount > 0 || hideCompleted ? `<div style="margin-bottom:10px"><button class="btn btn-sm ${hideCompleted?'btn-teal':'btn-outline'}" onclick="togglePTHide()" style="font-size:11px">${hideCompleted?'✓ Hiding completed past weeks ('+hiddenCount+')':'Hide completed past weeks'}</button></div>` : ''}
       <div class="tab-scroll"><div class="tabs">
-        ${weeks.map(w=>`<button class="tab-btn ${filterWk===w?'active':''}" onclick="filterPT('${w}')">${w}</button>`).join('')}
         <button class="tab-btn ${filterWk==='all'?'active':''}" onclick="filterPT('all')">All</button>
-        <button class="tab-btn" onclick="addPregTask(filterWk)">+ Add</button>
+        ${visibleWeeks.map(w=>{
+          const wDone = tasks.filter(t=>t.week===w&&t.done).length;
+          const wTotal = tasks.filter(t=>t.week===w).length;
+          const isCur = parseInt(String(w).replace('W',''))===curWk;
+          return `<button class="tab-btn ${filterWk===w?'active':''}" onclick="filterPT('${w}')" style="${isCur?'border-color:#2D8F8F;border-width:2px;background:#E6F5F5;color:#0F6E56;font-weight:700':''}">${w}${wDone===wTotal&&wTotal>0?' ✓':''}</button>`;
+        }).join('')}
+        <button class="tab-btn" onclick="addPregTask(window._ptFilterWk||'W37')">+ Add</button>
       </div></div>
+      <div id="pt-list"></div>
     `;
+    el.innerHTML = html;
+    renderPTList();
+  }
+
+  function renderPTList() {
+    const tasks = state.pregTasks||[];
+    let filteredTasks;
+    const curWk = currentPregWeek();
+    const isWeekPast = (w) => { const n = parseInt(String(w).replace('W','')); return !isNaN(n) && n < curWk; };
+    const isWeekFullyDone = (w) => { const wt = tasks.filter(t=>t.week===w); return wt.length>0 && wt.every(t=>t.done); };
+    const weeks = [...new Set(tasks.map(t=>t.week))].sort();
+    let visibleWeeks = weeks;
+    if (hideCompleted) visibleWeeks = weeks.filter(w => !(isWeekPast(w) && isWeekFullyDone(w)));
+
+    if (filterWk === 'all') {
+      filteredTasks = hideCompleted ? tasks.filter(t => visibleWeeks.includes(t.week)) : tasks;
+    } else {
+      filteredTasks = tasks.filter(t=>t.week===filterWk);
+    }
+
+    const cats = [...new Set(filteredTasks.map(t=>t.cat))];
+    const catColors = {Medical:'#2D8F8F',Admin:'#534AB7',Finance:'#0F6E56',Home:'#993C1D',Mental:'#854F0B',Relationship:'#993556'};
+
+    let html = '';
     cats.forEach(cat => {
       const catTasks = filteredTasks.filter(t=>t.cat===cat);
       html += `<div class="section-hdr" style="background:${catColors[cat]||'#1B3A6B'}"><span>${cat}</span></div>
-        <div class="card" style="padding:0 0 4px;margin-bottom:4px">`;
+        <div class="card" style="padding:0;margin-bottom:6px">`;
       catTasks.forEach(t => {
-        html += `<div class="checklist-item ${t.done?'done':''}">
-          <div class="check-box" onclick="togglePT('${t.id}')">${t.done?'✓':''}</div>
-          <div style="flex:1">
-            <input type="text" value="${t.task}" onchange="updatePT('${t.id}','task',this.value)"
-              style="font-size:13px;border:none;border-bottom:1px solid transparent;background:transparent;width:100%;padding:1px 0;${t.done?'text-decoration:line-through;color:#aaa':'color:#222'}"
-              onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='transparent'"
-              onclick="event.stopPropagation()">
-            <div class="item-meta" style="margin-top:4px">
-              <select onchange="updatePT('${t.id}','week',this.value)" onclick="event.stopPropagation()" style="font-size:10px;padding:2px 5px;border:1px solid #ddd;border-radius:4px">
-                ${['W34','W35','W36','W37','W38','W39','W40'].map(w=>'<option '+(t.week===w?'selected':'')+'>'+w+'</option>').join('')}
-              </select>
-              <select onchange="updatePT('${t.id}','pri',this.value)" onclick="event.stopPropagation()" style="font-size:10px;padding:2px 5px;border:1px solid #ddd;border-radius:4px">
-                ${['Essential','High','Medium','Low'].map(p=>'<option '+(t.pri===p?'selected':'')+'>'+p+'</option>').join('')}
-              </select>
+        html += `<div style="display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid #f5f5f5;${t.done?'opacity:.6':''}">
+          <div class="check-box" onclick="togglePT('${t.id}')" style="cursor:pointer;flex-shrink:0;margin-top:1px">${t.done?'✓':''}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;${t.done?'text-decoration:line-through;color:#aaa':'color:#222'}">${t.task}</div>
+            <div style="display:flex;gap:6px;margin-top:5px;align-items:center;flex-wrap:wrap">
+              <span class="badge" style="background:#eef0f2;color:#666">${t.week}</span>
+              ${priTag(t.pri)}
             </div>
           </div>
-          <button onclick="delPT('${t.id}')" class="del-btn" style="flex-shrink:0">✕</button>
+          <button onclick="editPregTask('${t.id}')" class="edit-btn" style="flex-shrink:0">✏️</button>
+          <button onclick="delPregTask('${t.id}')" class="del-btn" style="flex-shrink:0">✕</button>
         </div>`;
       });
       html += `</div>`;
     });
-    el.innerHTML = html;
+    if (filteredTasks.length === 0) {
+      html += '<div class="empty-state" style="padding:30px 0">No tasks in this view'+(hideCompleted?' (completed past weeks hidden)':'')+'</div>';
+    }
+    const listEl = document.getElementById('pt-list');
+    if (listEl) listEl.innerHTML = html;
   }
-  window.filterPT = (w) => { filterWk=w; render(); };
-  window.togglePT = (id) => { const t=(state.pregTasks||[]).find(x=>x.id===id); if(t) t.done=!t.done; saveState('pregTasks'); render(); };
-  window.delPT = (id) => { state.pregTasks=(state.pregTasks||[]).filter(x=>x.id!==id); saveState('pregTasks'); render(); };
-  window.updatePT = (id, field, val) => {
-    const t=(state.pregTasks||[]).find(x=>x.id===id); if(t) t[field]=val;
+
+  window.filterPT = (w) => { filterWk=w; window._ptFilterWk=w; render(); };
+  window.togglePTHide = () => { hideCompleted=!hideCompleted; render(); };
+  window.togglePT = (id) => {
+    const t=(state.pregTasks||[]).find(x=>x.id===id);
+    if(t) t.done=!t.done;
     saveState('pregTasks');
+    renderPTList(); // only re-render list, preserves filter tab
   };
-  window.addPregTask = (wk) => {
-    let m=document.getElementById('pt-modal');
-    if(!m){m=document.createElement('div');m.className='modal-overlay';m.id='pt-modal';document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});}
-    const weeks=[...new Set((state.pregTasks||[]).map(t=>t.week))].sort();
-    m.innerHTML=`<div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">➕ Add Pregnancy Task</div>
-      <div class="form-field"><label>Task *</label><input type="text" id="pt-task" placeholder="e.g. Schedule hospital tour"></div>
-      <div class="form-row">
-        <div><label>Week</label><select id="pt-week">${weeks.map(w=>`<option ${w===wk?'selected':''}>${w}</option>`).join('')}<option ${wk==='W39'?'selected':''}>W39</option><option ${wk==='W40'?'selected':''}>W40</option></select></div>
-        <div><label>Category</label><select id="pt-cat"><option>Medical</option><option>Admin</option><option>Finance</option><option>Home</option><option>Mental</option><option>Relationship</option></select></div>
-      </div>
-      <div class="form-field"><label>Priority</label><select id="pt-pri"><option>Essential</option><option>High</option><option>Medium</option></select></div>
-      <div class="modal-actions"><button class="btn btn-outline" onclick="document.getElementById('pt-modal').classList.remove('open')">Cancel</button><button class="btn btn-teal" onclick="savePT()">Add task</button></div>
-    </div>`;
-    m.classList.add('open');
-  };
-  window.savePT = () => {
-    const task=document.getElementById('pt-task')?.value?.trim(); if(!task){toast('Task required');return;}
-    if(!state.pregTasks) state.pregTasks=[];
-    state.pregTasks.push({id:uid(),task,week:document.getElementById('pt-week')?.value||'W38',cat:document.getElementById('pt-cat')?.value||'Medical',pri:document.getElementById('pt-pri')?.value||'High',done:false});
-    saveState('pregTasks');
-    document.getElementById('pt-modal').classList.remove('open');
-    toast('Task added!'); render();
-  };
+  window.editPregTask = (id) => { const t=(state.pregTasks||[]).find(x=>x.id===id); if(t) openPTModal(t); };
+  window.delPregTask = (id) => { state.pregTasks=(state.pregTasks||[]).filter(x=>x.id!==id); saveState('pregTasks'); render(); };
+  window.addPregTask = (wk) => openPTModal(null, wk);
+
   render();
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
-// NEWBORN INVENTORY — fully editable with qty and cost
-// ══════════════════════════════════════════════════════════════════════════════
+function openPTModal(task, defWk) {
+  let m = document.getElementById('pt-modal');
+  if (!m) {
+    m = document.createElement('div');
+    m.className = 'modal-overlay'; m.id = 'pt-modal';
+    document.body.appendChild(m);
+    m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+  }
+  const cats = ['Medical','Admin','Finance','Home','Mental','Relationship'];
+  const weeks = ['W34','W35','W36','W37','W38','W39','W40'];
+  m.innerHTML = `<div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">${task?'✏️ Edit Task':'➕ Add Task'}</div>
+    <div class="form-field"><label>Task *</label><input type="text" id="pt-task" value="${task?(task.task||'').replace(/"/g,'&quot;'):''}" placeholder="e.g. Pre-register at hospital"></div>
+    <div class="form-row">
+      <div class="form-field"><label>Week</label><select id="pt-week">${weeks.map(w=>`<option ${(task?.week||defWk)===w?'selected':''}>${w}</option>`).join('')}</select></div>
+      <div class="form-field"><label>Priority</label><select id="pt-pri">${['Essential','High','Medium','Low'].map(p=>`<option ${task?.pri===p?'selected':''}>${p}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-field"><label>Category</label><select id="pt-cat">${cats.map(ct=>`<option ${task?.cat===ct?'selected':''}>${ct}</option>`).join('')}</select></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('pt-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-teal" onclick="savePregTask('${task?.id||''}')">Save</button>
+    </div>
+  </div>`;
+  m.classList.add('open');
+}
+
+function savePregTask(existingId) {
+  const taskName = document.getElementById('pt-task')?.value?.trim();
+  if (!taskName) { toast('Task name required'); return; }
+  if (!state.pregTasks) state.pregTasks = [];
+  const data = {
+    task: taskName,
+    week: document.getElementById('pt-week')?.value||'W37',
+    pri: document.getElementById('pt-pri')?.value||'Medium',
+    cat: document.getElementById('pt-cat')?.value||'Admin',
+  };
+  if (existingId) {
+    const t = state.pregTasks.find(x=>x.id===existingId);
+    if (t) Object.assign(t, data);
+  } else {
+    state.pregTasks.push({id:uid(), ...data, done:false});
+  }
+  saveState('pregTasks');
+  document.getElementById('pt-modal').classList.remove('open');
+  toast('Saved! ✓');
+  showPage('preg-tasks');
+}
+
 PAGES['inventory'] = function(el) {
   let filterCat = 'all';
   let filterPri = 'all';
@@ -3555,14 +3717,16 @@ PAGES['vaccines'] = function(el) {
         <div style="display:flex;align-items:center;gap:8px">
           <label style="font-size:11px;font-weight:600;color:#888;white-space:nowrap">Date given:</label>
           <input type="date" value="${s.date||''}" onchange="setVaxDate(${i},this.value)" style="flex:1;font-size:13px;padding:7px 10px">
+          ${s.date?`<button onclick="clearVaxDate(${i})" style="background:#FCEBEB;border:1px solid #f0c0c0;color:#C0392B;font-size:11px;padding:6px 9px;border-radius:6px;cursor:pointer;white-space:nowrap;flex-shrink:0">Clear</button>`:''}
         </div>
       </div>`;
     });
     html+=`<button class="btn btn-teal btn-block" onclick="openAddVaxModal()" style="margin-bottom:80px">+ Add custom vaccine</button>`;
     el.innerHTML=html;
   }
-  window.toggleVax=(i)=>{if(!state.vaccines[i])state.vaccines[i]={};state.vaccines[i].given=!state.vaccines[i].given;if(state.vaccines[i].given&&!state.vaccines[i].date)state.vaccines[i].date=today();saveState('vaccines');render();};
-  window.setVaxDate=(i,v)=>{if(!state.vaccines[i])state.vaccines[i]={};state.vaccines[i].date=v;saveState('vaccines');};
+  window.toggleVax=(i)=>{if(!state.vaccines[i])state.vaccines[i]={};state.vaccines[i].given=!state.vaccines[i].given;if(state.vaccines[i].given&&!state.vaccines[i].date)state.vaccines[i].date=today();if(!state.vaccines[i].given)state.vaccines[i].date='';saveState('vaccines');render();};
+  window.setVaxDate=(i,v)=>{if(!state.vaccines[i])state.vaccines[i]={};state.vaccines[i].date=v;saveState('vaccines');render();};
+  window.clearVaxDate=(i)=>{if(state.vaccines[i]){state.vaccines[i].date='';}saveState('vaccines');render();toast('Date cleared');};
   window.delCustomVax=(i)=>{const ci=i-VACCINES.length;if(ci>=0&&confirm('Remove?')){state.customVaccines.splice(ci,1);saveState('customVaccines');render();}};
   window.openAddVaxModal=()=>{
     let m=document.getElementById('add-vax-modal');
@@ -5005,6 +5169,7 @@ function injectLandingCodeStep() {
 // ══════════════════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   loadLocal();
+  applyTheme();
   injectLandingCodeStep();
 
   // If already set up, skip landing entirely
