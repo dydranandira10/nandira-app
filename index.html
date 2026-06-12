@@ -2355,9 +2355,14 @@ PAGES['hospital-bag'] = function(el) {
 
     cats.forEach(cat => {
       const catItems = filteredItems.filter(i=>i.cat===cat);
+      const grpSub = catItems[0]?.subcat || '';
+      const grpCat = catItems[0]?.section || filterSection;
+      const gcEsc = grpCat.replace(/'/g, "\\'");
+      const gsEsc = grpSub.replace(/'/g, "\\'");
       html += `<div class="section-hdr" style="background:#1B3A6B;margin-bottom:4px">
-        <span>${cat}</span>
-        <button onclick="addBagItem('${cat.replace(/'/g,"\'")}','${(catItems[0]?.section||filterSection)}'); return false;" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;padding:3px 10px;font-size:11px">+ Add</button>
+        <span style="flex:1">${cat}</span>
+        <button onclick="bagEditGroup('${gcEsc}','${gsEsc}')" title="Edit category" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 9px;font-size:12px;border-radius:6px;cursor:pointer;margin-right:5px">✏️</button>
+        <button onclick="addBagItem('${gcEsc}','${gcEsc}','${gsEsc}')" style="background:rgba(255,255,255,.22);border:none;color:#fff;padding:3px 11px;font-size:11px;border-radius:6px;cursor:pointer;font-family:var(--font)">+ Add</button>
       </div>
       <div class="card" style="padding:0 0 4px;margin-bottom:6px">`;
       catItems.forEach(item => {
@@ -2403,7 +2408,72 @@ PAGES['hospital-bag'] = function(el) {
     renderBagList();
   };
 
-  window.addBagItem = (cat, section) => openBagModal(null, cat, section, renderBagList);
+  window.addBagItem = (cat, section, subcat) => openBagModal(null, cat, section, renderBagList, subcat);
+
+  window.bagEditGroup = (cat, sub) => {
+    let m = document.getElementById('bag-group-modal');
+    if (!m) {
+      m = document.createElement('div');
+      m.className = 'modal-overlay'; m.id = 'bag-group-modal';
+      document.body.appendChild(m);
+      m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+    }
+    const catCount = (state.hospitalBagItems||[]).filter(it => normSection(it) === cat).length;
+    const subCount = sub ? (state.hospitalBagItems||[]).filter(it => normSection(it)===cat && (it.subcat||'')===sub).length : 0;
+    m.innerHTML = `<div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">✏️ Edit Category</div>
+      <div class="form-field"><label>Category name</label><input type="text" id="bg-cat" value="${cat.replace(/"/g,'&quot;')}"></div>
+      <div class="form-field"><label>Sub-category name <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="bg-sub" value="${(sub||'').replace(/"/g,'&quot;')}" placeholder="e.g. Clothing, Toiletries — leave blank for none"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="document.getElementById('bag-group-modal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-teal" onclick="bagSaveGroup('${cat.replace(/'/g,"\\'")}','${(sub||'').replace(/'/g,"\\'")}')">Save</button>
+      </div>
+      <div style="border-top:1px solid #eee;margin-top:14px;padding-top:12px">
+        <button class="btn btn-block" onclick="bagDeleteGroup('${cat.replace(/'/g,"\\'")}','${(sub||'').replace(/'/g,"\\'")}')" style="background:#FCEBEB;color:#C0392B;border:1px solid #f0c0c0">
+          🗑 Delete ${sub ? 'sub-category "'+sub+'" ('+subCount+' items)' : 'category "'+cat+'" ('+catCount+' items)'}
+        </button>
+      </div>
+    </div>`;
+    m.classList.add('open');
+  };
+
+  window.bagSaveGroup = (oldCat, oldSub) => {
+    const newCat = (document.getElementById('bg-cat')?.value||'').trim();
+    const newSub = (document.getElementById('bg-sub')?.value||'').trim();
+    if (!newCat) { toast('Category name required'); return; }
+    // Update every item in this exact group (matching category AND the original sub-category)
+    (state.hospitalBagItems||[]).forEach(it => {
+      const sameCat = normSection(it) === oldCat;
+      const sameSub = (it.subcat||'') === (oldSub||'');
+      if (sameCat && sameSub) {
+        it.section = newCat;
+        it.subcat = newSub;  // applies whether adding, changing, or removing
+        it.cat = newSub ? (newCat + ' — ' + newSub) : newCat;
+      }
+    });
+    if (filterSection === oldCat) { filterSection = newCat; window._bagFilterSection = newCat; }
+    saveState('hospitalBagItems');
+    document.getElementById('bag-group-modal').classList.remove('open');
+    render();
+    toast('Saved ✓');
+  };
+
+  window.bagDeleteGroup = (cat, sub) => {
+    const label = sub ? 'sub-category "'+sub+'"' : 'category "'+cat+'"';
+    const count = (state.hospitalBagItems||[]).filter(it => normSection(it)===cat && (sub ? (it.subcat||'')===sub : true)).length;
+    if (!confirm('Delete '+label+' and all '+count+' item(s) in it? This cannot be undone.')) return;
+    state.hospitalBagItems = (state.hospitalBagItems||[]).filter(it => {
+      if (normSection(it) !== cat) return true;
+      if (sub) return (it.subcat||'') !== sub;
+      return false;
+    });
+    if (!sub && filterSection === cat) { filterSection = 'all'; window._bagFilterSection = 'all'; }
+    saveState('hospitalBagItems');
+    document.getElementById('bag-group-modal').classList.remove('open');
+    render();
+    toast('Deleted');
+  };
   window.editBagItem = (id) => {
     const item = (state.hospitalBagItems||[]).find(i=>i.id===id);
     if (item) openBagModal(item, item.cat, item.section, renderBagList);
@@ -2416,7 +2486,7 @@ PAGES['hospital-bag'] = function(el) {
   render();
 };
 
-function openBagModal(item, defCat, defSection, onSave) {
+function openBagModal(item, defCat, defSection, onSave, defSubcat) {
   let m = document.getElementById('bag-item-modal');
   if (!m) {
     m = document.createElement('div');
@@ -2431,7 +2501,7 @@ function openBagModal(item, defCat, defSection, onSave) {
   const allCats = [...new Set([...defaultCats, ...existingCats])];
   const curCat = item?.section || defSection || 'Mom';
   // Existing sub-categories for this item (strip the "Cat — " prefix if present)
-  const curSub = item ? (item.subcat || (item.cat||'').split('—').slice(1).join('—').trim()) : '';
+  const curSub = item ? (item.subcat || (item.cat||'').split('—').slice(1).join('—').trim()) : (defSubcat || '');
   m.innerHTML = `<div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">${item?'✏️ Edit Item':'➕ Add Item'}</div>
