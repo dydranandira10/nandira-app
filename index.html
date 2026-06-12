@@ -646,6 +646,17 @@ function loadLocal() {
     const s = localStorage.getItem(LOCAL_KEY);
     if (s) state = {...state, ...JSON.parse(s)};
   } catch(e) {}
+  migrateData();
+}
+
+function migrateData() {
+  if (state.hospitalBagItems) {
+    state.hospitalBagItems.forEach(item => {
+      if (item.section === 'Mother') item.section = 'Mom';
+      if (item.section === 'Father') item.section = 'Dad';
+      if (item.cat) item.cat = item.cat.replace(/Mother/g,'Mom').replace(/Father/g,'Dad').replace(/Mum/g,'Mom');
+    });
+  }
 }
 
 function saveLocal() {
@@ -2530,136 +2541,207 @@ PAGES['preg-tasks'] = function(el) {
 // NEWBORN INVENTORY — fully editable with qty and cost
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['inventory'] = function(el) {
+  let filterCat = 'all';
+  let filterPri = 'all';
+
   function render() {
     const items = state.inventoryItems||[];
+    let filtered = items;
+    if (filterCat !== 'all') filtered = filtered.filter(i=>i.cat===filterCat);
+    if (filterPri !== 'all') filtered = filtered.filter(i=>i.pri===filterPri);
+
     const cats = [...new Set(items.map(i=>i.cat))];
     const bought = items.filter(i=>i.purchased).length;
-    const totalSpent = items.filter(i=>i.purchased).reduce((a,i)=>a+(parseInt(i.cost)||0)*parseInt(i.qty||1),0);
-    const totalEst = items.reduce((a,i)=>a+(parseInt(i.cost)||0)*parseInt(i.qty||1),0);
-    let html = `
-      <div class="page-header"><h2>📦 Newborn Inventory</h2><p>${bought}/${items.length} purchased · Rp ${Math.round(totalSpent/1000000*10)/10}M spent</p></div>
+    const totalCost = items.filter(i=>i.purchased).reduce((a,i)=>a+(parseInt(i.cost)||0)*(parseInt(i.qty)||1),0);
+    const estCost = items.reduce((a,i)=>a+(parseInt(i.cost)||0)*(parseInt(i.qty)||1),0);
+
+    el.innerHTML = `
+      <div class="page-header"><h2>📦 Newborn Inventory</h2><p>${bought}/${items.length} purchased · Spent: Rp ${totalCost.toLocaleString('en-US')}</p></div>
       <div class="grid-3" style="margin-bottom:12px">
         <div class="stat-card" style="background:#0F6E56"><div class="val">${bought}</div><div class="lbl">Purchased</div></div>
         <div class="stat-card" style="background:#993C1D"><div class="val">${items.length-bought}</div><div class="lbl">Still needed</div></div>
-        <div class="stat-card" style="background:#1B3A6B"><div class="val">Rp ${Math.round(totalEst/1000000*10)/10}M</div><div class="lbl">Total estimate</div></div>
+        <div class="stat-card" style="background:#1B3A6B"><div class="val">${Math.round(estCost/1000000*10)/10}M</div><div class="lbl">Est. total Rp</div></div>
       </div>
+
+      <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:6px">Filter by priority</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
+        ${['all','Essential','High','Medium','Low'].map(p=>`<button class="tab-btn ${filterPri===p?'active':''}" onclick="setInvPri('${p}')">${p==='all'?'All':p}</button>`).join('')}
+      </div>
+
+      <div class="tab-scroll" style="margin-bottom:12px"><div class="tabs" style="flex-wrap:nowrap">
+        <button class="tab-btn ${filterCat==='all'?'active':''}" onclick="setInvCat('all')">All categories</button>
+        ${cats.map(cat=>`<button class="tab-btn ${filterCat===cat?'active':''}" onclick="setInvCat('${cat.replace(/'/g,"\\'")}')">${cat}</button>`).join('')}
+      </div></div>
+
+      <div id="inv-list"></div>
+      <button class="btn btn-teal btn-block" onclick="addInvItem()" style="margin:10px 0 80px">+ Add inventory item</button>
     `;
+    renderInvList();
+  }
+
+  function renderInvList() {
+    const items = state.inventoryItems||[];
+    let filtered = items;
+    if (filterCat !== 'all') filtered = filtered.filter(i=>i.cat===filterCat);
+    if (filterPri !== 'all') filtered = filtered.filter(i=>i.pri===filterPri);
+    const cats = [...new Set(filtered.map(i=>i.cat))];
+
+    let html = '';
     cats.forEach(cat => {
-      const catItems = items.filter(i=>i.cat===cat);
+      const catItems = filtered.filter(i=>i.cat===cat);
       const catBought = catItems.filter(i=>i.purchased).length;
-      html += `<div class="section-hdr" style="background:#1B3A6B">
-        <span>${cat} <span style="opacity:.7;font-size:10px">${catBought}/${catItems.length}</span></span>
-        <button onclick="addInvItem('${cat.replace(/'/g,'\\\'')}')" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;padding:3px 10px;font-size:11px">+ Add</button>
-      </div>
-      <div class="card" style="padding:0;overflow:hidden;margin-bottom:4px">`;
+      html += `<div class="section-hdr" style="background:#1B3A6B"><span>${cat}</span><span style="font-size:11px;opacity:.8">${catBought}/${catItems.length}</span></div>
+        <div class="card" style="padding:0;margin-bottom:6px">`;
       catItems.forEach(item => {
-        html += `<div style="padding:10px 12px;border-bottom:1px solid #f5f5f5">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <input type="checkbox" ${item.purchased?'checked':''} onchange="toggleInv('${item.id}')" style="width:18px;height:18px;cursor:pointer;flex-shrink:0;accent-color:var(--green)">
-            <input type="text" value="${item.item}" onchange="updateInv('${item.id}','item',this.value)"
-              style="flex:1;font-size:13px;font-weight:500;border:none;border-bottom:1px solid transparent;background:transparent;padding:2px 0;${item.purchased?'text-decoration:line-through;color:#aaa':'color:#222'}"
-              onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='transparent'">
-            <button onclick="delInv('${item.id}')" class="del-btn" style="flex-shrink:0">✕</button>
+        html += `<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #f5f5f5">
+          <input type="checkbox" ${item.purchased?'checked':''} onchange="toggleInv('${item.id}')" style="width:18px;height:18px;cursor:pointer;flex-shrink:0;accent-color:var(--green)">
+          <div style="flex:1;min-width:0;${item.purchased?'opacity:.55':''}">
+            <div style="font-size:13px;font-weight:500;${item.purchased?'text-decoration:line-through':''}">${item.item}</div>
+            <div style="font-size:11px;color:#888;margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              ${priTag(item.pri)}
+              <span>Qty: ${item.qty}</span>
+              <span>·</span>
+              <span>Rp ${(parseInt(item.cost)||0).toLocaleString('en-US')}</span>
+            </div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <select onchange="updateInv('${item.id}','pri',this.value)" style="font-size:11px;padding:3px 7px;border:1px solid #e0e0e0;border-radius:6px;background:#fafafa">
-              ${['Essential','High','Medium','Low'].map(p=>'<option '+(item.pri===p?'selected':'')+'>'+p+'</option>').join('')}
-            </select>
-            <label style="font-size:11px;color:#888">Qty</label>
-            <input type="number" value="${item.qty||1}" min="1" onchange="updateInv('${item.id}','qty',this.value)"
-              style="width:48px;font-size:12px;padding:4px 6px;border:1px solid #e0e0e0;border-radius:6px;text-align:center">
-            <label style="font-size:11px;color:#888">Rp</label>
-            <input type="number" value="${item.cost||0}" onchange="updateInv('${item.id}','cost',this.value)"
-              style="width:90px;font-size:12px;padding:4px 6px;border:1px solid #e0e0e0;border-radius:6px">
-          </div>
+          <button onclick="editInvItem('${item.id}')" class="edit-btn" style="flex-shrink:0">✏️</button>
+          <button onclick="delInvItem('${item.id}')" class="del-btn" style="flex-shrink:0">✕</button>
         </div>`;
       });
       html += `</div>`;
     });
-    html += `<button class="btn btn-teal btn-block" onclick="addInvItem('')" style="margin-bottom:80px">+ Add item</button>`;
-    el.innerHTML = html;
+    if (filtered.length === 0) html += '<div class="empty-state">No items match this filter</div>';
+    const listEl = document.getElementById('inv-list');
+    if (listEl) listEl.innerHTML = html;
   }
-  window.toggleInv = (id) => { const i=(state.inventoryItems||[]).find(x=>x.id===id); if(i) i.purchased=!i.purchased; saveState('inventoryItems'); render(); };
-  window.updateInv = (id,field,val) => { const i=(state.inventoryItems||[]).find(x=>x.id===id); if(i) i[field]=field==='qty'||field==='cost'?parseInt(val)||0:val; saveState('inventoryItems'); };
-  window.delInv = (id) => { state.inventoryItems=(state.inventoryItems||[]).filter(x=>x.id!==id); saveState('inventoryItems'); render(); };
-  window.addInvItem = (defCat) => {
-    let m=document.getElementById('inv-modal');
-    if(!m){m=document.createElement('div');m.className='modal-overlay';m.id='inv-modal';document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});}
-    const cats=[...new Set((state.inventoryItems||[]).map(i=>i.cat))].filter(Boolean);
-    m.innerHTML=`<div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">➕ Add Inventory Item</div>
-      <div class="form-field"><label>Item name *</label><input type="text" id="inv-name" placeholder="e.g. Nursing pillow"></div>
-      <div class="form-row">
-        <div><label>Qty</label><input type="number" id="inv-qty" value="1" min="1" inputmode="numeric"></div>
-        <div><label>Cost (Rp)</label><input type="number" id="inv-cost" placeholder="0" inputmode="numeric"></div>
-      </div>
-      <div class="form-row">
-        <div><label>Priority</label><select id="inv-pri"><option>Essential</option><option>High</option><option>Medium</option><option>Low</option></select></div>
-        <div><label>Category</label><input type="text" id="inv-cat" value="${defCat||''}" placeholder="🍼 Feeding"></div>
-      </div>
-      <div class="modal-actions"><button class="btn btn-outline" onclick="document.getElementById('inv-modal').classList.remove('open')">Cancel</button><button class="btn btn-teal" onclick="saveInvItem()">Add</button></div>
-    </div>`;
-    m.classList.add('open'); window._invRender=render;
+
+  window.setInvCat = (cat) => { filterCat = cat; render(); };
+  window.setInvPri = (p) => { filterPri = p; render(); };
+  window.toggleInv = (id) => {
+    const item = (state.inventoryItems||[]).find(i=>i.id===id);
+    if (item) item.purchased = !item.purchased;
+    saveState('inventoryItems'); renderInvList();
   };
-  window.saveInvItem = () => {
-    const name=document.getElementById('inv-name')?.value?.trim(); if(!name){toast('Name required');return;}
-    if(!state.inventoryItems) state.inventoryItems=[];
-    state.inventoryItems.push({id:uid(),item:name,qty:parseInt(document.getElementById('inv-qty')?.value)||1,cost:parseInt(document.getElementById('inv-cost')?.value)||0,pri:document.getElementById('inv-pri')?.value||'Essential',cat:document.getElementById('inv-cat')?.value||'General',purchased:false});
-    saveState('inventoryItems');
-    document.getElementById('inv-modal').classList.remove('open');
-    toast('Item added!'); if(window._invRender) window._invRender();
-  };
+  window.addInvItem = () => openInvModal(null);
+  window.editInvItem = (id) => { const item=(state.inventoryItems||[]).find(i=>i.id===id); if(item) openInvModal(item); };
+  window.delInvItem = (id) => { state.inventoryItems=(state.inventoryItems||[]).filter(i=>i.id!==id); saveState('inventoryItems'); render(); };
+
   render();
 };
-</script>
-<script>
+
+function openInvModal(item) {
+  let m = document.getElementById('inv-item-modal');
+  if (!m) {
+    m = document.createElement('div');
+    m.className = 'modal-overlay';
+    m.id = 'inv-item-modal';
+    document.body.appendChild(m);
+    m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+  }
+  const cats = [...new Set((state.inventoryItems||[]).map(i=>i.cat))];
+  m.innerHTML = `<div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">${item?'✏️ Edit Item':'➕ Add Item'}</div>
+    <div class="form-field"><label>Item name *</label><input type="text" id="iv-name" value="${item?(item.item||'').replace(/"/g,'&quot;'):''}" placeholder="e.g. Baby monitor"></div>
+    <div class="form-field"><label>Category</label><input type="text" id="iv-cat" value="${item?(item.cat||'').replace(/"/g,'&quot;'):(cats[0]||'📦 Other')}" list="iv-cat-list" placeholder="e.g. 🍼 Feeding">
+      <datalist id="iv-cat-list">${cats.map(c=>`<option value="${c}">`).join('')}</datalist>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label>Quantity</label><input type="number" id="iv-qty" value="${item?.qty||1}" min="1" inputmode="numeric"></div>
+      <div class="form-field"><label>Priority</label><select id="iv-pri">${['Essential','High','Medium','Low'].map(p=>`<option ${item?.pri===p?'selected':''}>${p}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-field"><label>Cost per item (Rp)</label><input type="number" id="iv-cost" value="${item?.cost||0}" min="0" inputmode="numeric"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('inv-item-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-teal" onclick="saveInvItem('${item?.id||''}')">Save</button>
+    </div>
+  </div>`;
+  m.classList.add('open');
+}
+
+function saveInvItem(existingId) {
+  const name = document.getElementById('iv-name')?.value?.trim();
+  if (!name) { toast('Name required'); return; }
+  if (!state.inventoryItems) state.inventoryItems = [];
+  const data = {
+    item: name,
+    cat: document.getElementById('iv-cat')?.value||'📦 Other',
+    qty: parseInt(document.getElementById('iv-qty')?.value)||1,
+    pri: document.getElementById('iv-pri')?.value||'Medium',
+    cost: parseInt(document.getElementById('iv-cost')?.value)||0,
+  };
+  if (existingId) {
+    const item = state.inventoryItems.find(i=>i.id===existingId);
+    if (item) Object.assign(item, data);
+  } else {
+    state.inventoryItems.push({id:uid(), ...data, purchased:false});
+  }
+  saveState('inventoryItems');
+  document.getElementById('inv-item-modal').classList.remove('open');
+  toast('Saved! ✓');
+  showPage('inventory');
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
-// FEEDING LOG — with recommendations + charts
 // ══════════════════════════════════════════════════════════════════════════════
+// DAILY TARGETS — age-based
 // ══════════════════════════════════════════════════════════════════════════════
-// CHART ENGINE — shared by all log pages
+function getDailyTargets() {
+  const rec = getRecommendations();
+  if (!rec) return null;
+  const sleepMatch = (rec.sleep||'').match(/(\d+)[–-](\d+)/);
+  return {
+    feedsMin: 8, feedsMax: 12,
+    sleepHrsMin: sleepMatch ? parseInt(sleepMatch[1]) : 14,
+    sleepHrsMax: sleepMatch ? parseInt(sleepMatch[2]) : 17,
+    wetNappies: rec.wetTarget || 6,
+    dirtyNappies: 2,
+    readingMins: 15,
+    phase: rec.phase,
+  };
+}
+
+// CHART ENGINE
 // ══════════════════════════════════════════════════════════════════════════════
 function getCanvasCtx(id) {
   const canvas = document.getElementById(id);
   if (!canvas) return null;
   const parent = canvas.parentElement;
   const dpr = window.devicePixelRatio || 1;
-  const logicalW = parent ? parent.clientWidth - 28 : 320;
-  const logicalH = parseInt(canvas.getAttribute('height')) || 160;
-  canvas.width = Math.round(logicalW * dpr);
-  canvas.height = Math.round(logicalH * dpr);
-  canvas.style.width = logicalW + 'px';
-  canvas.style.height = logicalH + 'px';
+  const cssW = parent ? parent.clientWidth - 28 : 320;
+  const cssH = parseInt(canvas.getAttribute('height')) || 160;
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, logicalW, logicalH);
-  return {canvas, ctx, w: logicalW, h: logicalH};
+  ctx.clearRect(0, 0, cssW, cssH);
+  return {canvas, ctx, w: cssW, h: cssH};
 }
 
 function drawBar(id, labels, datasets, yLabel) {
   const cc = getCanvasCtx(id); if (!cc) return;
   const {ctx, w, h} = cc;
-  const isHourly = labels.length >= 20; // 24-hour view
-  const pad = {t:20, r:10, b:isHourly?26:34, l:32};
+  const isHourly = labels.length >= 20;
+  const pad = {t:20, r:10, b:isHourly?26:34, l:yLabel?44:34};
   const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
   const maxVal = Math.max(...datasets.flatMap(d => d.data), 1);
   const nBars = labels.length;
   const groupW = cw / nBars;
   const barsPerGroup = datasets.length;
-  // For hourly: thin bars; for others: thicker
   const barW = Math.max(2, groupW * (isHourly?0.62:0.66) / barsPerGroup);
   const gap = (groupW - barW * barsPerGroup) / 2;
 
-  // Clean white background (no grey fill)
   ctx.clearRect(0, 0, w, h);
 
-  // Horizontal grid lines (subtle)
+  // Grid lines + y-axis values
   const gridSteps = 4;
   for (let i = 0; i <= gridSteps; i++) {
     const y = pad.t + ch * (1 - i/gridSteps);
     ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y);
     ctx.strokeStyle = i === 0 ? '#e9ecef' : '#f1f3f5';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.lineWidth = 1; ctx.stroke();
     if (i > 0) {
       const val = Math.round(maxVal * i / gridSteps * 10) / 10;
       ctx.fillStyle = '#adb5bd'; ctx.font = '9px -apple-system,sans-serif';
@@ -2668,25 +2750,31 @@ function drawBar(id, labels, datasets, yLabel) {
     }
   }
 
-  // Bars with rounded tops
+  // Y-axis caption (rotated)
+  if (yLabel) {
+    ctx.save();
+    ctx.translate(10, pad.t + ch/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillStyle = '#868e96'; ctx.font = '8px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+  }
+
+  // Bars
   datasets.forEach((ds, di) => {
     ds.data.forEach((val, i) => {
       const barH = Math.max(0, (val / maxVal) * ch);
       const x = pad.l + i * groupW + gap + di * (barW + (isHourly?0.5:1));
       const y = pad.t + ch - barH;
       if (barH > 0) {
-        // Gradient fill for depth
         const grad = ctx.createLinearGradient(0, y, 0, y + barH);
         grad.addColorStop(0, ds.color);
         grad.addColorStop(1, ds.color + 'bb');
         ctx.fillStyle = grad;
         const r = Math.min(barW/2, 3);
-        if (ctx.roundRect) {
-          ctx.beginPath(); ctx.roundRect(x, y, barW, barH, [r, r, 0, 0]); ctx.fill();
-        } else {
-          ctx.fillRect(x, y, barW, barH);
-        }
-        // Value label on top (only for non-hourly or tall bars)
+        if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, barW, barH, [r, r, 0, 0]); ctx.fill(); }
+        else ctx.fillRect(x, y, barW, barH);
         if (!isHourly && val > 0 && barH > 12) {
           ctx.fillStyle = '#495057'; ctx.font = 'bold 9px -apple-system,sans-serif';
           ctx.textAlign = 'center';
@@ -2696,23 +2784,16 @@ function drawBar(id, labels, datasets, yLabel) {
     });
   });
 
-  // X-axis labels
+  // X labels
   ctx.fillStyle = '#868e96'; ctx.font = (isHourly?'7.5px':'9px')+' -apple-system,sans-serif';
   ctx.textAlign = 'center';
   if (isHourly) {
-    // Show all 24 hours but compactly: label every 2 hours for legibility
     labels.forEach((lbl, i) => {
       const x = pad.l + i * groupW + groupW/2;
-      // Show even hours only as numbers; tick marks for all
-      if (i % 2 === 0) {
-        ctx.fillStyle = '#868e96';
-        ctx.fillText(String(i), x, h - 8);
-      }
-      // Small tick mark for every hour
+      if (i % 2 === 0) { ctx.fillStyle = '#868e96'; ctx.fillText(String(i), x, h - 8); }
       ctx.strokeStyle = '#dee2e6'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x, pad.t + ch); ctx.lineTo(x, pad.t + ch + 2); ctx.stroke();
     });
-    // "hour" axis caption
     ctx.fillStyle = '#adb5bd'; ctx.font = '8px -apple-system,sans-serif';
     ctx.textAlign = 'right';
     ctx.fillText('hour →', w - pad.r, h - 1);
@@ -2724,7 +2805,7 @@ function drawBar(id, labels, datasets, yLabel) {
     });
   }
 
-  // Legend (top, compact)
+  // Legend
   if (datasets.length > 1) {
     let lx = pad.l;
     ctx.font = '9px -apple-system,sans-serif';
@@ -2739,67 +2820,47 @@ function drawBar(id, labels, datasets, yLabel) {
   }
 }
 
-
-// ══════════════════════════════════════════════════════════════════════════════
-// TARGET HELPER — returns daily targets per baby age
-// ══════════════════════════════════════════════════════════════════════════════
-function getDailyTargets() {
-  const rec = getRecommendations();
-  if (!rec) return null;
-  return {
-    feedsMin: 8, feedsMax: 12,
-    breastMin: rec.feedFreq?.includes('8') ? 8 : 6,
-    sleepHrsMin: parseFloat(rec.sleep?.match(/(\d+)/)?.[1] || 14),
-    sleepHrsMax: parseFloat(rec.sleep?.match(/–(\d+)/)?.[1] || 17),
-    wetNappies: rec.wetTarget || 6,
-    dirtyNappies: 2,
-    readingMins: 15,
-    phase: rec.phase,
-  };
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// FEEDING LOG
-// ══════════════════════════════════════════════════════════════════════════════
 PAGES['feeding'] = function(el) {
   let chartView = 'daily';
-  let showForm = false;
+  let chartMetric = 'feeds'; // feeds | breast | formula
 
-  function getChartData(view) {
+  if (state.pumpedStash === undefined) state.pumpedStash = 0;
+
+  function getChartData(view, metric) {
+    const yLabels = {feeds:'feeds', breast:'minutes', formula:'ml'};
     if (view === 'hourly') {
-      const hrs = Array(24).fill(0);
+      const arr = Array(24).fill(0);
       state.feedingLog.filter(l => l.date === today()).forEach(l => {
         const h = parseInt(l.time?.split(':')[0] || 0);
-        if (h >= 0 && h < 24) hrs[h]++;
+        if (h >= 0 && h < 24) {
+          if (metric === 'feeds') arr[h]++;
+          else if (metric === 'breast') arr[h] += (parseInt(l.leftMin)||0)+(parseInt(l.rightMin)||0);
+          else if (metric === 'formula') arr[h] += parseInt(l.formulaMl)||0;
+        }
       });
-      return {
-        labels: Array.from({length:24}, (_,i) => String(i)),
-        datasets: [{label:'Feeds', data: hrs, color:'#2D8F8F'}]
-      };
+      const colors = {feeds:'#2D8F8F', breast:'#0F6E56', formula:'#534AB7'};
+      return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:yLabels[metric], data:arr, color:colors[metric]}], yLabel: metric==='feeds'?'feeds / hour':yLabels[metric]+' / hour'};
     } else if (view === 'daily') {
-      const days = Array.from({length:7}, (_,i) => {
-        const d = new Date(); d.setDate(d.getDate() - 6 + i);
-        return d.toISOString().split('T')[0];
-      });
-      return {
-        labels: days.map(d => d.slice(5).replace('-','/')),
-        datasets: [
-          {label:'Feeds', data: days.map(d => state.feedingLog.filter(l=>l.date===d).length), color:'#2D8F8F'},
-          {label:'Formula ml/10', data: days.map(d => Math.round(state.feedingLog.filter(l=>l.date===d).reduce((a,l)=>a+(parseInt(l.formulaMl)||0),0)/10)), color:'#534AB7'},
-        ]
-      };
+      const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split('T')[0]; });
+      const labels = days.map(d=>d.slice(5).replace('-','/'));
+      if (metric === 'feeds') {
+        return {labels, datasets:[{label:'Feeds', data:days.map(d=>state.feedingLog.filter(l=>l.date===d).length), color:'#2D8F8F'}], yLabel:'feeds / day'};
+      } else if (metric === 'breast') {
+        return {labels, datasets:[{label:'Breast min', data:days.map(d=>state.feedingLog.filter(l=>l.date===d).reduce((a,l)=>a+(parseInt(l.leftMin)||0)+(parseInt(l.rightMin)||0),0)), color:'#0F6E56'}], yLabel:'minutes / day'};
+      } else {
+        return {labels, datasets:[{label:'Formula ml', data:days.map(d=>state.feedingLog.filter(l=>l.date===d).reduce((a,l)=>a+(parseInt(l.formulaMl)||0),0)), color:'#534AB7'}], yLabel:'ml / day'};
+      }
     } else {
-      const weeks = Array.from({length:4}, (_,i) => {
-        const d = new Date(); d.setDate(d.getDate() - 21 + i*7);
-        return d.toISOString().split('T')[0];
-      });
-      return {
-        labels: ['4 wks ago','3 wks ago','2 wks ago','This week'],
-        datasets: [{label:'Total feeds', data: weeks.map(wS => {
-          const wE = new Date(wS); wE.setDate(wE.getDate()+7);
-          return state.feedingLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]).length;
-        }), color:'#2D8F8F'}]
-      };
+      const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return d.toISOString().split('T')[0]; });
+      const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
+      const sumWeek = (wS, fn) => { const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEs=wE.toISOString().split('T')[0]; return state.feedingLog.filter(l=>l.date>=wS&&l.date<wEs).reduce(fn,0); };
+      if (metric === 'feeds') {
+        return {labels, datasets:[{label:'Feeds', data:weeks.map(w=>sumWeek(w,(a)=>a+1)), color:'#2D8F8F'}], yLabel:'feeds / week'};
+      } else if (metric === 'breast') {
+        return {labels, datasets:[{label:'Breast min', data:weeks.map(w=>sumWeek(w,(a,l)=>a+(parseInt(l.leftMin)||0)+(parseInt(l.rightMin)||0))), color:'#0F6E56'}], yLabel:'minutes / week'};
+      } else {
+        return {labels, datasets:[{label:'Formula ml', data:weeks.map(w=>sumWeek(w,(a,l)=>a+(parseInt(l.formulaMl)||0))), color:'#534AB7'}], yLabel:'ml / week'};
+      }
     }
   }
 
@@ -2811,10 +2872,10 @@ PAGES['feeding'] = function(el) {
     const tl = todayLogs.reduce((a,l)=>a+(parseInt(l.leftMin)||0),0);
     const tr = todayLogs.reduce((a,l)=>a+(parseInt(l.rightMin)||0),0);
     const tfo = todayLogs.reduce((a,l)=>a+(parseInt(l.formulaMl)||0),0);
-    const tp = todayLogs.reduce((a,l)=>a+(parseInt(l.pumpedMl)||0),0);
     const feedOk = targets ? (tf >= targets.feedsMin ? 'good' : tf >= targets.feedsMin-2 ? 'ok' : 'low') : 'none';
     const statusColor = {good:'#0F6E56', ok:'#854F0B', low:'#C0392B', none:'#888'}[feedOk];
     const statusIcon = {good:'✓', ok:'~', low:'⚠', none:''}[feedOk];
+    const stash = state.pumpedStash || 0;
 
     el.innerHTML = `
       <div class="page-header">
@@ -2822,41 +2883,42 @@ PAGES['feeding'] = function(el) {
         <p>Today: ${tf} feeds · ${tl+tr}min breast · ${tfo}ml formula${rec?' · '+rec.phase:''}</p>
       </div>
 
-      <!-- Stats row -->
       <div class="grid-4" style="margin-bottom:12px">
         <div class="stat-card" style="background:#0F6E56">
-          <div class="val">${tf}</div>
-          <div class="lbl">Feeds today</div>
+          <div class="val">${tf}</div><div class="lbl">Feeds today</div>
           ${targets?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${targets.feedsMin}–${targets.feedsMax}</div>`:''}
         </div>
-        <div class="stat-card" style="background:#2D8F8F">
-          <div class="val">${tl+tr}m</div>
-          <div class="lbl">Breast total</div>
+        <div class="stat-card" style="background:#2D8F8F"><div class="val">${tl+tr}m</div><div class="lbl">Breast total</div></div>
+        <div class="stat-card" style="background:#534AB7"><div class="val">${tfo}ml</div><div class="lbl">Formula</div></div>
+        <div class="stat-card" style="background:${statusColor}"><div class="val">${statusIcon||'—'}</div><div class="lbl">${feedOk==='good'?'On track':feedOk==='ok'?'Getting there':feedOk==='low'?'Below target':'No target'}</div></div>
+      </div>
+
+      <!-- PUMPED MILK STASH -->
+      <div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,#EEEDFE,#f5f4ff);border:1px solid #d9d6f5">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#534AB7;text-transform:uppercase;letter-spacing:.04em">🥛 Pumped Milk Stash</div>
+            <div style="font-size:24px;font-weight:800;color:#534AB7;margin-top:2px">${stash} ml</div>
+          </div>
+          <div style="text-align:right;font-size:10px;color:#888;max-width:130px">Pumping adds to stash. Feeding stored milk subtracts.</div>
         </div>
-        <div class="stat-card" style="background:#534AB7">
-          <div class="val">${tfo}ml</div>
-          <div class="lbl">Formula</div>
-          ${rec?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">${rec.feedAmt}/feed</div>`:''}
-        </div>
-        <div class="stat-card" style="background:${statusColor}">
-          <div class="val">${statusIcon||'—'}</div>
-          <div class="lbl">${feedOk==='good'?'On track':feedOk==='ok'?'Getting there':feedOk==='low'?'Below target':'No target'}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="addStash(60)" style="background:#534AB7;color:#fff">+60ml</button>
+          <button class="btn btn-sm" onclick="addStash(90)" style="background:#534AB7;color:#fff">+90ml</button>
+          <button class="btn btn-sm" onclick="addStash(120)" style="background:#534AB7;color:#fff">+120ml</button>
+          <button class="btn btn-sm" onclick="useStash(60)" style="background:#fff;border:1.5px solid #534AB7;color:#534AB7">Feed 60ml</button>
+          <button class="btn btn-sm" onclick="useStash(90)" style="background:#fff;border:1.5px solid #534AB7;color:#534AB7">Feed 90ml</button>
+          <button class="btn btn-sm" onclick="customStash()" style="background:#fff;border:1.5px solid #ccc;color:#666">Custom</button>
         </div>
       </div>
 
-      <!-- Recommendations -->
       ${rec ? `<div class="rec-box">
         <h4>📋 ${rec.phase}</h4>
         <div class="rec-item"><span class="rec-label">Feeding frequency</span><span class="rec-val">${rec.feedFreq}</span></div>
         <div class="rec-item"><span class="rec-label">Amount per feed</span><span class="rec-val">${rec.feedAmt}</span></div>
         <div class="rec-item"><span class="rec-label">Today's feeds</span><span class="rec-val" style="color:${statusColor}">${tf} ${statusIcon}</span></div>
-        <div style="font-size:11px;color:#555;margin-top:6px;line-height:1.5">${rec.feeding}</div>
-      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px">
-        <span style="font-size:12px;color:#666">Set baby's birth date to see feeding targets</span>
-        <button onclick="openBabySettings()" class="btn btn-teal btn-sm" style="flex-shrink:0;font-size:12px">Set birth date</button>
-      </div>`}
+      </div>` : `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666;display:flex;align-items:center;justify-content:space-between">Set baby's date of birth to see feeding targets.<button onclick="openBabySettings()" class="btn btn-teal btn-sm" style="font-size:11px;padding:4px 9px;margin-left:6px">Set now</button></div>`}
 
-      <!-- Quick log -->
       <div class="card" style="margin-bottom:10px">
         <div class="card-title">Quick log</div>
         ${isMultiples() ? renderBabySelector(0,'setQFBaby')+'<input type="hidden" id="qf-baby" value="0">' : ''}
@@ -2867,16 +2929,15 @@ PAGES['feeding'] = function(el) {
           }).join('')}
           ${['60ml','90ml','120ml','150ml'].map(ml=>`<button class="btn btn-outline btn-sm" onclick="quickFeed('formula',${parseInt(ml)})">${ml}</button>`).join('')}
         </div>
-        <button class="btn btn-outline btn-block btn-sm" id="feed-toggle" onclick="toggleEl('feed-full-form');this.textContent=document.getElementById('feed-full-form').style.display==='none'?'+ Full entry':'− Hide form'">+ Full entry</button>
+        <button class="btn btn-outline btn-block btn-sm" onclick="toggleEl('feed-full-form');this.textContent=document.getElementById('feed-full-form').style.display==='none'?'+ Full entry':'− Hide form'">+ Full entry</button>
       </div>
 
-      <!-- Full form -->
       <div class="card" id="feed-full-form" style="display:none;margin-bottom:10px">
         <div class="card-title">Log a feed</div>
         ${isMultiples() ? renderBabySelector(0,'setFFBaby')+'<input type="hidden" id="ff-baby" value="0">' : ''}
-        <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-end">
-          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="f-date" value="${today()}" style="font-size:13px;padding:8px 10px"></div>
-          <div style="width:100px"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" style="font-size:13px;padding:8px 10px"></div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="f-date" value="${today()}" style="font-size:13px"></div>
+          <div style="width:90px"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" style="font-size:13px"></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>Left breast (min)</label><input type="number" id="f-left" min="0" placeholder="0" inputmode="numeric"></div>
@@ -2884,15 +2945,15 @@ PAGES['feeding'] = function(el) {
         </div>
         <div class="form-row">
           <div class="form-field"><label>Formula (ml)</label><input type="number" id="f-formula" min="0" placeholder="0" inputmode="numeric"></div>
-          <div class="form-field"><label>Pumped (ml)</label><input type="number" id="f-pump" min="0" placeholder="0" inputmode="numeric"></div>
+          <div class="form-field"><label>Stored milk fed (ml)</label><input type="number" id="f-stored" min="0" placeholder="0" inputmode="numeric"></div>
         </div>
         <div class="form-field"><label>Notes</label><input type="text" id="f-notes" placeholder="Latch quality, side started..."></div>
         <button class="btn btn-teal btn-block" onclick="addFeed()">Add feed</button>
+        <div style="font-size:10px;color:#888;margin-top:6px;text-align:center">Stored milk fed will subtract from your pumped stash</div>
       </div>
 
-      <!-- Chart -->
       <div class="card" style="margin-bottom:10px;padding:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
           <div class="card-title" style="margin:0">Trends</div>
           <div class="chart-tabs" style="margin:0">
             <button class="chart-tab ${chartView==='hourly'?'active':''}" onclick="setFeedChart('hourly')">Hourly</button>
@@ -2900,55 +2961,83 @@ PAGES['feeding'] = function(el) {
             <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setFeedChart('weekly')">Weekly</button>
           </div>
         </div>
-        <canvas id="feed-chart" height="160"></canvas>
+        <div style="display:flex;gap:5px;margin-bottom:10px">
+          <button class="chart-tab ${chartMetric==='feeds'?'active':''}" onclick="setFeedMetric('feeds')" style="font-size:11px">Feed count</button>
+          <button class="chart-tab ${chartMetric==='breast'?'active':''}" onclick="setFeedMetric('breast')" style="font-size:11px">Breast min</button>
+          <button class="chart-tab ${chartMetric==='formula'?'active':''}" onclick="setFeedMetric('formula')" style="font-size:11px">Formula ml</button>
+        </div>
+        <canvas id="feed-chart" height="170"></canvas>
       </div>
 
-      <!-- History -->
       <div class="card">
         <div class="card-title">History (most recent first)</div>
         ${state.feedingLog.length === 0 ? '<div class="empty-state">No feeds logged yet</div>' :
           state.feedingLog.slice().reverse().slice(0,50).map((l,ri) => {
             const i = state.feedingLog.length-1-ri;
             const parts = [l.leftMin?'L:'+l.leftMin+'m':'', l.rightMin?'R:'+l.rightMin+'m':'',
-              l.formulaMl?l.formulaMl+'ml':'', l.pumpedMl?'Pumped:'+l.pumpedMl+'ml':''].filter(Boolean);
+              l.formulaMl?l.formulaMl+'ml formula':'', l.storedMl?l.storedMl+'ml stored':'', l.pumpedMl?'Pumped:'+l.pumpedMl+'ml':''].filter(Boolean);
             return `<div class="log-row">
               <span style="font-size:11px;color:#888;min-width:95px;flex-shrink:0">${l.date} ${l.time||''}</span>
               ${isMultiples()&&l.babyIdx!=null?`<span class="badge" style="background:#E6F5F5;color:#2D8F8F;flex-shrink:0">${babyLabel(l.babyIdx)}</span>`:''}
               <span style="flex:1;font-size:12px">${parts.join(' · ')||'—'}</span>
-              ${l.notes?`<span style="font-size:11px;color:#aaa;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.notes}</span>`:''}
               <button onclick="delFeed(${i})" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;flex-shrink:0;padding:0 4px">×</button>
             </div>`;
           }).join('')
         }
       </div>
     `;
-    // Draw chart after DOM renders
     requestAnimationFrame(() => {
-      const cd = getChartData(chartView);
-      drawBar('feed-chart', cd.labels, cd.datasets);
+      const cd = getChartData(chartView, chartMetric);
+      drawBar('feed-chart', cd.labels, cd.datasets, cd.yLabel);
     });
   }
 
   window.setFeedChart = (v) => { chartView = v; render(); };
+  window.setFeedMetric = (m) => { chartMetric = m; render(); };
   window.setQFBaby = (i) => { const h=document.getElementById('qf-baby'); if(h) h.value=i; };
   window.setFFBaby = (i) => { const h=document.getElementById('ff-baby'); if(h) h.value=i; };
+  window.addStash = (ml) => { state.pumpedStash = (state.pumpedStash||0) + ml; saveState('pumpedStash'); render(); toast('+'+ml+'ml added to stash 🥛'); };
+  window.useStash = (ml) => {
+    const cur = state.pumpedStash||0;
+    if (cur < ml) { toast('Not enough in stash ('+cur+'ml)'); return; }
+    state.pumpedStash = cur - ml;
+    state.feedingLog.push({date:today(), time:new Date().toTimeString().slice(0,5), leftMin:0, rightMin:0, formulaMl:0, storedMl:ml, pumpedMl:0, notes:'Stored milk', babyIdx:0});
+    saveState(); render(); toast(ml+'ml stored milk fed 🍼');
+  };
+  window.customStash = () => {
+    const v = prompt('Amount in ml (positive to add, negative to use):');
+    if (v === null) return;
+    const ml = parseInt(v);
+    if (isNaN(ml)) { toast('Invalid amount'); return; }
+    const cur = state.pumpedStash||0;
+    if (ml < 0 && cur < -ml) { toast('Not enough in stash'); return; }
+    state.pumpedStash = cur + ml;
+    if (ml < 0) state.feedingLog.push({date:today(), time:new Date().toTimeString().slice(0,5), leftMin:0, rightMin:0, formulaMl:0, storedMl:-ml, pumpedMl:0, notes:'Stored milk', babyIdx:0});
+    saveState(); render(); toast('Stash updated');
+  };
   window.addFeed = () => {
     const bi = parseInt(document.getElementById('ff-baby')?.value||'0');
+    const stored = parseInt(document.getElementById('f-stored')?.value)||0;
+    if (stored > 0) {
+      const cur = state.pumpedStash||0;
+      state.pumpedStash = Math.max(0, cur - stored);
+    }
     state.feedingLog.push({
       date: document.getElementById('f-date')?.value||today(),
       time: document.getElementById('f-time')?.value||'',
       leftMin: parseInt(document.getElementById('f-left')?.value)||0,
       rightMin: parseInt(document.getElementById('f-right')?.value)||0,
       formulaMl: parseInt(document.getElementById('f-formula')?.value)||0,
-      pumpedMl: parseInt(document.getElementById('f-pump')?.value)||0,
+      storedMl: stored,
+      pumpedMl: 0,
       notes: document.getElementById('f-notes')?.value||'',
       babyIdx: bi,
     });
-    saveState('feedingLog'); render(); toast('Feed logged! 🍼');
+    saveState(); render(); toast('Feed logged! 🍼');
   };
   window.quickFeed = (type, amt) => {
     const bi = parseInt(document.getElementById('qf-baby')?.value||'0');
-    const e = {date:today(), time:new Date().toTimeString().slice(0,5), leftMin:0, rightMin:0, formulaMl:0, pumpedMl:0, notes:'Quick', babyIdx:bi};
+    const e = {date:today(), time:new Date().toTimeString().slice(0,5), leftMin:0, rightMin:0, formulaMl:0, storedMl:0, pumpedMl:0, notes:'Quick', babyIdx:bi};
     if (type==='left') e.leftMin=amt; else if (type==='right') e.rightMin=amt; else e.formulaMl=amt;
     state.feedingLog.push(e); saveState('feedingLog'); render();
     toast((isMultiples()?babyLabel(bi)+': ':'')+(type==='formula'?amt+'ml':type==='left'?'L '+amt+'m':'R '+amt+'m')+' logged!');
@@ -2957,40 +3046,47 @@ PAGES['feeding'] = function(el) {
   render();
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
-// SLEEP LOG
-// ══════════════════════════════════════════════════════════════════════════════
 PAGES['sleep'] = function(el) {
   let chartView = 'daily';
+  let chartMetric = 'all'; // all | night | naps
 
   function calcDur(l) {
     if (!l.start || !l.end) return 0;
     return Math.max(0, (new Date(l.date+'T'+l.end) - new Date(l.date+'T'+l.start)) / 3600000);
   }
 
-  function getChartData(view) {
+  function getChartData(view, metric) {
+    // metric: all | night | naps
+    const matchType = (l) => metric==='all' ? true : metric==='night' ? l.type==='Night' : l.type!=='Night';
     if (view === 'hourly') {
       const hrs = Array(24).fill(0);
-      state.sleepLog.filter(l=>l.date===today()).forEach(l => {
+      state.sleepLog.filter(l=>l.date===today()&&matchType(l)).forEach(l => {
         const h = parseInt(l.start?.split(':')[0]||0);
         if (h>=0&&h<24) hrs[h] += calcDur(l);
       });
-      return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:'Hrs', data:hrs.map(v=>Math.round(v*10)/10), color:'#185FA5'}]};
+      return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:'Hrs', data:hrs.map(v=>Math.round(v*10)/10), color:'#185FA5'}], yLabel:'hours slept / hour'};
     } else if (view === 'daily') {
       const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split('T')[0]; });
-      const night = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&l.type==='Night').reduce((a,l)=>a+calcDur(l),0)*10)/10);
-      const naps = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&l.type!=='Night').reduce((a,l)=>a+calcDur(l),0)*10)/10);
-      return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[{label:'Night',data:night,color:'#1B3A6B'},{label:'Naps',data:naps,color:'#534AB7'}]};
+      const labels = days.map(d=>d.slice(5).replace('-','/'));
+      if (metric === 'all') {
+        const night = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&l.type==='Night').reduce((a,l)=>a+calcDur(l),0)*10)/10);
+        const naps = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&l.type!=='Night').reduce((a,l)=>a+calcDur(l),0)*10)/10);
+        return {labels, datasets:[{label:'Night',data:night,color:'#1B3A6B'},{label:'Naps',data:naps,color:'#534AB7'}], yLabel:'hours / day'};
+      } else {
+        const data = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&matchType(l)).reduce((a,l)=>a+calcDur(l),0)*10)/10);
+        return {labels, datasets:[{label:metric==='night'?'Night':'Naps',data,color:metric==='night'?'#1B3A6B':'#534AB7'}], yLabel:'hours / day'};
+      }
     } else {
       const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return d.toISOString().split('T')[0]; });
-      return {labels:['4 wks ago','3 wks ago','2 wks ago','This week'], datasets:[{label:'Avg hrs/day', data:weeks.map(wS=>{
-        const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEStr=wE.toISOString().split('T')[0];
-        const total=state.sleepLog.filter(l=>l.date>=wS&&l.date<wEStr).reduce((a,l)=>a+calcDur(l),0);
-        return Math.round(total/7*10)/10;
-      }), color:'#185FA5'}]};
+      const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
+      const avg = (wS,fn) => { const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEs=wE.toISOString().split('T')[0]; return Math.round(state.sleepLog.filter(l=>l.date>=wS&&l.date<wEs&&fn(l)).reduce((a,l)=>a+calcDur(l),0)/7*10)/10; };
+      if (metric === 'all') {
+        return {labels, datasets:[{label:'Avg hrs/day',data:weeks.map(w=>avg(w,()=>true)),color:'#185FA5'}], yLabel:'avg hours / day'};
+      } else {
+        return {labels, datasets:[{label:metric==='night'?'Night':'Naps',data:weeks.map(w=>avg(w,matchType)),color:metric==='night'?'#1B3A6B':'#534AB7'}], yLabel:'avg hours / day'};
+      }
     }
   }
-
   function render() {
     const rec = getRecommendations();
     const targets = getDailyTargets();
@@ -3071,7 +3167,12 @@ PAGES['sleep'] = function(el) {
             <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setSleepChart('weekly')">Weekly</button>
           </div>
         </div>
-        <canvas id="sleep-chart" height="160"></canvas>
+        <div style="display:flex;gap:5px;margin-bottom:10px">
+          <button class="chart-tab ${chartMetric==='all'?'active':''}" onclick="setSleepMetric('all')" style="font-size:11px">All</button>
+          <button class="chart-tab ${chartMetric==='night'?'active':''}" onclick="setSleepMetric('night')" style="font-size:11px">Night only</button>
+          <button class="chart-tab ${chartMetric==='naps'?'active':''}" onclick="setSleepMetric('naps')" style="font-size:11px">Naps only</button>
+        </div>
+        <canvas id="sleep-chart" height="170"></canvas>
       </div>
 
       <div class="card">
@@ -3094,12 +3195,13 @@ PAGES['sleep'] = function(el) {
       </div>
     `;
     requestAnimationFrame(() => {
-      const cd = getChartData(chartView);
-      drawBar('sleep-chart', cd.labels, cd.datasets);
+      const cd = getChartData(chartView, chartMetric);
+      drawBar('sleep-chart', cd.labels, cd.datasets, cd.yLabel);
     });
   }
 
   window.setSleepChart = (v) => { chartView=v; render(); };
+  window.setSleepMetric = (m) => { chartMetric=m; render(); };
   window.setSBaby = (i) => { const h=document.getElementById('s-baby'); if(h) h.value=i; };
   window.addSleep = () => {
     const bi=parseInt(document.getElementById('s-baby')?.value||'0');
@@ -3131,19 +3233,19 @@ PAGES['diaper'] = function(el) {
       state.diaperLog.filter(l=>l.date===today()).forEach(l=>{
         const h=parseInt(l.time?.split(':')[0]||0); if(h>=0&&h<24){if(l.wet)wet[h]++;if(l.dirty)dirty[h]++;}
       });
-      return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:'Wet',data:wet,color:'#185FA5'},{label:'Dirty',data:dirty,color:'#0F6E56'}]};
+      return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:'Wet',data:wet,color:'#185FA5'},{label:'Dirty',data:dirty,color:'#0F6E56'}], yLabel:'count / hour'};
     } else if (view === 'daily') {
       const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
       return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[
         {label:'Wet',data:days.map(d=>state.diaperLog.filter(l=>l.date===d&&l.wet).length),color:'#185FA5'},
         {label:'Dirty',data:days.map(d=>state.diaperLog.filter(l=>l.date===d&&l.dirty).length),color:'#0F6E56'},
-      ]};
+      ], yLabel:'count / day'};
     } else {
       const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
       return {labels:['4 wks ago','3 wks ago','2 wks ago','This week'], datasets:[
         {label:'Wet/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.wet).length;}),color:'#185FA5'},
         {label:'Dirty/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.dirty).length;}),color:'#0F6E56'},
-      ]};
+      ], yLabel:'count / week'};
     }
   }
 
@@ -3246,7 +3348,7 @@ PAGES['diaper'] = function(el) {
     `;
     requestAnimationFrame(() => {
       const cd = getChartData(chartView);
-      drawBar('diaper-chart', cd.labels, cd.datasets);
+      drawBar('diaper-chart', cd.labels, cd.datasets, cd.yLabel);
     });
   }
 
@@ -3273,22 +3375,35 @@ PAGES['diaper'] = function(el) {
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['reading'] = function(el) {
   let chartView = 'daily';
+  let chartMetric = 'all';
 
-  function getChartData(view) {
+  function getChartData(view, metric) {
+    // metric: all | Indonesian | English
+    const matchLang = (l) => metric==='all' ? true : l.lang===metric;
     if (view === 'daily') {
       const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
-      return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[
-        {label:'Min',data:days.map(d=>state.readingLog.filter(l=>l.date===d).reduce((a,l)=>a+(parseInt(l.minutes)||0),0)),color:'#185FA5'},
-      ]};
+      const labels = days.map(d=>d.slice(5).replace('-','/'));
+      if (metric === 'all') {
+        const indo = days.map(d=>state.readingLog.filter(l=>l.date===d&&l.lang==='Indonesian').reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
+        const eng = days.map(d=>state.readingLog.filter(l=>l.date===d&&l.lang==='English').reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
+        const both = days.map(d=>state.readingLog.filter(l=>l.date===d&&(l.lang==='Both'||!l.lang)).reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
+        return {labels, datasets:[{label:'🇮🇩 Indo',data:indo.map((v,i)=>v+both[i]),color:'#0F6E56'},{label:'🇬🇧 Eng',data:eng.map((v,i)=>v+both[i]),color:'#185FA5'}], yLabel:'minutes / day'};
+      } else {
+        const data = days.map(d=>state.readingLog.filter(l=>l.date===d&&matchLang(l)).reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
+        return {labels, datasets:[{label:metric,data,color:metric==='Indonesian'?'#0F6E56':'#185FA5'}], yLabel:'minutes / day'};
+      }
     } else if (view === 'weekly') {
       const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
-      return {labels:['4 wks ago','3 wks ago','2 wks ago','This week'], datasets:[
-        {label:'Min/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.readingLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]).reduce((a,l)=>a+(parseInt(l.minutes)||0),0);}),color:'#185FA5'},
-      ]};
+      const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
+      const sumW=(wS,fn)=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);const wEs=wE.toISOString().split('T')[0];return state.readingLog.filter(l=>l.date>=wS&&l.date<wEs&&fn(l)).reduce((a,l)=>a+(parseInt(l.minutes)||0),0);};
+      if (metric === 'all') {
+        return {labels, datasets:[{label:'Min/wk',data:weeks.map(w=>sumW(w,()=>true)),color:'#185FA5'}], yLabel:'minutes / week'};
+      } else {
+        return {labels, datasets:[{label:metric,data:weeks.map(w=>sumW(w,matchLang)),color:metric==='Indonesian'?'#0F6E56':'#185FA5'}], yLabel:'minutes / week'};
+      }
     }
     return {labels:[], datasets:[]};
   }
-
   function render() {
     const readingLogs = state.readingLog||[];
     const todayLogs = readingLogs.filter(l=>l.date===today());
@@ -3353,7 +3468,12 @@ PAGES['reading'] = function(el) {
             <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setReadChart('weekly')">Weekly</button>
           </div>
         </div>
-        <canvas id="reading-chart" height="140"></canvas>
+        <div style="display:flex;gap:5px;margin-bottom:10px">
+          <button class="chart-tab ${chartMetric==='all'?'active':''}" onclick="setReadMetric('all')" style="font-size:11px">All</button>
+          <button class="chart-tab ${chartMetric==='Indonesian'?'active':''}" onclick="setReadMetric('Indonesian')" style="font-size:11px">🇮🇩 Indo</button>
+          <button class="chart-tab ${chartMetric==='English'?'active':''}" onclick="setReadMetric('English')" style="font-size:11px">🇬🇧 English</button>
+        </div>
+        <canvas id="reading-chart" height="160"></canvas>
       </div>
 
       ${allBooks.length>0?`<div class="card" style="margin-bottom:10px">
@@ -3386,12 +3506,13 @@ PAGES['reading'] = function(el) {
       </div>
     `;
     requestAnimationFrame(() => {
-      const cd = getChartData(chartView);
-      if (cd.labels.length) drawBar('reading-chart', cd.labels, cd.datasets);
+      const cd = getChartData(chartView, chartMetric);
+      if (cd.labels.length) drawBar('reading-chart', cd.labels, cd.datasets, cd.yLabel);
     });
   }
 
   window.setReadChart = (v) => { chartView=v; render(); };
+  window.setReadMetric = (m) => { chartMetric=m; render(); };
   window.addReading = () => {
     const mins=parseInt(document.getElementById('rl-min')?.value)||0;
     if(!mins){toast('Please enter duration');return;}
