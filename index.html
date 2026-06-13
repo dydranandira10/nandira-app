@@ -164,11 +164,30 @@ input[type=text],input[type=date],input[type=time],input[type=number],input[type
   font-size:14px;font-family:var(--font);background:#fff;color:#333;
   transition:border-color .15s;width:100%;
 }
-input[type=date],input[type=time]{padding:9px 10px;font-size:13px;}
+input[type=date],input[type=time]{
+  padding:10px 12px;font-size:14px;
+  -webkit-appearance:none;appearance:none;
+  min-width:0;max-width:100%;width:100%;
+  min-height:42px;line-height:1.2;
+  display:block;text-align:left;
+}
+/* iOS Safari: keep the date/time value inside the box */
+input[type=date]::-webkit-date-and-time-value,
+input[type=time]::-webkit-date-and-time-value{
+  text-align:left;margin:0;
+}
+input[type=date]::-webkit-calendar-picker-indicator,
+input[type=time]::-webkit-calendar-picker-indicator{
+  margin-left:auto;flex-shrink:0;
+}
+/* number inputs: stop spinner overflow */
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .form-row label,.form-field label{font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px;}
-.form-field{margin-bottom:10px;}
+.form-field{margin-bottom:10px;min-width:0;}
 
 /* ── BUTTONS ── */
 .btn{padding:10px 16px;border-radius:var(--rs);border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--font);transition:opacity .15s;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
@@ -438,6 +457,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="navTo('sleep')"><span class="icon">😴</span> Sleep Log</button>
   <button class="nav-item" onclick="navTo('diaper')"><span class="icon">💧</span> Diaper Log</button>
   <button class="nav-item" onclick="navTo('reading')"><span class="icon">📚</span> Reading Log</button>
+  <button class="nav-item" onclick="navTo('weight')"><span class="icon">⚖️</span> Weight Log</button>
   <div class="drawer-section">Development</div>
   <button class="nav-item" onclick="navTo('milestones')"><span class="icon">⭐</span> Milestones</button>
   <button class="nav-item" onclick="navTo('vaccines')"><span class="icon">💉</span> Vaccines</button>
@@ -457,6 +477,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
     <button class="nav-item" onclick="closeDrawer();openBabySettings()"><span class="icon">👶</span> Baby profile</button>
     <button class="nav-item" onclick="closeDrawer();showFamilyCode()"><span class="icon">🔗</span> Family sync code</button>
     <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon">📊</span> Export to Google Sheets</button>
+    <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon">💾</span> Back up all data</button>
+    <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon">♻️</span> Restore from backup</button>
   </div>
   <div style="height:20px"></div>
 </div>
@@ -650,6 +672,8 @@ let state = {
   sleepLog: [],
   diaperLog: [],
   readingLog: [],
+  weightLog: [],         // [{date, grams, babyIdx, notes}]
+  weightUnit: 'kg',      // display unit: 'kg' | 'g' | 'lboz'
   // Nav
   navSlots: ['dashboard','feeding','milestones','foods'],
   // Budget
@@ -1172,13 +1196,71 @@ function daysOld() {
 }
 function weeksOld() { const d = daysOld(); return d===null?null:Math.floor(d/7); }
 function monthsOld() { const d = daysOld(); return d===null?null:Math.floor(d/30.5); }
+function babyAgePrecise() {
+  if (!state.babyDOB) return null;
+  const birth = new Date(state.babyDOB + 'T00:00:00');
+  const now = new Date();
+  if (now < birth) return null;
+  let years = now.getFullYear() - birth.getFullYear();
+  let months = now.getMonth() - birth.getMonth();
+  let days = now.getDate() - birth.getDate();
+  if (days < 0) {
+    months--;
+    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+  if (months < 0) { years--; months += 12; }
+  const parts = [];
+  if (years > 0) parts.push(years + ' year' + (years!==1?'s':''));
+  if (months > 0) parts.push(months + ' month' + (months!==1?'s':''));
+  parts.push(days + ' day' + (days!==1?'s':''));
+  return parts.join(', ');
+}
+
+function babyAgeCards() {
+  // Returns [{val, lbl}, {val, lbl}] — two age stats appropriate to the baby's age
+  const d = daysOld();
+  if (d === null) return [{val:'—',lbl:'Age'},{val:'—',lbl:'Age'}];
+  const months = Math.floor(d / 30.44);
+  const years = Math.floor(months / 12);
+
+  if (d < 56) {
+    // Under 8 weeks: days + weeks
+    return [
+      {val: d, lbl: 'Days old'},
+      {val: Math.floor(d/7), lbl: 'Weeks old'},
+    ];
+  } else if (months < 24) {
+    // 2 months to <2 years: months + days-into-month (no weeks)
+    const birth = new Date(state.babyDOB+'T00:00:00');
+    const now = new Date();
+    let mo = (now.getFullYear()-birth.getFullYear())*12 + (now.getMonth()-birth.getMonth());
+    let dd = now.getDate()-birth.getDate();
+    if (dd<0){ mo--; const pm=new Date(now.getFullYear(),now.getMonth(),0); dd+=pm.getDate(); }
+    return [
+      {val: mo, lbl: mo===1?'Month old':'Months old'},
+      {val: dd, lbl: dd===1?'Day':'Days'},
+    ];
+  } else {
+    // 2 years+: years + months (remainder)
+    const remMonths = months % 12;
+    return [
+      {val: years, lbl: years===1?'Year old':'Years old'},
+      {val: remMonths, lbl: remMonths===1?'Month':'Months'},
+    ];
+  }
+}
+
+
 function babyAgeLbl() {
   const d = daysOld();
   if (d===null) return null;
-  if (d<14) return d+' days old';
+  if (d<14) return d+' day'+(d!==1?'s':'')+' old';
   if (d<60) return Math.floor(d/7)+' weeks old';
-  const m = Math.floor(d/30.5);
-  return m+' month'+(m!==1?'s':'')+' old';
+  const m = Math.floor(d/30.44);
+  if (m<24) return m+' month'+(m!==1?'s':'')+' old';
+  const years = Math.floor(m/12), rem = m%12;
+  return years+' year'+(years!==1?'s':'')+(rem>0?', '+rem+' month'+(rem!==1?'s':''):'')+' old';
 }
 function babyName() { return state.babyName||null; }
 function babyGender() { return state.babyGender||null; }
@@ -1360,6 +1442,7 @@ const ALL_PAGES = [
   {id:'sleep',icon:'😴',label:'Sleep',group:'Logs'},
   {id:'diaper',icon:'💧',label:'Diaper',group:'Logs'},
   {id:'reading',icon:'📚',label:'Reading',group:'Logs'},
+  {id:'weight',icon:'⚖️',label:'Weight',group:'Logs'},
   {id:'milestones',icon:'⭐',label:'Milestones',group:'Dev'},
   {id:'vaccines',icon:'💉',label:'Vaccines',group:'Dev'},
   {id:'language',icon:'💬',label:'Language',group:'Dev'},
@@ -1387,6 +1470,12 @@ function renderBottomNav(active) {
 }
 
 let _currentPage = 'dashboard';
+function toggleDashWeight() {
+  window._dashWeightOpen = !window._dashWeightOpen;
+  const cur = document.getElementById('page-dashboard');
+  if (cur && PAGES.dashboard) PAGES.dashboard(cur);
+}
+
 function navTo(pid) {
   closeDrawer(); showPage(pid); _currentPage=pid; renderBottomNav(pid);
   document.querySelectorAll('.nav-item').forEach(el=>{
@@ -1715,6 +1804,72 @@ async function saveBabyProfile() {
 // ══════════════════════════════════════════════════════════════════════════════
 // DAILY INTAKE RECOMMENDATIONS
 // ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+// WHO WEIGHT REFERENCE (median weight-for-age, 0–24 months, in grams)
+// Source: WHO Child Growth Standards (50th percentile)
+// ══════════════════════════════════════════════════════════════════════════════
+const WHO_WEIGHT = {
+  // month: [boyMedianG, girlMedianG, boyLowG(-2SD), boyHighG(+2SD), girlLowG, girlHighG]
+  0:  [3300, 3200, 2500, 4400, 2400, 4200],
+  1:  [4500, 4200, 3400, 5800, 3200, 5500],
+  2:  [5600, 5100, 4400, 7000, 4000, 6600],
+  3:  [6400, 5800, 5100, 7900, 4600, 7500],
+  4:  [7000, 6400, 5600, 8600, 5100, 8200],
+  5:  [7500, 6900, 6100, 9200, 5500, 8800],
+  6:  [7900, 7300, 6400, 9700, 5800, 9300],
+  7:  [8300, 7600, 6700, 10200, 6100, 9800],
+  8:  [8600, 7900, 6900, 10500, 6300, 10200],
+  9:  [8900, 8200, 7100, 10900, 6600, 10500],
+  10: [9200, 8500, 7400, 11200, 6800, 10900],
+  11: [9400, 8700, 7600, 11500, 7000, 11200],
+  12: [9600, 8900, 7700, 11800, 7100, 11500],
+  15: [10300, 9600, 8300, 12700, 7600, 12400],
+  18: [10900, 10200, 8800, 13500, 8100, 13200],
+  21: [11500, 10900, 9200, 14300, 8600, 14000],
+  24: [12200, 11500, 9700, 15300, 9000, 14800],
+};
+
+function getWeightReference(monthsOld, gender) {
+  // Returns {median, low, high} in grams for the baby's age, interpolating between known months
+  const keys = Object.keys(WHO_WEIGHT).map(Number).sort((a,b)=>a-b);
+  let lo = keys[0], hi = keys[keys.length-1];
+  for (let i=0;i<keys.length-1;i++){ if(monthsOld>=keys[i]&&monthsOld<=keys[i+1]){ lo=keys[i]; hi=keys[i+1]; break; } }
+  if (monthsOld<=keys[0]) { lo=hi=keys[0]; }
+  if (monthsOld>=keys[keys.length-1]) { lo=hi=keys[keys.length-1]; }
+  const isGirl = gender === 'girl';
+  const pick = (m) => {
+    const d = WHO_WEIGHT[m];
+    return { median: isGirl?d[1]:d[0], low: isGirl?d[4]:d[2], high: isGirl?d[5]:d[3] };
+  };
+  const a = pick(lo), b = pick(hi);
+  if (lo===hi) return a;
+  const t = (monthsOld-lo)/(hi-lo);
+  return {
+    median: Math.round(a.median+(b.median-a.median)*t),
+    low: Math.round(a.low+(b.low-a.low)*t),
+    high: Math.round(a.high+(b.high-a.high)*t),
+  };
+}
+
+// Weight unit conversion + formatting
+function gramsToDisplay(grams, unit) {
+  if (unit === 'g') return Math.round(grams) + ' g';
+  if (unit === 'lboz') {
+    const totalOz = grams / 28.3495;
+    const lb = Math.floor(totalOz / 16);
+    const oz = Math.round(totalOz - lb*16);
+    return lb + ' lb ' + oz + ' oz';
+  }
+  return (grams/1000).toFixed(2) + ' kg';
+}
+
+function displayToGrams(value, unit, ozValue) {
+  const v = parseFloat(value)||0;
+  if (unit === 'g') return v;
+  if (unit === 'lboz') return Math.round(v*453.592 + (parseFloat(ozValue)||0)*28.3495);
+  return Math.round(v*1000);
+}
+
 function getRecommendations() {
   const d = daysOld(); const w = d===null ? null : Math.floor(d/7);
   if (d===null) return null;
@@ -2169,8 +2324,8 @@ PAGES['dashboard'] = function(el) {
       ${pctBar(pregWk/40*100,'#993C1D',8)}
     </div>`:
     `<div class="grid-4" style="margin-bottom:12px">
-      <div class="stat-card" style="background:#1B3A6B"><div class="val">${daysOld()}</div><div class="lbl">Days old</div></div>
-      <div class="stat-card" style="background:#0F6E56"><div class="val">${weeksOld()}</div><div class="lbl">Weeks old</div></div>
+      <div class="stat-card" style="background:#1B3A6B"><div class="val">${babyAgeCards()[0].val}</div><div class="lbl">${babyAgeCards()[0].lbl}</div></div>
+      <div class="stat-card" style="background:#0F6E56"><div class="val">${babyAgeCards()[1].val}</div><div class="lbl">${babyAgeCards()[1].lbl}</div></div>
       <div class="stat-card" style="background:#534AB7"><div class="val">${milDone}/${MILESTONES.length}</div><div class="lbl">Milestones</div></div>
       <div class="stat-card" style="background:#993C1D"><div class="val">${vaxDone}/${vaxTotal}</div><div class="lbl">Vaccines</div></div>
     </div>`}
@@ -2188,7 +2343,23 @@ PAGES['dashboard'] = function(el) {
               <span class="prog-pct" style="color:${t.color}">${t.total?Math.round(t.done/t.total*100):0}%</span>
             </div>`).join('')}
         </div>
-        ${hasBaby?`<div class="card">
+        ${hasBaby?`
+      <div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">
+        <div onclick="toggleDashWeight()" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;user-select:none">
+          <div style="font-size:13px;font-weight:700;color:#222">⚖️ Weight trend</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${(state.weightLog&&state.weightLog.length)?`<span style="font-size:12px;color:#2D8F8F;font-weight:600">${gramsToDisplay([...state.weightLog].sort((a,b)=>b.date.localeCompare(a.date))[0].grams, state.weightUnit||'kg')}</span>`:'<span style="font-size:11px;color:#aaa">No data</span>'}
+            <span id="dash-weight-arrow" style="color:#aaa;font-size:12px">${window._dashWeightOpen?'▾':'▸'}</span>
+          </div>
+        </div>
+        <div id="dash-weight-body" style="display:${window._dashWeightOpen?'block':'none'};padding:0 14px 14px">
+          ${(state.weightLog&&state.weightLog.length)?`<canvas id="dash-weight-chart" height="150"></canvas>
+            <button class="btn btn-outline btn-block btn-sm" onclick="navTo('weight')" style="margin-top:8px">Open weight log →</button>`:
+            `<div style="text-align:center;padding:16px;font-size:12px;color:#888">No weight entries yet.<br><button class="btn btn-teal btn-sm" onclick="navTo('weight')" style="margin-top:8px">Log first weight</button></div>`}
+        </div>
+      </div>
+
+      <div class="card">
           <div class="card-title">Post-birth progress</div>
           ${postTracks.map(t=>`
             <div class="prog-row">
@@ -2250,12 +2421,19 @@ PAGES['dashboard'] = function(el) {
       </div>
     </div>
   `;
-};
 
-// ══════════════════════════════════════════════════════════════════════════════
-// KEY DATES PAGE
-// ══════════════════════════════════════════════════════════════════════════════
-PAGES['keyDates'] = function(el) {
+  // Render dashboard weight chart if expanded
+  if (hasBaby && window._dashWeightOpen && state.weightLog && state.weightLog.length) {
+    requestAnimationFrame(() => {
+      const logs = [...state.weightLog].sort((a,b)=>a.date.localeCompare(b.date)).slice(-14);
+      const unit = state.weightUnit||'kg';
+      const toY = (g)=> unit==='g'?g:unit==='lboz'?g/453.592:g/1000;
+      drawLine('dash-weight-chart', logs.map(l=>{ const d=new Date(l.date+'T00:00:00'); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }),
+        [{label:'Weight', data:logs.map(l=>Math.round(toY(l.grams)*100)/100), color:'#2D8F8F'}],
+        unit==='g'?'grams':unit==='lboz'?'lb':'kg', {trend:true});
+    });
+  }
+};PAGES['keyDates'] = function(el) {
   function render() {
     const dates = (state.keyDates||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
     el.innerHTML = `
@@ -2649,8 +2827,10 @@ function saveCsecTask(existingId) {
 // PREGNANCY TASKS — editable
 // ══════════════════════════════════════════════════════════════════════════════
 PAGES['preg-tasks'] = function(el) {
-  let filterWk = 'all';
+  let filterWk = window._ptFilterWk || 'all';
   let hideCompleted = false;
+  // After adding a task, force-show its week (don't hide it)
+  if (window._ptForceShow) { hideCompleted = false; window._ptForceShow = false; }
 
   function currentPregWeek() {
     const w = getPregWeek();
@@ -2693,9 +2873,9 @@ PAGES['preg-tasks'] = function(el) {
           const isCur = parseInt(String(w).replace('W',''))===curWk;
           return `<button class="tab-btn ${filterWk===w?'active':''}" onclick="filterPT('${w}')" style="${isCur?'border-color:#2D8F8F;border-width:2px;background:#E6F5F5;color:#0F6E56;font-weight:700':''}">${w}${wDone===wTotal&&wTotal>0?' ✓':''}</button>`;
         }).join('')}
-        <button class="tab-btn" onclick="addPregTask(window._ptFilterWk||'W37')">+ Add</button>
       </div></div>
       <div id="pt-list"></div>
+      <button class="btn btn-teal btn-block" onclick="addPregTask(window._ptFilterWk||'W37')" style="margin:12px 0 80px">+ Add new task</button>
     `;
     el.innerHTML = html;
     renderPTList();
@@ -2807,6 +2987,9 @@ function savePregTask(existingId) {
     state.pregTasks.push({id:uid(), ...data, done:false});
   }
   saveState('pregTasks');
+  // Switch the filter to the saved task's week so it's always visible after adding
+  window._ptFilterWk = data.week;
+  window._ptForceShow = true;
   document.getElementById('pt-modal').classList.remove('open');
   toast('Saved! ✓');
   showPage('preg-tasks');
@@ -3092,6 +3275,111 @@ function drawBar(id, labels, datasets, yLabel) {
   }
 }
 
+function drawLine(id, labels, datasets, yLabel, opts) {
+  opts = opts || {};
+  const cc = getCanvasCtx(id); if (!cc) return;
+  const {ctx, w, h} = cc;
+  const pad = {t:18, r:14, b: opts.xLabel?40:28, l: yLabel?44:36};
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  const allVals = datasets.flatMap(d=>d.data).filter(v=>v!=null);
+  if (allVals.length === 0) return;
+  let minV = Math.min(...allVals), maxV = Math.max(...allVals);
+  // Pad the range a little so the line isn't glued to edges
+  const range = (maxV - minV) || 1;
+  minV = minV - range*0.12; maxV = maxV + range*0.12;
+  const n = labels.length;
+  const xAt = (i) => pad.l + (n<=1 ? cw/2 : (cw * i/(n-1)));
+  const yAt = (v) => pad.t + ch * (1 - (v-minV)/(maxV-minV));
+
+  ctx.clearRect(0,0,w,h);
+
+  // Grid + y labels
+  const steps = 4;
+  for (let i=0;i<=steps;i++){
+    const y = pad.t + ch*(1-i/steps);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y);
+    ctx.strokeStyle = i===0?'#e9ecef':'#f1f3f5'; ctx.lineWidth=1; ctx.stroke();
+    const val = minV + (maxV-minV)*i/steps;
+    ctx.fillStyle='#adb5bd'; ctx.font='9px -apple-system,sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(val*100)/100, pad.l-5, y+3);
+  }
+
+  // Y-axis caption
+  if (yLabel) {
+    ctx.save(); ctx.translate(10, pad.t+ch/2); ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='#868e96'; ctx.font='8px -apple-system,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(yLabel, 0, 0); ctx.restore();
+  }
+
+  datasets.forEach(ds => {
+    const pts = ds.data.map((v,i)=> v==null?null:[xAt(i), yAt(v)]).filter(Boolean);
+    if (pts.length === 0) return;
+
+    // Trendline (linear regression) — drawn behind the data line
+    if (opts.trend && ds.data.filter(v=>v!=null).length >= 2) {
+      const xs = [], ys = [];
+      ds.data.forEach((v,i)=>{ if(v!=null){ xs.push(i); ys.push(v); } });
+      const nn = xs.length;
+      const sx = xs.reduce((a,b)=>a+b,0), sy = ys.reduce((a,b)=>a+b,0);
+      const sxy = xs.reduce((a,x,i)=>a+x*ys[i],0), sxx = xs.reduce((a,x)=>a+x*x,0);
+      const slope = (nn*sxy - sx*sy)/((nn*sxx - sx*sx)||1);
+      const intercept = (sy - slope*sx)/nn;
+      const x0 = xs[0], x1 = xs[xs.length-1];
+      ctx.beginPath();
+      ctx.moveTo(xAt(x0), yAt(slope*x0+intercept));
+      ctx.lineTo(xAt(x1), yAt(slope*x1+intercept));
+      ctx.strokeStyle = ds.trendColor || 'rgba(150,150,150,.7)';
+      ctx.lineWidth = 1.5; ctx.setLineDash([5,4]); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // Area fill under the line
+    if (opts.fill !== false) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pad.t+ch);
+      pts.forEach(p=>ctx.lineTo(p[0],p[1]));
+      ctx.lineTo(pts[pts.length-1][0], pad.t+ch);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+      grad.addColorStop(0, ds.color+'33'); grad.addColorStop(1, ds.color+'05');
+      ctx.fillStyle = grad; ctx.fill();
+    }
+
+    // The data line
+    ctx.beginPath();
+    pts.forEach((p,i)=> i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));
+    ctx.strokeStyle = ds.color; ctx.lineWidth = 2.2;
+    ctx.lineJoin='round'; ctx.lineCap='round'; ctx.stroke();
+
+    // Data points
+    pts.forEach(p=>{
+      ctx.beginPath(); ctx.arc(p[0],p[1],3,0,Math.PI*2);
+      ctx.fillStyle='#fff'; ctx.fill();
+      ctx.strokeStyle=ds.color; ctx.lineWidth=2; ctx.stroke();
+    });
+  });
+
+  // X labels (skip some if crowded)
+  ctx.fillStyle='#868e96'; ctx.font='9px -apple-system,sans-serif'; ctx.textAlign='center';
+  const skip = n>10 ? Math.ceil(n/8) : 1;
+  labels.forEach((lbl,i)=>{
+    if (i%skip!==0 && i!==n-1) return;
+    ctx.fillText(String(lbl).substring(0,7), xAt(i), h - (opts.xLabel?20:8));
+  });
+
+  // X-axis caption
+  if (opts.xLabel) {
+    ctx.fillStyle='#adb5bd'; ctx.font='8px -apple-system,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(opts.xLabel, pad.l+cw/2, h-4);
+  }
+
+  // Legend (trendline indicator)
+  if (opts.trend) {
+    ctx.font='8px -apple-system,sans-serif'; ctx.textAlign='right';
+    ctx.fillStyle='#aaa';
+    ctx.fillText('— — trend', w-pad.r, 11);
+  }
+}
+
 PAGES['feeding'] = function(el) {
   let chartView = 'daily';
   let chartMetric = 'feeds'; // feeds | breast | formula
@@ -3208,8 +3496,8 @@ PAGES['feeding'] = function(el) {
         <div class="card-title">Log a feed</div>
         ${isMultiples() ? renderBabySelector(0,'setFFBaby')+'<input type="hidden" id="ff-baby" value="0">' : ''}
         <div style="display:flex;gap:8px;margin-bottom:10px">
-          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="f-date" value="${today()}" style="font-size:13px"></div>
-          <div style="width:90px"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" style="font-size:13px"></div>
+          <div style="flex:1;min-width:0"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="f-date" value="${today()}" style="font-size:13px"></div>
+          <div style="width:118px;flex-shrink:0"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" style="font-size:13px"></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>Left breast (min)</label><input type="number" id="f-left" min="0" placeholder="0" inputmode="numeric"></div>
@@ -3420,8 +3708,8 @@ PAGES['sleep'] = function(el) {
           <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Type</label><select id="s-type" style="font-size:13px;padding:8px 10px"><option>Night</option><option>Day nap</option></select></div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:10px">
-          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Start</label><input type="time" id="s-start" style="font-size:13px;padding:8px 10px"></div>
-          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">End</label><input type="time" id="s-end" style="font-size:13px;padding:8px 10px"></div>
+          <div style="flex:1;min-width:0"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Start</label><input type="time" id="s-start" style="font-size:13px;padding:8px 10px"></div>
+          <div style="flex:1;min-width:0"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">End</label><input type="time" id="s-end" style="font-size:13px;padding:8px 10px"></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>Quality</label><select id="s-qual"><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option></select></div>
@@ -3577,7 +3865,7 @@ PAGES['diaper'] = function(el) {
 
       <div class="card" id="diaper-full-form" style="display:none;margin-bottom:10px">
         <div style="display:flex;gap:8px;margin-bottom:10px">
-          <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="d-date" value="${today()}" style="font-size:13px;padding:8px 10px"></div>
+          <div style="flex:1;min-width:0"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="d-date" value="${today()}" style="font-size:13px;padding:8px 10px"></div>
           <div style="width:100px"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Time</label><input type="time" id="d-time" value="${new Date().toTimeString().slice(0,5)}" style="font-size:13px;padding:8px 10px"></div>
         </div>
         <div class="form-row">
@@ -3793,6 +4081,184 @@ PAGES['reading'] = function(el) {
     saveState('readingLog'); render(); toast('📚 Reading logged!');
   };
   window.delReading = (i) => { state.readingLog.splice(i,1); saveState('readingLog'); render(); };
+  render();
+};
+
+PAGES['weight'] = function(el) {
+  let chartView = 'daily'; // daily | weekly | monthly
+  if (!state.weightLog) state.weightLog = [];
+  if (!state.weightUnit) state.weightUnit = 'kg';
+
+  function getChartData(view) {
+    const logs = [...state.weightLog].sort((a,b)=>a.date.localeCompare(b.date));
+    if (logs.length === 0) return {labels:[], datasets:[], yLabel:''};
+    const unit = state.weightUnit;
+    const toY = (g) => unit==='g' ? g : unit==='lboz' ? g/453.592 : g/1000;
+    const yLabel = unit==='g'?'grams':unit==='lboz'?'pounds':'kg';
+
+    if (view === 'daily') {
+      // Last 14 days with entries
+      const recent = logs.slice(-14);
+      return {
+        labels: recent.map(l=>{ const d=new Date(l.date+'T00:00:00'); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }),
+        datasets: [{label:'Weight', data:recent.map(l=>Math.round(toY(l.grams)*100)/100), color:'#2D8F8F'}],
+        yLabel, xLabel: 'Date',
+      };
+    } else if (view === 'weekly') {
+      // Average per week (week starts Monday), last 8 weeks
+      const mondayOf = (dateStr) => {
+        const d = new Date(dateStr+'T00:00:00');
+        const day = (d.getDay()+6)%7; // 0=Mon ... 6=Sun
+        d.setDate(d.getDate()-day);
+        return d.toISOString().split('T')[0];
+      };
+      const byWeek = {};
+      logs.forEach(l => { const mon=mondayOf(l.date); if(!byWeek[mon])byWeek[mon]=[]; byWeek[mon].push(l.grams); });
+      const weeks = Object.keys(byWeek).sort().slice(-8);
+      return {
+        labels: weeks.map(w=>{ const d=new Date(w+'T00:00:00'); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }),
+        datasets: [{label:'Avg weight', data:weeks.map(w=>{ const a=byWeek[w]; return Math.round(toY(a.reduce((x,y)=>x+y,0)/a.length)*100)/100; }), color:'#185FA5'}],
+        yLabel, xLabel: 'Week beginning (Mon)',
+      };
+    } else {
+      // Monthly average, last 12 months
+      const byMonth = {};
+      logs.forEach(l => { const m=l.date.slice(0,7); if(!byMonth[m])byMonth[m]=[]; byMonth[m].push(l.grams); });
+      const months = Object.keys(byMonth).sort().slice(-12);
+      return {
+        labels: months.map(m=>{ const d=new Date(m+'-01T00:00:00'); return d.toLocaleString('en-GB',{month:'short'})+' '+m.slice(2,4); }),
+        datasets: [{label:'Avg weight', data:months.map(m=>{ const a=byMonth[m]; return Math.round(toY(a.reduce((x,y)=>x+y,0)/a.length)*100)/100; }), color:'#534AB7'}],
+        yLabel, xLabel: 'Month',
+      };
+    }
+  }
+
+  function render() {
+    const unit = state.weightUnit;
+    const logs = [...state.weightLog].sort((a,b)=>b.date.localeCompare(a.date));
+    const latest = logs[0];
+    const hasBaby = !!state.babyDOB;
+    const mo = hasBaby ? (daysOld()/30.44) : 0;
+    const ref = hasBaby ? getWeightReference(mo, state.babyGender) : null;
+
+    // Status vs WHO reference
+    let statusHtml = '';
+    if (latest && ref) {
+      const g = latest.grams;
+      let label, color;
+      if (g < ref.low) { label='Below typical range'; color='#854F0B'; }
+      else if (g > ref.high) { label='Above typical range'; color='#185FA5'; }
+      else { label='Within healthy range'; color='#0F6E56'; }
+      const pctOfMedian = Math.round(g/ref.median*100);
+      statusHtml = `<div class="card" style="margin-bottom:12px;border-left:4px solid ${color}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:700;color:${color}">${label}</div>
+          <div style="font-size:11px;color:#888">${pctOfMedian}% of median</div>
+        </div>
+        <div style="font-size:11px;color:#666;line-height:1.6">
+          WHO median for ${Math.round(mo)} month${Math.round(mo)===1?'':'s'} (${state.babyGender==='girl'?'girl':state.babyGender==='boy'?'boy':'avg'}): <b>${gramsToDisplay(ref.median, unit)}</b><br>
+          Healthy range: ${gramsToDisplay(ref.low, unit)} – ${gramsToDisplay(ref.high, unit)}
+        </div>
+      </div>`;
+    }
+
+    const cd = getChartData(chartView);
+
+    el.innerHTML = `
+      <div class="page-header"><h2>⚖️ Weight Log</h2><p>${hasBaby ? logs.length+' entries · Track growth vs WHO standards' : 'Available once baby is born'}</p></div>
+
+      ${!hasBaby ? `<div class="card" style="background:#f8f9fa;border:1px solid #dee2e6;padding:14px;font-size:13px;color:#666;text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">👶</div>
+        Weight tracking starts once your baby arrives.<br>
+        <button onclick="openBabySettings()" class="btn btn-teal btn-sm" style="margin-top:10px">Set birth date</button>
+      </div>` : `
+
+      ${latest ? `<div class="grid-3" style="margin-bottom:12px">
+        <div class="stat-card" style="background:#2D8F8F"><div class="val" style="font-size:16px">${gramsToDisplay(latest.grams, unit)}</div><div class="lbl">Latest</div></div>
+        <div class="stat-card" style="background:#0F6E56"><div class="val" style="font-size:16px">${logs.length>1 ? (latest.grams>=logs[1].grams?'+':'')+gramsToDisplay(Math.abs(latest.grams-logs[1].grams), unit==='lboz'?'g':unit) : '—'}</div><div class="lbl">Last change</div></div>
+        <div class="stat-card" style="background:#534AB7"><div class="val" style="font-size:13px;line-height:1.2">${babyAgePrecise()||'—'}</div><div class="lbl">Age</div></div>
+      </div>` : ''}
+
+      ${statusHtml}
+
+      <div class="card" style="margin-bottom:10px">
+        <div class="card-title">Log weight</div>
+        <div style="display:flex;gap:5px;margin-bottom:10px">
+          <button class="chart-tab ${unit==='kg'?'active':''}" onclick="setWeightUnit('kg')" style="font-size:11px">kg</button>
+          <button class="chart-tab ${unit==='g'?'active':''}" onclick="setWeightUnit('g')" style="font-size:11px">grams</button>
+          <button class="chart-tab ${unit==='lboz'?'active':''}" onclick="setWeightUnit('lboz')" style="font-size:11px">lb / oz</button>
+        </div>
+        ${isMultiples() ? renderBabySelector(0,'setWeightBaby')+'<input type="hidden" id="w-baby" value="0">' : ''}
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1;min-width:0"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="w-date" value="${today()}" style="font-size:13px"></div>
+        </div>
+        ${unit==='lboz' ? `
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Pounds</label><input type="number" id="w-val" min="0" placeholder="0" inputmode="decimal" style="font-size:13px"></div>
+            <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Ounces</label><input type="number" id="w-oz" min="0" max="15" placeholder="0" inputmode="decimal" style="font-size:13px"></div>
+          </div>
+        ` : `
+          <div class="form-field"><label>Weight (${unit})</label><input type="number" id="w-val" min="0" step="${unit==='g'?'1':'0.01'}" placeholder="0" inputmode="decimal"></div>
+        `}
+        <div class="form-field"><label>Notes (optional)</label><input type="text" id="w-notes" placeholder="e.g. After feed, clinic visit"></div>
+        <button class="btn btn-teal btn-block" onclick="addWeight()">Add weight</button>
+      </div>
+
+      <div class="card" style="margin-bottom:10px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="card-title" style="margin:0">Growth trend</div>
+          <div class="chart-tabs" style="margin:0">
+            <button class="chart-tab ${chartView==='daily'?'active':''}" onclick="setWeightChart('daily')">Daily</button>
+            <button class="chart-tab ${chartView==='weekly'?'active':''}" onclick="setWeightChart('weekly')">Weekly</button>
+            <button class="chart-tab ${chartView==='monthly'?'active':''}" onclick="setWeightChart('monthly')">Monthly</button>
+          </div>
+        </div>
+        ${cd.labels.length===0 ? '<div class="empty-state" style="padding:30px 0">No weight entries yet</div>' : '<canvas id="weight-chart" height="180"></canvas>'}
+      </div>
+
+      <div class="card">
+        <div class="card-title">History</div>
+        ${logs.length===0 ? '<div class="empty-state">No entries yet</div>' :
+          logs.slice(0,60).map((l) => {
+            const realIdx = state.weightLog.indexOf(l);
+            return `<div class="log-row">
+              <span style="font-size:11px;color:#888;min-width:80px;flex-shrink:0">${l.date}</span>
+              ${isMultiples()&&l.babyIdx!=null?`<span class="badge" style="background:#E6F5F5;color:#2D8F8F;flex-shrink:0">${babyLabel(l.babyIdx)}</span>`:''}
+              <span style="flex:1;font-size:13px;font-weight:600">${gramsToDisplay(l.grams, unit)}</span>
+              ${l.notes?`<span style="font-size:11px;color:#aaa;flex-shrink:0;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.notes}</span>`:''}
+              <button onclick="delWeight(${realIdx})" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;flex-shrink:0;padding:0 4px">×</button>
+            </div>`;
+          }).join('')
+        }
+      </div>
+      `}
+    `;
+
+    if (hasBaby && cd.labels.length>0) {
+      requestAnimationFrame(() => drawLine('weight-chart', cd.labels, cd.datasets, cd.yLabel, {trend:true, xLabel:cd.xLabel}));
+    }
+  }
+
+  window.setWeightChart = (v) => { chartView = v; render(); };
+  window.setWeightUnit = (u) => { state.weightUnit = u; saveState('weightUnit'); render(); };
+  window.setWeightBaby = (i) => { const h=document.getElementById('w-baby'); if(h) h.value=i; };
+  window.addWeight = () => {
+    const unit = state.weightUnit;
+    const val = document.getElementById('w-val')?.value;
+    const oz = document.getElementById('w-oz')?.value;
+    if (!val && !oz) { toast('Enter a weight'); return; }
+    const grams = displayToGrams(val, unit, oz);
+    if (grams <= 0) { toast('Invalid weight'); return; }
+    const date = document.getElementById('w-date')?.value||today();
+    const bi = parseInt(document.getElementById('w-baby')?.value||'0');
+    // Replace same-day entry for same baby if exists
+    const existing = state.weightLog.findIndex(l=>l.date===date && (l.babyIdx||0)===bi);
+    const entry = {date, grams, babyIdx:bi, notes:document.getElementById('w-notes')?.value||''};
+    if (existing>=0) state.weightLog[existing]=entry; else state.weightLog.push(entry);
+    saveState('weightLog'); render(); toast('Weight logged! ⚖️');
+  };
+  window.delWeight = (i) => { state.weightLog.splice(i,1); saveState('weightLog'); render(); };
+
   render();
 };
 
@@ -4177,6 +4643,86 @@ function escCSV(v) {
   return s;
 }
 function rowCSV(arr){ return arr.map(escCSV).join(','+'\n'); }
+
+function backupAllData() {
+  try {
+    const backup = {
+      _app: 'BabyOS',
+      _version: 2,
+      _exportedAt: new Date().toISOString(),
+      _babyName: state.babyName || state.momName || 'baby',
+      data: state,
+    };
+    const json = JSON.stringify(backup, null, 2);
+    const blob = new Blob([json], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const datestamp = new Date().toISOString().split('T')[0];
+    const safeName = (state.babyName||'BabyOS').replace(/[^a-z0-9]/gi,'_');
+    a.href = url;
+    a.download = 'BabyOS_backup_' + safeName + '_' + datestamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    // Remember last backup date
+    try { localStorage.setItem('babyos_last_backup', new Date().toISOString()); } catch(e){}
+    toast('Backup downloaded! 💾 Save it to Google Drive or iCloud.');
+  } catch(e) {
+    toast('Backup failed: ' + e.message);
+  }
+}
+
+function restoreDataPrompt() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        const restored = parsed.data || parsed; // accept raw state too
+        if (!restored || typeof restored !== 'object') { toast('Invalid backup file'); return; }
+        const when = parsed._exportedAt ? new Date(parsed._exportedAt).toLocaleString('en-GB') : 'unknown date';
+        const counts = [
+          (restored.feedingLog||[]).length + ' feeds',
+          (restored.sleepLog||[]).length + ' sleeps',
+          (restored.diaperLog||[]).length + ' diapers',
+          (restored.weightLog||[]).length + ' weights',
+        ].join(', ');
+        if (!confirm('Restore backup from ' + when + '?\n\nContains: ' + counts + '\n\nThis will REPLACE all current data on this device. Continue?')) return;
+        // Merge restored data over the default state shape
+        Object.keys(restored).forEach(k => { state[k] = restored[k]; });
+        saveLocal();
+        // Push to cloud so both phones get it
+        if (typeof saveState === 'function') saveState();
+        toast('Restored! ✓ Reloading...');
+        setTimeout(()=>location.reload(), 800);
+      } catch(err) {
+        toast('Could not read backup: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function checkBackupReminder() {
+  try {
+    const last = localStorage.getItem('babyos_last_backup');
+    if (!state.babyDOB) return; // only remind once baby is born and logging
+    const totalLogs = (state.feedingLog||[]).length + (state.sleepLog||[]).length + (state.diaperLog||[]).length + (state.weightLog||[]).length;
+    if (totalLogs < 10) return; // not enough data to bother
+    if (!last) { return; } // first reminder handled elsewhere
+    const daysSince = (new Date() - new Date(last)) / 86400000;
+    if (daysSince > 14) {
+      setTimeout(()=>toast('Reminder: time to back up your data (menu, then Back up all data)'), 3000);
+    }
+  } catch(e){}
+}
 
 function exportToSheets() {
   const now = new Date().toISOString().split('T')[0];
@@ -5280,6 +5826,7 @@ function injectLandingCodeStep() {
 document.addEventListener('DOMContentLoaded', () => {
   loadLocal();
   applyTheme();
+  checkBackupReminder();
   injectLandingCodeStep();
 
   // If already set up, skip landing entirely
