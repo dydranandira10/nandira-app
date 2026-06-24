@@ -696,7 +696,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon">📊</span> Export to Google Sheets</button>
   <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon">💾</span> Back up all data</button>
   <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon">♻️</span> Restore from backup</button>
-  <div style="padding:12px 16px;font-size:10px;color:var(--theme-text-dim);opacity:0.6">Build: 24 Jun 2026, 07:30</div>
+  <div style="padding:12px 16px;font-size:10px;color:var(--theme-text-dim);opacity:0.6">Build: 24 Jun 2026, 08:01</div>
   <div style="height:20px"></div>
 </div>
 
@@ -2781,10 +2781,11 @@ PAGES['now'] = function(el) {
             <button class="now-ftype ${window._nowFeedType==='stored'?'on':''}" onclick="nowSetFeed('stored')">🥛 Stored</button>
             <button class="now-ftype ${window._nowFeedType==='formula'?'on':''}" onclick="nowSetFeed('formula')">🍼 Formula</button>
           </div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <div style="flex:1"><label class="now-flbl">Start</label><input type="time" id="nf-start" value="${nowTime}"></div>
-            <div style="flex:1"><label class="now-flbl">End</label><input type="time" id="nf-end"></div>
+          <div style="display:flex;gap:8px;margin-bottom:4px">
+            <div style="flex:1"><label class="now-flbl">Start</label><input type="time" id="nf-start" value="${nowTime}" oninput="nowUpdateDuration()"></div>
+            <div style="flex:1"><label class="now-flbl">End</label><input type="time" id="nf-end" oninput="nowUpdateDuration()"></div>
           </div>
+          <div id="nf-dur-display" style="font-size:12px;color:#fff;font-weight:600;text-align:center;margin-bottom:8px;min-height:15px;opacity:.9"></div>
           <div id="nf-amt-wrap" style="display:${window._nowFeedType?'block':'none'};margin-bottom:8px">
             <label class="now-flbl" id="nf-amt-lbl">Amount</label>
             <input type="number" id="nf-amt" inputmode="numeric" placeholder="0">
@@ -2892,10 +2893,21 @@ function nowSetFeed(type) {
   const btn = [...document.querySelectorAll('.now-ftype')].find(b=>b.textContent.toLowerCase().includes(type==='left'?'left':type==='right'?'right':type));
   if (btn) btn.classList.add('on');
   if (!wrap) return;
-  if (type==='left'||type==='right') { wrap.style.display='block'; lbl.textContent='Duration (min)'; amt.placeholder='e.g. 15'; }
-  else if (type==='stored') { wrap.style.display='block'; lbl.textContent='Stored milk (ml)'; amt.placeholder='e.g. 60'; }
-  else if (type==='formula') { wrap.style.display='block'; lbl.textContent='Formula (ml)'; amt.placeholder='e.g. 60'; }
-  if (amt) amt.focus();
+  if (type==='left'||type==='right') { wrap.style.display='none'; nowUpdateDuration(); }
+  else if (type==='stored') { wrap.style.display='block'; lbl.textContent='Stored milk (ml)'; amt.placeholder='e.g. 60'; if(amt) amt.focus(); }
+  else if (type==='formula') { wrap.style.display='block'; lbl.textContent='Formula (ml)'; amt.placeholder='e.g. 60'; if(amt) amt.focus(); }
+}
+function nowUpdateDuration() {
+  const start = document.getElementById('nf-start')?.value;
+  const end = document.getElementById('nf-end')?.value;
+  const disp = document.getElementById('nf-dur-display');
+  if (!disp) return;
+  if (!start || !end) { disp.textContent=''; return; }
+  const [sh,sm]=start.split(':').map(Number); const [eh,em]=end.split(':').map(Number);
+  let diff=(eh*60+em)-(sh*60+sm); if(diff<0)diff+=1440;
+  if(diff===0){disp.textContent='';return;}
+  const h=Math.floor(diff/60), m=diff%60;
+  disp.textContent='⏱ '+(h>0?h+'h'+(m>0?' '+m+'m':''):m+' min');
 }
 function nowSegSelect(btn, key, val) {
   window[key] = val;
@@ -2905,11 +2917,20 @@ function nowSegSelect(btn, key, val) {
 function nowSaveFeed() {
   const type = window._nowFeedType;
   if (!type) { toast('Pick a feed type'); return; }
+  const start = document.getElementById('nf-start')?.value||'';
+  const endT = document.getElementById('nf-end')?.value||'';
   const amt = parseInt(document.getElementById('nf-amt')?.value)||0;
-  const entry = { date: today(), time: document.getElementById('nf-start')?.value||'', endTime: document.getElementById('nf-end')?.value||'',
+  let durMin = 0;
+  if (start && endT) {
+    const [sh,sm] = start.split(':').map(Number);
+    const [eh,em] = endT.split(':').map(Number);
+    durMin = (eh*60+em) - (sh*60+sm);
+    if (durMin < 0) durMin += 1440;
+  }
+  const entry = { date: today(), time: start, endTime: endT, feedType: type,
     leftMin:0, rightMin:0, formulaMl:0, storedMl:0, pumpedMl:0, notes:'', babyIdx:0 };
-  if (type==='left') entry.leftMin=amt;
-  else if (type==='right') entry.rightMin=amt;
+  if (type==='left') entry.leftMin = durMin || amt;
+  else if (type==='right') entry.rightMin = durMin || amt;
   else if (type==='formula') entry.formulaMl=amt;
   else if (type==='stored') { entry.storedMl=amt; state.pumpedStash=Math.max(0,(state.pumpedStash||0)-amt); }
   if (!state.feedingLog) state.feedingLog=[];
@@ -4282,6 +4303,13 @@ PAGES['feeding'] = function(el) {
   }
 
   function feedTypeLabel(l) {
+    // Prefer explicit feedType (new entries); fall back to inference (legacy entries)
+    const t = l.feedType;
+    if (t==='left') return '💙 Left';
+    if (t==='right') return '💗 Right';
+    if (t==='stored') return '🥛 Stored';
+    if (t==='formula') return '🍼 Formula';
+    if (t==='pumped') return '💧 Pumped';
     if (l.leftMin) return '💙 Left';
     if (l.rightMin) return '💗 Right';
     if (l.storedMl) return '🥛 Stored';
@@ -4387,39 +4415,52 @@ PAGES['feeding'] = function(el) {
     const hint = document.getElementById('feed-amount-hint');
     if (!wrap) return;
     if (type==='left' || type==='right') {
-      wrap.style.display='block'; lbl.textContent='Duration (minutes)'; amt.placeholder='e.g. 15';
-      hint.textContent='';
+      // Breast: no manual amount — duration is auto-calculated from start/end times
+      wrap.style.display='none';
+      updateFeedDuration();
     } else if (type==='stored') {
       wrap.style.display='block'; lbl.textContent='Stored milk (ml)'; amt.placeholder='e.g. 60';
       hint.textContent='Will subtract from your pumped stash ('+(state.pumpedStash||0)+'ml available)';
+      amt.focus();
     } else if (type==='formula') {
       wrap.style.display='block'; lbl.textContent='Formula (ml)'; amt.placeholder='e.g. 60';
       hint.textContent='';
+      amt.focus();
     } else { wrap.style.display='none'; }
-    amt.focus();
   };
   window.addFeed = () => {
     const bi = parseInt(document.getElementById('ff-baby')?.value||'0');
     const ftype = document.getElementById('f-ftype')?.value||'';
     if (!ftype) { toast('Pick a feed type'); return; }
+    const start = document.getElementById('f-time')?.value||'';
+    const endT = document.getElementById('f-endtime')?.value||'';
     const amt = parseInt(document.getElementById('f-amount')?.value)||0;
+    // Duration in minutes from start/end times (for breast feeds)
+    let durMin = 0;
+    if (start && endT) {
+      const [sh,sm] = start.split(':').map(Number);
+      const [eh,em] = endT.split(':').map(Number);
+      durMin = (eh*60+em) - (sh*60+sm);
+      if (durMin < 0) durMin += 1440;
+    }
     const entry = {
       date: document.getElementById('f-date')?.value||today(),
-      time: document.getElementById('f-time')?.value||'',
-      endTime: document.getElementById('f-endtime')?.value||'',
+      time: start,
+      endTime: endT,
+      feedType: ftype,
       leftMin: 0, rightMin: 0, formulaMl: 0, storedMl: 0, pumpedMl: 0,
       notes: document.getElementById('f-notes')?.value||'',
       babyIdx: bi,
     };
-    if (ftype==='left') entry.leftMin = amt;
-    else if (ftype==='right') entry.rightMin = amt;
+    if (ftype==='left') entry.leftMin = durMin || amt;
+    else if (ftype==='right') entry.rightMin = durMin || amt;
     else if (ftype==='formula') entry.formulaMl = amt;
     else if (ftype==='stored') {
       entry.storedMl = amt;
       state.pumpedStash = Math.max(0, (state.pumpedStash||0) - amt);
     }
     state.feedingLog.push(entry);
-    saveState(); render(); toast('Feed logged! 🍼');
+    saveState('feedingLog'); render(); toast('Feed logged! 🍼');
   };
   window.quickFeed = (type, amt) => {
     const bi = parseInt(document.getElementById('qf-baby')?.value||'0');
