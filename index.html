@@ -43,9 +43,54 @@ const FB_URL = 'https://nandira-app-default-rtdb.firebaseio.com';
   --theme-nav-dim:rgba(92,84,31,.65);
   --theme-active-bg:#FFF06A;
   --theme-active-text:#4A4420;
+
+  /* ── DESIGN SYSTEM: TYPE SCALE (6 sizes, 2 weights) ── */
+  --fs-display:28px;  /* hero numbers, big time-since */
+  --fs-title:20px;    /* page titles */
+  --fs-bodyL:17px;    /* prominent body */
+  --fs-body:15px;     /* default body / list rows */
+  --fs-label:13px;    /* labels, captions */
+  --fs-micro:11px;    /* smallest allowed — column headers */
+  --fw-regular:400;
+  --fw-bold:700;
+  --lh-tight:1.2;
+  --lh-base:1.5;
+
+  /* ── DESIGN SYSTEM: SPACING (8pt grid) ── */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px;
+
+  /* ── DESIGN SYSTEM: RADIUS ── */
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:22px; --r-pill:999px;
+
+  /* ── DESIGN SYSTEM: ELEVATION (subtle, consistent) ── */
+  --elev-1:0 1px 3px rgba(0,0,0,.06);
+  --elev-2:0 2px 8px -3px rgba(0,0,0,.10);
+  --elev-3:0 8px 24px -8px rgba(0,0,0,.18);
+
+  /* ── DESIGN SYSTEM: SEMANTIC STATUS (single source of truth) ── */
+  --status-good:#0F6E56; --status-good-bg:#E1F5EE;
+  --status-warn:#854F0B; --status-warn-bg:#FAEEDA;
+  --status-bad:#C0392B;  --status-bad-bg:#FCEBEB;
+  --status-info:#185FA5; --status-info-bg:#E6F1FB;
+
+  /* ── DESIGN SYSTEM: NEUTRAL TEXT RAMP (WCAG-checked on white) ── */
+  --ink:#2A2A33;        /* primary text — 13.2:1 */
+  --ink-2:#5A5A66;      /* secondary — 6.4:1 */
+  --ink-3:#767680;      /* tertiary/captions — 4.6:1, passes AA */
+  --hairline:#ECECEC;   /* row dividers */
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
+/* ══ ACCESSIBILITY FOUNDATION ══ */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+/* Visible focus ring for keyboard users (not mouse) */
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,[role="button"]:focus-visible{outline:2.5px solid #2D8F8F;outline-offset:2px;border-radius:6px;}
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
+}
+/* Minimum touch target for any interactive element flagged .tap */
+.tap{min-width:44px;min-height:44px;}
 /* ══ NIGHT MODE ══ */
 body.night-mode{background:#12121a !important;color:#e8e4d8 !important;}
 body.night-mode .card{background:#1e1e2a !important;border:0.5px solid rgba(255,255,255,.09);box-shadow:none !important;}
@@ -94,7 +139,8 @@ body.night-mode .top-bar-sub,body.night-mode .top-bar-sub *{color:#9a9280 !impor
 /* Dim secondary text a touch so hierarchy survives */
 body.night-mode [style*="#888"],body.night-mode [style*="#999"],body.night-mode [style*="#aaa"],
 body.night-mode [style*="#ccc"],body.night-mode [style*="#777"],body.night-mode [style*="#666"],
-body.night-mode .card-title,body.night-mode .empty-state{color:#a8a08c !important;}
+body.night-mode .card-title,body.night-mode .empty-state,
+body.night-mode [style*="#767680"],body.night-mode [style*="#5A5A66"],body.night-mode [style*="color:var(--ink-3)"],body.night-mode [style*="color:var(--ink-2)"]{color:#a8a08c !important;}
 /* Coloured stat-card text & badges stay vivid (override the broad rule) */
 body.night-mode .stat-card .val,body.night-mode .stat-card .lbl{color:#fff !important;}
 
@@ -146,12 +192,12 @@ body.night-mode [style*="background:#F5"],body.night-mode [style*="background:#F
 body.night-mode .badge,body.night-mode [style*="border-radius:4px"][style*="background:#"],
 body.night-mode [style*="border-radius:20px"][style*="background:#"]{filter:brightness(.92);}
 
-body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a1a1a;min-height:100vh;padding-bottom:var(--bar);transition:background .4s ease;}
+body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a1a1a;min-height:100vh;padding-bottom:var(--bar);transition:background .4s ease;}
 
 /* ── LANDING ── */
 #landing{position:fixed;inset:0;background:linear-gradient(160deg,#1B3A6B 0%,#2D8F8F 100%);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;overflow-y:auto;}
 #landing h1{font-size:32px;font-weight:800;color:#fff;text-align:center;margin-bottom:6px;}
-#landing .sub{font-size:14px;color:rgba(255,255,255,.7);text-align:center;margin-bottom:32px;}
+#landing .sub{font-size:15px;color:rgba(255,255,255,.7);text-align:center;margin-bottom:32px;}
 .landing-card{background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border-radius:20px;padding:24px;width:100%;max-width:420px;border:1px solid rgba(255,255,255,.2);}
 .landing-card label{font-size:12px;font-weight:600;color:rgba(255,255,255,.8);display:block;margin-bottom:5px;letter-spacing:.04em;}
 .landing-card input,.landing-card select{
@@ -165,7 +211,7 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .landing-gender-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
 .gender-btn{padding:10px 4px;border-radius:10px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);text-align:center;transition:all .15s;}
 .gender-btn.selected{background:rgba(255,255,255,.3);border-color:rgba(255,255,255,.8);color:#fff;}
-.gender-btn div{font-size:22px;margin-bottom:3px;}
+.gender-btn div{font-size:20px;margin-bottom:3px;}
 .landing-btn{width:100%;padding:14px;border-radius:12px;border:none;background:#fff;color:var(--navy);font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;margin-top:4px;}
 .landing-btn:active{opacity:.9;}
 .landing-step{font-size:11px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:16px;letter-spacing:.05em;text-transform:uppercase;}
@@ -187,7 +233,7 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .top-bar-left{flex:1;cursor:pointer;}
 .top-bar-title{font-size:17px;font-weight:700;color:var(--theme-text);letter-spacing:-.2px;}
 .top-bar-sub{font-size:11px;color:var(--theme-text-dim);margin-top:1px;display:flex;align-items:center;gap:4px;}
-.top-bar-menu{background:none;border:none;color:rgba(255,255,255,.8);font-size:22px;cursor:pointer;padding:4px;}
+.top-bar-menu{background:none;border:none;color:rgba(255,255,255,.8);font-size:20px;cursor:pointer;padding:4px;}
 
 /* ── BOTTOM NAV ── */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;border-top:1px solid #e8e8e8;display:grid;grid-template-columns:repeat(5,1fr);height:var(--bar);box-shadow:0 -2px 10px rgba(0,0,0,.08);}
@@ -195,7 +241,7 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .bnav-item:active{background:#f5f5f5;}
 .bnav-item.active .bnav-icon,.bnav-item.active .bnav-label{color:var(--teal);}
 .bnav-icon{font-size:20px;line-height:1;}
-.bnav-label{font-size:9px;font-weight:500;color:#888;}
+.bnav-label{font-size:11px;font-weight:500;color:#767680;}
 .bnav-item.active .bnav-label{font-weight:700;}
 
 /* ── DRAWER ── */
@@ -207,7 +253,7 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .drawer-header h1{font-size:16px;font-weight:700;color:var(--theme-text);}
 .drawer-header p{font-size:11px;color:var(--theme-text-dim);margin-top:3px;}
 .drawer-close{background:none;border:none;color:var(--theme-text);font-size:20px;cursor:pointer;}
-.drawer-section{padding:12px 16px 4px;font-size:10px;font-weight:700;color:var(--theme-nav-dim);text-transform:uppercase;letter-spacing:.07em;}
+.drawer-section{padding:12px 16px 4px;font-size:11px;font-weight:700;color:var(--theme-nav-dim);text-transform:uppercase;letter-spacing:.07em;}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;margin:2px 8px;border-radius:10px;cursor:pointer;color:var(--theme-nav-text);font-size:13px;font-weight:500;border:none;background:transparent;font-family:var(--font);width:calc(100% - 16px);text-align:left;transition:background .12s,color .12s;}
 .nav-item:hover,.nav-item:active{background:rgba(0,0,0,.05);color:var(--theme-nav-text);}
 .nav-item.active{background:var(--theme-active-bg);color:var(--theme-active-text);font-weight:700;}
@@ -226,16 +272,16 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .page-header p{font-size:12px;color:var(--dgray);margin-top:3px;line-height:1.4;}
 
 /* ── CARDS ── */
-.card{background:#fff;border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px;}
+.card{background:#fff;border-radius:var(--r-md);padding:var(--sp-4);box-shadow:var(--elev-1);border:0.5px solid rgba(0,0,0,.04);margin-bottom:var(--sp-3);}
 .card-title{font-size:11px;font-weight:700;color:var(--dgray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
 
 /* ── STAT CARDS ── */
-.stat-card{border-radius:var(--r);padding:12px 10px;text-align:center;}
-.stat-card .val{font-size:22px;font-weight:700;color:#fff;line-height:1.1;}
-.stat-card .lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:2px;}
+.stat-card{border-radius:var(--r-md);padding:var(--sp-3) 10px;text-align:center;box-shadow:var(--elev-2);}
+.stat-card .val{font-size:20px;font-weight:700;color:#fff;line-height:1.1;}
+.stat-card .lbl{font-size:11px;color:rgba(255,255,255,.8);margin-top:2px;}
 
 /* ── PROGRESS ── */
 .prog-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
@@ -254,7 +300,7 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .checklist-item.done .check-box{background:var(--green);border-color:var(--green);color:#fff;}
 .item-text{font-size:13px;line-height:1.4;flex:1;}
 .item-meta{font-size:11px;color:var(--mgray);margin-top:2px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
-.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:8px;}
 
 /* ── SECTION HEADER ── */
 .section-hdr{padding:8px 12px;font-size:12px;font-weight:700;color:#fff;border-radius:var(--rs);margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;}
@@ -262,7 +308,7 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 /* ══ NOW PAGE — crafted home screen ══ */
 .now-page{padding:6px 2px 24px;}
 .now-greet{margin-bottom:16px;padding:0 4px;}
-.now-greet-text{font-size:22px;font-weight:800;color:#2A2A33;letter-spacing:-0.5px;}
+.now-greet-text{font-size:20px;font-weight:800;color:#2A2A33;letter-spacing:-0.5px;}
 .now-greet-sub{font-size:13px;color:#9a9a9a;margin-top:2px;}
 
 .now-hero{position:relative;background:linear-gradient(150deg,#2D8F8F,#1F7373);border-radius:22px;padding:20px 20px 18px;margin-bottom:14px;overflow:hidden;cursor:pointer;box-shadow:0 8px 24px -8px rgba(45,143,143,.5);transition:transform .15s;}
@@ -272,7 +318,7 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .now-hero-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:1px;}
 .now-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.2);color:#fff;}
 .now-hero-main{display:flex;align-items:baseline;gap:8px;position:relative;}
-.now-hero-big{font-size:42px;font-weight:800;color:#fff;letter-spacing:-1.5px;line-height:1;}
+.now-hero-big{font-size:40px;font-weight:800;color:#fff;letter-spacing:-1.5px;line-height:1;}
 .now-hero-unit{font-size:16px;color:rgba(255,255,255,.7);font-weight:500;}
 .now-hero-empty{font-size:24px;font-weight:700;color:#fff;}
 .now-hero-meta{font-size:13px;color:rgba(255,255,255,.78);margin-top:6px;position:relative;}
@@ -281,11 +327,11 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .now-tiles{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
 .now-tile{position:relative;display:flex;align-items:center;gap:13px;background:#fff;border-radius:16px;padding:14px 15px;cursor:pointer;border:0.5px solid rgba(0,0,0,.05);box-shadow:0 2px 8px -4px rgba(0,0,0,.08);transition:transform .15s;}
 .now-tile:active{transform:scale(.98);}
-.now-tile-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;}
+.now-tile-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .now-tile-body{flex:1;min-width:0;}
 .now-tile-label{font-size:11px;color:#9a9a9a;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;}
 .now-tile-val{font-size:17px;font-weight:700;color:#2A2A33;}
-.now-tile-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;}
+.now-tile-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;}
 
 .now-today{background:#fff;border-radius:16px;padding:16px;border:0.5px solid rgba(0,0,0,.05);box-shadow:0 2px 8px -4px rgba(0,0,0,.08);margin-bottom:14px;}
 .now-today-head{font-size:13px;font-weight:700;color:#2A2A33;margin-bottom:14px;}
@@ -295,7 +341,7 @@ body{font-family:var(--font);font-size:14px;background:var(--theme-bg);color:#1a
 .nts-lbl{font-size:11px;color:#9a9a9a;margin-top:4px;}
 .now-today-div{width:1px;height:32px;background:#f0f0f0;}
 
-.now-dash-btn{width:100%;background:transparent;border:none;color:#9a9a9a;font-size:14px;font-weight:600;font-family:var(--font);padding:8px;cursor:pointer;}
+.now-dash-btn{width:100%;background:transparent;border:none;color:#9a9a9a;font-size:15px;font-weight:600;font-family:var(--font);padding:8px;cursor:pointer;}
 .now-dash-btn:active{color:#2D8F8F;}
 
 .now-hero-pre{text-align:center;padding:32px 20px;background:linear-gradient(135deg,#FFF9EC,#FFFCE8);border-radius:22px;border:0.5px solid #F0E0B8;}
@@ -341,30 +387,30 @@ body.night-mode .feed-type-btn{background:#262634 !important;border-color:rgba(2
 body.night-mode .feed-type-btn.active{background:#1d4d4d !important;border-color:#3da3a3 !important;color:#7fd4d4 !important;box-shadow:0 0 0 1px #3da3a3 !important;}
 /* ── FEED HISTORY TABLE ── */
 .feed-hist-head{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--lgray);}
-.feed-hist-head span{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.3px;font-family:var(--font);}
+.feed-hist-head span{font-size:11px;font-weight:700;color:#767680;text-transform:uppercase;letter-spacing:.3px;font-family:var(--font);}
 .feed-hist-scroll{max-height:360px;overflow-y:auto;}
 .feed-hist-row{display:flex;align-items:center;gap:6px;padding:11px 12px;border-bottom:1px solid #f4f4f4;}
 .feed-hist-row span{font-family:var(--font);font-size:12px;}
-.fh-date{width:48px;flex-shrink:0;color:#888;}
-.fh-time{width:46px;flex-shrink:0;color:#888;}
-.fh-dur{width:40px;flex-shrink:0;color:#aaa;}
+.fh-date{width:48px;flex-shrink:0;color:#767680;}
+.fh-time{width:46px;flex-shrink:0;color:#767680;}
+.fh-dur{width:40px;flex-shrink:0;color:#767680;}
 .fh-feed{flex:1;min-width:0;color:#333;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.fh-del{width:24px;flex-shrink:0;background:none;border:none;color:#ccc;font-size:18px;cursor:pointer;padding:0;line-height:1;font-family:var(--font);}
-.fh-del:active{color:#C0392B;}
+.fh-del{width:44px;height:44px;flex-shrink:0;background:none;border:none;color:#bbb;font-size:20px;cursor:pointer;padding:0;line-height:1;font-family:var(--font);display:flex;align-items:center;justify-content:center;margin:-11px -10px -11px 0;border-radius:8px;}
+.fh-del:active{color:#C0392B;background:#FCEBEB;}.fh-del:focus-visible{outline:2px solid #2D8F8F;outline-offset:1px;}
 .fh-delh{width:24px;flex-shrink:0;}
 /* ── SHARED LOG HISTORY TABLE (sleep/diaper/weight) ── */
 .loghist-head{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--lgray);}
-.loghist-head span{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.3px;font-family:var(--font);}
+.loghist-head span{font-size:11px;font-weight:700;color:#767680;text-transform:uppercase;letter-spacing:.3px;font-family:var(--font);}
 .loghist-scroll{max-height:360px;overflow-y:auto;}
 .loghist-row{display:flex;align-items:center;gap:6px;padding:11px 12px;border-bottom:1px solid #f4f4f4;}
 .loghist-row span{font-family:var(--font);font-size:12px;}
-.lh-date{width:48px;flex-shrink:0;color:#888;}
-.lh-time{width:46px;flex-shrink:0;color:#888;}
+.lh-date{width:48px;flex-shrink:0;color:#767680;}
+.lh-time{width:46px;flex-shrink:0;color:#767680;}
 .lh-dur{width:42px;flex-shrink:0;color:#185FA5;font-weight:600;}
 .lh-main{flex:1;min-width:0;color:#333;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lh-note{width:74px;flex-shrink:0;color:#bbb;font-size:11px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lh-del{width:24px;flex-shrink:0;background:none;border:none;color:#ccc;font-size:18px;cursor:pointer;padding:0;line-height:1;font-family:var(--font);}
-.lh-del:active{color:#C0392B;}
+.lh-del{width:44px;height:44px;flex-shrink:0;background:none;border:none;color:#bbb;font-size:20px;cursor:pointer;padding:0;line-height:1;font-family:var(--font);display:flex;align-items:center;justify-content:center;margin:-11px -10px -11px 0;border-radius:8px;}
+.lh-del:active{color:#C0392B;background:#FCEBEB;}.lh-del:focus-visible{outline:2px solid #2D8F8F;outline-offset:1px;}
 .lh-delh{width:24px;flex-shrink:0;}
 body.night-mode .loghist-row{border-bottom-color:rgba(255,255,255,.06);}
 body.night-mode .loghist-head{border-bottom-color:rgba(255,255,255,.1);}
@@ -373,11 +419,11 @@ body.night-mode .feed-hist-head{border-bottom-color:rgba(255,255,255,.1);}
 /* ── INPUTS ── */
 input[type=text],input[type=date],input[type=time],input[type=number],input[type=email],select,textarea{
   border:1.5px solid #e0e0e0;border-radius:var(--rs);padding:10px 12px;
-  font-size:14px;font-family:var(--font);background:#fff;color:#333;
+  font-size:15px;font-family:var(--font);background:#fff;color:#333;
   transition:border-color .15s;width:100%;
 }
 input[type=date],input[type=time]{
-  padding:10px 12px;font-size:14px;
+  padding:10px 12px;font-size:15px;
   -webkit-appearance:none;appearance:none;
   min-width:0;max-width:100%;width:100%;
   min-height:42px;line-height:1.2;
@@ -402,7 +448,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 .form-field{margin-bottom:10px;min-width:0;}
 
 /* ── BUTTONS ── */
-.btn{padding:10px 16px;border-radius:var(--rs);border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--font);transition:opacity .15s;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.btn{padding:12px 16px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:15px;font-weight:600;font-family:var(--font);transition:opacity .15s,transform .1s;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:44px;}.btn:active{transform:scale(.97);}
 .btn:active{opacity:.8;}
 .btn-teal{background:var(--teal);color:#fff;}
 .btn-navy{background:var(--navy);color:#fff;}
@@ -453,7 +499,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 .book-emoji{font-size:24px;flex-shrink:0;}
 .book-info{flex:1;min-width:0;}
 .book-title{font-size:13px;font-weight:600;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.book-meta{font-size:11px;color:#888;margin-top:2px;}
+.book-meta{font-size:11px;color:#767680;margin-top:2px;}
 
 /* ── VAX CARDS ── */
 .vax-card{background:#fff;border-radius:var(--r);border:1.5px solid #eee;padding:12px 14px;margin-bottom:8px;}
@@ -633,7 +679,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 <!-- ══════════════════════════════════════════════════════════════════════════
      MAIN APP
 ══════════════════════════════════════════════════════════════════════════ -->
-<div class="app" id="app" style="display:none">
+<div class="app" id="app" style="display:none" role="main">
 
 <div class="top-bar">
   <div class="top-bar-left" onclick="navTo('dashboard')">
@@ -643,27 +689,29 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
       <span id="top-bar-sub-text">Loading...</span>
     </div>
   </div>
-  <button class="top-bar-menu" onclick="openDrawer()" style="color:var(--theme-text)">☰</button>
+  <button class="top-bar-menu" onclick="openDrawer()" style="color:var(--theme-text)" aria-label="Open menu" aria-haspopup="true">☰</button>
 </div>
 
-<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()" aria-hidden="true"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header" style="display:flex;align-items:flex-start;justify-content:space-between">
     <div>
       <h1 id="drawer-title"><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</h1>
       <p id="drawer-sub">Loading...</p>
     </div>
-    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
   </div>
   <div class="drawer-section">Overview</div>
   <button class="nav-item" onclick="navTo('now')"><span class="icon">🌟</span> Now</button>
   <button class="nav-item active" onclick="navTo('dashboard')"><span class="icon">🏠</span> Dashboard</button>
   <div id="phase-suggest"></div>
+  <div id="drawer-prebirth">
   <div class="drawer-section">Pre-Birth</div>
   <button class="nav-item" onclick="navTo('hospital-bag')"><span class="icon">🎒</span> Hospital Bag</button>
   <button class="nav-item" onclick="navTo('csection')"><span class="icon">🏥</span> C-Section Prep</button>
   <button class="nav-item" onclick="navTo('preg-tasks')"><span class="icon">✅</span> Pregnancy Tasks</button>
   <button class="nav-item" onclick="navTo('inventory')"><span class="icon">📦</span> Newborn Inventory</button>
+  </div>
   <div class="drawer-section">Post-Birth</div>
   <button class="nav-item" onclick="navTo('first100')"><span class="icon">📅</span> First 100 Days</button>
   <button class="nav-item" onclick="navTo('foods')"><span class="icon">🥣</span> 100 Foods</button>
@@ -696,7 +744,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon">📊</span> Export to Google Sheets</button>
   <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon">💾</span> Back up all data</button>
   <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon">♻️</span> Restore from backup</button>
-  <div style="padding:12px 16px;font-size:10px;color:var(--theme-text-dim);opacity:0.6">Build: 24 Jun 2026, 08:01</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 24 Jun 2026, 08:38</div>
   <div style="height:20px"></div>
 </div>
 
@@ -737,11 +785,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 
 <main class="main" id="main-content"></main>
 
-<nav class="bottom-nav" id="bottom-nav"></nav>
+<nav class="bottom-nav" id="bottom-nav" aria-label="Primary navigation"></nav>
 
 </div><!-- end #app -->
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1136,7 +1184,7 @@ function showFamilyCode() {
     '<div style="text-align:center;padding:20px 0">' +
     '<div style="font-size:36px;font-weight:800;color:var(--navy);letter-spacing:.15em;font-family:monospace">' + (state.familyCode||'—') + '</div>' +
     '<div style="font-size:13px;color:#666;margin-top:8px">Share this code with your partner</div>' +
-    '<div style="font-size:12px;color:#888;margin-top:4px">They enter it on the landing screen to sync data</div>' +
+    '<div style="font-size:12px;color:#767680;margin-top:4px">They enter it on the landing screen to sync data</div>' +
     '</div>' +
     '<div style="background:#f5f5f5;border-radius:8px;padding:12px;font-size:12px;color:#555;line-height:1.6">' +
     '📱 Open Baby OS on your partner\'s phone<br>' +
@@ -1700,6 +1748,9 @@ function updateSubtitles() {
 // ══════════════════════════════════════════════════════════════════════════════
 function openDrawer() {
   renderPhaseSuggest();
+  // Hide pre-birth tools once baby is born (phase-aware IA)
+  const pb = document.getElementById('drawer-prebirth');
+  if (pb) pb.style.display = (typeof getPhase==='function' && getPhase()!=='pregnancy') ? 'none' : '';
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawer-overlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1769,7 +1820,7 @@ function renderBottomNav(active) {
   nav.innerHTML = slots.map((pid,i) => {
     const p = ALL_PAGES.find(x=>x.id===pid)||{icon:'❓',label:'?',id:pid};
     const isActive = active===p.id;
-    return '<button class="bnav-item '+(isActive?'active':'')+'" onclick="navTo(\''+p.id+'\')"><span class="bnav-icon">'+p.icon+'</span><span class="bnav-label">'+p.label+'</span></button>';
+    return '<button class="bnav-item '+(isActive?'active':'')+'" onclick="navTo(\''+p.id+'\')" aria-label="'+p.label+'"'+(isActive?' aria-current="page"':'')+'><span class="bnav-icon" aria-hidden="true">'+p.icon+'</span><span class="bnav-label">'+p.label+'</span></button>';
   }).join('')+'<button class="bnav-item '+(active==='__more'?'active':'')+'" onclick="openDrawer()"><span class="bnav-icon">☰</span><span class="bnav-label">More</span></button>';
 }
 
@@ -1830,7 +1881,7 @@ function renderNavCust() {
   sheet.appendChild(title);
   
   const hint = document.createElement('p');
-  hint.style.cssText = 'font-size:12px;color:#888;margin-bottom:12px';
+  hint.style.cssText = 'font-size:12px;color:#767680;margin-bottom:12px';
   hint.textContent = 'Tap a slot number to change it. ☰ More is always last.';
   sheet.appendChild(hint);
   
@@ -1892,7 +1943,7 @@ function pickSlot(i) {
   const groups = [...new Set(ALL_PAGES.map(p => p.group))];
   groups.forEach(g => {
     const hdr = document.createElement('div');
-    hdr.style.cssText = 'font-size:10px;font-weight:700;color:#888;text-transform:uppercase;padding:7px 12px 3px;background:#fafafa';
+    hdr.style.cssText = 'font-size:11px;font-weight:700;color:#767680;text-transform:uppercase;padding:7px 12px 3px;background:#fafafa';
     hdr.textContent = g;
     picker.appendChild(hdr);
     ALL_PAGES.filter(p => p.group === g).forEach(p => {
@@ -1904,7 +1955,7 @@ function pickSlot(i) {
       row.style.cursor = inUse ? 'default' : 'pointer';
       row.innerHTML = '<span style="font-size:18px;width:28px">' + p.icon + '</span>' +
         '<div><div style="font-size:13px;font-weight:' + (isCurrent ? '700' : '500') + '">' + p.label + (isCurrent ? ' ✓' : '') + '</div>' +
-        '<div style="font-size:11px;color:#888">' + p.group + (inUse ? ' · in use' : '') + '</div></div>';
+        '<div style="font-size:11px;color:#767680">' + p.group + (inUse ? ' · in use' : '') + '</div></div>';
       if (!inUse) row.onclick = () => setSlot(i, p.id);
       picker.appendChild(row);
     });
@@ -1973,7 +2024,7 @@ function openBabySettings() {
     btn.id = 'bsg-' + v;
     const sel = state.babyGender === v;
     btn.style.cssText = 'padding:10px 6px;border-radius:10px;border:2px solid '+(sel?'var(--teal)':'#ddd')+';background:'+(sel?'#E6F5F5':'#fff')+';font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:'+(sel?'var(--teal)':'#777');
-    btn.innerHTML = '<div style="font-size:22px;margin-bottom:3px">'+e+'</div>'+l;
+    btn.innerHTML = '<div style="font-size:20px;margin-bottom:3px">'+e+'</div>'+l;
     btn.onclick = () => selectBsGender(v);
     gg.appendChild(btn);
   });
@@ -1983,7 +2034,7 @@ function openBabySettings() {
   // Number of babies
   const nbf = document.createElement('div');
   nbf.className = 'form-field';
-  nbf.innerHTML = '<label>Number of babies</label><select id="bs-nbabies" style="font-size:14px"><option value="1" '+(( state.numberOfBabies||1)===1?'selected':'')+'>1 baby (singleton)</option><option value="2" '+((state.numberOfBabies||1)===2?'selected':'')+'>2 babies (twins)</option><option value="3" '+((state.numberOfBabies||1)===3?'selected':'')+'>3 babies (triplets)</option><option value="4" '+((state.numberOfBabies||1)===4?'selected':'')+'>4 babies (quadruplets)</option><option value="5" '+((state.numberOfBabies||1)===5?'selected':'')+'>5 babies (quintuplets)</option><option value="6" '+((state.numberOfBabies||1)===6?'selected':'')+'>6 babies (sextuplets)</option></select>';
+  nbf.innerHTML = '<label>Number of babies</label><select id="bs-nbabies" style="font-size:15px"><option value="1" '+(( state.numberOfBabies||1)===1?'selected':'')+'>1 baby (singleton)</option><option value="2" '+((state.numberOfBabies||1)===2?'selected':'')+'>2 babies (twins)</option><option value="3" '+((state.numberOfBabies||1)===3?'selected':'')+'>3 babies (triplets)</option><option value="4" '+((state.numberOfBabies||1)===4?'selected':'')+'>4 babies (quadruplets)</option><option value="5" '+((state.numberOfBabies||1)===5?'selected':'')+'>5 babies (quintuplets)</option><option value="6" '+((state.numberOfBabies||1)===6?'selected':'')+'>6 babies (sextuplets)</option></select>';
   sheet.appendChild(nbf);
 
   // Per-baby name/gender fields (for multiples)
@@ -3074,14 +3125,14 @@ PAGES['dashboard'] = function(el) {
         <div onclick="toggleDashWeight()" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;user-select:none">
           <div style="font-size:13px;font-weight:700;color:#222">⚖️ Weight trend</div>
           <div style="display:flex;align-items:center;gap:8px">
-            ${(state.weightLog&&state.weightLog.length)?`<span style="font-size:12px;color:#2D8F8F;font-weight:600">${gramsToDisplay([...state.weightLog].sort((a,b)=>b.date.localeCompare(a.date))[0].grams, state.weightUnit||'kg')}</span>`:'<span style="font-size:11px;color:#aaa">No data</span>'}
-            <span id="dash-weight-arrow" style="color:#aaa;font-size:12px">${window._dashWeightOpen?'▾':'▸'}</span>
+            ${(state.weightLog&&state.weightLog.length)?`<span style="font-size:12px;color:#2D8F8F;font-weight:600">${gramsToDisplay([...state.weightLog].sort((a,b)=>b.date.localeCompare(a.date))[0].grams, state.weightUnit||'kg')}</span>`:'<span style="font-size:11px;color:#767680">No data</span>'}
+            <span id="dash-weight-arrow" style="color:#767680;font-size:12px">${window._dashWeightOpen?'▾':'▸'}</span>
           </div>
         </div>
         <div id="dash-weight-body" style="display:${window._dashWeightOpen?'block':'none'};padding:0 14px 14px">
           ${(state.weightLog&&state.weightLog.length)?`<canvas id="dash-weight-chart" height="150"></canvas>
             <button class="btn btn-outline btn-block btn-sm" onclick="navTo('weight')" style="margin-top:8px">Open weight log →</button>`:
-            `<div style="text-align:center;padding:16px;font-size:12px;color:#888">No weight entries yet.<br><button class="btn btn-teal btn-sm" onclick="navTo('weight')" style="margin-top:8px">Log first weight</button></div>`}
+            `<div style="text-align:center;padding:16px;font-size:12px;color:#767680">No weight entries yet.<br><button class="btn btn-teal btn-sm" onclick="navTo('weight')" style="margin-top:8px">Log first weight</button></div>`}
         </div>
       </div>
 
@@ -3120,7 +3171,7 @@ PAGES['dashboard'] = function(el) {
             return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f5f5f5">
               <div style="width:8px;height:8px;border-radius:50%;background:${s.given?'#0F6E56':overdue?'#C0392B':'#ddd'};flex-shrink:0"></div>
               <span style="font-size:12px;flex:1">${v.name}</span>
-              <span style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:6px;background:${s.given?'#E1F5EE':overdue?'#FCEBEB':'#f0f0f0'};color:${s.given?'#0F6E56':overdue?'#C0392B':'#888'}">${s.given?'✓ Done':overdue?'Overdue':v.age}</span>
+              <span style="font-size:11px;font-weight:600;padding:2px 6px;border-radius:6px;background:${s.given?'#E1F5EE':overdue?'#FCEBEB':'#f0f0f0'};color:${s.given?'#0F6E56':overdue?'#C0392B':'#888'}">${s.given?'✓ Done':overdue?'Overdue':v.age}</span>
             </div>`;
           }).join('')}
         </div>`:`
@@ -3140,7 +3191,7 @@ PAGES['dashboard'] = function(el) {
           const color=DOMAIN_COLORS[domain];
           return `<div style="background:${color};border-radius:8px;padding:9px 10px;cursor:pointer" onclick="navTo('milestones')">
             <div style="font-size:18px;font-weight:700;color:#fff">${done}/${total}</div>
-            <div style="font-size:9px;color:rgba(255,255,255,.8)">${domain}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.8)">${domain}</div>
             ${pctBar(total?done/total*100:0,'rgba(255,255,255,.7)',3)}
           </div>`;
         }).join('')}
@@ -3328,7 +3379,7 @@ PAGES['hospital-bag'] = function(el) {
       <div class="modal-handle"></div>
       <div class="modal-title">✏️ Edit Category</div>
       <div class="form-field"><label>Category name</label><input type="text" id="bg-cat" value="${cat.replace(/"/g,'&quot;')}"></div>
-      <div class="form-field"><label>Sub-category name <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="bg-sub" value="${(sub||'').replace(/"/g,'&quot;')}" placeholder="e.g. Clothing, Toiletries — leave blank for none"></div>
+      <div class="form-field"><label>Sub-category name <span style="color:#767680;font-weight:400">(optional)</span></label><input type="text" id="bg-sub" value="${(sub||'').replace(/"/g,'&quot;')}" placeholder="e.g. Clothing, Toiletries — leave blank for none"></div>
       <div class="modal-actions">
         <button class="btn btn-outline" onclick="document.getElementById('bag-group-modal').classList.remove('open')">Cancel</button>
         <button class="btn btn-teal" onclick="bagSaveGroup('${cat.replace(/'/g,"\\'")}','${(sub||'').replace(/'/g,"\\'")}')">Save</button>
@@ -3421,7 +3472,7 @@ function openBagModal(item, defCat, defSection, onSave, defSubcat) {
       </select>
       <input type="text" id="bi-newcat" placeholder="New category name" style="display:none;margin-top:6px">
     </div>
-    <div class="form-field"><label>Sub-category <span style="color:#aaa;font-weight:400">(optional)</span></label><input type="text" id="bi-subcat" value="${(curSub||'').replace(/"/g,'&quot;')}" placeholder="e.g. Clothing, Toiletries, Recovery"></div>
+    <div class="form-field"><label>Sub-category <span style="color:#767680;font-weight:400">(optional)</span></label><input type="text" id="bi-subcat" value="${(curSub||'').replace(/"/g,'&quot;')}" placeholder="e.g. Clothing, Toiletries, Recovery"></div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="document.getElementById('bag-item-modal').classList.remove('open')">Cancel</button>
       <button class="btn btn-teal" onclick="saveBagItem('${item?.id||''}')">Save</button>
@@ -3491,7 +3542,7 @@ PAGES['csection'] = function(el) {
       const pdone = phaseTasks.filter(t=>t.done).length;
       const isRed = phase.includes('🚨');
       html += `<div class="section-hdr" style="background:${isRed?'#C0392B':'#1B3A6B'}">
-        <span>${phase} <span style="font-size:10px;opacity:.75">${pdone}/${phaseTasks.length}</span></span>
+        <span>${phase} <span style="font-size:11px;opacity:.75">${pdone}/${phaseTasks.length}</span></span>
         <button onclick="addCsecTask('${phase.replace(/'/g,'\\\'')}')" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;padding:3px 10px;font-size:11px">+ Add</button>
       </div>
       <div class="card" style="padding:0 0 4px;margin-bottom:4px">`;
@@ -3527,7 +3578,7 @@ function openCsecModal(task, defPhase, onSave) {
   const phases=[...new Set((state.csectionTasks||[]).map(t=>t.phase))];
   m.innerHTML=`<div class="modal-sheet"><div class="modal-handle"></div>
     <div class="modal-title">${task?'✏️ Edit Task':'➕ Add Task'}</div>
-    <div class="form-field"><label>Task *</label><textarea id="ct-task" rows="2" style="resize:none;font-size:14px;padding:10px;border:1.5px solid #ddd;border-radius:8px;width:100%;font-family:var(--font)">${task?.task||''}</textarea></div>
+    <div class="form-field"><label>Task *</label><textarea id="ct-task" rows="2" style="resize:none;font-size:15px;padding:10px;border:1.5px solid #ddd;border-radius:8px;width:100%;font-family:var(--font)">${task?.task||''}</textarea></div>
     <div class="form-field"><label>Phase</label><input type="text" id="ct-phase" value="${task?.phase||defPhase||''}" placeholder="e.g. 📋 Pre-Surgery — Medical"></div>
     <div class="form-row">
       <div><label>Owner</label><select id="ct-owner"><option ${task?.owner==='Both'?'selected':''}>Both</option><option ${task?.owner==='Mom'?'selected':''}>Mom</option><option ${task?.owner==='Dad'?'selected':''}>Dad</option><option ${task?.owner==='Medical'?'selected':''}>Medical</option></select></div>
@@ -3635,7 +3686,7 @@ PAGES['preg-tasks'] = function(el) {
         html += `<div style="display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid #f5f5f5;${t.done?'opacity:.6':''}">
           <div class="check-box" onclick="togglePT('${t.id}')" style="cursor:pointer;flex-shrink:0;margin-top:1px">${t.done?'✓':''}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;${t.done?'text-decoration:line-through;color:#aaa':'color:#222'}">${t.task}</div>
+            <div style="font-size:13px;${t.done?'text-decoration:line-through;color:#767680':'color:#222'}">${t.task}</div>
             <div style="display:flex;gap:6px;margin-top:5px;align-items:center;flex-wrap:wrap">
               <span class="badge" style="background:#eef0f2;color:#666">${t.week}</span>
               ${priTag(t.pri)}
@@ -3744,7 +3795,7 @@ PAGES['inventory'] = function(el) {
         <div class="stat-card" style="background:#1B3A6B"><div class="val">${Math.round(estCost/1000000*10)/10}M</div><div class="lbl">Est. total Rp</div></div>
       </div>
 
-      <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:6px">Filter by priority</div>
+      <div style="font-size:11px;font-weight:700;color:#767680;text-transform:uppercase;margin-bottom:6px">Filter by priority</div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
         ${['all','Essential','High','Medium','Low'].map(p=>`<button class="tab-btn ${filterPri===p?'active':''}" onclick="setInvPri('${p}')">${p==='all'?'All':p}</button>`).join('')}
       </div>
@@ -3778,7 +3829,7 @@ PAGES['inventory'] = function(el) {
           <input type="checkbox" ${item.purchased?'checked':''} onchange="toggleInv('${item.id}')" style="width:18px;height:18px;cursor:pointer;flex-shrink:0;accent-color:var(--green)">
           <div style="flex:1;min-width:0;${item.purchased?'opacity:.55':''}">
             <div style="font-size:13px;font-weight:500;${item.purchased?'text-decoration:line-through':''}">${item.item}</div>
-            <div style="font-size:11px;color:#888;margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <div style="font-size:11px;color:#767680;margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
               ${priTag(item.pri)}
               <span>Qty: ${item.qty}</span>
               <span>·</span>
@@ -4204,7 +4255,7 @@ PAGES['feeding'] = function(el) {
       <div class="grid-4" style="margin-bottom:12px">
         <div class="stat-card" style="background:#0F6E56">
           <div class="val">${tf}</div><div class="lbl">Feeds today</div>
-          ${targets?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${targets.feedsMin}–${targets.feedsMax}</div>`:''}
+          ${targets?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">target ${targets.feedsMin}–${targets.feedsMax}</div>`:''}
         </div>
         <div class="stat-card" style="background:#2D8F8F"><div class="val">${tl+tr}m</div><div class="lbl">Breast total</div></div>
         <div class="stat-card" style="background:#534AB7"><div class="val">${tfo}ml</div><div class="lbl">Formula</div></div>
@@ -4218,7 +4269,7 @@ PAGES['feeding'] = function(el) {
             <div style="font-size:11px;font-weight:700;color:#534AB7;text-transform:uppercase;letter-spacing:.04em">🥛 Pumped Milk Stash</div>
             <div style="font-size:24px;font-weight:800;color:#534AB7;margin-top:2px">${stash} ml</div>
           </div>
-          <div style="text-align:right;font-size:10px;color:#888;max-width:130px">Pumping adds to stash. Feeding stored milk subtracts.</div>
+          <div style="text-align:right;font-size:11px;color:#767680;max-width:130px">Pumping adds to stash. Feeding stored milk subtracts.</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn btn-sm" onclick="addStash(60)" style="background:#534AB7;color:#fff">+60ml</button>
@@ -4239,6 +4290,7 @@ PAGES['feeding'] = function(el) {
 
       <div class="card" id="feed-full-form" style="margin-bottom:10px">
         <div class="card-title">Log a feed</div>
+        <div id="feed-timer-box" style="margin-bottom:14px"></div>
         ${isMultiples() ? renderBabySelector(0,'setFFBaby')+'<input type="hidden" id="ff-baby" value="0">' : ''}
 
         <div style="display:flex;gap:8px;margin-bottom:12px">
@@ -4261,7 +4313,7 @@ PAGES['feeding'] = function(el) {
         <div id="feed-amount-wrap" style="display:none;margin-bottom:12px">
           <label class="ff-lbl" id="feed-amount-lbl">Amount</label>
           <input type="number" id="f-amount" min="0" placeholder="0" inputmode="numeric">
-          <div id="feed-amount-hint" style="font-size:10px;color:#999;margin-top:4px"></div>
+          <div id="feed-amount-hint" style="font-size:11px;color:#767680;margin-top:4px"></div>
         </div>
 
         <input type="hidden" id="f-ftype" value="">
@@ -4287,9 +4339,9 @@ PAGES['feeding'] = function(el) {
       </div>
 
       <div class="card" style="padding:0;overflow:hidden">
-        <div onclick="toggleFeedHist()" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none">
-          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${state.feedingLog.length})</span></div>
-          <span id="feed-hist-arrow" style="color:#aaa;font-size:13px">${window._feedHistOpen?'▾':'▸'}</span>
+        <div onclick="toggleFeedHist()" role="button" tabindex="0" aria-expanded="${window._feedHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFeedHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
+          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#767680;font-size:12px">(${state.feedingLog.length})</span></div>
+          <span id="feed-hist-arrow" style="color:#767680;font-size:13px">${window._feedHistOpen?'▾':'▸'}</span>
         </div>
         <div id="feed-hist-body" style="display:${window._feedHistOpen?'block':'none'}">
           ${renderFeedHistory()}
@@ -4297,6 +4349,7 @@ PAGES['feeding'] = function(el) {
       </div>
     `;
     requestAnimationFrame(() => {
+      if (window.renderFeedTimer) window.renderFeedTimer();
       const cd = getChartData(chartView, chartMetric);
       drawBar('feed-chart', cd.labels, cd.datasets, cd.yLabel);
     });
@@ -4354,7 +4407,7 @@ PAGES['feeding'] = function(el) {
         '<span class="fh-time">' + endT + '</span>' +
         '<span class="fh-dur">' + dur + '</span>' +
         '<span class="fh-feed">' + feedCell + '</span>' +
-        '<button class="fh-del" onclick="delFeed(' + idx + ')">×</button>' +
+        '<button class="fh-del" onclick="delFeed(' + idx + ')" aria-label="Delete feed entry">×</button>' +
       '</div>';
     });
     return '<div class="feed-hist-head">' +
@@ -4427,6 +4480,48 @@ PAGES['feeding'] = function(el) {
       hint.textContent='';
       amt.focus();
     } else { wrap.style.display='none'; }
+  };
+  window.renderFeedTimer = () => {
+    const box = document.getElementById('feed-timer-box');
+    if (!box) return;
+    const t = window._feedTimer;
+    if (t && t.running) {
+      const elapsed = Math.floor((Date.now() - t.start)/1000);
+      const mm = Math.floor(elapsed/60), ss = elapsed%60;
+      box.innerHTML = '<div style="background:linear-gradient(135deg,#2D8F8F,#1F7373);border-radius:16px;padding:16px;text-align:center;color:#fff">' +
+        '<div style="font-size:13px;opacity:.85;margin-bottom:4px">Feeding ' + (t.side==='left'?'💙 left':t.side==='right'?'💗 right':'') + '</div>' +
+        '<div style="font-size:36px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums">' + String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0') + '</div>' +
+        '<button onclick="stopFeedTimer()" aria-label="Stop feeding timer" style="margin-top:10px;width:100%;background:#fff;color:#1F7373;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;font-family:var(--font);cursor:pointer">⏹ Stop &amp; review</button>' +
+      '</div>';
+    } else {
+      box.innerHTML = '<div style="display:flex;gap:8px">' +
+        '<button onclick="startFeedTimer(\'left\')" aria-label="Start timing left breast feed" style="flex:1;background:#E6F5F5;color:#1F7373;border:1.5px solid #2D8F8F;border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Time 💙 Left</button>' +
+        '<button onclick="startFeedTimer(\'right\')" aria-label="Start timing right breast feed" style="flex:1;background:#FBEAF0;color:#993556;border:1.5px solid #D4537E;border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Time 💗 Right</button>' +
+      '</div>';
+    }
+  };
+  window.startFeedTimer = (side) => {
+    window._feedTimer = { running:true, start:Date.now(), side };
+    if (window._feedTimerInterval) clearInterval(window._feedTimerInterval);
+    window._feedTimerInterval = setInterval(() => { if(window.renderFeedTimer) window.renderFeedTimer(); }, 1000);
+    renderFeedTimer();
+    if (navigator.vibrate) navigator.vibrate(15);
+  };
+  window.stopFeedTimer = () => {
+    const t = window._feedTimer;
+    if (!t || !t.running) return;
+    if (window._feedTimerInterval) { clearInterval(window._feedTimerInterval); window._feedTimerInterval=null; }
+    const startD = new Date(t.start), endD = new Date();
+    const fmt = (d) => d.toTimeString().slice(0,5);
+    // Pre-fill the form with the timed values
+    const ds = document.getElementById('f-time'); if (ds) ds.value = fmt(startD);
+    const de = document.getElementById('f-endtime'); if (de) de.value = fmt(endD);
+    selectFeedType(t.side);
+    if (window.updateFeedDuration) updateFeedDuration();
+    window._feedTimer = { running:false };
+    renderFeedTimer();
+    if (navigator.vibrate) navigator.vibrate([15,40,15]);
+    toast('Timer stopped — review and save');
   };
   window.addFeed = () => {
     const bi = parseInt(document.getElementById('ff-baby')?.value||'0');
@@ -4536,12 +4631,12 @@ PAGES['sleep'] = function(el) {
         <div class="stat-card" style="background:#185FA5">
           <div class="val">${totalHrs.toFixed(1)}h</div>
           <div class="lbl">Total today</div>
-          ${targets?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${targets.sleepHrsMin}–${targets.sleepHrsMax}h</div>`:''}
+          ${targets?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">target ${targets.sleepHrsMin}–${targets.sleepHrsMax}h</div>`:''}
         </div>
         <div class="stat-card" style="background:#534AB7">
           <div class="val">${longest.toFixed(1)}h</div>
           <div class="lbl">Longest stretch</div>
-          ${rec?`<div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target: ${rec.sleepStretch}</div>`:''}
+          ${rec?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">target: ${rec.sleepStretch}</div>`:''}
         </div>
         <div class="stat-card" style="background:${statusColor}">
           <div class="val">${sleepOk==='good'?'✓':sleepOk==='ok'?'~':'⚠'}</div>
@@ -4594,9 +4689,9 @@ PAGES['sleep'] = function(el) {
       </div>
 
       <div class="card" style="padding:0;overflow:hidden">
-        <div onclick="toggleSleepHist()" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none">
-          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${state.sleepLog.length})</span></div>
-          <span style="color:#aaa;font-size:13px">${window._sleepHistOpen?'▾':'▸'}</span>
+        <div onclick="toggleSleepHist()" role="button" tabindex="0" aria-expanded="${window._sleepHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSleepHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
+          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#767680;font-size:12px">(${state.sleepLog.length})</span></div>
+          <span style="color:#767680;font-size:13px">${window._sleepHistOpen?'▾':'▸'}</span>
         </div>
         <div style="display:${window._sleepHistOpen?'block':'none'}">${renderSleepHistory()}</div>
       </div>
@@ -4621,7 +4716,7 @@ PAGES['sleep'] = function(el) {
         '<span class="lh-time">'+(l.end||'—')+'</span>' +
         '<span class="lh-dur">'+dur.toFixed(1)+'h</span>' +
         '<span class="lh-main">'+typeIcon+'</span>' +
-        '<button class="lh-del" onclick="delSleep('+idx+')">×</button>' +
+        '<button class="lh-del" onclick="delSleep('+idx+')" aria-label="Delete sleep entry">×</button>' +
       '</div>';
     });
     return '<div class="loghist-head">' +
@@ -4699,7 +4794,7 @@ PAGES['diaper'] = function(el) {
         <div class="stat-card" style="background:#185FA5">
           <div class="val">${wet}</div>
           <div class="lbl">Wet today</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${wetTarget}+</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">target ${wetTarget}+</div>
         </div>
         <div class="stat-card" style="background:#0F6E56">
           <div class="val">${dirty}</div>
@@ -4760,9 +4855,9 @@ PAGES['diaper'] = function(el) {
       </div>
 
       <div class="card" style="padding:0;overflow:hidden">
-        <div onclick="toggleDiaperHist()" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none">
-          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${state.diaperLog.length})</span></div>
-          <span style="color:#aaa;font-size:13px">${window._diaperHistOpen?'▾':'▸'}</span>
+        <div onclick="toggleDiaperHist()" role="button" tabindex="0" aria-expanded="${window._diaperHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDiaperHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
+          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#767680;font-size:12px">(${state.diaperLog.length})</span></div>
+          <span style="color:#767680;font-size:13px">${window._diaperHistOpen?'▾':'▸'}</span>
         </div>
         <div style="display:${window._diaperHistOpen?'block':'none'}">${renderDiaperHistory()}</div>
       </div>
@@ -4803,7 +4898,7 @@ PAGES['diaper'] = function(el) {
         '<span class="lh-date">'+dateShort+'</span>' +
         '<span class="lh-time">'+(l.time||'—')+'</span>' +
         '<span class="lh-main">'+kind+(color?' · '+color:'')+'</span>' +
-        '<button class="lh-del" onclick="delDiaper('+idx+')">×</button>' +
+        '<button class="lh-del" onclick="delDiaper('+idx+')" aria-label="Delete diaper entry">×</button>' +
       '</div>';
     });
     return '<div class="loghist-head">' +
@@ -4869,7 +4964,7 @@ PAGES['reading'] = function(el) {
         <div class="stat-card" style="background:#185FA5">
           <div class="val">${todayMins}</div>
           <div class="lbl">Min today</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7);margin-top:2px">target ${TARGET_MINS} min</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">target ${TARGET_MINS} min</div>
         </div>
         <div class="stat-card" style="background:#534AB7">
           <div class="val">${readingLogs.length}</div>
@@ -4930,15 +5025,15 @@ PAGES['reading'] = function(el) {
           const lang=bLogs[bLogs.length-1]?.lang||'';
           return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5">
             <span style="font-size:20px">${lang==='Indonesian'?'🇮🇩':lang==='English'?'🇬🇧':'📚'}</span>
-            <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${book}</div><div style="font-size:11px;color:#888">${bLogs.length} session${bLogs.length!==1?'s':''} · ${mins} min total</div></div>
+            <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${book}</div><div style="font-size:11px;color:#767680">${bLogs.length} session${bLogs.length!==1?'s':''} · ${mins} min total</div></div>
           </div>`;
         }).join('')}
       </div>`:''}
 
       <div class="card" style="padding:0;overflow:hidden">
-        <div onclick="toggleReadingHist()" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none">
-          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${readingLogs.length})</span></div>
-          <span style="color:#aaa;font-size:13px">${window._readingHistOpen?'▾':'▸'}</span>
+        <div onclick="toggleReadingHist()" role="button" tabindex="0" aria-expanded="${window._readingHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReadingHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
+          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#767680;font-size:12px">(${readingLogs.length})</span></div>
+          <span style="color:#767680;font-size:13px">${window._readingHistOpen?'▾':'▸'}</span>
         </div>
         <div style="display:${window._readingHistOpen?'block':'none'}">${renderReadingHistory()}</div>
       </div>
@@ -4962,7 +5057,7 @@ PAGES['reading'] = function(el) {
         '<span class="lh-date">'+dateShort+'</span>' +
         '<span class="lh-dur">'+(l.minutes||0)+'m</span>' +
         '<span class="lh-main">'+flag+' '+(l.book||'(no title)')+'</span>' +
-        '<button class="lh-del" onclick="delReading('+idx+')">×</button>' +
+        '<button class="lh-del" onclick="delReading('+idx+')" aria-label="Delete reading entry">×</button>' +
       '</div>';
     });
     return '<div class="loghist-head">' +
@@ -5051,7 +5146,7 @@ PAGES['weight'] = function(el) {
       statusHtml = `<div class="card" style="margin-bottom:12px;border-left:4px solid ${color}">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <div style="font-size:12px;font-weight:700;color:${color}">${label}</div>
-          <div style="font-size:11px;color:#888">${pctOfMedian}% of median</div>
+          <div style="font-size:11px;color:#767680">${pctOfMedian}% of median</div>
         </div>
         <div style="font-size:11px;color:#666;line-height:1.6">
           WHO median for ${Math.round(mo)} month${Math.round(mo)===1?'':'s'} (${state.babyGender==='girl'?'girl':state.babyGender==='boy'?'boy':'avg'}): <b>${gramsToDisplay(ref.median, unit)}</b><br>
@@ -5115,9 +5210,9 @@ PAGES['weight'] = function(el) {
       </div>
 
       <div class="card" style="padding:0;overflow:hidden">
-        <div onclick="toggleWeightHist()" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none">
-          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${state.weightLog.length})</span></div>
-          <span style="color:#aaa;font-size:13px">${window._weightHistOpen?'▾':'▸'}</span>
+        <div onclick="toggleWeightHist()" role="button" tabindex="0" aria-expanded="${window._weightHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleWeightHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
+          <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#767680;font-size:12px">(${state.weightLog.length})</span></div>
+          <span style="color:#767680;font-size:13px">${window._weightHistOpen?'▾':'▸'}</span>
         </div>
         <div style="display:${window._weightHistOpen?'block':'none'}">${renderWeightHistory(unit)}</div>
       </div>
@@ -5147,7 +5242,7 @@ PAGES['weight'] = function(el) {
         '<span class="lh-date">'+dateShort+'</span>' +
         '<span class="lh-main" style="font-weight:600">'+gramsToDisplay(l.grams, unit)+'</span>' +
         (l.notes?'<span class="lh-note">'+l.notes+'</span>':'<span class="lh-note"></span>') +
-        '<button class="lh-del" onclick="delWeight('+realIdx+')">×</button>' +
+        '<button class="lh-del" onclick="delWeight('+realIdx+')" aria-label="Delete weight entry">×</button>' +
       '</div>';
     });
     return '<div class="loghist-head">' +
@@ -5196,19 +5291,19 @@ PAGES['vaccines'] = function(el) {
           <div class="vax-check ${s.given?'given':''}" onclick="toggleVax(${i})">${s.given?'✓':''}</div>
           <div style="flex:1">
             <div style="font-size:13px;font-weight:600;color:${s.given?'#aaa':'#222'};${s.given?'text-decoration:line-through':''}">
-              ${v.name}${isCustom?` <span style="font-size:9px;background:#EEEDFE;color:#534AB7;padding:1px 5px;border-radius:4px">Custom</span>`:''}
+              ${v.name}${isCustom?` <span style="font-size:11px;background:#EEEDFE;color:#534AB7;padding:1px 5px;border-radius:4px">Custom</span>`:''}
             </div>
             <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
-              <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E6F1FB;color:#185FA5">${v.age}</span>
-              ${dueDate?`<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:7px;background:${overdue?'#FCEBEB':'#f0f0f0'};color:${overdue?'#C0392B':'#666'}">${overdue?'⚠ Overdue · ':'Due: '}${formatDate(dueDate)}</span>`:''}
-              ${s.given?`<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E1F5EE;color:#0F6E56">✓ Given ${s.date?'· '+formatDate(s.date):''}</span>`:''}
+              <span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E6F1FB;color:#185FA5">${v.age}</span>
+              ${dueDate?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:${overdue?'#FCEBEB':'#f0f0f0'};color:${overdue?'#C0392B':'#666'}">${overdue?'⚠ Overdue · ':'Due: '}${formatDate(dueDate)}</span>`:''}
+              ${s.given?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E1F5EE;color:#0F6E56">✓ Given ${s.date?'· '+formatDate(s.date):''}</span>`:''}
             </div>
-            ${v.notes?`<div style="font-size:11px;color:#888;margin-top:4px;line-height:1.4">${v.notes}</div>`:''}
+            ${v.notes?`<div style="font-size:11px;color:#767680;margin-top:4px;line-height:1.4">${v.notes}</div>`:''}
           </div>
           ${isCustom?`<button onclick="delCustomVax(${i})" class="del-btn" style="flex-shrink:0">✕</button>`:''}
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <label style="font-size:11px;font-weight:600;color:#888;white-space:nowrap">Date given:</label>
+          <label style="font-size:11px;font-weight:600;color:#767680;white-space:nowrap">Date given:</label>
           <input type="date" value="${s.date||''}" onchange="setVaxDate(${i},this.value)" style="flex:1;font-size:13px;padding:7px 10px">
           ${s.date?`<button onclick="clearVaxDate(${i})" style="background:#FCEBEB;border:1px solid #f0c0c0;color:#C0392B;font-size:11px;padding:6px 9px;border-radius:6px;cursor:pointer;white-space:nowrap;flex-shrink:0">Clear</button>`:''}
         </div>
@@ -5297,8 +5392,8 @@ PAGES['foods'] = function(el) {
           const {color} = GROUP_META[g];
           const isActive = filterMode === g;
           return `<div style="cursor:pointer;padding:4px 6px;border-radius:6px;border:1.5px solid ${isActive?color:'#eee'};background:${isActive?color+'18':'transparent'}" onclick="setFoodFilter('${g}')">
-            <div style="font-size:9px;font-weight:700;color:${color}">${g.includes('Protein')?'Protein':g}</div>
-            <div style="font-size:10px;color:#888">${d}/${t}</div>
+            <div style="font-size:11px;font-weight:700;color:${color}">${g.includes('Protein')?'Protein':g}</div>
+            <div style="font-size:11px;color:#767680">${d}/${t}</div>
             ${pctBar(t?d/t*100:0, color, 3)}
           </div>`;
         }).join('') + '</div>';
@@ -5324,7 +5419,7 @@ PAGES['foods'] = function(el) {
             ${f[5]?'<span class="badge" style="background:#FCEBEB;color:#C0392B">⚠ Top allergen</span>':''}
           </div>
         </div>
-        <button onclick="closeDetail()" style="background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;padding:0;line-height:1;flex-shrink:0">✕</button>
+        <button onclick="closeDetail()" style="background:none;border:none;font-size:20px;color:#767680;cursor:pointer;padding:0;line-height:1;flex-shrink:0">✕</button>
       </div>
       <div class="detail-panel" style="margin-bottom:12px">
         <div class="dp-title">How to prepare (Indonesian kitchen)</div>
@@ -5394,10 +5489,10 @@ PAGES['foods'] = function(el) {
             const isSelected = selectedFood === i;
             return `<div class="food-card ${s.tried?'tried':''} ${hasConcern?'concern':''}" onclick="selectFood(${i})"
               style="${isSelected?'border-color:'+color+';border-width:2px;':''}" >
-              <span style="position:absolute;top:5px;right:8px;font-size:9px;color:#bbb">${f[0]}</span>
+              <span style="position:absolute;top:5px;right:8px;font-size:11px;color:#bbb">${f[0]}</span>
               <div style="font-size:12px;font-weight:700;color:#222;margin-bottom:4px;padding-right:18px;line-height:1.3">${f[1]}</div>
-              <div><span class="fage" style="background:${am.bg||'#f0f0f0'};color:${am.color||'#888'}">${f[3]}</span>${f[5]?` <span class="badge" style="background:#FCEBEB;color:#C0392B;font-size:9px">allergen</span>`:''}</div>
-              ${s.tried?`<div style="font-size:10px;font-weight:600;color:${hasConcern?'#854F0B':'#0F6E56'};margin-top:4px">${s.reaction&&s.reaction!=='None'?s.reaction:'✓ Tried'}${s.ageTried?' · '+s.ageTried:''}</div>`:''}
+              <div><span class="fage" style="background:${am.bg||'#f0f0f0'};color:${am.color||'#888'}">${f[3]}</span>${f[5]?` <span class="badge" style="background:#FCEBEB;color:#C0392B;font-size:11px">allergen</span>`:''}</div>
+              ${s.tried?`<div style="font-size:11px;font-weight:600;color:${hasConcern?'#854F0B':'#0F6E56'};margin-top:4px">${s.reaction&&s.reaction!=='None'?s.reaction:'✓ Tried'}${s.ageTried?' · '+s.ageTried:''}</div>`:''}
             </div>`;
           }).join('')}
         </div>` : ''}
@@ -5505,7 +5600,7 @@ PAGES['budget'] = function(el) {
       ${state.budgetItems.length>0?`<div class="card">
         <div class="card-title">Expense log</div>
         ${state.budgetItems.map((item,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f5f5f5">
-          <div style="flex:1"><div style="font-size:13px;font-weight:500">${item.name}</div><div style="font-size:11px;color:#888">${item.cat} · ${item.date||''}</div></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">${item.name}</div><div style="font-size:11px;color:#767680">${item.cat} · ${item.date||''}</div></div>
           <div style="font-size:13px;font-weight:700;color:#1B3A6B">Rp ${parseInt(item.actual||0).toLocaleString('id-ID')}</div>
           <button onclick="delBudget(${i})" class="del-btn">✕</button>
         </div>`).join('')}
@@ -5514,7 +5609,7 @@ PAGES['budget'] = function(el) {
       <button class="btn btn-teal btn-block" onclick="openBudgetModal()" style="margin-bottom:12px">+ Log expense</button>
       <div class="card">
         <div class="card-title">Cost reference (IDR)</div>
-        ${[['Hospital','C-Section room (1–3 days, mid-range private)','Rp 5–15 juta','Varies by hospital class'],['Hospital','Surgeon fee (OBGYN)','Rp 3–10 juta',''],['Hospital','Anesthesiologist fee','Rp 2–5 juta',''],['Hospital','Medications & supplies','Rp 2 juta','Post-op meds, IV'],['Hospital','Lab tests (pre-op + newborn)','Rp 1.5 juta',''],['Monthly','Diapers (~200/month)','Rp 800 rb',''],['Monthly','Baby wipes (4–5 packs)','Rp 300 rb',''],['Monthly','Pediatrician visits','Rp 200–500 rb/visit',''],['Monthly','Baby nurse (suster bayi)','Rp 3–5 juta/month','Highly recommended 3 months'],['Monthly','BPJS (baby)','Rp 100 rb/month','Register within 28 days'],['Admin','Birth certificate (Dukcapil)','Free',''],].map(([cat,item,cost,notes])=>`<div style="padding:8px 0;border-bottom:1px solid #f5f5f5"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1"><span class="badge" style="background:${cat==='Hospital'?'#FCEBEB':cat==='Monthly'?'#FAEEDA':'#E6F1FB'};color:${cat==='Hospital'?'#C0392B':cat==='Monthly'?'#854F0B':'#185FA5'}">${cat}</span><div style="font-size:13px;font-weight:500;margin-top:3px">${item}</div>${notes?`<div style="font-size:11px;color:#888;margin-top:1px">${notes}</div>`:''}</div><div style="font-size:13px;font-weight:700;color:#1B3A6B;white-space:nowrap;flex-shrink:0">${cost}</div></div></div>`).join('')}
+        ${[['Hospital','C-Section room (1–3 days, mid-range private)','Rp 5–15 juta','Varies by hospital class'],['Hospital','Surgeon fee (OBGYN)','Rp 3–10 juta',''],['Hospital','Anesthesiologist fee','Rp 2–5 juta',''],['Hospital','Medications & supplies','Rp 2 juta','Post-op meds, IV'],['Hospital','Lab tests (pre-op + newborn)','Rp 1.5 juta',''],['Monthly','Diapers (~200/month)','Rp 800 rb',''],['Monthly','Baby wipes (4–5 packs)','Rp 300 rb',''],['Monthly','Pediatrician visits','Rp 200–500 rb/visit',''],['Monthly','Baby nurse (suster bayi)','Rp 3–5 juta/month','Highly recommended 3 months'],['Monthly','BPJS (baby)','Rp 100 rb/month','Register within 28 days'],['Admin','Birth certificate (Dukcapil)','Free',''],].map(([cat,item,cost,notes])=>`<div style="padding:8px 0;border-bottom:1px solid #f5f5f5"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1"><span class="badge" style="background:${cat==='Hospital'?'#FCEBEB':cat==='Monthly'?'#FAEEDA':'#E6F1FB'};color:${cat==='Hospital'?'#C0392B':cat==='Monthly'?'#854F0B':'#185FA5'}">${cat}</span><div style="font-size:13px;font-weight:500;margin-top:3px">${item}</div>${notes?`<div style="font-size:11px;color:#767680;margin-top:1px">${notes}</div>`:''}</div><div style="font-size:13px;font-weight:700;color:#1B3A6B;white-space:nowrap;flex-shrink:0">${cost}</div></div></div>`).join('')}
       </div>
     `;
   }
@@ -5866,16 +5961,16 @@ PAGES['milestones'] = function(el) {
               <div style="flex:1;min-width:0">
                 <div style="font-size:13px;font-weight:600;line-height:1.4;color:${m[5]?'#C0392B':s.achieved?'#aaa':'#1a1a1a'};${s.achieved?'text-decoration:line-through':''}">${m[2]}${m[5]?' 🚨':''}</div>
                 <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;align-items:center">
-                  <span class="badge" style="background:${color}22;color:${color};font-size:10px">${m[3]}</span>
-                  ${s.date ? `<span style="font-size:10px;color:#0F6E56">✓ ${s.date}</span>` : ''}
+                  <span class="badge" style="background:${color}22;color:${color};font-size:11px">${m[3]}</span>
+                  ${s.date ? `<span style="font-size:11px;color:#0F6E56">✓ ${s.date}</span>` : ''}
                 </div>
-                ${m[4] ? `<div style="font-size:11px;color:#aaa;font-style:italic;margin-top:4px;line-height:1.4">${m[4].substring(0,80)}${m[4].length>80?'…':''}</div>` : ''}
+                ${m[4] ? `<div style="font-size:11px;color:#767680;font-style:italic;margin-top:4px;line-height:1.4">${m[4].substring(0,80)}${m[4].length>80?'…':''}</div>` : ''}
               </div>
               <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:4px">
                 <button onclick="toggleMilestone(${i})" style="padding:5px 11px;border-radius:8px;border:1.5px solid ${s.achieved?'#0F6E56':'#ddd'};background:${s.achieved?'#E1F5EE':'#fff'};color:${s.achieved?'#0F6E56':'#666'};font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">
                   ${s.achieved?'✓ Done':'Mark done'}
                 </button>
-                <button onclick="toggleConcern(${i})" style="padding:4px 10px;border-radius:8px;border:1.5px solid ${s.concern?'#C0392B':'#eee'};background:${s.concern?'#FCEBEB':'#fff'};color:${s.concern?'#C0392B':'#aaa'};font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap">
+                <button onclick="toggleConcern(${i})" style="padding:4px 10px;border-radius:8px;border:1.5px solid ${s.concern?'#C0392B':'#eee'};background:${s.concern?'#FCEBEB':'#fff'};color:${s.concern?'#C0392B':'#aaa'};font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">
                   ${s.concern?'⚠ Flagged':'Flag'}
                 </button>
               </div>
@@ -5885,7 +5980,7 @@ PAGES['milestones'] = function(el) {
         </div>`;
     });
 
-    if (!Object.keys(byAge).length) html += '<div class="card" style="text-align:center;color:#aaa;padding:24px">No milestones match this filter.</div>';
+    if (!Object.keys(byAge).length) html += '<div class="card" style="text-align:center;color:#767680;padding:24px">No milestones match this filter.</div>';
 
   // Custom milestones
   const customMils = state.customMilestones || [];
@@ -5898,7 +5993,7 @@ PAGES['milestones'] = function(el) {
         <div class="domain-dot" style="background:#534AB7"></div>
         <div style="flex:1" onclick="toggleCustomMil(${ci})">
           <div class="mtext" style="font-size:13px">${m.text}</div>
-          <div style="font-size:10px;color:#888;margin-top:2px">${m.age||''}${s.date?' · '+s.date:''}</div>
+          <div style="font-size:11px;color:#767680;margin-top:2px">${m.age||''}${s.date?' · '+s.date:''}</div>
         </div>
         <div style="display:flex;gap:6px;margin-left:8px">
           <button onclick="toggleCustomMil(${ci})" style="padding:4px 10px;border-radius:10px;border:1.5px solid ${s.achieved?'#0F6E56':'#ddd'};background:${s.achieved?'#E1F5EE':'#fff'};color:${s.achieved?'#0F6E56':'#888'};font-size:11px;cursor:pointer;white-space:nowrap;font-family:inherit">
@@ -5928,7 +6023,7 @@ PAGES['milestones'] = function(el) {
         <div class="modal-handle"></div>
         <div class="modal-title">➕ Add Custom Milestone / Note</div>
         <div class="modal-field"><label>Milestone / observation *</label>
-          <textarea id="am-text" rows="2" placeholder="e.g. First smile · Said 'mama' clearly · Waved at grandma" style="font-size:14px;padding:10px;border:1.5px solid #ddd;border-radius:8px;width:100%;font-family:inherit;resize:none"></textarea>
+          <textarea id="am-text" rows="2" placeholder="e.g. First smile · Said 'mama' clearly · Waved at grandma" style="font-size:15px;padding:10px;border:1.5px solid #ddd;border-radius:8px;width:100%;font-family:inherit;resize:none"></textarea>
         </div>
         <div class="modal-field"><label>Age / date</label><input type="text" id="am-age" placeholder="e.g. 3 months, 2 weeks"></div>
         <div class="modal-actions">
@@ -6113,7 +6208,7 @@ PAGES['signs'] = function(el) {
         '</div>' +
         '<div style="font-size:11px;color:#555;background:#f8f8f8;border-radius:6px;padding:7px 9px;line-height:1.5;margin-bottom:6px"><b>How:</b> '+s.how+'</div>' +
         '<div style="font-size:11px;color:#777;line-height:1.4"><b>When:</b> '+s.use+'</div>' +
-        '<div style="font-size:10px;color:#aaa;margin-top:4px">Introduce: '+s.age+'</div>' +
+        '<div style="font-size:11px;color:#767680;margin-top:4px">Introduce: '+s.age+'</div>' +
       '</div>';
     });
 
@@ -6222,7 +6317,7 @@ PAGES['philosophy'] = function(el) {
       ].map(p => `<div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
           <div style="width:40px;height:40px;border-radius:50%;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:${p.color}">${p.pct}%</div>
-          <div style="font-size:14px;font-weight:700;color:${p.color}">${p.name}</div>
+          <div style="font-size:15px;font-weight:700;color:${p.color}">${p.name}</div>
         </div>
         <div style="font-size:11px;color:#555;line-height:1.6">${p.core}</div>
         ${pctBar(p.pct, p.color, 6)}
@@ -6259,7 +6354,7 @@ PAGES['situations'] = function(el) {
       <div class="grid-2" style="margin-bottom:4px">
         ${SITUATIONS.map((s,i) => `
           <div onclick="selectSit(${i})" class="card" style="cursor:pointer;border:${selected===i?'2px solid #1B3A6B':'1px solid #eee'};padding:12px 14px">
-            <div style="font-size:14px;font-weight:600;color:#1B3A6B;margin-bottom:4px">${s.title}</div>
+            <div style="font-size:15px;font-weight:600;color:#1B3A6B;margin-bottom:4px">${s.title}</div>
             <div style="font-size:11px;color:#777">Lead: ${s.lead}</div>
           </div>
         `).join('')}
@@ -6396,7 +6491,7 @@ PAGES['knowledge'] = function(el) {
         </table>
       </div>
     `).join('')}
-    <div style="font-size:11px;color:#aaa;text-align:center;padding:8px">All data saved locally to your browser. Use the Export button to back up.</div>
+    <div style="font-size:11px;color:#767680;text-align:center;padding:8px">All data saved locally to your browser. Use the Export button to back up.</div>
   `;
 };
 
@@ -6447,7 +6542,7 @@ function renderNavCustomizer() {
   m.innerHTML = `<div class="modal-sheet" style="max-height:90vh">
     <div class="modal-handle"></div>
     <div class="modal-title">📱 Customise Bottom Navigation</div>
-    <p style="font-size:12px;color:#888;margin-bottom:14px">Tap a slot to change it. The ☰ More button is always last.</p>
+    <p style="font-size:12px;color:#767680;margin-bottom:14px">Tap a slot to change it. The ☰ More button is always last.</p>
     <div class="nav-customize-grid">
       ${slots.map((pageId, i) => {
         const p = ALL_PAGES.find(x => x.id === pageId) || {icon:'❓',label:'Unknown'};
@@ -6464,7 +6559,7 @@ function renderNavCustomizer() {
         <span class="nav-slot-label">More (fixed)</span>
       </div>
     </div>
-    <div style="font-size:11px;color:#888;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Tap a slot above to choose a page</div>
+    <div style="font-size:11px;color:#767680;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Tap a slot above to choose a page</div>
     <div class="page-picker-list" id="nav-page-picker" style="display:none"></div>
     <div class="modal-actions" style="margin-top:12px">
       <button class="btn btn-outline" onclick="resetNavSlots()">Reset to default</button>
@@ -6483,7 +6578,7 @@ function pickNavSlot(slotIndex) {
   let html = '';
   groups.forEach(group => {
     const pages = ALL_PAGES.filter(p => p.group === group);
-    html += '<div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;padding:8px 14px 4px;background:#fafafa">' + group + '</div>';
+    html += '<div style="font-size:11px;font-weight:700;color:#767680;text-transform:uppercase;letter-spacing:.05em;padding:8px 14px 4px;background:#fafafa">' + group + '</div>';
     pages.forEach(p => {
       const inUse = slots.includes(p.id) && slots.indexOf(p.id) !== slotIndex;
       const isCurrent = slots[slotIndex] === p.id;
