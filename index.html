@@ -81,6 +81,21 @@ const FB_URL = 'https://nandira-app-default-rtdb.firebaseio.com';
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
+/* ══ CELEBRATION MOMENT ══ */
+.celebrate-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(20,20,30,.55);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s;}
+.celebrate-overlay.show{opacity:1;pointer-events:auto;}
+.celebrate-card{background:#fff;border-radius:24px;padding:32px 28px;text-align:center;max-width:300px;margin:20px;transform:scale(.85);transition:transform .4s cubic-bezier(.2,1.3,.4,1);box-shadow:0 20px 60px -12px rgba(0,0,0,.4);}
+.celebrate-overlay.show .celebrate-card{transform:scale(1);}
+.celebrate-emoji{font-size:64px;line-height:1;margin-bottom:14px;display:inline-block;animation:celebratePop .5s cubic-bezier(.2,1.4,.4,1);}
+@keyframes celebratePop{0%{transform:scale(0) rotate(-20deg);}100%{transform:scale(1) rotate(0);}}
+.celebrate-title{font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px;letter-spacing:-.5px;}
+.celebrate-sub{font-size:14px;color:var(--ink-3);line-height:1.5;margin-bottom:20px;}
+.celebrate-btn{width:100%;background:var(--teal);color:#fff;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:700;font-family:var(--font);cursor:pointer;min-height:44px;}
+.confetti-piece{position:fixed;width:9px;height:9px;top:-12px;z-index:9998;pointer-events:none;border-radius:2px;animation:confettiFall linear forwards;}
+@keyframes confettiFall{to{transform:translateY(105vh) rotate(720deg);opacity:.9;}}
+body.night-mode .celebrate-card{background:#1e1e2a;}
+body.night-mode .celebrate-title{color:#f0ece0;}
+@media (prefers-reduced-motion: reduce){.confetti-piece{display:none;}.celebrate-emoji{animation:none;}}
 /* ══ ACCESSIBILITY FOUNDATION ══ */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 /* Visible focus ring for keyboard users (not mouse) */
@@ -240,7 +255,7 @@ body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a
 .bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:6px 2px;border:none;background:transparent;font-family:var(--font);transition:background .1s;}
 .bnav-item:active{background:#f5f5f5;}
 .bnav-item.active .bnav-icon,.bnav-item.active .bnav-label{color:var(--teal);}
-.bnav-icon{font-size:20px;line-height:1;}
+.bnav-icon{font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;height:24px;}.bnav-icon svg{display:block;}
 .bnav-label{font-size:11px;font-weight:500;color:#767680;}
 .bnav-item.active .bnav-label{font-weight:700;}
 
@@ -523,7 +538,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 .summary-row:last-child{border-bottom:none;}
 .del-btn{padding:4px 8px;border-radius:6px;border:1px solid #FCEBEB;background:#FFF5F5;font-size:11px;color:var(--red);cursor:pointer;font-family:var(--font);flex-shrink:0;}
 .edit-btn{padding:4px 9px;border-radius:6px;border:1px solid #ddd;background:#fff;font-size:11px;color:var(--dgray);cursor:pointer;font-family:var(--font);}
-.empty-state{text-align:center;padding:32px 16px;color:var(--mgray);font-size:13px;}
+.empty-state{text-align:center;padding:28px 20px;color:var(--ink-3);font-size:14px;line-height:1.5;}.empty-state::before{content:'';display:block;width:44px;height:44px;margin:0 auto 12px;border-radius:50%;background:var(--status-good-bg,#E1F5EE);opacity:.7;}
 
 /* ── BABY SELECTOR ── */
 .baby-selector{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;margin-bottom:12px;-webkit-overflow-scrolling:touch;}
@@ -720,6 +735,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="navTo('diaper')"><span class="icon">💧</span> Diaper Log</button>
   <button class="nav-item" onclick="navTo('reading')"><span class="icon">📚</span> Reading Log</button>
   <button class="nav-item" onclick="navTo('weight')"><span class="icon">⚖️</span> Weight Log</button>
+  <button class="nav-item" onclick="navTo('pump')"><span class="icon">🥛</span> Pumping</button>
+  <button class="nav-item" onclick="navTo('meds')"><span class="icon">💊</span> Medications</button>
   <div class="drawer-section">Development</div>
   <button class="nav-item" onclick="navTo('milestones')"><span class="icon">⭐</span> Milestones</button>
   <button class="nav-item" onclick="navTo('vaccines')"><span class="icon">💉</span> Vaccines</button>
@@ -744,7 +761,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon">📊</span> Export to Google Sheets</button>
   <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon">💾</span> Back up all data</button>
   <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon">♻️</span> Restore from backup</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 24 Jun 2026, 08:38</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 02 Jul 2026, 08:42</div>
   <div style="height:20px"></div>
 </div>
 
@@ -938,9 +955,12 @@ let state = {
   diaperLog: [],
   readingLog: [],
   weightLog: [],         // [{date, grams, babyIdx, notes}]
+  feedIntervalHours: null, // user-set feed interval (hours); null = use age-based recommendation
+  pumpLog: [],           // [{date, time, leftMl, rightMl, totalMl, notes, babyIdx}]
+  medsLog: [],           // [{date, time, name, dose, notes, babyIdx}]
   weightUnit: 'kg',      // display unit: 'kg' | 'g' | 'lboz'
   // Nav
-  navSlots: ['dashboard','feeding','milestones','foods'],
+  navSlots: ['now','feeding','sleep','diaper'],
   // Budget
   budgetItems: [],
   // Bilingual
@@ -955,6 +975,13 @@ function loadLocal() {
 }
 
 function migrateData() {
+  // Ensure new log arrays exist for users created before these features
+  if (!Array.isArray(state.pumpLog)) state.pumpLog = [];
+  if (!Array.isArray(state.medsLog)) state.medsLog = [];
+  // Migrate users still on the original default nav to the daily-actions nav
+  if (state.navSlots && state.navSlots.join(',') === 'dashboard,feeding,milestones,foods') {
+    state.navSlots = ['now','feeding','sleep','diaper'];
+  }
   if (state.hospitalBagItems) {
     state.hospitalBagItems.forEach(item => {
       // Normalize cat text
@@ -1798,6 +1825,8 @@ const ALL_PAGES = [
   {id:'diaper',icon:'💧',label:'Diaper',group:'Logs'},
   {id:'reading',icon:'📚',label:'Reading',group:'Logs'},
   {id:'weight',icon:'⚖️',label:'Weight',group:'Logs'},
+  {id:'pump',icon:'🥛',label:'Pumping',group:'Logs'},
+  {id:'meds',icon:'💊',label:'Meds',group:'Logs'},
   {id:'milestones',icon:'⭐',label:'Milestones',group:'Dev'},
   {id:'vaccines',icon:'💉',label:'Vaccines',group:'Dev'},
   {id:'language',icon:'💬',label:'Language',group:'Dev'},
@@ -1810,8 +1839,30 @@ const ALL_PAGES = [
   {id:'budget',icon:'💰',label:'Budget',group:'Ref'},
   {id:'knowledge',icon:'📋',label:'Knowledge',group:'Ref'},
 ];
-const DEFAULT_NAV = ['dashboard','feeding','milestones','foods'];
+const DEFAULT_NAV = ['now','feeding','sleep','diaper'];
 function getNavSlots() { return state.navSlots||[...DEFAULT_NAV]; }
+
+// ── ICON SYSTEM: consistent inline SVG (24x24, stroke 1.8, round) ──
+const SVG_ICONS = {
+  now: '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+  dashboard: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>',
+  feeding: '<path d="M9 2h6"/><path d="M10 2v3h4V2"/><path d="M8.5 8.5C8.5 6.6 10 5 12 5s3.5 1.6 3.5 3.5V19a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 8.5 19Z"/><path d="M8.5 12h7M8.5 16h7"/>',
+  sleep: '<path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/>',
+  diaper: '<path d="M12 21c-3.6 0-6.5-2.9-6.5-6.4 0-4 4.2-8.4 6-10.1a.7.7 0 0 1 1 0c1.8 1.7 6 6.1 6 10.1 0 3.5-2.9 6.4-6.5 6.4Z"/>',
+  weight: '<path d="M3 17l5.5-5.5 4 4L21 7"/><path d="M15.5 7H21v5.5"/>',
+  pump: '<path d="M8 3h8"/><path d="M12 3v4"/><circle cx="12" cy="13" r="6"/><path d="M12 10.5V13l1.8 1.8"/>',
+  meds: '<rect x="3.5" y="9" width="17" height="8" rx="4" transform="rotate(-35 12 13)"/><path d="M8.6 16.2l6.8-4.8"/>',
+  milestones: '<path d="M12 2.5l2.6 5.3 5.9.9-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 8.7l5.9-.9Z"/>',
+  reading: '<path d="M12 6.5C10.5 5 8.5 4 5.5 4c-1 0-2 .1-2.5.3V19c.5-.2 1.5-.3 2.5-.3 3 0 5 1 6.5 2.5 1.5-1.5 3.5-2.5 6.5-2.5 1 0 2 .1 2.5.3V4.3C20.5 4.1 19.5 4 18.5 4c-3 0-5 1-6.5 2.5Z"/><path d="M12 6.5v14.7"/>',
+  foods: '<path d="M4 11h16c0 5-3.6 9-8 9s-8-4-8-9Z"/><path d="M12 8c0-2.5 1.5-4 4-5"/>',
+  more: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+};
+function svgIcon(id, size) {
+  const paths = SVG_ICONS[id];
+  if (!paths) return null;
+  size = size || 24;
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths+'</svg>';
+}
 
 function renderBottomNav(active) {
   const nav = document.getElementById('bottom-nav');
@@ -1820,8 +1871,9 @@ function renderBottomNav(active) {
   nav.innerHTML = slots.map((pid,i) => {
     const p = ALL_PAGES.find(x=>x.id===pid)||{icon:'❓',label:'?',id:pid};
     const isActive = active===p.id;
-    return '<button class="bnav-item '+(isActive?'active':'')+'" onclick="navTo(\''+p.id+'\')" aria-label="'+p.label+'"'+(isActive?' aria-current="page"':'')+'><span class="bnav-icon" aria-hidden="true">'+p.icon+'</span><span class="bnav-label">'+p.label+'</span></button>';
-  }).join('')+'<button class="bnav-item '+(active==='__more'?'active':'')+'" onclick="openDrawer()"><span class="bnav-icon">☰</span><span class="bnav-label">More</span></button>';
+    const ic = svgIcon(p.id, 24) || p.icon;
+    return '<button class="bnav-item '+(isActive?'active':'')+'" onclick="navTo(\''+p.id+'\')" aria-label="'+p.label+'"'+(isActive?' aria-current="page"':'')+'><span class="bnav-icon" aria-hidden="true">'+ic+'</span><span class="bnav-label">'+p.label+'</span></button>';
+  }).join('')+'<button class="bnav-item '+(active==='__more'?'active':'')+'" onclick="openDrawer()" aria-label="More"><span class="bnav-icon" aria-hidden="true">'+(svgIcon('more',24)||'☰')+'</span><span class="bnav-label">More</span></button>';
 }
 
 let _currentPage = 'dashboard';
@@ -2651,12 +2703,23 @@ function _agoText(dt) {
 function lastFeedInfo() {
   const e = _latest(state.feedingLog);
   if (!e) return null;
-  const dt = _entryDateTime(e);
+  // "Time since" should measure from the END of the last feed (fall back to start if no end time)
+  let dt = null;
+  if (e.date && e.endTime) {
+    const et = e.endTime.length===5 ? e.endTime : '12:00';
+    dt = new Date(e.date + 'T' + et + ':00');
+    // If end time is earlier than start (crossed midnight), it belongs to the next day
+    const startDt = _entryDateTime(e);
+    if (startDt && dt < startDt) dt = new Date(dt.getTime() + 86400000);
+    if (isNaN(dt)) dt = null;
+  }
+  if (!dt) dt = _entryDateTime(e); // fallback: start time
   let side = '';
-  if (e.leftMin && !e.rightMin) side = 'left side';
-  else if (e.rightMin && !e.leftMin) side = 'right side';
-  else if (e.formulaMl) side = 'formula';
-  else if (e.storedMl) side = 'stored milk';
+  const t = e.feedType;
+  if (t==='left' || (e.leftMin && !e.rightMin)) side = 'left side';
+  else if (t==='right' || (e.rightMin && !e.leftMin)) side = 'right side';
+  else if (t==='formula' || e.formulaMl) side = 'formula';
+  else if (t==='stored' || e.storedMl) side = 'stored milk';
   else if (e.leftMin && e.rightMin) side = 'both sides';
   return { ago: _agoText(dt), side, dt, minsAgo: dt ? Math.floor((Date.now()-dt.getTime())/60000) : null };
 }
@@ -2774,8 +2837,10 @@ PAGES['now'] = function(el) {
   const rec = getRecommendations();
 
   let feedHint = '', feedHintColor = '#1D9E75';
-  if (feed && feed.minsAgo!=null && rec && rec.feedFreq) {
-    const freqH = parseFloat((''+rec.feedFreq).match(/[\d.]+/)?.[0]||'3');
+  // Use the user's custom interval if set, else fall back to the age-based recommendation
+  let freqH = state.feedIntervalHours;
+  if (!freqH && rec && rec.feedFreq) freqH = parseFloat((''+rec.feedFreq).match(/[\d.]+/)?.[0]||'3');
+  if (feed && feed.minsAgo!=null && freqH) {
     const dueMins = freqH*60;
     if (feed.minsAgo >= dueMins) { feedHint = 'Due now'; feedHintColor = '#C9842B'; }
     else if (feed.minsAgo >= dueMins*0.8) { feedHint = 'Due soon'; feedHintColor = '#C9842B'; }
@@ -2795,6 +2860,14 @@ PAGES['now'] = function(el) {
     }
     if (wLogs.length>=2) { const diff = latestW.grams - wLogs[wLogs.length-2].grams; wTrend = (diff>=0?'↑':'↓')+gramsToDisplay(Math.abs(diff),'g'); }
   }
+
+  // Pumping + meds latest info
+  const pumpLogs = (state.pumpLog||[]);
+  const lastPump = pumpLogs.length ? _latest(pumpLogs) : null;
+  const lastPumpAgo = lastPump ? _agoText(_entryDateTime(lastPump)) : null;
+  const medsLogs = (state.medsLog||[]);
+  const lastMed = medsLogs.length ? _latest(medsLogs) : null;
+  const lastMedAgo = lastMed ? _agoText(_entryDateTime(lastMed)) : null;
 
   const open = window._nowOpen || '';
   const nowTime = new Date().toTimeString().slice(0,5);
@@ -2822,6 +2895,7 @@ PAGES['now'] = function(el) {
             <div class="now-hero-main"><span class="now-hero-empty">No feeds yet today</span></div>
             <div class="now-hero-meta">Tap to log the first one</div>
           `}
+          <button onclick="event.stopPropagation();openFeedIntervalPicker()" aria-label="Set feeding interval" style="margin-top:8px;background:rgba(255,255,255,.15);border:none;color:rgba(255,255,255,.95);font-size:12px;font-weight:600;font-family:var(--font);padding:5px 12px;border-radius:999px;cursor:pointer;min-height:32px">⏱ Reminder: ${feedIntervalLabel()} · change</button>
         </div>
         <div class="now-hero-cta" onclick="nowToggle('feed')">${open==='feed'?'− Close':'+ Log a feed'}</div>
         ${open==='feed'?`
@@ -2848,7 +2922,7 @@ PAGES['now'] = function(el) {
       <!-- SLEEP TILE -->
       <div class="now-tile-wrap">
         <div class="now-tile" onclick="nowToggle('sleep')">
-          <div class="now-tile-icon" style="background:#EEEDFE">😴</div>
+          <div class="now-tile-icon" style="background:#EEEDFE;color:#534AB7">${svgIcon('sleep',22)}</div>
           <div class="now-tile-body">
             <div class="now-tile-label">Last sleep</div>
             <div class="now-tile-val">${sleep?sleep.ago+' ago':'—'}</div>
@@ -2873,7 +2947,7 @@ PAGES['now'] = function(el) {
       <!-- DIAPER TILE -->
       <div class="now-tile-wrap">
         <div class="now-tile" onclick="nowToggle('diaper')">
-          <div class="now-tile-icon" style="background:#E6F1FB">💧</div>
+          <div class="now-tile-icon" style="background:#E6F1FB;color:#185FA5">${svgIcon('diaper',22)}</div>
           <div class="now-tile-body">
             <div class="now-tile-label">Last diaper</div>
             <div class="now-tile-val">${diaper?diaper.ago+' ago':'—'}</div>
@@ -2893,7 +2967,7 @@ PAGES['now'] = function(el) {
       <!-- WEIGHT TILE -->
       <div class="now-tile-wrap">
         <div class="now-tile" onclick="nowToggle('weight')">
-          <div class="now-tile-icon" style="background:#E1F5EE">⚖️</div>
+          <div class="now-tile-icon" style="background:#E1F5EE;color:#0F6E56">${svgIcon('weight',22)}</div>
           <div class="now-tile-body">
             <div class="now-tile-label">Weight ${wTrend?'· '+wTrend:''}</div>
             <div class="now-tile-val">${latestW?gramsToDisplay(latestW.grams, state.weightUnit||'kg'):'—'}</div>
@@ -2906,6 +2980,46 @@ PAGES['now'] = function(el) {
           <label class="now-flbl">Weight (${state.weightUnit||'kg'})</label>
           <input type="number" id="nw-val" inputmode="decimal" step="0.01" placeholder="e.g. 6.2" style="margin-bottom:8px">
           <button class="now-save" onclick="nowSaveWeight()">Save weight</button>
+        </div>` : ''}
+      </div>
+
+      <!-- PUMPING TILE -->
+      <div class="now-tile-wrap">
+        <div class="now-tile" onclick="nowToggle('pump')">
+          <div class="now-tile-icon" style="background:#E6F5F5;color:#2D8F8F">${svgIcon('pump',22)}</div>
+          <div class="now-tile-body">
+            <div class="now-tile-label">Pumping · stash ${state.pumpedStash||0}ml</div>
+            <div class="now-tile-val">${lastPumpAgo?lastPumpAgo+' ago':'—'}</div>
+          </div>
+          <span class="now-tile-add">${open==='pump'?'−':'+'}</span>
+        </div>
+        ${open==='pump'?`
+        <div class="now-form">
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <div style="flex:1"><label class="now-flbl">Left (ml)</label><input type="number" id="np-left" inputmode="numeric" placeholder="0"></div>
+            <div style="flex:1"><label class="now-flbl">Right (ml)</label><input type="number" id="np-right" inputmode="numeric" placeholder="0"></div>
+          </div>
+          <button class="now-save" onclick="nowSavePump()">Save & add to stash</button>
+        </div>` : ''}
+      </div>
+
+      <!-- MEDS TILE -->
+      <div class="now-tile-wrap">
+        <div class="now-tile" onclick="nowToggle('meds')">
+          <div class="now-tile-icon" style="background:#FCEBEB;color:#C0392B">${svgIcon('meds',22)}</div>
+          <div class="now-tile-body">
+            <div class="now-tile-label">Medications</div>
+            <div class="now-tile-val">${lastMed?(lastMed.name+' · '+lastMedAgo+' ago'):'—'}</div>
+          </div>
+          <span class="now-tile-add">${open==='meds'?'−':'+'}</span>
+        </div>
+        ${open==='meds'?`
+        <div class="now-form">
+          <label class="now-flbl">Medication</label>
+          <input type="text" id="nm-name" placeholder="e.g. Vitamin D" style="margin-bottom:8px">
+          <label class="now-flbl">Dose (optional)</label>
+          <input type="text" id="nm-dose" placeholder="e.g. 1 drop" style="margin-bottom:8px">
+          <button class="now-save" onclick="nowSaveMeds()">Save dose</button>
         </div>` : ''}
       </div>
 
@@ -3026,6 +3140,110 @@ function nowSaveWeight() {
   window._nowOpen='';
   const el=document.getElementById('page-now'); if(el) PAGES.now(el);
   toast('Weight logged! ⚖️');
+}
+
+function nowSavePump() {
+  const left = parseInt(document.getElementById('np-left')?.value)||0;
+  const right = parseInt(document.getElementById('np-right')?.value)||0;
+  const total = left + right;
+  if (total <= 0) { toast('Enter an amount'); return; }
+  if (!state.pumpLog) state.pumpLog = [];
+  state.pumpLog.push({ date: today(), time: new Date().toTimeString().slice(0,5),
+    leftMl:left, rightMl:right, totalMl:total, notes:'', babyIdx:0 });
+  state.pumpedStash = (state.pumpedStash||0) + total;
+  saveState('pumpLog'); saveState('pumpedStash');
+  window._nowOpen='';
+  const el=document.getElementById('page-now'); if(el) PAGES.now(el);
+  toast('Pumped '+total+'ml added to stash 🥛');
+}
+function nowSaveMeds() {
+  const name = (document.getElementById('nm-name')?.value||'').trim();
+  if (!name) { toast('Enter a medication name'); return; }
+  if (!state.medsLog) state.medsLog = [];
+  state.medsLog.push({ date: today(), time: new Date().toTimeString().slice(0,5),
+    name, dose: document.getElementById('nm-dose')?.value||'', notes:'', babyIdx:0 });
+  saveState('medsLog');
+  window._nowOpen='';
+  const el=document.getElementById('page-now'); if(el) PAGES.now(el);
+  toast('Dose logged 💊');
+}
+
+function feedIntervalLabel() {
+  const h = state.feedIntervalHours;
+  if (!h) return 'auto (by age)';
+  return 'every ' + (h % 1 === 0 ? h : h.toFixed(1)) + 'h';
+}
+function openFeedIntervalPicker() {
+  const options = [
+    ['Auto (by age)', null],
+    ['Every 1.5 hours', 1.5],
+    ['Every 2 hours', 2],
+    ['Every 2.5 hours', 2.5],
+    ['Every 3 hours', 3],
+    ['Every 3.5 hours', 3.5],
+    ['Every 4 hours', 4],
+  ];
+  let m = document.getElementById('feed-interval-modal');
+  if (!m) { m = document.createElement('div'); m.className='modal-overlay'; m.id='feed-interval-modal'; document.body.appendChild(m);
+    m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); }); }
+  const cur = state.feedIntervalHours;
+  m.innerHTML = '<div class="modal-sheet" role="dialog" aria-label="Set feeding reminder interval">' +
+    '<div class="modal-handle"></div>' +
+    '<div class="modal-title">Feeding reminder</div>' +
+    '<div style="font-size:13px;color:var(--ink-3);margin-bottom:14px">How often should we remind you it\'s time to feed?</div>' +
+    options.map(([label,val]) => {
+      const active = (val===cur) || (val===null && !cur);
+      return '<button onclick="setFeedInterval('+(val===null?'null':val)+')" style="width:100%;text-align:left;padding:14px 16px;margin-bottom:8px;border-radius:12px;border:1.5px solid '+(active?'var(--teal)':'#e0e0e0')+';background:'+(active?'#E6F5F5':'#fff')+';color:'+(active?'var(--teal)':'var(--ink)')+';font-size:15px;font-weight:'+(active?'700':'500')+';font-family:var(--font);cursor:pointer;min-height:44px">'+(active?'✓ ':'')+label+'</button>';
+    }).join('') +
+    '</div>';
+  m.classList.add('open');
+}
+window.setFeedInterval = (h) => {
+  state.feedIntervalHours = h;
+  saveState('feedIntervalHours');
+  const m = document.getElementById('feed-interval-modal'); if (m) m.classList.remove('open');
+  const el = document.getElementById('page-now'); if (el && PAGES.now) PAGES.now(el);
+  toast(h ? 'Reminder set: every '+h+'h' : 'Reminder set to auto');
+};
+
+function celebrate(opts) {
+  opts = opts || {};
+  const emoji = opts.emoji || '🎉';
+  const title = opts.title || 'Nice!';
+  const sub = opts.sub || '';
+  let ov = document.getElementById('celebrate-overlay');
+  if (!ov) { ov = document.createElement('div'); ov.className='celebrate-overlay'; ov.id='celebrate-overlay';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-live','assertive'); document.body.appendChild(ov);
+    ov.addEventListener('click', e=>{ if(e.target===ov) closeCelebrate(); }); }
+  ov.innerHTML = '<div class="celebrate-card">' +
+    '<div class="celebrate-emoji">'+emoji+'</div>' +
+    '<div class="celebrate-title">'+title+'</div>' +
+    (sub?'<div class="celebrate-sub">'+sub+'</div>':'') +
+    '<button class="celebrate-btn" onclick="closeCelebrate()">'+(opts.cta||'Yay!')+'</button>' +
+    '</div>';
+  requestAnimationFrame(()=> ov.classList.add('show'));
+  fireConfetti();
+  if (navigator.vibrate) navigator.vibrate([20,40,20,40,60]);
+}
+function closeCelebrate() {
+  const ov = document.getElementById('celebrate-overlay');
+  if (ov) ov.classList.remove('show');
+}
+function fireConfetti() {
+  const colors = ['#2D8F8F','#534AB7','#FFC93C','#E8968A','#0F6E56','#185FA5','#FFB3B3'];
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+  for (let i=0;i<48;i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.background = colors[i % colors.length];
+    p.style.animationDuration = (1.6 + Math.random()*1.4) + 's';
+    p.style.animationDelay = (Math.random()*0.3) + 's';
+    if (Math.random()>0.5) p.style.borderRadius = '50%';
+    document.body.appendChild(p);
+    setTimeout(()=> p.remove(), 3400);
+  }
 }
 
 function greetingText() {
@@ -4502,6 +4720,7 @@ PAGES['feeding'] = function(el) {
   };
   window.startFeedTimer = (side) => {
     window._feedTimer = { running:true, start:Date.now(), side };
+    try { localStorage.setItem('babyos_feed_timer', JSON.stringify(window._feedTimer)); } catch(e){}
     if (window._feedTimerInterval) clearInterval(window._feedTimerInterval);
     window._feedTimerInterval = setInterval(() => { if(window.renderFeedTimer) window.renderFeedTimer(); }, 1000);
     renderFeedTimer();
@@ -4519,6 +4738,7 @@ PAGES['feeding'] = function(el) {
     selectFeedType(t.side);
     if (window.updateFeedDuration) updateFeedDuration();
     window._feedTimer = { running:false };
+    try { localStorage.removeItem('babyos_feed_timer'); } catch(e){}
     renderFeedTimer();
     if (navigator.vibrate) navigator.vibrate([15,40,15]);
     toast('Timer stopped — review and save');
@@ -4656,6 +4876,7 @@ PAGES['sleep'] = function(el) {
 
       <div class="card" id="sleep-full-form" style="margin-bottom:10px">
         <div class="card-title">Log sleep</div>
+        <div id="sleep-timer-box" style="margin-bottom:14px"></div>
         <div style="display:flex;gap:8px;margin-bottom:10px">
           <div style="flex:2"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Date</label><input type="date" id="s-date" value="${today()}" style="font-size:13px;padding:8px 10px"></div>
           <div style="flex:1"><label style="font-size:11px;font-weight:600;color:var(--dgray);display:block;margin-bottom:4px">Type</label><select id="s-type" style="font-size:13px;padding:8px 10px"><option>Night</option><option>Day nap</option></select></div>
@@ -4697,6 +4918,7 @@ PAGES['sleep'] = function(el) {
       </div>
     `;
     requestAnimationFrame(() => {
+      if (window.renderSleepTimer) window.renderSleepTimer();
       const cd = getChartData(chartView, chartMetric);
       drawBar('sleep-chart', cd.labels, cd.datasets, cd.yLabel);
     });
@@ -4728,6 +4950,49 @@ PAGES['sleep'] = function(el) {
   window.setSleepChart = (v) => { chartView=v; render(); };
   window.setSleepMetric = (m) => { chartMetric=m; render(); };
   window.setSBaby = (i) => { const h=document.getElementById('s-baby'); if(h) h.value=i; };
+  window.renderSleepTimer = () => {
+    const box = document.getElementById('sleep-timer-box');
+    if (!box) return;
+    const t = window._sleepTimer;
+    if (t && t.running) {
+      const elapsed = Math.floor((Date.now() - t.start)/1000);
+      const hh = Math.floor(elapsed/3600), mm = Math.floor((elapsed%3600)/60), ss = elapsed%60;
+      const disp = hh>0 ? (hh+':'+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0')) : (String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0'));
+      box.innerHTML = '<div style="background:linear-gradient(135deg,#534AB7,#3F3896);border-radius:16px;padding:16px;text-align:center;color:#fff">' +
+        '<div style="font-size:13px;opacity:.85;margin-bottom:4px">😴 Sleeping…</div>' +
+        '<div style="font-size:36px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums">' + disp + '</div>' +
+        '<button onclick="stopSleepTimer()" aria-label="Stop sleep timer" style="margin-top:10px;width:100%;background:#fff;color:#3F3896;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;font-family:var(--font);cursor:pointer">⏹ Woke up</button>' +
+      '</div>';
+    } else {
+      box.innerHTML = '<button onclick="startSleepTimer()" aria-label="Start sleep timer" style="width:100%;background:#EEEDFE;color:#3F3896;border:1.5px solid #534AB7;border-radius:12px;padding:15px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Start sleep timer</button>';
+    }
+  };
+  window.startSleepTimer = () => {
+    window._sleepTimer = { running:true, start:Date.now() };
+    try { localStorage.setItem('babyos_sleep_timer', JSON.stringify(window._sleepTimer)); } catch(e){}
+    if (window._sleepTimerInterval) clearInterval(window._sleepTimerInterval);
+    window._sleepTimerInterval = setInterval(() => { if(window.renderSleepTimer) window.renderSleepTimer(); }, 1000);
+    renderSleepTimer();
+    if (navigator.vibrate) navigator.vibrate(15);
+  };
+  window.stopSleepTimer = () => {
+    const t = window._sleepTimer;
+    if (!t || !t.running) return;
+    if (window._sleepTimerInterval) { clearInterval(window._sleepTimerInterval); window._sleepTimerInterval=null; }
+    const startD = new Date(t.start), endD = new Date();
+    const fmt = (d) => d.toTimeString().slice(0,5);
+    const ds = document.getElementById('s-start'); if (ds) ds.value = fmt(startD);
+    const de = document.getElementById('s-end'); if (de) de.value = fmt(endD);
+    // Auto-set type based on time of day
+    const hr = startD.getHours();
+    const st = document.getElementById('s-type');
+    if (st) st.value = (hr >= 19 || hr < 6) ? 'Night' : 'Day nap';
+    window._sleepTimer = { running:false };
+    try { localStorage.removeItem('babyos_sleep_timer'); } catch(e){}
+    renderSleepTimer();
+    if (navigator.vibrate) navigator.vibrate([15,40,15]);
+    toast('Sleep timed — review and save');
+  };
   window.addSleep = () => {
     const bi=parseInt(document.getElementById('s-baby')?.value||'0');
     state.sleepLog.push({date:document.getElementById('s-date')?.value||today(),start:document.getElementById('s-start')?.value,end:document.getElementById('s-end')?.value,type:document.getElementById('s-type')?.value||'Night',quality:document.getElementById('s-qual')?.value||'Good',notes:document.getElementById('s-notes')?.value||'',babyIdx:bi});
@@ -5270,6 +5535,180 @@ PAGES['weight'] = function(el) {
     saveState('weightLog'); render(); toast('Weight logged! ⚖️');
   };
   window.delWeight = (i) => { if(!confirm('Delete this weight entry?')) return; state.weightLog.splice(i,1); saveState('weightLog'); render(); toast('Deleted'); };
+
+  render();
+};
+
+PAGES['pump'] = function(el) {
+  if (!state.pumpLog) state.pumpLog = [];
+
+  function render() {
+  const logs = state.pumpLog || [];
+  const today_ = today();
+  const todayLogs = logs.filter(l => l.date === today_);
+  const todayMl = todayLogs.reduce((a,l)=>a+(l.totalMl||0),0);
+  const stash = state.pumpedStash || 0;
+
+  el.innerHTML = `
+    <div class="page-header">
+      <h2>🥛 Pumping</h2>
+      <p>${todayLogs.length} session${todayLogs.length!==1?'s':''} today · ${todayMl}ml pumped</p>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:12px">
+      <div class="stat-card" style="background:linear-gradient(135deg,#2D8F8F,#1F7373);color:#fff">
+        <div style="font-size:24px;font-weight:800">${todayMl}<span style="font-size:14px">ml</span></div>
+        <div style="font-size:12px;opacity:.9">Pumped today</div>
+      </div>
+      <div class="stat-card" style="background:linear-gradient(135deg,#534AB7,#3F3896);color:#fff">
+        <div style="font-size:24px;font-weight:800">${stash}<span style="font-size:14px">ml</span></div>
+        <div style="font-size:12px;opacity:.9">In stash</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Log pumping</div>
+      ${isMultiples() ? renderBabySelector(0,'setPumpBaby')+'<input type="hidden" id="pump-baby" value="0">' : ''}
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="flex:1;min-width:0"><label class="ff-lbl">Date</label><input type="date" id="pump-date" value="${today_}"></div>
+        <div style="flex:1;min-width:0"><label class="ff-lbl">Time</label><input type="time" id="pump-time" value="${new Date().toTimeString().slice(0,5)}"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="flex:1;min-width:0"><label class="ff-lbl">Left (ml)</label><input type="number" id="pump-left" inputmode="numeric" placeholder="0"></div>
+        <div style="flex:1;min-width:0"><label class="ff-lbl">Right (ml)</label><input type="number" id="pump-right" inputmode="numeric" placeholder="0"></div>
+      </div>
+      <div class="form-field"><label class="ff-lbl">Notes <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="pump-notes" placeholder="e.g. after morning feed"></div>
+      <button class="btn btn-teal btn-block" onclick="addPump()">Save & add to stash</button>
+      <div style="font-size:11px;color:var(--ink-3);margin-top:6px;text-align:center">Total pumped is added to your stash</div>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <div onclick="togglePumpHist()" role="button" tabindex="0" aria-expanded="${window._pumpHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePumpHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
+        <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${logs.length})</span></div>
+        <span style="color:#aaa;font-size:13px">${window._pumpHistOpen?'▾':'▸'}</span>
+      </div>
+      <div style="display:${window._pumpHistOpen?'block':'none'}">${renderPumpHistory()}</div>
+    </div>
+  `;
+  }
+
+  function renderPumpHistory() {
+    const logs = state.pumpLog || [];
+    if (!logs.length) return '<div class="empty-state" style="padding:0 14px 18px">No pumping logged yet</div>';
+    let rows = '';
+    logs.map((l,idx)=>({l,idx})).reverse().slice(0,100).forEach(({l,idx})=>{
+      const dateShort = (l.date||'').slice(5).replace('-','/');
+      const breakdown = [(l.leftMl?'L '+l.leftMl:''),(l.rightMl?'R '+l.rightMl:'')].filter(Boolean).join(' · ');
+      rows += '<div class="loghist-row">' +
+        '<span class="lh-date">'+dateShort+'</span>' +
+        '<span class="lh-time">'+(l.time||'—')+'</span>' +
+        '<span class="lh-dur" style="color:#2D8F8F">'+(l.totalMl||0)+'ml</span>' +
+        '<span class="lh-main">'+(breakdown||'—')+'</span>' +
+        '<button class="lh-del" onclick="delPump('+idx+')" aria-label="Delete pumping entry">×</button>' +
+      '</div>';
+    });
+    return '<div class="loghist-head"><span class="lh-date">Date</span><span class="lh-time">Time</span><span class="lh-dur">Total</span><span class="lh-main">Breakdown</span><span class="lh-delh"></span></div><div class="loghist-scroll">'+rows+'</div>';
+  }
+
+  window.setPumpBaby = (i) => { const el2=document.getElementById('pump-baby'); if(el2) el2.value=i; renderBabySelectorUpdate&&renderBabySelectorUpdate('setPumpBaby',i); };
+  window.togglePumpHist = () => { window._pumpHistOpen = !window._pumpHistOpen; render(); };
+  window.addPump = () => {
+    const left = parseInt(document.getElementById('pump-left')?.value)||0;
+    const right = parseInt(document.getElementById('pump-right')?.value)||0;
+    const total = left + right;
+    if (total <= 0) { toast('Enter an amount'); return; }
+    if (!state.pumpLog) state.pumpLog = [];
+    state.pumpLog.push({
+      date: document.getElementById('pump-date')?.value||today(),
+      time: document.getElementById('pump-time')?.value||'',
+      leftMl: left, rightMl: right, totalMl: total,
+      notes: document.getElementById('pump-notes')?.value||'',
+      babyIdx: parseInt(document.getElementById('pump-baby')?.value||'0'),
+    });
+    state.pumpedStash = (state.pumpedStash||0) + total;
+    saveState('pumpLog'); saveState('pumpedStash'); render();
+    toast('Pumped '+total+'ml added to stash 🥛');
+  };
+  window.delPump = (i) => { if(!confirm('Delete this pumping entry?')) return;
+    const e = state.pumpLog[i];
+    if (e && e.totalMl) state.pumpedStash = Math.max(0,(state.pumpedStash||0) - e.totalMl);
+    state.pumpLog.splice(i,1); saveState('pumpLog'); saveState('pumpedStash'); render(); toast('Deleted'); };
+
+  render();
+};
+
+PAGES['meds'] = function(el) {
+  if (!state.medsLog) state.medsLog = [];
+
+  function render() {
+  const logs = state.medsLog || [];
+  const today_ = today();
+  const todayLogs = logs.filter(l => l.date === today_);
+  const recentNames = [...new Set(logs.slice().reverse().map(l=>l.name).filter(Boolean))].slice(0,4);
+
+  el.innerHTML = `
+    <div class="page-header">
+      <h2>💊 Medications</h2>
+      <p>${todayLogs.length} dose${todayLogs.length!==1?'s':''} given today</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Log a dose</div>
+      ${isMultiples() ? renderBabySelector(0,'setMedsBaby')+'<input type="hidden" id="meds-baby" value="0">' : ''}
+      <div class="form-field"><label class="ff-lbl">Medication</label><input type="text" id="meds-name" placeholder="e.g. Vitamin D, Paracetamol" list="meds-suggestions"><datalist id="meds-suggestions">${recentNames.map(n=>'<option value="'+n.replace(/"/g,'&quot;')+'">').join('')}</datalist></div>
+      ${recentNames.length ? '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'+recentNames.map(n=>'<button class="btn btn-outline btn-sm" onclick="document.getElementById(\'meds-name\').value='+JSON.stringify(n)+'">'+n+'</button>').join('')+'</div>' : ''}
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="flex:1;min-width:0"><label class="ff-lbl">Date</label><input type="date" id="meds-date" value="${today_}"></div>
+        <div style="flex:1;min-width:0"><label class="ff-lbl">Time</label><input type="time" id="meds-time" value="${new Date().toTimeString().slice(0,5)}"></div>
+      </div>
+      <div class="form-field"><label class="ff-lbl">Dose <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="meds-dose" placeholder="e.g. 5ml, 1 drop, 2.5mg"></div>
+      <div class="form-field"><label class="ff-lbl">Notes <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="meds-notes" placeholder="e.g. for fever"></div>
+      <button class="btn btn-teal btn-block" onclick="addMeds()">Save dose</button>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <div onclick="toggleMedsHist()" role="button" tabindex="0" aria-expanded="${window._medsHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMedsHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
+        <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${logs.length})</span></div>
+        <span style="color:#aaa;font-size:13px">${window._medsHistOpen?'▾':'▸'}</span>
+      </div>
+      <div style="display:${window._medsHistOpen?'block':'none'}">${renderMedsHistory()}</div>
+    </div>
+  `;
+  }
+
+  function renderMedsHistory() {
+    const logs = state.medsLog || [];
+    if (!logs.length) return '<div class="empty-state" style="padding:0 14px 18px">No medications logged yet</div>';
+    let rows = '';
+    logs.map((l,idx)=>({l,idx})).reverse().slice(0,100).forEach(({l,idx})=>{
+      const dateShort = (l.date||'').slice(5).replace('-','/');
+      const nameDose = l.name + (l.dose?' · '+l.dose:'');
+      rows += '<div class="loghist-row">' +
+        '<span class="lh-date">'+dateShort+'</span>' +
+        '<span class="lh-time">'+(l.time||'—')+'</span>' +
+        '<span class="lh-main">💊 '+nameDose+'</span>' +
+        '<button class="lh-del" onclick="delMeds('+idx+')" aria-label="Delete medication entry">×</button>' +
+      '</div>';
+    });
+    return '<div class="loghist-head"><span class="lh-date">Date</span><span class="lh-time">Time</span><span class="lh-main">Medication</span><span class="lh-delh"></span></div><div class="loghist-scroll">'+rows+'</div>';
+  }
+
+  window.setMedsBaby = (i) => { const el2=document.getElementById('meds-baby'); if(el2) el2.value=i; };
+  window.toggleMedsHist = () => { window._medsHistOpen = !window._medsHistOpen; render(); };
+  window.addMeds = () => {
+    const name = (document.getElementById('meds-name')?.value||'').trim();
+    if (!name) { toast('Enter a medication name'); return; }
+    if (!state.medsLog) state.medsLog = [];
+    state.medsLog.push({
+      date: document.getElementById('meds-date')?.value||today(),
+      time: document.getElementById('meds-time')?.value||'',
+      name, dose: document.getElementById('meds-dose')?.value||'',
+      notes: document.getElementById('meds-notes')?.value||'',
+      babyIdx: parseInt(document.getElementById('meds-baby')?.value||'0'),
+    });
+    saveState('medsLog'); render(); toast('Dose logged 💊');
+  };
+  window.delMeds = (i) => { if(!confirm('Delete this medication entry?')) return; state.medsLog.splice(i,1); saveState('medsLog'); render(); toast('Deleted'); };
 
   render();
 };
@@ -6066,9 +6505,15 @@ PAGES['milestones'] = function(el) {
   window.setMilFilter = (f) => { filterAchieved = f; render(); };
   window.toggleMilestone = (i) => {
     if (!state.milestones[i]) state.milestones[i] = {};
-    state.milestones[i].achieved = !state.milestones[i].achieved;
-    if (state.milestones[i].achieved && !state.milestones[i].date) state.milestones[i].date = today();
+    const nowAchieved = !state.milestones[i].achieved;
+    state.milestones[i].achieved = nowAchieved;
+    if (nowAchieved && !state.milestones[i].date) state.milestones[i].date = today();
     saveState(); render();
+    if (nowAchieved) {
+      const m = MILESTONES[i];
+      const nm = m ? (Array.isArray(m) ? m[2] : (m.text||m.name||'A milestone')) : 'A milestone';
+      celebrate({ emoji:'⭐', title:'Milestone unlocked!', sub:'“'+nm+'” — logged for '+(babyName()||'Baby')+' 💛', cta:'Celebrate 🎉' });
+    }
   };
   window.toggleConcern = (i) => {
     if (!state.milestones[i]) state.milestones[i] = {};
@@ -6835,10 +7280,37 @@ function injectLandingCodeStep() {
 // ══════════════════════════════════════════════════════════════════════════════
 // APP INIT
 // ══════════════════════════════════════════════════════════════════════════════
+// Restore any running timers after an app close/reopen (persisted in localStorage)
+function restoreTimers() {
+  try {
+    const ft = localStorage.getItem('babyos_feed_timer');
+    if (ft) {
+      const t = JSON.parse(ft);
+      if (t && t.running && t.start) {
+        window._feedTimer = t;
+        if (window._feedTimerInterval) clearInterval(window._feedTimerInterval);
+        window._feedTimerInterval = setInterval(() => { if(window.renderFeedTimer) window.renderFeedTimer(); }, 1000);
+      }
+    }
+  } catch(e){}
+  try {
+    const st = localStorage.getItem('babyos_sleep_timer');
+    if (st) {
+      const t = JSON.parse(st);
+      if (t && t.running && t.start) {
+        window._sleepTimer = t;
+        if (window._sleepTimerInterval) clearInterval(window._sleepTimerInterval);
+        window._sleepTimerInterval = setInterval(() => { if(window.renderSleepTimer) window.renderSleepTimer(); }, 1000);
+      }
+    }
+  } catch(e){}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadLocal();
   applyTheme();
   applyNightModeOnLoad();
+  restoreTimers();
   checkBackupReminder();
   injectLandingCodeStep();
 
