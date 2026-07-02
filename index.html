@@ -113,6 +113,9 @@ body.night-mode .top-bar{background:#1e1e2a !important;}
 body.night-mode .top-bar-title{color:#e8c97a !important;}
 body.night-mode .bottom-nav{background:#1e1e2a !important;border-top:0.5px solid rgba(255,255,255,.09);}
 body.night-mode .bottom-nav-item.active{color:#e8c97a !important;}
+body.night-mode .bnav-item{color:#8a8470 !important;}
+body.night-mode .bnav-item.active{color:#e8c97a !important;}
+body.night-mode .bnav-icon svg{stroke:currentColor !important;}
 body.night-mode .stat-card{filter:brightness(.85) saturate(.92);}
 body.night-mode input,body.night-mode select,body.night-mode textarea{background-color:#262634 !important;color:#e8e4d8 !important;border-color:rgba(255,255,255,.15) !important;}
 body.night-mode .drawer{background:#181820 !important;}
@@ -717,40 +720,41 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
     <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
   </div>
   <div class="drawer-section">Overview</div>
-  <button class="nav-item" onclick="navTo('now')"><span class="icon">🌟</span> Now</button>
+  <button class="nav-item" onclick="navTo('now')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></span> Now</button>
+  <button class="nav-item" onclick="navTo('rhythm')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 14l3-4 3 3 4-6"/></svg></span> Rhythm</button>
   <button class="nav-item active" onclick="navTo('dashboard')"><span class="icon">🏠</span> Dashboard</button>
   <div id="phase-suggest"></div>
   <div id="drawer-prebirth">
   <div class="drawer-section">Pre-Birth</div>
-  <button class="nav-item" onclick="navTo('hospital-bag')"><span class="icon">🎒</span> Hospital Bag</button>
-  <button class="nav-item" onclick="navTo('csection')"><span class="icon">🏥</span> C-Section Prep</button>
-  <button class="nav-item" onclick="navTo('preg-tasks')"><span class="icon">✅</span> Pregnancy Tasks</button>
-  <button class="nav-item" onclick="navTo('inventory')"><span class="icon">📦</span> Newborn Inventory</button>
+  <button class="nav-item" onclick="navTo('hospital-bag')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span> Hospital Bag</button>
+  <button class="nav-item" onclick="navTo('csection')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z"/><path d="M12 7V3M9 5h6"/></svg></span> C-Section Prep</button>
+  <button class="nav-item" onclick="navTo('preg-tasks')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13M4 12h13M4 19h13"/><path d="M20 5l-1.5 1.5L17.5 5M20 12l-1.5 1.5L17.5 12M20 19l-1.5 1.5L17.5 19"/></svg></span> Pregnancy Tasks</button>
+  <button class="nav-item" onclick="navTo('inventory')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5Z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span> Newborn Inventory</button>
   </div>
   <div class="drawer-section">Post-Birth</div>
-  <button class="nav-item" onclick="navTo('first100')"><span class="icon">📅</span> First 100 Days</button>
-  <button class="nav-item" onclick="navTo('foods')"><span class="icon">🥣</span> 100 Foods</button>
-  <button class="nav-item" onclick="navTo('feeding')"><span class="icon">🍼</span> Feeding Log</button>
-  <button class="nav-item" onclick="navTo('sleep')"><span class="icon">😴</span> Sleep Log</button>
-  <button class="nav-item" onclick="navTo('diaper')"><span class="icon">💧</span> Diaper Log</button>
-  <button class="nav-item" onclick="navTo('reading')"><span class="icon">📚</span> Reading Log</button>
-  <button class="nav-item" onclick="navTo('weight')"><span class="icon">⚖️</span> Weight Log</button>
-  <button class="nav-item" onclick="navTo('pump')"><span class="icon">🥛</span> Pumping</button>
-  <button class="nav-item" onclick="navTo('meds')"><span class="icon">💊</span> Medications</button>
+  <button class="nav-item" onclick="navTo('first100')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/></svg></span> First 100 Days</button>
+  <button class="nav-item" onclick="navTo('foods')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16c0 5-3.6 9-8 9s-8-4-8-9Z"/><path d="M12 8c0-2.5 1.5-4 4-5"/></svg></span> 100 Foods</button>
+  <button class="nav-item" onclick="navTo('feeding')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6"/><path d="M10 2v3h4V2"/><path d="M8.5 8.5C8.5 6.6 10 5 12 5s3.5 1.6 3.5 3.5V19a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 8.5 19Z"/><path d="M8.5 12h7M8.5 16h7"/></svg></span> Feeding Log</button>
+  <button class="nav-item" onclick="navTo('sleep')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/></svg></span> Sleep Log</button>
+  <button class="nav-item" onclick="navTo('diaper')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21c-3.6 0-6.5-2.9-6.5-6.4 0-4 4.2-8.4 6-10.1a.7.7 0 0 1 1 0c1.8 1.7 6 6.1 6 10.1 0 3.5-2.9 6.4-6.5 6.4Z"/></svg></span> Diaper Log</button>
+  <button class="nav-item" onclick="navTo('reading')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5 8.5 4 5.5 4c-1 0-2 .1-2.5.3V19c.5-.2 1.5-.3 2.5-.3 3 0 5 1 6.5 2.5 1.5-1.5 3.5-2.5 6.5-2.5 1 0 2 .1 2.5.3V4.3C20.5 4.1 19.5 4 18.5 4c-3 0-5 1-6.5 2.5Z"/><path d="M12 6.5v14.7"/></svg></span> Reading Log</button>
+  <button class="nav-item" onclick="navTo('weight')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5.5-5.5 4 4L21 7"/><path d="M15.5 7H21v5.5"/></svg></span> Weight Log</button>
+  <button class="nav-item" onclick="navTo('pump')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8"/><path d="M12 3v4"/><circle cx="12" cy="13" r="6"/><path d="M12 10.5V13l1.8 1.8"/></svg></span> Pumping</button>
+  <button class="nav-item" onclick="navTo('meds')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="9" width="17" height="8" rx="4" transform="rotate(-35 12 13)"/><path d="M8.6 16.2l6.8-4.8"/></svg></span> Medications</button>
   <div class="drawer-section">Development</div>
-  <button class="nav-item" onclick="navTo('milestones')"><span class="icon">⭐</span> Milestones</button>
-  <button class="nav-item" onclick="navTo('vaccines')"><span class="icon">💉</span> Vaccines</button>
-  <button class="nav-item" onclick="navTo('language')"><span class="icon">💬</span> Language</button>
-  <button class="nav-item" onclick="navTo('signs')"><span class="icon">🤟</span> Baby Signs</button>
-  <button class="nav-item" onclick="navTo('bilingual')"><span class="icon">🌏</span> Bilingual</button>
+  <button class="nav-item" onclick="navTo('milestones')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.6 5.3 5.9.9-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 8.7l5.9-.9Z"/></svg></span> Milestones</button>
+  <button class="nav-item" onclick="navTo('vaccines')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4l6 6M17 7l-9 9-4 1 1-4 9-9Z"/><path d="M12 9l3 3"/></svg></span> Vaccines</button>
+  <button class="nav-item" onclick="navTo('language')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M9 4v2M11 6c0 4-3 8-7 9M7 9c1 2 3 3.5 5 4"/><path d="M13 20l4-9 4 9M14.5 17h5"/></svg></span> Language</button>
+  <button class="nav-item" onclick="navTo('signs')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11M10 10V5.5a1.5 1.5 0 0 1 3 0V11M13 10.5V7a1.5 1.5 0 0 1 3 0v6a6 6 0 0 1-6 6h-1a5 5 0 0 1-5-5v-1"/></svg></span> Baby Signs</button>
+  <button class="nav-item" onclick="navTo('bilingual')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span> Bilingual</button>
   <div class="drawer-section">Parenting</div>
-  <button class="nav-item" onclick="navTo('philosophy')"><span class="icon">📖</span> Philosophy</button>
-  <button class="nav-item" onclick="navTo('situations')"><span class="icon">🧩</span> Situations</button>
-  <button class="nav-item" onclick="navTo('montessori')"><span class="icon">🔵</span> Montessori</button>
-  <button class="nav-item" onclick="navTo('rie')"><span class="icon">💚</span> RIE Guide</button>
+  <button class="nav-item" onclick="navTo('philosophy')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h7v15H4ZM20 5h-7v15h7Z"/></svg></span> Philosophy</button>
+  <button class="nav-item" onclick="navTo('situations')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 10h8M8 14h5"/><path d="M4 5h16v11H8l-4 4Z"/></svg></span> Situations</button>
+  <button class="nav-item" onclick="navTo('montessori')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span> Montessori</button>
+  <button class="nav-item" onclick="navTo('rie')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.5A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7-.5C19 15.6 12 20 12 20Z"/></svg></span> RIE Guide</button>
   <div class="drawer-section">Reference</div>
-  <button class="nav-item" onclick="navTo('budget')"><span class="icon">💰</span> Budget</button>
-  <button class="nav-item" onclick="navTo('knowledge')"><span class="icon">📋</span> Knowledge Base</button>
+  <button class="nav-item" onclick="navTo('budget')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10c0-1 1-1.7 2.5-1.7s2.5.7 2.5 1.7-1 1.5-2.5 1.5-2.5.5-2.5 1.5 1 1.7 2.5 1.7 2.5-.7 2.5-1.7"/></svg></span> Budget</button>
+  <button class="nav-item" onclick="navTo('knowledge')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span> Knowledge Base</button>
   <div class="drawer-section" style="border-top:1px solid rgba(0,0,0,.06);margin-top:8px;padding-top:12px">Settings</div>
   <button class="nav-item" onclick="toggleNightMode()"><span class="icon">🌙</span> <span id="night-mode-label">Night mode</span></button>
   <button class="nav-item" onclick="openNavCustomizer()"><span class="icon">📱</span> Customise tabs</button>
@@ -761,7 +765,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon">📊</span> Export to Google Sheets</button>
   <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon">💾</span> Back up all data</button>
   <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon">♻️</span> Restore from backup</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 02 Jul 2026, 08:42</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 02 Jul 2026, 09:14</div>
   <div style="height:20px"></div>
 </div>
 
@@ -1820,6 +1824,7 @@ const ALL_PAGES = [
   {id:'first100',icon:'📅',label:'100 Days',group:'Post-Birth'},
   {id:'foods',icon:'🥣',label:'100 Foods',group:'Post-Birth'},
   {id:'now',icon:'🌟',label:'Now',group:'Home'},
+  {id:'rhythm',icon:'📊',label:'Rhythm',group:'Home'},
   {id:'feeding',icon:'🍼',label:'Feeding',group:'Logs'},
   {id:'sleep',icon:'😴',label:'Sleep',group:'Logs'},
   {id:'diaper',icon:'💧',label:'Diaper',group:'Logs'},
@@ -1856,6 +1861,22 @@ const SVG_ICONS = {
   reading: '<path d="M12 6.5C10.5 5 8.5 4 5.5 4c-1 0-2 .1-2.5.3V19c.5-.2 1.5-.3 2.5-.3 3 0 5 1 6.5 2.5 1.5-1.5 3.5-2.5 6.5-2.5 1 0 2 .1 2.5.3V4.3C20.5 4.1 19.5 4 18.5 4c-3 0-5 1-6.5 2.5Z"/><path d="M12 6.5v14.7"/>',
   foods: '<path d="M4 11h16c0 5-3.6 9-8 9s-8-4-8-9Z"/><path d="M12 8c0-2.5 1.5-4 4-5"/>',
   more: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  'hospital-bag': '<path d="M6 8h12l-1 12H7Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  csection: '<path d="M12 21a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z"/><path d="M12 7V3M9 5h6"/>',
+  'preg-tasks': '<path d="M4 5h13M4 12h13M4 19h13"/><path d="M20 5l-1.5 1.5L17.5 5M20 12l-1.5 1.5L17.5 12M20 19l-1.5 1.5L17.5 19"/>',
+  inventory: '<path d="M3 8l9-5 9 5v8l-9 5-9-5Z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+  first100: '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/>',
+  vaccines: '<path d="M14 4l6 6M17 7l-9 9-4 1 1-4 9-9Z"/><path d="M12 9l3 3"/>',
+  language: '<path d="M4 6h10M9 4v2M11 6c0 4-3 8-7 9M7 9c1 2 3 3.5 5 4"/><path d="M13 20l4-9 4 9M14.5 17h5"/>',
+  signs: '<path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11M10 10V5.5a1.5 1.5 0 0 1 3 0V11M13 10.5V7a1.5 1.5 0 0 1 3 0v6a6 6 0 0 1-6 6h-1a5 5 0 0 1-5-5v-1"/>',
+  bilingual: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+  philosophy: '<path d="M4 5h7v15H4ZM20 5h-7v15h7Z"/>',
+  situations: '<path d="M8 10h8M8 14h5"/><path d="M4 5h16v11H8l-4 4Z"/>',
+  montessori: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+  rie: '<path d="M12 20s-7-4.4-7-9.5A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7-.5C19 15.6 12 20 12 20Z"/>',
+  budget: '<circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10c0-1 1-1.7 2.5-1.7s2.5.7 2.5 1.7-1 1.5-2.5 1.5-2.5.5-2.5 1.5 1 1.7 2.5 1.7 2.5-.7 2.5-1.7"/>',
+  knowledge: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+  keyDates: '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4M9 14l2 2 4-4"/>',
 };
 function svgIcon(id, size) {
   const paths = SVG_ICONS[id];
@@ -5711,6 +5732,91 @@ PAGES['meds'] = function(el) {
   window.delMeds = (i) => { if(!confirm('Delete this medication entry?')) return; state.medsLog.splice(i,1); saveState('medsLog'); render(); toast('Deleted'); };
 
   render();
+};
+
+PAGES['rhythm'] = function(el) {
+  if (!state.babyDOB) {
+    el.innerHTML = '<div class="page-header"><h2>Rhythm</h2><p>Available once your baby arrives</p></div><div class="card"><div class="empty-state">Your daily rhythm will appear here once you start logging.</div></div>';
+    return;
+  }
+
+  // How many days to show
+  window._rhythmDays = window._rhythmDays || 3;
+
+  function dayEvents(dateStr) {
+    const ev = [];
+    (state.feedingLog||[]).filter(l=>l.date===dateStr).forEach(l=>{
+      const m = timeToMin(l.time); if(m!=null) ev.push({type:'feed', start:m, end:timeToMin(l.endTime)});
+    });
+    (state.sleepLog||[]).filter(l=>l.date===dateStr).forEach(l=>{
+      const s=timeToMin(l.start), e=timeToMin(l.end); if(s!=null) ev.push({type:'sleep', start:s, end:(e!=null?e:s+30)});
+    });
+    (state.diaperLog||[]).filter(l=>l.date===dateStr).forEach(l=>{
+      const m = timeToMin(l.time); if(m!=null) ev.push({type:'diaper', start:m, end:null});
+    });
+    return ev;
+  }
+  function timeToMin(t) { if(!t||t.length<4) return null; const [h,m]=t.split(':').map(Number); if(isNaN(h))return null; return h*60+(m||0); }
+
+  const days = [];
+  for (let i=0;i<window._rhythmDays;i++){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    days.push({ ds, label: i===0?'Today':(i===1?'Yesterday':d.toLocaleDateString('en',{weekday:'short', day:'numeric'})), events: dayEvents(ds) });
+  }
+
+  // SVG timeline: 24h wide. Colors from tokens.
+  const COL = { feed:'#2D8F8F', sleep:'#534AB7', diaper:'#185FA5' };
+  function renderDayRow(day) {
+    const W=1000, H=44, padL=0;
+    let bars = '';
+    // hour gridlines
+    for (let h=0;h<=24;h+=6){ const x=(h/24)*W; bars += '<line x1="'+x+'" y1="0" x2="'+x+'" y2="'+H+'" stroke="#eee" stroke-width="1"/>'; }
+    day.events.forEach(e=>{
+      const x = (e.start/1440)*W;
+      if (e.type==='sleep' && e.end!=null) {
+        let w = ((e.end - e.start)/1440)*W; if(w<0) w += W; if(w<3) w=3;
+        bars += '<rect x="'+x.toFixed(1)+'" y="8" width="'+w.toFixed(1)+'" height="'+(H-16)+'" rx="4" fill="'+COL.sleep+'" opacity="0.75"/>';
+      } else if (e.type==='feed') {
+        bars += '<circle cx="'+x.toFixed(1)+'" cy="'+(H/2)+'" r="6" fill="'+COL.feed+'"/>';
+      } else if (e.type==='diaper') {
+        bars += '<circle cx="'+x.toFixed(1)+'" cy="'+(H-8)+'" r="4" fill="'+COL.diaper+'"/>';
+      }
+    });
+    return '<div style="margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3);margin-bottom:3px"><span style="font-weight:600;color:var(--ink)">'+day.label+'</span><span>'+day.events.filter(e=>e.type==='feed').length+' feeds · '+day.events.filter(e=>e.type==='sleep').length+' sleeps</span></div>' +
+      '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="width:100%;height:44px;background:var(--off,#F8F9FA);border-radius:8px">'+bars+'</svg>' +
+    '</div>';
+  }
+
+  const hourLabels = ['12a','6a','12p','6p','12a'];
+  el.innerHTML = `
+    <div class="page-header">
+      <h2>Daily Rhythm</h2>
+      <p>See ${babyName()||'baby'}'s patterns at a glance</p>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        ${[3,5,7].map(n=>`<button class="btn btn-sm ${window._rhythmDays===n?'btn-teal':'btn-outline'}" onclick="setRhythmDays(${n})" style="flex:1">${n} days</button>`).join('')}
+      </div>
+      ${days.map(renderDayRow).join('')}
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:2px;padding:0 2px">
+        ${hourLabels.map(h=>`<span>${h}</span>`).join('')}
+      </div>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:16px;font-size:12px;color:var(--ink-2)">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:${COL.feed};display:inline-block"></span>Feed</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:9px;border-radius:3px;background:${COL.sleep};opacity:.75;display:inline-block"></span>Sleep</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${COL.diaper};display:inline-block"></span>Diaper</span>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--status-info-bg);border:none">
+      <div style="font-size:13px;color:var(--ink-2);line-height:1.5">💡 Look for patterns: clustered feeds in the evening are normal (cluster feeding), and longer sleep stretches usually lengthen over time.</div>
+    </div>
+  `;
+
+  window.setRhythmDays = (n) => { window._rhythmDays = n; const e=document.getElementById('page-rhythm'); if(e) PAGES.rhythm(e); };
 };
 
 PAGES['vaccines'] = function(el) {
