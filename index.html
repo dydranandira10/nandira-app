@@ -81,6 +81,18 @@ const FB_URL = 'https://nandira-app-default-rtdb.firebaseio.com';
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
+.now-streak{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:600;color:var(--status-good);background:var(--status-good-bg);padding:5px 12px;border-radius:999px;}
+body.night-mode .now-streak{background:rgba(95,212,212,.12);color:#7fd4c4;}
+/* ══ NIGHT-CONTEXT HOME (2am cognitive-load reduction) ══ */
+.now-page.night-context .now-tile-wrap,
+.now-page.night-context .now-today,
+.now-page.night-context .now-dash-btn{opacity:.42;transition:opacity .3s;}
+.now-page.night-context .now-tile-wrap:hover,
+.now-page.night-context .now-tile-wrap:focus-within,
+.now-page.night-context .now-today:hover{opacity:1;}
+/* Feeding hero stays fully prominent + gets a gentle glow at night */
+.now-page.night-context .now-hero{box-shadow:0 8px 32px -6px rgba(45,143,143,.55);}
+.now-page.night-context .now-greet-text{opacity:.8;}
 /* ══ CELEBRATION MOMENT ══ */
 .celebrate-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(20,20,30,.55);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s;}
 .celebrate-overlay.show{opacity:1;pointer-events:auto;}
@@ -270,7 +282,7 @@ body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a
 .drawer-header{padding:18px 16px 14px;background:var(--theme-topbar);border-bottom:1px solid rgba(0,0,0,.06);transition:background .4s ease;}
 .drawer-header h1{font-size:16px;font-weight:700;color:var(--theme-text);}
 .drawer-header p{font-size:11px;color:var(--theme-text-dim);margin-top:3px;}
-.drawer-close{background:none;border:none;color:var(--theme-text);font-size:20px;cursor:pointer;}
+.drawer-close{background:none;border:none;color:var(--theme-text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .drawer-section{padding:12px 16px 4px;font-size:11px;font-weight:700;color:var(--theme-nav-dim);text-transform:uppercase;letter-spacing:.07em;}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;margin:2px 8px;border-radius:10px;cursor:pointer;color:var(--theme-nav-text);font-size:13px;font-weight:500;border:none;background:transparent;font-family:var(--font);width:calc(100% - 16px);text-align:left;transition:background .12s,color .12s;}
 .nav-item:hover,.nav-item:active{background:rgba(0,0,0,.05);color:var(--theme-nav-text);}
@@ -340,6 +352,10 @@ body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a
 .now-hero-unit{font-size:16px;color:rgba(255,255,255,.7);font-weight:500;}
 .now-hero-empty{font-size:24px;font-weight:700;color:#fff;}
 .now-hero-meta{font-size:13px;color:rgba(255,255,255,.78);margin-top:6px;position:relative;}
+.now-hero-times{display:flex;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.18);}
+.nht-item{font-size:14px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;}
+.nht-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px;margin-right:3px;}
+.nht-sep{width:1px;height:16px;background:rgba(255,255,255,.25);}
 .now-hero-cta{margin-top:16px;background:rgba(255,255,255,.18);backdrop-filter:blur(4px);border-radius:12px;padding:12px;text-align:center;font-size:15px;font-weight:700;color:#fff;position:relative;}
 
 .now-tiles{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
@@ -402,6 +418,15 @@ body.night-mode .nts-val{color:#5fd4d4 !important;}
 .feed-type-btn:active{transform:scale(.97);}
 .feed-type-btn.active{border-color:var(--teal);background:#E6F5F5;color:var(--teal);box-shadow:0 0 0 1px var(--teal);}
 body.night-mode .feed-type-btn{background:#262634 !important;border-color:rgba(255,255,255,.15) !important;color:#c4bca8 !important;}
+/* ── Night-mode contrast fixes for pill/tab controls (readability) ── */
+body.night-mode .timer-btn-left{background:#173d38 !important;color:#7fd4c4 !important;border-color:#2D8F8F !important;}
+body.night-mode .timer-btn-right{background:#3d1a28 !important;color:#f0a0bd !important;border-color:#D4537E !important;}
+body.night-mode .tab-btn{background:#262634 !important;color:#c4bca8 !important;border-color:rgba(255,255,255,.15) !important;}
+body.night-mode .tab-btn.active{background:#3a5a8c !important;color:#fff !important;border-color:#3a5a8c !important;}
+body.night-mode .chart-tab{background:#262634 !important;color:#c4bca8 !important;border-color:rgba(255,255,255,.15) !important;}
+body.night-mode .chart-tab.active{background:#2D8F8F !important;color:#fff !important;border-color:#2D8F8F !important;}
+body.night-mode .btn-sm{color:#c4bca8;}
+body.night-mode .btn-outline.btn-sm{background:#262634 !important;color:#e8e4d8 !important;border-color:rgba(255,255,255,.18) !important;}
 body.night-mode .feed-type-btn.active{background:#1d4d4d !important;border-color:#3da3a3 !important;color:#7fd4d4 !important;box-shadow:0 0 0 1px #3da3a3 !important;}
 /* ── FEED HISTORY TABLE ── */
 .feed-hist-head{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--lgray);}
@@ -717,12 +742,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
       <h1 id="drawer-title"><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</h1>
       <p id="drawer-sub">Loading...</p>
     </div>
-    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <div class="drawer-section">Overview</div>
   <button class="nav-item" onclick="navTo('now')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></span> Now</button>
-  <button class="nav-item" onclick="navTo('rhythm')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 14l3-4 3 3 4-6"/></svg></span> Rhythm</button>
-  <button class="nav-item active" onclick="navTo('dashboard')"><span class="icon">🏠</span> Dashboard</button>
+  <button class="nav-item" onclick="navTo('rhythm')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 14l3-4 3 3 4-6"/></svg></span> Insights</button>
+  <button class="nav-item active" onclick="navTo('dashboard')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg></span> Dashboard</button>
   <div id="phase-suggest"></div>
   <div id="drawer-prebirth">
   <div class="drawer-section">Pre-Birth</div>
@@ -734,11 +759,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <div class="drawer-section">Post-Birth</div>
   <button class="nav-item" onclick="navTo('first100')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/></svg></span> First 100 Days</button>
   <button class="nav-item" onclick="navTo('foods')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16c0 5-3.6 9-8 9s-8-4-8-9Z"/><path d="M12 8c0-2.5 1.5-4 4-5"/></svg></span> 100 Foods</button>
-  <button class="nav-item" onclick="navTo('feeding')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6"/><path d="M10 2v3h4V2"/><path d="M8.5 8.5C8.5 6.6 10 5 12 5s3.5 1.6 3.5 3.5V19a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 8.5 19Z"/><path d="M8.5 12h7M8.5 16h7"/></svg></span> Feeding Log</button>
-  <button class="nav-item" onclick="navTo('sleep')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/></svg></span> Sleep Log</button>
-  <button class="nav-item" onclick="navTo('diaper')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21c-3.6 0-6.5-2.9-6.5-6.4 0-4 4.2-8.4 6-10.1a.7.7 0 0 1 1 0c1.8 1.7 6 6.1 6 10.1 0 3.5-2.9 6.4-6.5 6.4Z"/></svg></span> Diaper Log</button>
-  <button class="nav-item" onclick="navTo('reading')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5 8.5 4 5.5 4c-1 0-2 .1-2.5.3V19c.5-.2 1.5-.3 2.5-.3 3 0 5 1 6.5 2.5 1.5-1.5 3.5-2.5 6.5-2.5 1 0 2 .1 2.5.3V4.3C20.5 4.1 19.5 4 18.5 4c-3 0-5 1-6.5 2.5Z"/><path d="M12 6.5v14.7"/></svg></span> Reading Log</button>
-  <button class="nav-item" onclick="navTo('weight')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5.5-5.5 4 4L21 7"/><path d="M15.5 7H21v5.5"/></svg></span> Weight Log</button>
+  <button class="nav-item" onclick="navTo('feeding')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6"/><path d="M10 2v3h4V2"/><path d="M8.5 8.5C8.5 6.6 10 5 12 5s3.5 1.6 3.5 3.5V19a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 8.5 19Z"/><path d="M8.5 12h7M8.5 16h7"/></svg></span> Feeding</button>
+  <button class="nav-item" onclick="navTo('sleep')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/></svg></span> Sleep</button>
+  <button class="nav-item" onclick="navTo('diaper')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21c-3.6 0-6.5-2.9-6.5-6.4 0-4 4.2-8.4 6-10.1a.7.7 0 0 1 1 0c1.8 1.7 6 6.1 6 10.1 0 3.5-2.9 6.4-6.5 6.4Z"/></svg></span> Diaper</button>
+  <button class="nav-item" onclick="navTo('reading')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5 8.5 4 5.5 4c-1 0-2 .1-2.5.3V19c.5-.2 1.5-.3 2.5-.3 3 0 5 1 6.5 2.5 1.5-1.5 3.5-2.5 6.5-2.5 1 0 2 .1 2.5.3V4.3C20.5 4.1 19.5 4 18.5 4c-3 0-5 1-6.5 2.5Z"/><path d="M12 6.5v14.7"/></svg></span> Reading</button>
+  <button class="nav-item" onclick="navTo('weight')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5.5-5.5 4 4L21 7"/><path d="M15.5 7H21v5.5"/></svg></span> Weight</button>
   <button class="nav-item" onclick="navTo('pump')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8"/><path d="M12 3v4"/><circle cx="12" cy="13" r="6"/><path d="M12 10.5V13l1.8 1.8"/></svg></span> Pumping</button>
   <button class="nav-item" onclick="navTo('meds')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="9" width="17" height="8" rx="4" transform="rotate(-35 12 13)"/><path d="M8.6 16.2l6.8-4.8"/></svg></span> Medications</button>
   <div class="drawer-section">Development</div>
@@ -756,16 +781,16 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="navTo('budget')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10c0-1 1-1.7 2.5-1.7s2.5.7 2.5 1.7-1 1.5-2.5 1.5-2.5.5-2.5 1.5 1 1.7 2.5 1.7 2.5-.7 2.5-1.7"/></svg></span> Budget</button>
   <button class="nav-item" onclick="navTo('knowledge')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span> Knowledge Base</button>
   <div class="drawer-section" style="border-top:1px solid rgba(0,0,0,.06);margin-top:8px;padding-top:12px">Settings</div>
-  <button class="nav-item" onclick="toggleNightMode()"><span class="icon">🌙</span> <span id="night-mode-label">Night mode</span></button>
-  <button class="nav-item" onclick="openNavCustomizer()"><span class="icon">📱</span> Customise tabs</button>
-  <button class="nav-item" onclick="closeDrawer();openBabySettings()"><span class="icon">👶</span> Baby profile</button>
-  <button class="nav-item" onclick="closeDrawer();showFamilyCode()"><span class="icon">🔗</span> Family sync code</button>
+  <button class="nav-item" onclick="toggleNightMode()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/></svg></span> <span id="night-mode-label">Night mode</span></button>
+  <button class="nav-item" onclick="openNavCustomizer()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></span> Customise tabs</button>
+  <button class="nav-item" onclick="closeDrawer();openBabySettings()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M6 21c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M10 8h.01M14 8h.01"/></svg></span> Baby profile</button>
+  <button class="nav-item" onclick="closeDrawer();showFamilyCode()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></span> Family sync code</button>
 
   <div class="drawer-section">Data &amp; Backup</div>
-  <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon">📊</span> Export to Google Sheets</button>
-  <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon">💾</span> Back up all data</button>
-  <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon">♻️</span> Restore from backup</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 02 Jul 2026, 09:14</div>
+  <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
+  <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span> Back up all data</button>
+  <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><path d="M12 8v4l3 2"/></svg></span> Restore from backup</button>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 02 Jul 2026, 14:31</div>
   <div style="height:20px"></div>
 </div>
 
@@ -784,10 +809,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <div class="drawer-section">Post-Birth</div>
   <button class="nav-item" onclick="showPage('first100')"><span class="icon">📅</span> First 100 Days</button>
   <button class="nav-item" onclick="showPage('foods')"><span class="icon">🥣</span> 100 Foods</button>
-  <button class="nav-item" onclick="showPage('feeding')"><span class="icon">🍼</span> Feeding Log</button>
-  <button class="nav-item" onclick="showPage('sleep')"><span class="icon">😴</span> Sleep Log</button>
-  <button class="nav-item" onclick="showPage('diaper')"><span class="icon">💧</span> Diaper Log</button>
-  <button class="nav-item" onclick="showPage('reading')"><span class="icon">📚</span> Reading Log</button>
+  <button class="nav-item" onclick="showPage('feeding')"><span class="icon">🍼</span> Feeding</button>
+  <button class="nav-item" onclick="showPage('sleep')"><span class="icon">😴</span> Sleep</button>
+  <button class="nav-item" onclick="showPage('diaper')"><span class="icon">💧</span> Diaper</button>
+  <button class="nav-item" onclick="showPage('reading')"><span class="icon">📚</span> Reading</button>
   <div class="drawer-section">Development</div>
   <button class="nav-item" onclick="showPage('milestones')"><span class="icon">⭐</span> Milestones</button>
   <button class="nav-item" onclick="showPage('vaccines')"><span class="icon">💉</span> Vaccines</button>
@@ -962,6 +987,7 @@ let state = {
   feedIntervalHours: null, // user-set feed interval (hours); null = use age-based recommendation
   pumpLog: [],           // [{date, time, leftMl, rightMl, totalMl, notes, babyIdx}]
   medsLog: [],           // [{date, time, name, dose, notes, babyIdx}]
+  stashLog: [],          // [{date, time, ml, reason}] — stash removals not counted as feeds
   weightUnit: 'kg',      // display unit: 'kg' | 'g' | 'lboz'
   // Nav
   navSlots: ['now','feeding','sleep','diaper'],
@@ -982,6 +1008,7 @@ function migrateData() {
   // Ensure new log arrays exist for users created before these features
   if (!Array.isArray(state.pumpLog)) state.pumpLog = [];
   if (!Array.isArray(state.medsLog)) state.medsLog = [];
+  if (!Array.isArray(state.stashLog)) state.stashLog = [];
   // Migrate users still on the original default nav to the daily-actions nav
   if (state.navSlots && state.navSlots.join(',') === 'dashboard,feeding,milestones,foods') {
     state.navSlots = ['now','feeding','sleep','diaper'];
@@ -1804,10 +1831,10 @@ function renderPhaseSuggest() {
   }
   const sugg = getPhaseSuggestions();
   box.innerHTML = `<div class="drawer-section" style="margin-top:6px;display:flex;justify-content:space-between;align-items:center">
-      <span>✨ Suggested now · ${getPhaseLabel()}</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>Suggested now · ${getPhaseLabel()}</span>
       <button onclick="setPhaseSuggestHidden(true)" style="background:none;border:none;color:inherit;opacity:.6;font-size:11px;cursor:pointer;padding:2px 4px">hide</button>
     </div>` +
-    sugg.map(([id,label]) => `<button class="nav-item" onclick="navTo('${id}')" style="opacity:.95"><span class="icon">${label.split(' ')[0]}</span> ${label.split(' ').slice(1).join(' ')}</button>`).join('');
+    sugg.map(([id,label]) => `<button class="nav-item" onclick="navTo('${id}')" style="opacity:.95"><span class="icon">${svgIcon(id,20)||label.split(' ')[0]}</span> ${label.split(' ').slice(1).join(' ')}</button>`).join('');
 }
 function closeDrawer() {
   document.getElementById('drawer').classList.remove('open');
@@ -1824,7 +1851,7 @@ const ALL_PAGES = [
   {id:'first100',icon:'📅',label:'100 Days',group:'Post-Birth'},
   {id:'foods',icon:'🥣',label:'100 Foods',group:'Post-Birth'},
   {id:'now',icon:'🌟',label:'Now',group:'Home'},
-  {id:'rhythm',icon:'📊',label:'Rhythm',group:'Home'},
+  {id:'rhythm',icon:'📊',label:'Insights',group:'Home'},
   {id:'feeding',icon:'🍼',label:'Feeding',group:'Logs'},
   {id:'sleep',icon:'😴',label:'Sleep',group:'Logs'},
   {id:'diaper',icon:'💧',label:'Diaper',group:'Logs'},
@@ -1877,6 +1904,14 @@ const SVG_ICONS = {
   budget: '<circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10c0-1 1-1.7 2.5-1.7s2.5.7 2.5 1.7-1 1.5-2.5 1.5-2.5.5-2.5 1.5 1 1.7 2.5 1.7 2.5-.7 2.5-1.7"/>',
   knowledge: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/>',
   keyDates: '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4M9 14l2 2 4-4"/>',
+  nightmode: '<path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/>',
+  tabs: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/>',
+  baby: '<circle cx="12" cy="8" r="4"/><path d="M6 21c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M10 8h.01M14 8h.01"/>',
+  sync: '<path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>',
+  export: '<path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/><path d="M14 13l2 2 3-3" stroke-width="2"/>',
+  backup: '<path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+  restore: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><path d="M12 8v4l3 2"/>',
+  home2: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>',
 };
 function svgIcon(id, size) {
   const paths = SVG_ICONS[id];
@@ -2867,6 +2902,13 @@ PAGES['now'] = function(el) {
     else if (feed.minsAgo >= dueMins*0.8) { feedHint = 'Due soon'; feedHintColor = '#C9842B'; }
     else { const left = dueMins - feed.minsAgo; feedHint = left>=60 ? 'Next ~'+Math.round(left/60*10)/10+'h' : 'Next ~'+Math.round(left)+'m'; }
   }
+  // Exact timestamps: when the last feed ended, and when the next is due
+  const fmtClock = (d) => { if(!d||isNaN(d)) return '—'; let h=d.getHours(), m=d.getMinutes(); const ap=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12; return h+':'+String(m).padStart(2,'0')+' '+ap; };
+  let lastFeedClock = '', nextFeedClock = '';
+  if (feed && feed.dt) {
+    lastFeedClock = fmtClock(feed.dt);
+    if (freqH) nextFeedClock = fmtClock(new Date(feed.dt.getTime() + freqH*3600000));
+  }
 
   const wLogs = (state.weightLog||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
   const latestW = wLogs[wLogs.length-1];
@@ -2893,12 +2935,17 @@ PAGES['now'] = function(el) {
   const open = window._nowOpen || '';
   const nowTime = new Date().toTimeString().slice(0,5);
 
+  const _hr = new Date().getHours();
+  const isNightContext = (_hr >= 19 || _hr < 6);
+  const nightClass = isNightContext ? ' night-context' : '';
+
   el.innerHTML = `
-    <div class="now-page">
+    <div class="now-page${nightClass}">
 
       <div class="now-greet">
         <div class="now-greet-text">${greetingText()}</div>
-        <div class="now-greet-sub">${babyName()||'Baby'} · ${babyAgeLbl()}</div>
+        <div class="now-greet-sub">${isNightContext ? 'Night mode · the essentials only' : (babyName()||'Baby')+' · '+babyAgeLbl()}</div>
+        ${(() => { if (isNightContext) return ''; const s=streakMessage(loggingStreak()); return s ? '<div class="now-streak">'+s.emoji+' '+s.text+'</div>' : ''; })()}
       </div>
 
       <!-- FEEDING HERO (collapsible quick-log) -->
@@ -2912,6 +2959,10 @@ PAGES['now'] = function(el) {
           ${feed ? `
             <div class="now-hero-main"><span class="now-hero-big">${feed.ago}</span><span class="now-hero-unit">ago</span></div>
             <div class="now-hero-meta">${feed.side||'feed'} · ${sum.feeds} today</div>
+            <div class="now-hero-times">
+              <span class="nht-item"><span class="nht-lbl">Last</span> ${lastFeedClock||'—'}</span>
+              ${nextFeedClock?`<span class="nht-sep"></span><span class="nht-item"><span class="nht-lbl">Next</span> ${nextFeedClock}</span>`:''}
+            </div>
           ` : `
             <div class="now-hero-main"><span class="now-hero-empty">No feeds yet today</span></div>
             <div class="now-hero-meta">Tap to log the first one</div>
@@ -3265,6 +3316,38 @@ function fireConfetti() {
     document.body.appendChild(p);
     setTimeout(()=> p.remove(), 3400);
   }
+}
+
+function loggingStreak() {
+  // Count consecutive days (ending today or yesterday) with at least one logged entry.
+  // Forgiving by design: newborn life is unpredictable, so we don't punish gaps —
+  // we simply recognize consistency when it exists.
+  const logs = [state.feedingLog, state.sleepLog, state.diaperLog, state.pumpLog, state.medsLog, state.readingLog, state.weightLog];
+  const dates = new Set();
+  logs.forEach(arr => (arr||[]).forEach(e => { if (e && e.date) dates.add(e.date); }));
+  if (!dates.size) return 0;
+  const dayMs = 86400000;
+  const startOfDay = (d) => { const x=new Date(d); x.setHours(0,0,0,0); return x.getTime(); };
+  let streak = 0;
+  let cursor = startOfDay(new Date());
+  // Allow the streak to "count" from today OR yesterday (so an unlogged-so-far today doesn't zero it)
+  const todayStr = new Date(cursor).toISOString().slice(0,10);
+  const ydayStr = new Date(cursor - dayMs).toISOString().slice(0,10);
+  if (!dates.has(todayStr) && !dates.has(ydayStr)) return 0;
+  if (!dates.has(todayStr)) cursor -= dayMs; // start counting from yesterday
+  while (true) {
+    const ds = new Date(cursor).toISOString().slice(0,10);
+    if (dates.has(ds)) { streak++; cursor -= dayMs; } else break;
+  }
+  return streak;
+}
+function streakMessage(n) {
+  // Warm, no-pressure acknowledgment. Never guilt, never loss-framing.
+  if (n >= 30) return { emoji:'🌟', text: n+'-day rhythm going strong' };
+  if (n >= 14) return { emoji:'💛', text: n+' days of staying close' };
+  if (n >= 7)  return { emoji:'✨', text: n+'-day logging streak' };
+  if (n >= 3)  return { emoji:'🌱', text: n+' days in a row' };
+  return null; // below 3 days: stay quiet, no pressure
 }
 
 function greetingText() {
@@ -4734,8 +4817,8 @@ PAGES['feeding'] = function(el) {
       '</div>';
     } else {
       box.innerHTML = '<div style="display:flex;gap:8px">' +
-        '<button onclick="startFeedTimer(\'left\')" aria-label="Start timing left breast feed" style="flex:1;background:#E6F5F5;color:#1F7373;border:1.5px solid #2D8F8F;border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Time 💙 Left</button>' +
-        '<button onclick="startFeedTimer(\'right\')" aria-label="Start timing right breast feed" style="flex:1;background:#FBEAF0;color:#993556;border:1.5px solid #D4537E;border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Time 💗 Right</button>' +
+        '<button class="timer-btn timer-btn-left" onclick="startFeedTimer(\'left\')" aria-label="Start timing left breast feed" style="flex:1;background:#E6F5F5;color:#1F7373;border:1.5px solid #2D8F8F;border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Time 💙 Left</button>' +
+        '<button class="timer-btn timer-btn-right" onclick="startFeedTimer(\'right\')" aria-label="Start timing right breast feed" style="flex:1;background:#FBEAF0;color:#993556;border:1.5px solid #D4537E;border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Time 💗 Right</button>' +
       '</div>';
     }
   };
@@ -5603,6 +5686,17 @@ PAGES['pump'] = function(el) {
       <div style="font-size:11px;color:var(--ink-3);margin-top:6px;text-align:center">Total pumped is added to your stash</div>
     </div>
 
+    <div class="card">
+      <div class="card-title">Adjust stash</div>
+      <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px">Remove milk from the stash without logging a feed — for spilled, expired, or discarded milk.</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="flex:1;min-width:0"><label class="ff-lbl">Amount (ml)</label><input type="number" id="stash-adj-ml" inputmode="numeric" placeholder="e.g. 60"></div>
+        <div style="flex:1;min-width:0"><label class="ff-lbl">Reason</label><select id="stash-adj-reason"><option value="Spilled">Spilled</option><option value="Expired">Expired</option><option value="Discarded">Discarded</option><option value="Correction">Correction</option></select></div>
+      </div>
+      <button class="btn btn-outline btn-block" onclick="removeStash()" style="border-color:#C9842B;color:#993C1D">− Remove from stash</button>
+      <div style="font-size:11px;color:var(--ink-3);margin-top:6px;text-align:center">This does not count as a feed</div>
+    </div>
+
     <div class="card" style="padding:0;overflow:hidden">
       <div onclick="togglePumpHist()" role="button" tabindex="0" aria-expanded="${window._pumpHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePumpHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
         <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${logs.length})</span></div>
@@ -5614,25 +5708,55 @@ PAGES['pump'] = function(el) {
   }
 
   function renderPumpHistory() {
-    const logs = state.pumpLog || [];
-    if (!logs.length) return '<div class="empty-state" style="padding:0 14px 18px">No pumping logged yet</div>';
-    let rows = '';
-    logs.map((l,idx)=>({l,idx})).reverse().slice(0,100).forEach(({l,idx})=>{
-      const dateShort = (l.date||'').slice(5).replace('-','/');
-      const breakdown = [(l.leftMl?'L '+l.leftMl:''),(l.rightMl?'R '+l.rightMl:'')].filter(Boolean).join(' · ');
-      rows += '<div class="loghist-row">' +
-        '<span class="lh-date">'+dateShort+'</span>' +
-        '<span class="lh-time">'+(l.time||'—')+'</span>' +
-        '<span class="lh-dur" style="color:#2D8F8F">'+(l.totalMl||0)+'ml</span>' +
-        '<span class="lh-main">'+(breakdown||'—')+'</span>' +
-        '<button class="lh-del" onclick="delPump('+idx+')" aria-label="Delete pumping entry">×</button>' +
-      '</div>';
+    const pumps = (state.pumpLog||[]).map((l,idx)=>({kind:'pump', l, idx}));
+    const removals = (state.stashLog||[]).map((l,idx)=>({kind:'remove', l, idx}));
+    const all = pumps.concat(removals);
+    if (!all.length) return '<div class="empty-state" style="padding:0 14px 18px">No pumping logged yet</div>';
+    // Sort chronologically, newest first
+    all.sort((a,b)=>{
+      const ka=(a.l.date||'')+'T'+(a.l.time||'00:00'), kb=(b.l.date||'')+'T'+(b.l.time||'00:00');
+      return kb.localeCompare(ka);
     });
-    return '<div class="loghist-head"><span class="lh-date">Date</span><span class="lh-time">Time</span><span class="lh-dur">Total</span><span class="lh-main">Breakdown</span><span class="lh-delh"></span></div><div class="loghist-scroll">'+rows+'</div>';
+    let rows = '';
+    all.slice(0,100).forEach(item=>{
+      const l = item.l;
+      const dateShort = (l.date||'').slice(5).replace('-','/');
+      if (item.kind==='pump') {
+        const breakdown = [(l.leftMl?'L '+l.leftMl:''),(l.rightMl?'R '+l.rightMl:'')].filter(Boolean).join(' · ');
+        rows += '<div class="loghist-row">' +
+          '<span class="lh-date">'+dateShort+'</span>' +
+          '<span class="lh-time">'+(l.time||'—')+'</span>' +
+          '<span class="lh-dur" style="color:#2D8F8F">+'+(l.totalMl||0)+'ml</span>' +
+          '<span class="lh-main">'+(breakdown||'Pumped')+'</span>' +
+          '<button class="lh-del" onclick="delPump('+item.idx+')" aria-label="Delete pumping entry">×</button>' +
+        '</div>';
+      } else {
+        rows += '<div class="loghist-row">' +
+          '<span class="lh-date">'+dateShort+'</span>' +
+          '<span class="lh-time">'+(l.time||'—')+'</span>' +
+          '<span class="lh-dur" style="color:#993C1D">−'+(l.ml||0)+'ml</span>' +
+          '<span class="lh-main" style="color:var(--ink-3)">'+(l.reason||'Removed')+' · not a feed</span>' +
+          '<button class="lh-del" onclick="delStashRemoval('+item.idx+')" aria-label="Delete stash adjustment">×</button>' +
+        '</div>';
+      }
+    });
+    return '<div class="loghist-head"><span class="lh-date">Date</span><span class="lh-time">Time</span><span class="lh-dur">Change</span><span class="lh-main">Detail</span><span class="lh-delh"></span></div><div class="loghist-scroll">'+rows+'</div>';
   }
 
   window.setPumpBaby = (i) => { const el2=document.getElementById('pump-baby'); if(el2) el2.value=i; renderBabySelectorUpdate&&renderBabySelectorUpdate('setPumpBaby',i); };
   window.togglePumpHist = () => { window._pumpHistOpen = !window._pumpHistOpen; render(); };
+  window.removeStash = () => {
+    const ml = parseInt(document.getElementById('stash-adj-ml')?.value)||0;
+    if (ml <= 0) { toast('Enter an amount'); return; }
+    const reason = document.getElementById('stash-adj-reason')?.value||'Discarded';
+    const cur = state.pumpedStash||0;
+    if (ml > cur) { toast('Only '+cur+'ml in stash'); return; }
+    state.pumpedStash = cur - ml;
+    if (!state.stashLog) state.stashLog = [];
+    state.stashLog.push({ date: today(), time: new Date().toTimeString().slice(0,5), ml, reason });
+    saveState('pumpedStash'); saveState('stashLog'); render();
+    toast('Removed '+ml+'ml ('+reason.toLowerCase()+') — not a feed');
+  };
   window.addPump = () => {
     const left = parseInt(document.getElementById('pump-left')?.value)||0;
     const right = parseInt(document.getElementById('pump-right')?.value)||0;
@@ -5650,6 +5774,10 @@ PAGES['pump'] = function(el) {
     saveState('pumpLog'); saveState('pumpedStash'); render();
     toast('Pumped '+total+'ml added to stash 🥛');
   };
+  window.delStashRemoval = (i) => { if(!confirm('Delete this stash adjustment?')) return;
+    const e = state.stashLog[i];
+    if (e && e.ml) state.pumpedStash = (state.pumpedStash||0) + e.ml; // restore the removed amount
+    state.stashLog.splice(i,1); saveState('stashLog'); saveState('pumpedStash'); render(); toast('Adjustment removed'); };
   window.delPump = (i) => { if(!confirm('Delete this pumping entry?')) return;
     const e = state.pumpLog[i];
     if (e && e.totalMl) state.pumpedStash = Math.max(0,(state.pumpedStash||0) - e.totalMl);
@@ -5736,88 +5864,165 @@ PAGES['meds'] = function(el) {
 
 PAGES['rhythm'] = function(el) {
   if (!state.babyDOB) {
-    el.innerHTML = '<div class="page-header"><h2>Rhythm</h2><p>Available once your baby arrives</p></div><div class="card"><div class="empty-state">Your daily rhythm will appear here once you start logging.</div></div>';
+    el.innerHTML = '<div class="page-header"><h2>Insights</h2><p>Available once your baby arrives</p></div><div class="card"><div class="empty-state">Insights appear here once you have a few days of logging.</div></div>';
     return;
   }
 
-  // How many days to show
-  window._rhythmDays = window._rhythmDays || 3;
+  // ── Data prep: last 7 days vs prior 7 days ──
+  function toMin(t){ if(!t||t.length<4) return null; const [h,m]=t.split(':').map(Number); return isNaN(h)?null:h*60+(m||0); }
+  function sleepDur(s){ if(!s.start||!s.end) return 0; let d=(toMin(s.end)-toMin(s.start))/60; if(d<0)d+=24; return d; }
+  function dateNDaysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+  const last7 = []; for(let i=0;i<7;i++) last7.push(dateNDaysAgo(i));
+  const prev7 = []; for(let i=7;i<14;i++) prev7.push(dateNDaysAgo(i));
 
-  function dayEvents(dateStr) {
-    const ev = [];
-    (state.feedingLog||[]).filter(l=>l.date===dateStr).forEach(l=>{
-      const m = timeToMin(l.time); if(m!=null) ev.push({type:'feed', start:m, end:timeToMin(l.endTime)});
+  const feeds = state.feedingLog||[], sleeps = state.sleepLog||[], diapers = state.diaperLog||[];
+
+  function inSet(arr, dates){ return arr.filter(x=>dates.includes(x.date)); }
+  function daysCovered(arr, dates){ return new Set(arr.filter(x=>dates.includes(x.date)).map(x=>x.date)).size || 1; }
+
+  // ── Metric: avg feeds/day ──
+  const feeds7 = inSet(feeds,last7), feedsP = inSet(feeds,prev7);
+  const feedsPerDay = feeds7.length / daysCovered(feeds,last7);
+  const feedsPerDayPrev = feedsP.length ? feedsP.length / daysCovered(feeds,prev7) : null;
+
+  // ── Metric: avg sleep hrs/day + longest stretch ──
+  function sleepHours(arr){ let tot=0; arr.forEach(s=>{ let d=sleepDur(s); if(d>0) tot+=d; }); return tot; }
+  const sleeps7 = inSet(sleeps,last7), sleepsP = inSet(sleeps,prev7);
+  const sleepPerDay = sleepHours(sleeps7)/daysCovered(sleeps,last7);
+  const sleepPerDayPrev = sleepsP.length ? sleepHours(sleepsP)/daysCovered(sleeps,prev7) : null;
+  let longestStretch7 = 0; sleeps7.forEach(s=>{ const d=sleepDur(s); if(d>longestStretch7) longestStretch7=d; });
+  let longestStretchP = 0; sleepsP.forEach(s=>{ const d=sleepDur(s); if(d>longestStretchP) longestStretchP=d; });
+
+  // ── Metric: avg feed interval (from end of one to start of next, same day) ──
+  function avgInterval(fArr, dates){
+    let gaps=[]; dates.forEach(dt=>{
+      const day = fArr.filter(f=>f.date===dt && f.time).sort((a,b)=>toMin(a.time)-toMin(b.time));
+      for(let i=1;i<day.length;i++){ const prevEnd=toMin(day[i-1].endTime||day[i-1].time); const start=toMin(day[i].time); if(prevEnd!=null&&start!=null&&start>prevEnd) gaps.push(start-prevEnd); }
     });
-    (state.sleepLog||[]).filter(l=>l.date===dateStr).forEach(l=>{
-      const s=timeToMin(l.start), e=timeToMin(l.end); if(s!=null) ev.push({type:'sleep', start:s, end:(e!=null?e:s+30)});
-    });
-    (state.diaperLog||[]).filter(l=>l.date===dateStr).forEach(l=>{
-      const m = timeToMin(l.time); if(m!=null) ev.push({type:'diaper', start:m, end:null});
-    });
-    return ev;
+    return gaps.length ? gaps.reduce((a,b)=>a+b,0)/gaps.length : null;
   }
-  function timeToMin(t) { if(!t||t.length<4) return null; const [h,m]=t.split(':').map(Number); if(isNaN(h))return null; return h*60+(m||0); }
+  const interval7 = avgInterval(feeds, last7);
 
-  const days = [];
-  for (let i=0;i<window._rhythmDays;i++){
-    const d = new Date(); d.setDate(d.getDate()-i);
-    const ds = d.toISOString().slice(0,10);
-    days.push({ ds, label: i===0?'Today':(i===1?'Yesterday':d.toLocaleDateString('en',{weekday:'short', day:'numeric'})), events: dayEvents(ds) });
+  // ── Metric: wet diapers/day (hydration signal) ──
+  const dia7 = inSet(diapers,last7).filter(d=>d.wet);
+  const wetPerDay = dia7.length / daysCovered(diapers,last7);
+  const diaP = inSet(diapers,prev7).filter(d=>d.wet);
+  const wetPerDayPrev = diaP.length ? diaP.length/daysCovered(diapers,prev7) : null;
+
+  // ── Metric: typical nap window (most common daytime sleep start hour) ──
+  const napStarts = sleeps7.filter(s=>{ const m=toMin(s.start); return m!=null && m>=360 && m<1080; }).map(s=>Math.floor(toMin(s.start)/60));
+  let napWindow = null;
+  if (napStarts.length>=3){ const counts={}; napStarts.forEach(h=>counts[h]=(counts[h]||0)+1); const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]; napWindow=parseInt(top[0]); }
+
+  // ── Build insight cards ──
+  const insights = [];
+  const fmtH = (m)=> m>=60 ? (Math.round(m/60*10)/10)+'h' : Math.round(m)+'m';
+  const pct = (a,b)=> b? Math.round((a-b)/b*100) : 0;
+  const clock = (h)=>{ const ap=h>=12?'pm':'am'; let hh=h%12; if(hh===0)hh=12; return hh+ap; };
+
+  // Sleep trend
+  if (sleepPerDayPrev!=null && sleeps7.length>=3){
+    const delta = pct(sleepPerDay, sleepPerDayPrev);
+    if (Math.abs(delta)>=10) insights.push({ tone: delta>0?'good':'info', icon: delta>0?'trending-up':'trending-down',
+      title: (delta>0?'Sleep is increasing':'Sleep dipped this week'),
+      body: babyName()+' averaged '+sleepPerDay.toFixed(1)+'h/day, '+(delta>0?'up':'down')+' '+Math.abs(delta)+'% from last week ('+sleepPerDayPrev.toFixed(1)+'h).' });
+  }
+  // Longest stretch growth (developmental win)
+  if (longestStretch7>0 && longestStretchP>0 && longestStretch7 - longestStretchP >= 0.5){
+    insights.push({ tone:'good', icon:'moon',
+      title:'Longest sleep stretch is growing',
+      body:'Best stretch reached '+longestStretch7.toFixed(1)+'h, up from '+longestStretchP.toFixed(1)+'h last week — a sign sleep is consolidating.' });
+  }
+  // Nap window prediction
+  if (napWindow!=null){
+    insights.push({ tone:'info', icon:'clock',
+      title:'Predictable nap window',
+      body:babyName()+' usually gets sleepy around '+clock(napWindow)+'. Planning quiet time just before can make settling easier.' });
+  }
+  // Feed interval
+  if (interval7!=null){
+    insights.push({ tone:'info', icon:'droplet',
+      title:'Typical feed spacing',
+      body:'Feeds are averaging about '+fmtH(interval7)+' apart. '+(feedsPerDay?('Roughly '+Math.round(feedsPerDay)+' feeds a day.'):'') });
+  }
+  // Cluster feeding detection (many feeds in evening)
+  const eveFeeds = feeds7.filter(f=>{ const m=toMin(f.time); return m!=null && m>=1020 && m<1320; }).length;
+  if (feeds7.length>0 && eveFeeds/feeds7.length > 0.28){
+    insights.push({ tone:'info', icon:'stack-2',
+      title:'Evening cluster feeding',
+      body:'A good share of feeds happen between 5–10pm. This is normal and often means longer sleep afterward.' });
+  }
+  // Hydration watch (wet diaper drop)
+  if (wetPerDayPrev!=null && wetPerDay < wetPerDayPrev && wetPerDayPrev-wetPerDay >= 1.5 && wetPerDay < 6){
+    insights.push({ tone:'warn', icon:'alert-triangle',
+      title:'Fewer wet diapers than usual',
+      body:'Wet diapers dropped to about '+wetPerDay.toFixed(1)+'/day from '+wetPerDayPrev.toFixed(1)+'. Worth keeping an eye on hydration; ask your pediatrician if it continues.' });
   }
 
-  // SVG timeline: 24h wide. Colors from tokens.
-  const COL = { feed:'#2D8F8F', sleep:'#534AB7', diaper:'#185FA5' };
-  function renderDayRow(day) {
-    const W=1000, H=44, padL=0;
-    let bars = '';
-    // hour gridlines
-    for (let h=0;h<=24;h+=6){ const x=(h/24)*W; bars += '<line x1="'+x+'" y1="0" x2="'+x+'" y2="'+H+'" stroke="#eee" stroke-width="1"/>'; }
-    day.events.forEach(e=>{
-      const x = (e.start/1440)*W;
-      if (e.type==='sleep' && e.end!=null) {
-        let w = ((e.end - e.start)/1440)*W; if(w<0) w += W; if(w<3) w=3;
-        bars += '<rect x="'+x.toFixed(1)+'" y="8" width="'+w.toFixed(1)+'" height="'+(H-16)+'" rx="4" fill="'+COL.sleep+'" opacity="0.75"/>';
-      } else if (e.type==='feed') {
-        bars += '<circle cx="'+x.toFixed(1)+'" cy="'+(H/2)+'" r="6" fill="'+COL.feed+'"/>';
-      } else if (e.type==='diaper') {
-        bars += '<circle cx="'+x.toFixed(1)+'" cy="'+(H-8)+'" r="4" fill="'+COL.diaper+'"/>';
-      }
-    });
-    return '<div style="margin-bottom:10px">' +
-      '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3);margin-bottom:3px"><span style="font-weight:600;color:var(--ink)">'+day.label+'</span><span>'+day.events.filter(e=>e.type==='feed').length+' feeds · '+day.events.filter(e=>e.type==='sleep').length+' sleeps</span></div>' +
-      '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="width:100%;height:44px;background:var(--off,#F8F9FA);border-radius:8px">'+bars+'</svg>' +
+  // Fallback if not enough data
+  const enoughData = feeds7.length + sleeps7.length >= 5;
+
+  const toneColor = { good:'#0F6E56', info:'#185FA5', warn:'#854F0B' };
+  const toneBg = { good:'#E1F5EE', info:'#E6F1FB', warn:'#FAEEDA' };
+
+  function insightCard(ins){
+    return '<div class="card" style="border-left:3px solid '+toneColor[ins.tone]+';border-radius:0 12px 12px 0">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+        '<span style="width:26px;height:26px;border-radius:8px;background:'+toneBg[ins.tone]+';color:'+toneColor[ins.tone]+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon2(ins.icon,16)+'</span>' +
+        '<span style="font-size:15px;font-weight:700;color:var(--ink)">'+ins.title+'</span>' +
+      '</div>' +
+      '<div style="font-size:13px;color:var(--ink-2);line-height:1.5;padding-left:34px">'+ins.body+'</div>' +
     '</div>';
   }
 
-  const hourLabels = ['12a','6a','12p','6p','12a'];
+  // ── Weekly snapshot numbers ──
+  const snapshot = [
+    ['Feeds/day', feedsPerDay?feedsPerDay.toFixed(1):'—', feedsPerDayPrev, feedsPerDay],
+    ['Sleep/day', sleepPerDay?sleepPerDay.toFixed(1)+'h':'—', sleepPerDayPrev, sleepPerDay],
+    ['Longest sleep', longestStretch7?longestStretch7.toFixed(1)+'h':'—', longestStretchP, longestStretch7],
+    ['Wet/day', wetPerDay?wetPerDay.toFixed(1):'—', wetPerDayPrev, wetPerDay],
+  ];
+
   el.innerHTML = `
     <div class="page-header">
-      <h2>Daily Rhythm</h2>
-      <p>See ${babyName()||'baby'}'s patterns at a glance</p>
+      <h2>Insights</h2>
+      <p>What ${babyName()||'baby'}'s last 7 days are telling you</p>
     </div>
 
     <div class="card">
-      <div style="display:flex;gap:8px;margin-bottom:14px">
-        ${[3,5,7].map(n=>`<button class="btn btn-sm ${window._rhythmDays===n?'btn-teal':'btn-outline'}" onclick="setRhythmDays(${n})" style="flex:1">${n} days</button>`).join('')}
-      </div>
-      ${days.map(renderDayRow).join('')}
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:2px;padding:0 2px">
-        ${hourLabels.map(h=>`<span>${h}</span>`).join('')}
-      </div>
-      <div style="display:flex;gap:16px;justify-content:center;margin-top:16px;font-size:12px;color:var(--ink-2)">
-        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:${COL.feed};display:inline-block"></span>Feed</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:9px;border-radius:3px;background:${COL.sleep};opacity:.75;display:inline-block"></span>Sleep</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${COL.diaper};display:inline-block"></span>Diaper</span>
+      <div class="card-title">This week at a glance</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${snapshot.map(([label,val,prev,cur])=>{
+          let trend=''; if(prev!=null && cur){ const d=Math.round((cur-prev)/prev*100); if(Math.abs(d)>=5) trend='<span style="font-size:11px;color:'+(d>0?'#0F6E56':'#993C1D')+';font-weight:600"> '+(d>0?'↑':'↓')+Math.abs(d)+'%</span>'; }
+          return '<div style="background:var(--off,#F8F9FA);border-radius:12px;padding:12px"><div style="font-size:20px;font-weight:800;color:var(--ink)">'+val+trend+'</div><div style="font-size:11px;color:var(--ink-3);margin-top:2px">'+label+'</div></div>';
+        }).join('')}
       </div>
     </div>
+
+    ${enoughData ? (insights.length ? insights.map(insightCard).join('') :
+      '<div class="card"><div class="empty-state">Keep logging — patterns will surface here as more data comes in.</div></div>') :
+      '<div class="card"><div class="empty-state">A few more days of logging and your personalized insights will appear here.</div></div>'}
 
     <div class="card" style="background:var(--status-info-bg);border:none">
-      <div style="font-size:13px;color:var(--ink-2);line-height:1.5">💡 Look for patterns: clustered feeds in the evening are normal (cluster feeding), and longer sleep stretches usually lengthen over time.</div>
+      <div style="font-size:12px;color:var(--ink-2);line-height:1.5"><strong>How to read this:</strong> these are observations from your own logs, not medical advice. Every baby is different — trust your instincts and your pediatrician.</div>
     </div>
   `;
-
-  window.setRhythmDays = (n) => { window._rhythmDays = n; const e=document.getElementById('page-rhythm'); if(e) PAGES.rhythm(e); };
 };
+
+// Small icon helper for insights (uses the existing SVG_ICONS where possible, plus a few extras)
+function svgIcon2(id, size){
+  const P = {
+    'trending-up':'<path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/>',
+    'trending-down':'<path d="M3 7l6 6 4-4 8 8"/><path d="M17 17h4v-4"/>',
+    'moon':'<path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/>',
+    'clock':'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/>',
+    'droplet':'<path d="M12 21c-3.6 0-6.5-2.9-6.5-6.4 0-4 4.2-8.4 6-10.1a.7.7 0 0 1 1 0c1.8 1.7 6 6.1 6 10.1 0 3.5-2.9 6.4-6.5 6.4Z"/>',
+    'stack-2':'<path d="M12 3l9 5-9 5-9-5Z"/><path d="M3 13l9 5 9-5"/>',
+    'alert-triangle':'<path d="M12 4l9 16H3Z"/><path d="M12 10v4M12 17h.01"/>',
+  };
+  const paths = P[id] || P['clock'];
+  return '<svg width="'+(size||16)+'" height="'+(size||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths+'</svg>';
+}
 
 PAGES['vaccines'] = function(el) {
   if(!state.customVaccines) state.customVaccines=[];
