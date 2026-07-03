@@ -93,6 +93,37 @@ body.night-mode .now-streak{background:rgba(95,212,212,.12);color:#7fd4c4;}
 /* Feeding hero stays fully prominent + gets a gentle glow at night */
 .now-page.night-context .now-hero{box-shadow:0 8px 32px -6px rgba(45,143,143,.55);}
 .now-page.night-context .now-greet-text{opacity:.8;}
+/* ── NOTES PAGE ── */
+.note-tag-btn{padding:8px 13px;border-radius:999px;border:1.5px solid;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all .12s;min-height:36px;}
+.note-tag-pill{font-size:11px;font-weight:700;padding:4px 11px;border-radius:999px;text-transform:uppercase;letter-spacing:.3px;}
+.note-icon-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--ink-3);cursor:pointer;border-radius:8px;padding:0;}
+.note-icon-btn:active{background:rgba(0,0,0,.05);color:var(--ink);}
+body.night-mode textarea,body.night-mode #note-search{background:#262634 !important;color:#e8e4d8 !important;border-color:rgba(255,255,255,.15) !important;}
+body.night-mode .note-icon-btn:active{background:rgba(255,255,255,.08);}
+/* ── MICRO-INTERACTIONS ── */
+@keyframes gentleRise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.now-tile-wrap,.stat-card{animation:gentleRise .28s ease-out both;}
+/* Stagger the Now tiles subtly for a polished cascade */
+.now-tile-wrap:nth-child(1){animation-delay:.02s;}
+.now-tile-wrap:nth-child(2){animation-delay:.05s;}
+.now-tile-wrap:nth-child(3){animation-delay:.08s;}
+.now-tile-wrap:nth-child(4){animation-delay:.11s;}
+.now-tile-wrap:nth-child(5){animation-delay:.14s;}
+/* Tactile press on tappable tiles */
+.now-tile:active,.stat-card:active{transform:scale(.985);transition:transform .08s;}
+.loghist-row{transition:background .15s;}
+@media (prefers-reduced-motion: reduce){.now-tile-wrap,.stat-card{animation:none;}}
+/* ── SUCCESS TOAST CHECKMARK ── */
+.toast-check{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--teal,#2D8F8F);border-radius:50%;flex-shrink:0;}
+.toast-check-path{stroke-dasharray:24;stroke-dashoffset:24;animation:toastCheck .4s ease-out .1s forwards;}
+@keyframes toastCheck{to{stroke-dashoffset:0;}}
+#toast.is-success{background:#1a2e2e;}
+@media (prefers-reduced-motion: reduce){.toast-check-path{animation:none;stroke-dashoffset:0;}}
+/* ── UNDO TOAST ── */
+#toast.has-action{display:flex;align-items:center;gap:14px;padding-right:8px;}
+.toast-msg{flex:1;}
+.toast-undo{background:rgba(255,255,255,.16);border:none;color:#fff;font-weight:700;font-family:var(--font);font-size:14px;padding:8px 16px;border-radius:8px;cursor:pointer;min-height:36px;flex-shrink:0;}
+.toast-undo:active{background:rgba(255,255,255,.28);}
 /* ══ CELEBRATION MOMENT ══ */
 .celebrate-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(20,20,30,.55);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s;}
 .celebrate-overlay.show{opacity:1;pointer-events:auto;}
@@ -123,7 +154,8 @@ body.night-mode{background:#12121a !important;color:#e8e4d8 !important;}
 body.night-mode .card{background:#1e1e2a !important;border:0.5px solid rgba(255,255,255,.09);box-shadow:none !important;}
 body.night-mode .top-bar{background:#1e1e2a !important;}
 body.night-mode .top-bar-title{color:#e8c97a !important;}
-body.night-mode .bottom-nav{background:#1e1e2a !important;border-top:0.5px solid rgba(255,255,255,.09);}
+body.night-mode .bottom-nav{background:rgba(30,30,42,.92) !important;border:0.5px solid rgba(255,255,255,.10) !important;box-shadow:0 6px 24px -6px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3) !important;}
+body.night-mode .bnav-item.active{background:rgba(95,212,212,.14) !important;}
 body.night-mode .bottom-nav-item.active{color:#e8c97a !important;}
 body.night-mode .bnav-item{color:#8a8470 !important;}
 body.night-mode .bnav-item.active{color:#e8c97a !important;}
@@ -222,7 +254,7 @@ body.night-mode [style*="background:#F5"],body.night-mode [style*="background:#F
 body.night-mode .badge,body.night-mode [style*="border-radius:4px"][style*="background:#"],
 body.night-mode [style*="border-radius:20px"][style*="background:#"]{filter:brightness(.92);}
 
-body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a1a1a;min-height:100vh;padding-bottom:var(--bar);transition:background .4s ease;}
+body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a1a1a;min-height:100vh;padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 84px);transition:background .4s ease;}
 
 /* ── LANDING ── */
 #landing{position:fixed;inset:0;background:linear-gradient(160deg,#1B3A6B 0%,#2D8F8F 100%);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;overflow-y:auto;}
@@ -266,8 +298,8 @@ body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a
 .top-bar-menu{background:none;border:none;color:rgba(255,255,255,.8);font-size:20px;cursor:pointer;padding:4px;}
 
 /* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;border-top:1px solid #e8e8e8;display:grid;grid-template-columns:repeat(5,1fr);height:var(--bar);box-shadow:0 -2px 10px rgba(0,0,0,.08);}
-.bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:6px 2px;border:none;background:transparent;font-family:var(--font);transition:background .1s;}
+.bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5);border:0.5px solid rgba(0,0,0,.06);border-radius:var(--r-pill,999px);display:grid;grid-template-columns:repeat(5,1fr);height:60px;width:min(calc(100% - 24px), 440px);box-shadow:0 6px 24px -6px rgba(0,0,0,.22),0 2px 6px rgba(0,0,0,.08);padding:0 6px;box-sizing:border-box;}
+.bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:6px 2px;margin:7px 3px;border:none;background:transparent;border-radius:16px;font-family:var(--font);transition:background .18s,color .18s,transform .1s;}.bnav-item.active{background:var(--teal-bg,#E6F5F5);}.bnav-item:active{transform:scale(.92);}
 .bnav-item:active{background:#f5f5f5;}
 .bnav-item.active .bnav-icon,.bnav-item.active .bnav-label{color:var(--teal);}
 .bnav-icon{font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;height:24px;}.bnav-icon svg{display:block;}
@@ -747,14 +779,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <div class="drawer-section">Overview</div>
   <button class="nav-item" onclick="navTo('now')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></span> Now</button>
   <button class="nav-item" onclick="navTo('rhythm')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 14l3-4 3 3 4-6"/></svg></span> Insights</button>
+  <button class="nav-item" onclick="navTo('notes')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-4-3-3 2-3-2-4 3Z"/><path d="M9 8h6M9 12h6"/></svg></span> Notes</button>
   <button class="nav-item active" onclick="navTo('dashboard')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg></span> Dashboard</button>
   <div id="phase-suggest"></div>
   <div id="drawer-prebirth">
-  <div class="drawer-section">Pre-Birth</div>
+  <div class="drawer-section drawer-section-toggle" id="prebirth-header" onclick="togglePrebirthSection()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePrebirthSection();}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
+    <span>Pre-Birth</span><span id="prebirth-caret" style="font-size:11px;opacity:.6">▾</span>
+  </div>
+  <div id="prebirth-items">
   <button class="nav-item" onclick="navTo('hospital-bag')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span> Hospital Bag</button>
   <button class="nav-item" onclick="navTo('csection')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z"/><path d="M12 7V3M9 5h6"/></svg></span> C-Section Prep</button>
   <button class="nav-item" onclick="navTo('preg-tasks')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13M4 12h13M4 19h13"/><path d="M20 5l-1.5 1.5L17.5 5M20 12l-1.5 1.5L17.5 12M20 19l-1.5 1.5L17.5 19"/></svg></span> Pregnancy Tasks</button>
   <button class="nav-item" onclick="navTo('inventory')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5Z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span> Newborn Inventory</button>
+  </div>
   </div>
   <div class="drawer-section">Post-Birth</div>
   <button class="nav-item" onclick="navTo('first100')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/></svg></span> First 100 Days</button>
@@ -790,7 +827,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
   <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span> Back up all data</button>
   <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><path d="M12 8v4l3 2"/></svg></span> Restore from backup</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 02 Jul 2026, 14:31</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 03 Jul 2026, 04:46</div>
   <div style="height:20px"></div>
 </div>
 
@@ -988,6 +1025,7 @@ let state = {
   pumpLog: [],           // [{date, time, leftMl, rightMl, totalMl, notes, babyIdx}]
   medsLog: [],           // [{date, time, name, dose, notes, babyIdx}]
   stashLog: [],          // [{date, time, ml, reason}] — stash removals not counted as feeds
+  notesLog: [],          // [{id, date, time, text, tag, pinned, ageLabel}]
   weightUnit: 'kg',      // display unit: 'kg' | 'g' | 'lboz'
   // Nav
   navSlots: ['now','feeding','sleep','diaper'],
@@ -1009,6 +1047,7 @@ function migrateData() {
   if (!Array.isArray(state.pumpLog)) state.pumpLog = [];
   if (!Array.isArray(state.medsLog)) state.medsLog = [];
   if (!Array.isArray(state.stashLog)) state.stashLog = [];
+  if (!Array.isArray(state.notesLog)) state.notesLog = [];
   // Migrate users still on the original default nav to the daily-actions nav
   if (state.navSlots && state.navSlots.join(',') === 'dashboard,feeding,milestones,foods') {
     state.navSlots = ['now','feeding','sleep','diaper'];
@@ -1467,7 +1506,7 @@ function getDefaultKeyDates(edd) {
   if (!edd) edd = '2026-06-19';
   const addDays = (d, n) => {
     const r = new Date(d + 'T00:00:00'); r.setDate(r.getDate() + n);
-    return r.toISOString().split('T')[0];
+    return localDateStr(r);
   };
   const subDays = (d, n) => addDays(d, -n);
   return [
@@ -1485,7 +1524,19 @@ function getDefaultKeyDates(edd) {
 // ══════════════════════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
-function today() { return new Date().toISOString().split('T')[0]; }
+function today() {
+  // Use LOCAL date, not UTC. toISOString() shifts to UTC, which in +7 timezones
+  // makes early-morning hours (e.g. 2am) still read as the previous day.
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+function localDateStr(d) {
+  // Local YYYY-MM-DD for any Date object (avoids UTC shift from toISOString)
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
 function formatDate(d) {
   if (!d) return '—';
   try {
@@ -1671,8 +1722,42 @@ function pctBar(pct, color, h=6) {
 function toast(msg) {
   const el = document.getElementById('toast');
   if (!el) return;
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 2500);
+  el.innerHTML = ''; el.textContent = msg; el.classList.remove('has-action'); el.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>el.classList.remove('show'), 2500);
+}
+
+// Undo-based delete: performs the removal immediately but keeps a restore path for a few seconds.
+// This replaces jarring native confirm() dialogs with a faster, safer, more elegant pattern.
+function toastSuccess(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.classList.remove('has-action');
+  el.innerHTML = '<span class="toast-check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6" class="toast-check-path"/></svg></span><span class="toast-msg"></span>';
+  el.querySelector('.toast-msg').textContent = msg;
+  el.classList.add('has-action','is-success');
+  el.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>{ el.classList.remove('show','is-success'); }, 2200);
+}
+
+function toastUndo(msg, onUndo) {
+  const el = document.getElementById('toast');
+  if (!el) { if(onUndo){} return; }
+  el.classList.add('has-action');
+  el.innerHTML = '<span class="toast-msg"></span><button class="toast-undo" type="button">Undo</button>';
+  el.querySelector('.toast-msg').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._toastTimer);
+  let undone = false;
+  const btn = el.querySelector('.toast-undo');
+  btn.onclick = () => {
+    undone = true;
+    el.classList.remove('show');
+    if (navigator.vibrate) navigator.vibrate(10);
+    if (typeof onUndo === 'function') onUndo();
+  };
+  window._toastTimer = setTimeout(()=>{ el.classList.remove('show'); el.classList.remove('has-action'); }, 5000);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1804,11 +1889,31 @@ function updateSubtitles() {
 // ══════════════════════════════════════════════════════════════════════════════
 // DRAWER + BOTTOM NAV
 // ══════════════════════════════════════════════════════════════════════════════
+function togglePrebirthSection() {
+  const items = document.getElementById('prebirth-items');
+  const caret = document.getElementById('prebirth-caret');
+  if (!items) return;
+  window._prebirthManuallyToggled = true;
+  const isHidden = items.style.display === 'none';
+  items.style.display = isHidden ? '' : 'none';
+  if (caret) caret.textContent = isHidden ? '▾' : '▸';
+}
+
 function openDrawer() {
   renderPhaseSuggest();
-  // Hide pre-birth tools once baby is born (phase-aware IA)
-  const pb = document.getElementById('drawer-prebirth');
-  if (pb) pb.style.display = (typeof getPhase==='function' && getPhase()!=='pregnancy') ? 'none' : '';
+  // Post-birth: collapse pre-birth tools (still accessible), but keep them expanded pre-birth
+  const born = (typeof getPhase==='function' && getPhase()!=='pregnancy');
+  const pbItems = document.getElementById('prebirth-items');
+  const pbCaret = document.getElementById('prebirth-caret');
+  const pbHeader = document.getElementById('prebirth-header');
+  if (pbItems && !window._prebirthManuallyToggled) {
+    // Default state: collapsed after birth, expanded before
+    pbItems.style.display = born ? 'none' : '';
+    if (pbCaret) pbCaret.textContent = born ? '▸' : '▾';
+    if (pbHeader) pbHeader.style.cursor = born ? 'pointer' : 'default';
+  }
+  // Label it as archived once born, so it's clearly optional
+  if (pbHeader) { const lbl = pbHeader.querySelector('span'); if (lbl) lbl.textContent = born ? 'Pre-Birth (archived)' : 'Pre-Birth'; }
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawer-overlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1852,6 +1957,7 @@ const ALL_PAGES = [
   {id:'foods',icon:'🥣',label:'100 Foods',group:'Post-Birth'},
   {id:'now',icon:'🌟',label:'Now',group:'Home'},
   {id:'rhythm',icon:'📊',label:'Insights',group:'Home'},
+  {id:'notes',icon:'📝',label:'Notes',group:'Home'},
   {id:'feeding',icon:'🍼',label:'Feeding',group:'Logs'},
   {id:'sleep',icon:'😴',label:'Sleep',group:'Logs'},
   {id:'diaper',icon:'💧',label:'Diaper',group:'Logs'},
@@ -3175,7 +3281,7 @@ function nowSaveFeed() {
   saveState('feedingLog');
   window._nowOpen=''; window._nowFeedType='';
   const el=document.getElementById('page-now'); if(el) PAGES.now(el);
-  toast('Feed logged! 🍼');
+  toastSuccess('Feed logged! 🍼');
 }
 function nowSaveSleep() {
   const start = document.getElementById('ns-start')?.value;
@@ -3186,7 +3292,7 @@ function nowSaveSleep() {
   saveState('sleepLog');
   window._nowOpen='';
   const el=document.getElementById('page-now'); if(el) PAGES.now(el);
-  toast('Sleep logged! 😴');
+  toastSuccess('Sleep logged! 😴');
 }
 function nowSaveDiaper(type) {
   if (!state.diaperLog) state.diaperLog=[];
@@ -3196,7 +3302,7 @@ function nowSaveDiaper(type) {
   saveState('diaperLog');
   window._nowOpen='';
   const el=document.getElementById('page-now'); if(el) PAGES.now(el);
-  toast('Diaper logged! 💧');
+  toastSuccess('Diaper logged! 💧');
 }
 function nowSaveWeight() {
   const v = parseFloat(document.getElementById('nw-val')?.value);
@@ -3211,7 +3317,7 @@ function nowSaveWeight() {
   saveState('weightLog');
   window._nowOpen='';
   const el=document.getElementById('page-now'); if(el) PAGES.now(el);
-  toast('Weight logged! ⚖️');
+  toastSuccess('Weight logged! ⚖️');
 }
 
 function nowSavePump() {
@@ -3226,7 +3332,7 @@ function nowSavePump() {
   saveState('pumpLog'); saveState('pumpedStash');
   window._nowOpen='';
   const el=document.getElementById('page-now'); if(el) PAGES.now(el);
-  toast('Pumped '+total+'ml added to stash 🥛');
+  toastSuccess('Pumped '+total+'ml added to stash 🥛');
 }
 function nowSaveMeds() {
   const name = (document.getElementById('nm-name')?.value||'').trim();
@@ -3237,7 +3343,7 @@ function nowSaveMeds() {
   saveState('medsLog');
   window._nowOpen='';
   const el=document.getElementById('page-now'); if(el) PAGES.now(el);
-  toast('Dose logged 💊');
+  toastSuccess('Dose logged 💊');
 }
 
 function feedIntervalLabel() {
@@ -3331,12 +3437,12 @@ function loggingStreak() {
   let streak = 0;
   let cursor = startOfDay(new Date());
   // Allow the streak to "count" from today OR yesterday (so an unlogged-so-far today doesn't zero it)
-  const todayStr = new Date(cursor).toISOString().slice(0,10);
-  const ydayStr = new Date(cursor - dayMs).toISOString().slice(0,10);
+  const todayStr = localDateStr(new Date(cursor));
+  const ydayStr = localDateStr(new Date(cursor - dayMs));
   if (!dates.has(todayStr) && !dates.has(ydayStr)) return 0;
   if (!dates.has(todayStr)) cursor -= dayMs; // start counting from yesterday
   while (true) {
-    const ds = new Date(cursor).toISOString().slice(0,10);
+    const ds = localDateStr(new Date(cursor));
     if (dates.has(ds)) { streak++; cursor -= dayMs; } else break;
   }
   return streak;
@@ -4512,7 +4618,7 @@ PAGES['feeding'] = function(el) {
       const colors = {feeds:'#2D8F8F', breast:'#0F6E56', formula:'#534AB7'};
       return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:yLabels[metric], data:arr, color:colors[metric]}], yLabel: metric==='feeds'?'feeds / hour':yLabels[metric]+' / hour'};
     } else if (view === 'daily') {
-      const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split('T')[0]; });
+      const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return localDateStr(d); });
       const labels = days.map(d=>d.slice(5).replace('-','/'));
       if (metric === 'feeds') {
         return {labels, datasets:[{label:'Feeds', data:days.map(d=>state.feedingLog.filter(l=>l.date===d).length), color:'#2D8F8F'}], yLabel:'feeds / day'};
@@ -4522,9 +4628,9 @@ PAGES['feeding'] = function(el) {
         return {labels, datasets:[{label:'Formula ml', data:days.map(d=>state.feedingLog.filter(l=>l.date===d).reduce((a,l)=>a+(parseInt(l.formulaMl)||0),0)), color:'#534AB7'}], yLabel:'ml / day'};
       }
     } else {
-      const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return d.toISOString().split('T')[0]; });
+      const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return localDateStr(d); });
       const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
-      const sumWeek = (wS, fn) => { const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEs=wE.toISOString().split('T')[0]; return state.feedingLog.filter(l=>l.date>=wS&&l.date<wEs).reduce(fn,0); };
+      const sumWeek = (wS, fn) => { const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEs=localDateStr(wE); return state.feedingLog.filter(l=>l.date>=wS&&l.date<wEs).reduce(fn,0); };
       if (metric === 'feeds') {
         return {labels, datasets:[{label:'Feeds', data:weeks.map(w=>sumWeek(w,(a)=>a+1)), color:'#2D8F8F'}], yLabel:'feeds / week'};
       } else if (metric === 'breast') {
@@ -4879,7 +4985,7 @@ PAGES['feeding'] = function(el) {
       state.pumpedStash = Math.max(0, (state.pumpedStash||0) - amt);
     }
     state.feedingLog.push(entry);
-    saveState('feedingLog'); render(); toast('Feed logged! 🍼');
+    saveState('feedingLog'); render(); toastSuccess('Feed logged! 🍼');
   };
   window.quickFeed = (type, amt) => {
     const bi = parseInt(document.getElementById('qf-baby')?.value||'0');
@@ -4888,7 +4994,7 @@ PAGES['feeding'] = function(el) {
     state.feedingLog.push(e); saveState('feedingLog'); render();
     toast((isMultiples()?babyLabel(bi)+': ':'')+(type==='formula'?amt+'ml':type==='left'?'L '+amt+'m':'R '+amt+'m')+' logged!');
   };
-  window.delFeed = (i) => { if(!confirm('Delete this feed entry?')) return; state.feedingLog.splice(i,1); saveState('feedingLog'); render(); toast('Deleted'); };
+  window.delFeed = (i) => { const item=state.feedingLog[i]; state.feedingLog.splice(i,1); saveState('feedingLog'); render(); toastUndo('Feed deleted', ()=>{ state.feedingLog.splice(i,0,item); saveState('feedingLog'); render(); }); };
   render();
 };
 
@@ -4914,7 +5020,7 @@ PAGES['sleep'] = function(el) {
       });
       return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:'Hrs', data:hrs.map(v=>Math.round(v*10)/10), color:'#185FA5'}], yLabel:'hours slept / hour'};
     } else if (view === 'daily') {
-      const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split('T')[0]; });
+      const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); return localDateStr(d); });
       const labels = days.map(d=>d.slice(5).replace('-','/'));
       if (metric === 'all') {
         const night = days.map(d => Math.round(state.sleepLog.filter(l=>l.date===d&&l.type==='Night').reduce((a,l)=>a+calcDur(l),0)*10)/10);
@@ -4925,9 +5031,9 @@ PAGES['sleep'] = function(el) {
         return {labels, datasets:[{label:metric==='night'?'Night':'Naps',data,color:metric==='night'?'#1B3A6B':'#534AB7'}], yLabel:'hours / day'};
       }
     } else {
-      const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return d.toISOString().split('T')[0]; });
+      const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return localDateStr(d); });
       const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
-      const avg = (wS,fn) => { const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEs=wE.toISOString().split('T')[0]; return Math.round(state.sleepLog.filter(l=>l.date>=wS&&l.date<wEs&&fn(l)).reduce((a,l)=>a+calcDur(l),0)/7*10)/10; };
+      const avg = (wS,fn) => { const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEs=localDateStr(wE); return Math.round(state.sleepLog.filter(l=>l.date>=wS&&l.date<wEs&&fn(l)).reduce((a,l)=>a+calcDur(l),0)/7*10)/10; };
       if (metric === 'all') {
         return {labels, datasets:[{label:'Avg hrs/day',data:weeks.map(w=>avg(w,()=>true)),color:'#185FA5'}], yLabel:'avg hours / day'};
       } else {
@@ -5095,12 +5201,12 @@ PAGES['sleep'] = function(el) {
     try { localStorage.removeItem('babyos_sleep_timer'); } catch(e){}
     renderSleepTimer();
     if (navigator.vibrate) navigator.vibrate([15,40,15]);
-    toast('Sleep timed — review and save');
+    toastSuccess('Sleep timed — review and save');
   };
   window.addSleep = () => {
     const bi=parseInt(document.getElementById('s-baby')?.value||'0');
     state.sleepLog.push({date:document.getElementById('s-date')?.value||today(),start:document.getElementById('s-start')?.value,end:document.getElementById('s-end')?.value,type:document.getElementById('s-type')?.value||'Night',quality:document.getElementById('s-qual')?.value||'Good',notes:document.getElementById('s-notes')?.value||'',babyIdx:bi});
-    saveState('sleepLog'); render(); toast('Sleep logged! 😴');
+    saveState('sleepLog'); render(); toastSuccess('Sleep logged! 😴');
   };
   window.quickSleep = (mins,type) => {
     const bi=parseInt(document.getElementById('s-baby')?.value||'0');
@@ -5110,7 +5216,7 @@ PAGES['sleep'] = function(el) {
     saveState('sleepLog'); render();
     toast((isMultiples()?babyLabel(bi)+': ':'')+(mins>=60?Math.floor(mins/60)+'h'+(mins%60?mins%60+'m':''):mins+'m')+' '+type.toLowerCase()+' logged!');
   };
-  window.delSleep = (i) => { if(!confirm('Delete this sleep entry?')) return; state.sleepLog.splice(i,1); saveState('sleepLog'); render(); toast('Deleted'); };
+  window.delSleep = (i) => { const item=state.sleepLog[i]; state.sleepLog.splice(i,1); saveState('sleepLog'); render(); toastUndo('Sleep deleted', ()=>{ state.sleepLog.splice(i,0,item); saveState('sleepLog'); render(); }); };
   render();
 };
 
@@ -5129,16 +5235,16 @@ PAGES['diaper'] = function(el) {
       });
       return {labels: Array.from({length:24},(_,i)=>String(i)), datasets:[{label:'Wet',data:wet,color:'#185FA5'},{label:'Dirty',data:dirty,color:'#0F6E56'}], yLabel:'count / hour'};
     } else if (view === 'daily') {
-      const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
+      const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return localDateStr(d);});
       return {labels:days.map(d=>d.slice(5).replace('-','/')), datasets:[
         {label:'Wet',data:days.map(d=>state.diaperLog.filter(l=>l.date===d&&l.wet).length),color:'#185FA5'},
         {label:'Dirty',data:days.map(d=>state.diaperLog.filter(l=>l.date===d&&l.dirty).length),color:'#0F6E56'},
       ], yLabel:'count / day'};
     } else {
-      const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
+      const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return localDateStr(d);});
       return {labels:['4 wks ago','3 wks ago','2 wks ago','This week'], datasets:[
-        {label:'Wet/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.wet).length;}),color:'#185FA5'},
-        {label:'Dirty/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<wE.toISOString().split('T')[0]&&l.dirty).length;}),color:'#0F6E56'},
+        {label:'Wet/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<localDateStr(wE)&&l.wet).length;}),color:'#185FA5'},
+        {label:'Dirty/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return state.diaperLog.filter(l=>l.date>=wS&&l.date<localDateStr(wE)&&l.dirty).length;}),color:'#0F6E56'},
       ], yLabel:'count / week'};
     }
   }
@@ -5242,7 +5348,7 @@ PAGES['diaper'] = function(el) {
   window.addDiaper = () => {
     const bi=parseInt(document.getElementById('d-baby')?.value||'0');
     state.diaperLog.push({date:document.getElementById('d-date')?.value||today(),time:document.getElementById('d-time')?.value||'',wet:document.getElementById('d-wet')?.value==='Yes',dirty:document.getElementById('d-dirty')?.value==='Yes',color:document.getElementById('d-color')?.value||'N/A',notes:document.getElementById('d-notes')?.value||'',babyIdx:bi});
-    saveState('diaperLog'); render(); toast('Diaper logged! 💧');
+    saveState('diaperLog'); render(); toastSuccess('Diaper logged! 💧');
   };
   window.quickDiaper = (type) => {
     const bi=parseInt(document.getElementById('d-baby')?.value||'0');
@@ -5276,7 +5382,7 @@ PAGES['diaper'] = function(el) {
       '</div><div class="loghist-scroll">'+rows+'</div>';
   }
   window.toggleDiaperHist = () => { window._diaperHistOpen = !window._diaperHistOpen; render(); };
-  window.delDiaper = (i) => { if(!confirm('Delete this diaper entry?')) return; state.diaperLog.splice(i,1); saveState('diaperLog'); render(); toast('Deleted'); };
+  window.delDiaper = (i) => { const item=state.diaperLog[i]; state.diaperLog.splice(i,1); saveState('diaperLog'); render(); toastUndo('Diaper deleted', ()=>{ state.diaperLog.splice(i,0,item); saveState('diaperLog'); render(); }); };
   render();
 };
 
@@ -5291,7 +5397,7 @@ PAGES['reading'] = function(el) {
     // metric: all | Indonesian | English
     const matchLang = (l) => metric==='all' ? true : l.lang===metric;
     if (view === 'daily') {
-      const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
+      const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return localDateStr(d);});
       const labels = days.map(d=>d.slice(5).replace('-','/'));
       if (metric === 'all') {
         const indo = days.map(d=>state.readingLog.filter(l=>l.date===d&&l.lang==='Indonesian').reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
@@ -5303,9 +5409,9 @@ PAGES['reading'] = function(el) {
         return {labels, datasets:[{label:metric,data,color:metric==='Indonesian'?'#0F6E56':'#185FA5'}], yLabel:'minutes / day'};
       }
     } else if (view === 'weekly') {
-      const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return d.toISOString().split('T')[0];});
+      const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return localDateStr(d);});
       const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
-      const sumW=(wS,fn)=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);const wEs=wE.toISOString().split('T')[0];return state.readingLog.filter(l=>l.date>=wS&&l.date<wEs&&fn(l)).reduce((a,l)=>a+(parseInt(l.minutes)||0),0);};
+      const sumW=(wS,fn)=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);const wEs=localDateStr(wE);return state.readingLog.filter(l=>l.date>=wS&&l.date<wEs&&fn(l)).reduce((a,l)=>a+(parseInt(l.minutes)||0),0);};
       if (metric === 'all') {
         return {labels, datasets:[{label:'Min/wk',data:weeks.map(w=>sumW(w,()=>true)),color:'#185FA5'}], yLabel:'minutes / week'};
       } else {
@@ -5442,7 +5548,7 @@ PAGES['reading'] = function(el) {
     state.readingLog.push({date:document.getElementById('rl-date')?.value||today(),minutes:mins,book:document.getElementById('rl-book')?.value?.trim()||'',lang:document.getElementById('rl-lang')?.value||'',response:document.getElementById('rl-resp')?.value||'',notes:''});
     saveState('readingLog'); render(); toast('📚 Reading logged!');
   };
-  window.delReading = (i) => { if(!confirm('Delete this reading entry?')) return; state.readingLog.splice(i,1); saveState('readingLog'); render(); toast('Deleted'); };
+  window.delReading = (i) => { const item=state.readingLog[i]; state.readingLog.splice(i,1); saveState('readingLog'); render(); toastUndo('Reading deleted', ()=>{ state.readingLog.splice(i,0,item); saveState('readingLog'); render(); }); };
   render();
 };
 
@@ -5472,7 +5578,7 @@ PAGES['weight'] = function(el) {
         const d = new Date(dateStr+'T00:00:00');
         const day = (d.getDay()+6)%7; // 0=Mon ... 6=Sun
         d.setDate(d.getDate()-day);
-        return d.toISOString().split('T')[0];
+        return localDateStr(d);
       };
       const byWeek = {};
       logs.forEach(l => { const mon=mondayOf(l.date); if(!byWeek[mon])byWeek[mon]=[]; byWeek[mon].push(l.grams); });
@@ -5636,9 +5742,9 @@ PAGES['weight'] = function(el) {
     const existing = state.weightLog.findIndex(l=>l.date===date && (l.babyIdx||0)===bi);
     const entry = {date, grams, babyIdx:bi, notes:document.getElementById('w-notes')?.value||''};
     if (existing>=0) state.weightLog[existing]=entry; else state.weightLog.push(entry);
-    saveState('weightLog'); render(); toast('Weight logged! ⚖️');
+    saveState('weightLog'); render(); toastSuccess('Weight logged! ⚖️');
   };
-  window.delWeight = (i) => { if(!confirm('Delete this weight entry?')) return; state.weightLog.splice(i,1); saveState('weightLog'); render(); toast('Deleted'); };
+  window.delWeight = (i) => { const item=state.weightLog[i]; state.weightLog.splice(i,1); saveState('weightLog'); render(); toastUndo('Weight deleted', ()=>{ state.weightLog.splice(i,0,item); saveState('weightLog'); render(); }); };
 
   render();
 };
@@ -5772,16 +5878,19 @@ PAGES['pump'] = function(el) {
     });
     state.pumpedStash = (state.pumpedStash||0) + total;
     saveState('pumpLog'); saveState('pumpedStash'); render();
-    toast('Pumped '+total+'ml added to stash 🥛');
+    toastSuccess('Pumped '+total+'ml added to stash 🥛');
   };
   window.delStashRemoval = (i) => { if(!confirm('Delete this stash adjustment?')) return;
     const e = state.stashLog[i];
     if (e && e.ml) state.pumpedStash = (state.pumpedStash||0) + e.ml; // restore the removed amount
     state.stashLog.splice(i,1); saveState('stashLog'); saveState('pumpedStash'); render(); toast('Adjustment removed'); };
-  window.delPump = (i) => { if(!confirm('Delete this pumping entry?')) return;
+  window.delPump = (i) => {
     const e = state.pumpLog[i];
+    const prevStash = state.pumpedStash;
     if (e && e.totalMl) state.pumpedStash = Math.max(0,(state.pumpedStash||0) - e.totalMl);
-    state.pumpLog.splice(i,1); saveState('pumpLog'); saveState('pumpedStash'); render(); toast('Deleted'); };
+    state.pumpLog.splice(i,1); saveState('pumpLog'); saveState('pumpedStash'); render();
+    toastUndo('Pumping deleted', ()=>{ state.pumpLog.splice(i,0,e); state.pumpedStash=prevStash; saveState('pumpLog'); saveState('pumpedStash'); render(); });
+  }
 
   render();
 };
@@ -5855,9 +5964,9 @@ PAGES['meds'] = function(el) {
       notes: document.getElementById('meds-notes')?.value||'',
       babyIdx: parseInt(document.getElementById('meds-baby')?.value||'0'),
     });
-    saveState('medsLog'); render(); toast('Dose logged 💊');
+    saveState('medsLog'); render(); toastSuccess('Dose logged 💊');
   };
-  window.delMeds = (i) => { if(!confirm('Delete this medication entry?')) return; state.medsLog.splice(i,1); saveState('medsLog'); render(); toast('Deleted'); };
+  window.delMeds = (i) => { const item=state.medsLog[i]; state.medsLog.splice(i,1); saveState('medsLog'); render(); toastUndo('Medication deleted', ()=>{ state.medsLog.splice(i,0,item); saveState('medsLog'); render(); }); };
 
   render();
 };
@@ -5871,7 +5980,7 @@ PAGES['rhythm'] = function(el) {
   // ── Data prep: last 7 days vs prior 7 days ──
   function toMin(t){ if(!t||t.length<4) return null; const [h,m]=t.split(':').map(Number); return isNaN(h)?null:h*60+(m||0); }
   function sleepDur(s){ if(!s.start||!s.end) return 0; let d=(toMin(s.end)-toMin(s.start))/60; if(d<0)d+=24; return d; }
-  function dateNDaysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+  function dateNDaysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return localDateStr(d); }
   const last7 = []; for(let i=0;i<7;i++) last7.push(dateNDaysAgo(i));
   const prev7 = []; for(let i=7;i<14;i++) prev7.push(dateNDaysAgo(i));
 
@@ -5925,38 +6034,44 @@ PAGES['rhythm'] = function(el) {
     const delta = pct(sleepPerDay, sleepPerDayPrev);
     if (Math.abs(delta)>=10) insights.push({ tone: delta>0?'good':'info', icon: delta>0?'trending-up':'trending-down',
       title: (delta>0?'Sleep is increasing':'Sleep dipped this week'),
-      body: babyName()+' averaged '+sleepPerDay.toFixed(1)+'h/day, '+(delta>0?'up':'down')+' '+Math.abs(delta)+'% from last week ('+sleepPerDayPrev.toFixed(1)+'h).' });
+      body: babyName()+' averaged '+sleepPerDay.toFixed(1)+'h/day, '+(delta>0?'up':'down')+' '+Math.abs(delta)+'% from last week ('+sleepPerDayPrev.toFixed(1)+'h).',
+      action: (delta>0? 'Keep the current routine — it\'s working. Note what changed this week so you can repeat it.' : 'Common around growth spurts or leaps. Try an earlier bedtime tonight and keep the wind-down consistent.') });
   }
   // Longest stretch growth (developmental win)
   if (longestStretch7>0 && longestStretchP>0 && longestStretch7 - longestStretchP >= 0.5){
     insights.push({ tone:'good', icon:'moon',
       title:'Longest sleep stretch is growing',
-      body:'Best stretch reached '+longestStretch7.toFixed(1)+'h, up from '+longestStretchP.toFixed(1)+'h last week — a sign sleep is consolidating.' });
+      body:'Best stretch reached '+longestStretch7.toFixed(1)+'h, up from '+longestStretchP.toFixed(1)+'h last week — a sign sleep is consolidating.',
+      action:'Protect the start of this stretch — keep the room dark and quiet, and try a dream feed just before it to extend it further.' });
   }
   // Nap window prediction
   if (napWindow!=null){
     insights.push({ tone:'info', icon:'clock',
       title:'Predictable nap window',
-      body:babyName()+' usually gets sleepy around '+clock(napWindow)+'. Planning quiet time just before can make settling easier.' });
+      body:babyName()+' usually gets sleepy around '+clock(napWindow)+'.',
+      action:'Start the wind-down ~15 min before '+clock(napWindow)+' — dim lights, less stimulation — to catch the sleepy window before overtiredness sets in.' });
   }
   // Feed interval
   if (interval7!=null){
     insights.push({ tone:'info', icon:'droplet',
       title:'Typical feed spacing',
-      body:'Feeds are averaging about '+fmtH(interval7)+' apart. '+(feedsPerDay?('Roughly '+Math.round(feedsPerDay)+' feeds a day.'):'') });
+      body:'Feeds are averaging about '+fmtH(interval7)+' apart. '+(feedsPerDay?('Roughly '+Math.round(feedsPerDay)+' feeds a day.'):''),
+      action:'Set your feed reminder to '+fmtH(interval7)+' on the Now screen so the next-feed countdown matches '+babyName()+'\'s real rhythm.' });
   }
   // Cluster feeding detection (many feeds in evening)
   const eveFeeds = feeds7.filter(f=>{ const m=toMin(f.time); return m!=null && m>=1020 && m<1320; }).length;
   if (feeds7.length>0 && eveFeeds/feeds7.length > 0.28){
     insights.push({ tone:'info', icon:'stack-2',
       title:'Evening cluster feeding',
-      body:'A good share of feeds happen between 5–10pm. This is normal and often means longer sleep afterward.' });
+      body:'A good share of feeds happen between 5–10pm. This is normal and often means longer sleep afterward.',
+      action:'Plan for it: get comfortable, keep water and a snack nearby for the evening cluster, and don\'t treat the frequent feeds as a supply problem.' });
   }
   // Hydration watch (wet diaper drop)
   if (wetPerDayPrev!=null && wetPerDay < wetPerDayPrev && wetPerDayPrev-wetPerDay >= 1.5 && wetPerDay < 6){
     insights.push({ tone:'warn', icon:'alert-triangle',
       title:'Fewer wet diapers than usual',
-      body:'Wet diapers dropped to about '+wetPerDay.toFixed(1)+'/day from '+wetPerDayPrev.toFixed(1)+'. Worth keeping an eye on hydration; ask your pediatrician if it continues.' });
+      body:'Wet diapers dropped to about '+wetPerDay.toFixed(1)+'/day from '+wetPerDayPrev.toFixed(1)+'.',
+      action:'Offer an extra feed today and keep logging diapers. If it stays below 6 wet/day or '+babyName()+' seems unwell, call your pediatrician.' });
   }
 
   // Fallback if not enough data
@@ -5966,12 +6081,19 @@ PAGES['rhythm'] = function(el) {
   const toneBg = { good:'#E1F5EE', info:'#E6F1FB', warn:'#FAEEDA' };
 
   function insightCard(ins){
+    const actionHtml = ins.action ? (
+      '<div style="margin-top:10px;margin-left:34px;padding:10px 12px;background:'+toneBg[ins.tone]+';border-radius:10px;display:flex;gap:8px;align-items:flex-start">' +
+        '<span style="color:'+toneColor[ins.tone]+';flex-shrink:0;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.3px">Try this</span>' +
+        '<span style="font-size:13px;color:var(--ink);line-height:1.5">'+ins.action+'</span>' +
+      '</div>'
+    ) : '';
     return '<div class="card" style="border-left:3px solid '+toneColor[ins.tone]+';border-radius:0 12px 12px 0">' +
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
         '<span style="width:26px;height:26px;border-radius:8px;background:'+toneBg[ins.tone]+';color:'+toneColor[ins.tone]+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon2(ins.icon,16)+'</span>' +
         '<span style="font-size:15px;font-weight:700;color:var(--ink)">'+ins.title+'</span>' +
       '</div>' +
       '<div style="font-size:13px;color:var(--ink-2);line-height:1.5;padding-left:34px">'+ins.body+'</div>' +
+      actionHtml +
     '</div>';
   }
 
@@ -6004,7 +6126,7 @@ PAGES['rhythm'] = function(el) {
       '<div class="card"><div class="empty-state">A few more days of logging and your personalized insights will appear here.</div></div>'}
 
     <div class="card" style="background:var(--status-info-bg);border:none">
-      <div style="font-size:12px;color:var(--ink-2);line-height:1.5"><strong>How to read this:</strong> these are observations from your own logs, not medical advice. Every baby is different — trust your instincts and your pediatrician.</div>
+      <div style="font-size:12px;color:var(--ink-2);line-height:1.5"><strong>How this works:</strong> BabyOS compares this week to last week and surfaces the patterns worth noticing, each with something to try. These are observations from your own logs, not medical advice — every baby is different, so trust your instincts and your pediatrician.</div>
     </div>
   `;
 };
@@ -6021,6 +6143,146 @@ function svgIcon2(id, size){
     'alert-triangle':'<path d="M12 4l9 16H3Z"/><path d="M12 10v4M12 17h.01"/>',
   };
   const paths = P[id] || P['clock'];
+  return '<svg width="'+(size||16)+'" height="'+(size||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths+'</svg>';
+}
+
+PAGES['notes'] = function(el) {
+  // Tag taxonomy — structured capture so notes are retrievable, not a soup
+  const TAGS = [
+    ['general', 'Note', '#5A5A66', '#F0F0F2'],
+    ['doctor', 'For doctor', '#185FA5', '#E6F1FB'],
+    ['symptom', 'Symptom', '#993C1D', '#FAEEDA'],
+    ['memory', 'Memory', '#0F6E56', '#E1F5EE'],
+    ['todo', 'To-do / buy', '#534AB7', '#EEEDFE'],
+  ];
+  const tagMeta = (id) => TAGS.find(t=>t[0]===id) || TAGS[0];
+
+  window._notesTag = window._notesTag || 'general';   // compose tag
+  window._notesFilter = window._notesFilter || 'all';  // list filter
+  window._notesSearch = window._notesSearch || '';
+
+  function render() {
+    const notes = (state.notesLog||[]).slice();
+    // Filter
+    let filtered = notes;
+    if (window._notesFilter !== 'all') filtered = filtered.filter(n => n.tag === window._notesFilter);
+    if (window._notesSearch) { const q = window._notesSearch.toLowerCase(); filtered = filtered.filter(n => (n.text||'').toLowerCase().includes(q)); }
+    // Sort: pinned first, then newest
+    filtered.sort((a,b) => {
+      if (!!b.pinned !== !!a.pinned) return (b.pinned?1:0) - (a.pinned?1:0);
+      return (b.date+'T'+(b.time||'')).localeCompare(a.date+'T'+(a.time||''));
+    });
+
+    const doctorCount = notes.filter(n => n.tag==='doctor').length;
+    const totalCount = notes.length;
+
+    // Filter chips with counts
+    const filterChips = [['all','All',totalCount]].concat(TAGS.map(t => [t[0], t[1], notes.filter(n=>n.tag===t[0]).length]));
+
+    el.innerHTML = `
+      <div class="page-header">
+        <h2>Notes</h2>
+        <p>${totalCount? totalCount+' note'+(totalCount!==1?'s':'') : 'Capture anything — quickly'}</p>
+      </div>
+
+      ${doctorCount>0 ? `
+      <div class="card" style="background:var(--status-info-bg);border:none;cursor:pointer" onclick="setNotesFilter('doctor')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:32px;height:32px;border-radius:9px;background:#185FA5;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">${svgIcon2b('stethoscope',18)}</span>
+          <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--ink)">${doctorCount} question${doctorCount!==1?'s':''} for the doctor</div><div style="font-size:12px;color:var(--ink-2)">Tap to see your visit checklist</div></div>
+          <span style="color:var(--ink-3)">›</span>
+        </div>
+      </div>` : ''}
+
+      <div class="card">
+        <div class="card-title">New note</div>
+        <textarea id="note-input" rows="3" placeholder="Type anything — a question, a symptom, a memory..." style="width:100%;resize:vertical;font-family:var(--font);font-size:15px;padding:12px;border-radius:10px;border:1.5px solid #e0e0e0;box-sizing:border-box;margin-bottom:10px">${(window._noteDraft||"").replace(/</g,"&lt;")}</textarea>
+        <div style="font-size:11px;font-weight:600;color:var(--ink-3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px">Tag</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+          ${TAGS.map(([id,label,fg,bg]) => `<button class="note-tag-btn ${window._notesTag===id?'on':''}" data-tag="${id}" onclick="setNoteTag('${id}')" style="${window._notesTag===id?('background:'+fg+';color:#fff;border-color:'+fg):('background:'+bg+';color:'+fg+';border-color:transparent')}">${label}</button>`).join('')}
+        </div>
+        <button class="btn btn-teal btn-block" onclick="addNote()">Save note</button>
+      </div>
+
+      <div class="card" style="padding:12px">
+        <input type="text" id="note-search" placeholder="Search notes..." value="${(window._notesSearch||'').replace(/"/g,'&quot;')}" oninput="searchNotes(this.value)" style="width:100%;font-family:var(--font);font-size:14px;padding:10px 12px;border-radius:10px;border:1.5px solid #e0e0e0;box-sizing:border-box;margin-bottom:10px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${filterChips.map(([id,label,count]) => `<button class="tab-btn ${window._notesFilter===id?'active':''}" onclick="setNotesFilter('${id}')">${label}${count>0?' '+count:''}</button>`).join('')}
+        </div>
+      </div>
+
+      ${filtered.length ? filtered.map(n => noteCard(n)).join('') : `<div class="card"><div class="empty-state">${window._notesSearch||window._notesFilter!=='all' ? 'No notes match this filter.' : 'No notes yet — jot down your first thought above.'}</div></div>`}
+    `;
+  }
+
+  function noteCard(n) {
+    const meta = tagMeta(n.tag);
+    const dateShort = (n.date||'').slice(5).replace('-','/');
+    const safeText = (n.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    return '<div class="card" style="'+(n.pinned?'border-left:3px solid #C9842B;':'')+'">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px">' +
+        '<span class="note-tag-pill" style="background:'+meta[3]+';color:'+meta[2]+'">'+meta[1]+'</span>' +
+        '<div style="display:flex;gap:2px;flex-shrink:0">' +
+          '<button class="note-icon-btn" onclick="togglePinNote('+n.id+')" aria-label="'+(n.pinned?'Unpin':'Pin')+' note" title="Pin">'+(n.pinned?svgIcon2b('pin-filled',16):svgIcon2b('pin',16))+'</button>' +
+          '<button class="note-icon-btn" onclick="delNote('+n.id+')" aria-label="Delete note">'+svgIcon2b('trash',16)+'</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:15px;color:var(--ink);line-height:1.5;white-space:pre-wrap">'+safeText+'</div>' +
+      '<div style="font-size:11px;color:var(--ink-3);margin-top:8px">'+dateShort+(n.time?' · '+n.time:'')+(n.ageLabel?' · '+n.ageLabel:'')+'</div>' +
+    '</div>';
+  }
+
+  window.setNoteTag = (t) => {
+    // Preserve any in-progress text across the re-render
+    const inp = document.getElementById('note-input'); if(inp) window._noteDraft = inp.value;
+    window._notesTag = t; render();
+    const inp2 = document.getElementById('note-input'); if(inp2 && window._noteDraft){ inp2.value = window._noteDraft; }
+  };
+  window.setNotesFilter = (f) => { window._notesFilter = f; render(); };
+  window.searchNotes = (v) => { window._notesSearch = v; const notes = (state.notesLog||[]); /* live filter without full re-render focus loss */
+    const all = document.querySelectorAll('#page-notes'); render();
+    const inp = document.getElementById('note-search'); if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  };
+  window.addNote = () => {
+    const inp = document.getElementById('note-input');
+    const text = (inp?.value||'').trim();
+    if (!text) { toast('Write something first'); return; }
+    if (!state.notesLog) state.notesLog = [];
+    const now = new Date();
+    state.notesLog.push({
+      id: Date.now(),
+      date: today(),
+      time: now.toTimeString().slice(0,5),
+      text,
+      tag: window._notesTag || 'general',
+      pinned: false,
+      ageLabel: (state.babyDOB && typeof babyAgeLbl==='function') ? babyAgeLbl() : '',
+    });
+    saveState('notesLog');
+    window._noteDraft=''; window._notesSearch=''; render();
+    toastSuccess('Note saved 📝');
+  };
+  window.togglePinNote = (id) => {
+    const n = (state.notesLog||[]).find(x=>x.id===id);
+    if (n) { n.pinned = !n.pinned; saveState('notesLog'); render(); }
+  };
+  window.delNote = (id) => {
+    if (!confirm('Delete this note?')) return;
+    state.notesLog = (state.notesLog||[]).filter(x=>x.id!==id);
+    saveState('notesLog'); render(); toast('Deleted');
+  };
+
+  render();
+};
+
+function svgIcon2b(id, size){
+  const P = {
+    'stethoscope':'<path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M6 3H4M14 3h2"/><path d="M10 16v1a4 4 0 0 0 8 0v-1"/><circle cx="18" cy="14" r="2"/>',
+    'pin':'<path d="M12 17v5"/><path d="M9 3h6l-1 6 3 3v1H7v-1l3-3Z"/>',
+    'pin-filled':'<path d="M12 17v5" stroke-width="2"/><path d="M9 3h6l-1 6 3 3v1H7v-1l3-3Z" fill="currentColor"/>',
+    'trash':'<path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/>',
+  };
+  const paths = P[id] || '';
   return '<svg width="'+(size||16)+'" height="'+(size||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths+'</svg>';
 }
 
