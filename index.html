@@ -88,8 +88,12 @@ body.night-mode .now-streak{background:rgba(95,212,212,.12);color:#7fd4c4;}
 .now-page.night-context .now-today,
 .now-page.night-context .now-dash-btn{opacity:.42;transition:opacity .3s;}
 .now-page.night-context .now-tile-wrap:hover,
-.now-page.night-context .now-tile-wrap:focus-within,
-.now-page.night-context .now-today:hover{opacity:1;}
+.night-context .now-tile-wrap:focus-within,
+.night-context .now-tile-wrap:active,
+.night-context .now-tile-wrap.expanded,
+.night-context .now-tile-wrap:has(.now-quicklog),
+.night-context .now-tile-wrap:has(.now-seg),
+.now-page.night-context .now-today:hover{opacity:1 !important;}
 /* Feeding hero stays fully prominent + gets a gentle glow at night */
 .now-page.night-context .now-hero{box-shadow:0 8px 32px -6px rgba(45,143,143,.55);}
 .now-page.night-context .now-greet-text{opacity:.8;}
@@ -154,7 +158,7 @@ body.night-mode{background:#12121a !important;color:#e8e4d8 !important;}
 body.night-mode .card{background:#1e1e2a !important;border:0.5px solid rgba(255,255,255,.09);box-shadow:none !important;}
 body.night-mode .top-bar{background:#1e1e2a !important;}
 body.night-mode .top-bar-title{color:#e8c97a !important;}
-body.night-mode .bottom-nav{background:rgba(30,30,42,.82) !important;border:0.5px solid rgba(255,255,255,.10) !important;box-shadow:0 6px 24px -6px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3) !important;}
+body.night-mode .bottom-nav{background:rgba(30,30,42,.45) !important;border:0.5px solid rgba(255,255,255,.10) !important;box-shadow:0 6px 24px -6px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3) !important;}
 body.night-mode .bnav-item.active{background:rgba(95,212,212,.14) !important;}
 body.night-mode .bottom-nav-item.active{color:#e8c97a !important;}
 body.night-mode .bnav-item{color:#8a8470 !important;}
@@ -298,13 +302,15 @@ body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a
 .top-bar-menu{background:none;border:none;color:rgba(255,255,255,.8);font-size:20px;cursor:pointer;padding:4px;}
 
 /* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;left:14px;bottom:calc(env(safe-area-inset-bottom, 0px) + 16px);z-index:100;background:rgba(255,255,255,.82);backdrop-filter:blur(20px) saturate(1.7);-webkit-backdrop-filter:blur(18px) saturate(1.6);border:0.5px solid rgba(0,0,0,.06);border-radius:28px;display:grid;grid-template-columns:repeat(5,1fr);height:64px;width:calc(100vw - 28px);max-width:430px;box-shadow:0 8px 28px -6px rgba(0,0,0,.20),0 2px 8px rgba(0,0,0,.08);padding:8px;box-sizing:border-box;gap:2px;overflow:hidden;}
+.bottom-nav{position:fixed;left:14px;bottom:calc(env(safe-area-inset-bottom, 0px) + 16px);z-index:100;background:rgba(255,255,255,.45);backdrop-filter:blur(28px) saturate(1.9);-webkit-backdrop-filter:blur(28px) saturate(1.9);border:0.5px solid rgba(0,0,0,.06);border-radius:28px;display:grid;grid-template-columns:repeat(5,1fr);height:64px;width:calc(100vw - 28px);max-width:430px;box-shadow:0 8px 28px -6px rgba(0,0,0,.20),0 2px 8px rgba(0,0,0,.08);padding:8px;box-sizing:border-box;gap:2px;overflow:hidden;}
 .bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0;margin:0;border:none;background:transparent;border-radius:18px;font-family:var(--font);transition:background .18s,color .18s,transform .1s,opacity .22s ease .1s;height:100%;}.bnav-item.active{background:var(--teal-bg,#E6F5F5);}
 /* ── SCROLL-COLLAPSE: pill shrinks to the current-page icon ── */
 .bottom-nav{transition:width .38s cubic-bezier(.33,1,.4,1),height .38s cubic-bezier(.33,1,.4,1),border-radius .38s cubic-bezier(.33,1,.4,1),background .2s;}
-.bottom-nav.collapsed{width:56px;height:56px;border-radius:50%;padding:0;}
-.bottom-nav.collapsed .bnav-item:not(.active){opacity:0;transition:opacity .18s ease;pointer-events:none;}
-.bottom-nav.collapsed .bnav-item.active{background:transparent;grid-column:1;transition:opacity .18s ease;}
+.bnav-current-extra{display:none;}
+.bottom-nav.collapsed .bnav-current-extra{display:flex !important;width:auto !important;max-width:none;height:auto;flex:0 0 auto;align-items:center;justify-content:center;margin:0 !important;padding:0 !important;}
+.bottom-nav.collapsed{width:56px;height:56px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;gap:0 !important;}
+.bottom-nav.collapsed .bnav-item:not(.active):not(.bnav-current-extra){display:none !important;}
+.bottom-nav.collapsed .bnav-item.active{background:transparent !important;width:auto !important;max-width:none;height:auto;flex:0 0 auto;display:flex;align-items:center;justify-content:center;margin:0 !important;padding:0 !important;transition:opacity .18s ease;}
 .bottom-nav.collapsed .bnav-label{display:none;}
 .bottom-nav.collapsed .bnav-item.active .bnav-icon{color:var(--teal,#2D8F8F);}
 body.night-mode .bottom-nav.collapsed .bnav-item.active .bnav-icon{color:#5fd4d4;}
@@ -435,7 +441,7 @@ body.night-mode .bottom-nav.collapsed .bnav-item.active .bnav-icon{color:#5fd4d4
 .now-save{width:100%;background:#fff;color:#2D8F8F;border:none;border-radius:11px;padding:13px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;margin-top:4px;}
 .now-tile-wrap .now-save{background:#2D8F8F;color:#fff;}
 .now-seg{display:flex;gap:7px;}
-.now-seg-btn{flex:1;padding:10px;border:1.5px solid #e0e0e0;border-radius:10px;background:#fff;color:#666;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;}
+.now-seg-btn{flex:1;padding:13px 10px;min-height:46px;border:1.5px solid #e0e0e0;border-radius:10px;background:#fff;color:#666;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}.now-seg-btn:active{transform:scale(.97);}
 .now-seg-btn.on{border-color:var(--teal);background:#E6F5F5;color:var(--teal);}
 .now-diaper-btn{flex:1;padding:14px 8px;border:1.5px solid #e0e0e0;border-radius:11px;background:#fff;color:#444;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;}
 .now-diaper-btn:active{background:#E6F1FB;border-color:#185FA5;}
@@ -836,7 +842,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
   <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span> Back up all data</button>
   <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><path d="M12 8v4l3 2"/></svg></span> Restore from backup</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 03 Jul 2026, 15:09</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 04 Jul 2026, 05:16</div>
   <div style="height:20px"></div>
 </div>
 
@@ -2030,6 +2036,10 @@ const SVG_ICONS = {
   backup: '<path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
   restore: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><path d="M12 8v4l3 2"/>',
   home2: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>',
+  notes: '<path d="M5 3h14v18l-4-3-3 2-3-2-4 3Z"/><path d="M9 8h6M9 12h6"/>',
+  rhythm: '<path d="M4 4v16h16"/><path d="M7 14l3-4 3 3 4-6"/>',
+  'hospital-bag': '<path d="M6 8h12l-1 12H7Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M12 12v4M10 14h4"/>',
+  'preg-tasks': '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/>',
 };
 function svgIcon(id, size) {
   const paths = SVG_ICONS[id];
@@ -2042,12 +2052,25 @@ function renderBottomNav(active) {
   const nav = document.getElementById('bottom-nav');
   if (!nav) return;
   const slots = getNavSlots();
-  nav.innerHTML = slots.map((pid,i) => {
+  const activeInSlots = slots.includes(active);
+  let html = '';
+  // If the current page isn't one of the nav slots, prepend a "current page" chip.
+  // It's hidden in the expanded bar but becomes the icon shown when the pill collapses.
+  if (!activeInSlots && active && active !== '__more') {
+    const cp = ALL_PAGES.find(x=>x.id===active);
+    if (cp) {
+      const cic = svgIcon(cp.id, 24) || cp.icon;
+      html += '<button class="bnav-item active bnav-current-extra" onclick="navTo(\''+cp.id+'\')" aria-label="'+cp.label+'" aria-current="page"><span class="bnav-icon" aria-hidden="true">'+cic+'</span><span class="bnav-label">'+cp.label+'</span></button>';
+    }
+  }
+  html += slots.map((pid,i) => {
     const p = ALL_PAGES.find(x=>x.id===pid)||{icon:'❓',label:'?',id:pid};
     const isActive = active===p.id;
     const ic = svgIcon(p.id, 24) || p.icon;
     return '<button class="bnav-item '+(isActive?'active':'')+'" onclick="navTo(\''+p.id+'\')" aria-label="'+p.label+'"'+(isActive?' aria-current="page"':'')+'><span class="bnav-icon" aria-hidden="true">'+ic+'</span><span class="bnav-label">'+p.label+'</span></button>';
-  }).join('')+'<button class="bnav-item '+(active==='__more'?'active':'')+'" onclick="openDrawer()" aria-label="More"><span class="bnav-icon" aria-hidden="true">'+(svgIcon('more',24)||'☰')+'</span><span class="bnav-label">More</span></button>';
+  }).join('');
+  html += '<button class="bnav-item '+(active==='__more'?'active':'')+'" onclick="openDrawer()" aria-label="More"><span class="bnav-icon" aria-hidden="true">'+(svgIcon('more',24)||'☰')+'</span><span class="bnav-label">More</span></button>';
+  nav.innerHTML = html;
 }
 
 let _currentPage = 'dashboard';
@@ -5011,7 +5034,7 @@ PAGES['feeding'] = function(el) {
     state.feedingLog.push(e); saveState('feedingLog'); render();
     toast((isMultiples()?babyLabel(bi)+': ':'')+(type==='formula'?amt+'ml':type==='left'?'L '+amt+'m':'R '+amt+'m')+' logged!');
   };
-  window.delFeed = (i) => { const item=state.feedingLog[i]; state.feedingLog.splice(i,1); saveState('feedingLog'); render(); toastUndo('Feed deleted', ()=>{ state.feedingLog.splice(i,0,item); saveState('feedingLog'); render(); }); };
+  window.delFeed = (i) => { if(!confirm('Delete this feed entry?')) return; state.feedingLog.splice(i,1); saveState('feedingLog'); render(); toast('Feed deleted'); };
   render();
 };
 
@@ -5236,7 +5259,7 @@ PAGES['sleep'] = function(el) {
     saveState('sleepLog'); render();
     toast((isMultiples()?babyLabel(bi)+': ':'')+(mins>=60?Math.floor(mins/60)+'h'+(mins%60?mins%60+'m':''):mins+'m')+' '+type.toLowerCase()+' logged!');
   };
-  window.delSleep = (i) => { const item=state.sleepLog[i]; state.sleepLog.splice(i,1); saveState('sleepLog'); render(); toastUndo('Sleep deleted', ()=>{ state.sleepLog.splice(i,0,item); saveState('sleepLog'); render(); }); };
+  window.delSleep = (i) => { if(!confirm('Delete this sleep entry?')) return; state.sleepLog.splice(i,1); saveState('sleepLog'); render(); toast('Sleep deleted'); };
   render();
 };
 
@@ -5402,7 +5425,7 @@ PAGES['diaper'] = function(el) {
       '</div><div class="loghist-scroll">'+rows+'</div>';
   }
   window.toggleDiaperHist = () => { window._diaperHistOpen = !window._diaperHistOpen; render(); };
-  window.delDiaper = (i) => { const item=state.diaperLog[i]; state.diaperLog.splice(i,1); saveState('diaperLog'); render(); toastUndo('Diaper deleted', ()=>{ state.diaperLog.splice(i,0,item); saveState('diaperLog'); render(); }); };
+  window.delDiaper = (i) => { if(!confirm('Delete this diaper entry?')) return; state.diaperLog.splice(i,1); saveState('diaperLog'); render(); toast('Diaper deleted'); };
   render();
 };
 
@@ -5568,7 +5591,7 @@ PAGES['reading'] = function(el) {
     state.readingLog.push({date:document.getElementById('rl-date')?.value||today(),minutes:mins,book:document.getElementById('rl-book')?.value?.trim()||'',lang:document.getElementById('rl-lang')?.value||'',response:document.getElementById('rl-resp')?.value||'',notes:''});
     saveState('readingLog'); render(); toast('📚 Reading logged!');
   };
-  window.delReading = (i) => { const item=state.readingLog[i]; state.readingLog.splice(i,1); saveState('readingLog'); render(); toastUndo('Reading deleted', ()=>{ state.readingLog.splice(i,0,item); saveState('readingLog'); render(); }); };
+  window.delReading = (i) => { if(!confirm('Delete this reading entry?')) return; state.readingLog.splice(i,1); saveState('readingLog'); render(); toast('Reading deleted'); };
   render();
 };
 
@@ -5766,7 +5789,7 @@ PAGES['weight'] = function(el) {
     if (existing>=0) state.weightLog[existing]=entry; else state.weightLog.push(entry);
     saveState('weightLog'); render(); toastSuccess('Weight logged! ⚖️');
   };
-  window.delWeight = (i) => { const item=state.weightLog[i]; state.weightLog.splice(i,1); saveState('weightLog'); render(); toastUndo('Weight deleted', ()=>{ state.weightLog.splice(i,0,item); saveState('weightLog'); render(); }); };
+  window.delWeight = (i) => { if(!confirm('Delete this weight entry?')) return; state.weightLog.splice(i,1); saveState('weightLog'); render(); toast('Weight deleted'); };
 
   render();
 };
@@ -5907,12 +5930,11 @@ PAGES['pump'] = function(el) {
     if (e && e.ml) state.pumpedStash = (state.pumpedStash||0) + e.ml; // restore the removed amount
     state.stashLog.splice(i,1); saveState('stashLog'); saveState('pumpedStash'); render(); toast('Adjustment removed'); };
   window.delPump = (i) => {
+    if(!confirm('Delete this pumping entry?')) return;
     const e = state.pumpLog[i];
-    const prevStash = state.pumpedStash;
     if (e && e.totalMl) state.pumpedStash = Math.max(0,(state.pumpedStash||0) - e.totalMl);
-    state.pumpLog.splice(i,1); saveState('pumpLog'); saveState('pumpedStash'); render();
-    toastUndo('Pumping deleted', ()=>{ state.pumpLog.splice(i,0,e); state.pumpedStash=prevStash; saveState('pumpLog'); saveState('pumpedStash'); render(); });
-  }
+    state.pumpLog.splice(i,1); saveState('pumpLog'); saveState('pumpedStash'); render(); toast('Pumping deleted');
+  };
 
   render();
 };
@@ -5988,7 +6010,7 @@ PAGES['meds'] = function(el) {
     });
     saveState('medsLog'); render(); toastSuccess('Dose logged 💊');
   };
-  window.delMeds = (i) => { const item=state.medsLog[i]; state.medsLog.splice(i,1); saveState('medsLog'); render(); toastUndo('Medication deleted', ()=>{ state.medsLog.splice(i,0,item); saveState('medsLog'); render(); }); };
+  window.delMeds = (i) => { if(!confirm('Delete this medication entry?')) return; state.medsLog.splice(i,1); saveState('medsLog'); render(); toast('Medication deleted'); };
 
   render();
 };
