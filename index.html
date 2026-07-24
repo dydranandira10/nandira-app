@@ -35,18 +35,18 @@ const FB_URL = 'https://nandira-app-default-rtdb.firebaseio.com';
   --font-display:'Fraunces',Georgia,'Times New Roman',serif;
   --r:12px;--rs:8px;--shadow:0 1px 4px rgba(0,0,0,.09);
   --bar:60px;
-  /* Gender theme (defaults = pale yellow / neutral) */
-  --theme-bg:#FFFFA7;
-  --theme-topbar:#FFF06A;
+  /* Gender theme (defaults = warm paper; gender now only tints the active-nav pill) */
+  --theme-bg:#FBF6EC;
+  --theme-topbar:#FFFDF8;
   --theme-accent:#B89530;
   --theme-card-tint:#FFFFD6;
   --theme-text:#2A2A33;
-  --theme-text-dim:rgba(40,40,55,.55);
-  --theme-drawer-bg:#FFFEF2;
-  --theme-nav-text:#5C541F;
-  --theme-nav-dim:rgba(92,84,31,.65);
-  --theme-active-bg:#FFF06A;
-  --theme-active-text:#4A4420;
+  --theme-text-dim:rgba(42,42,51,.6);
+  --theme-drawer-bg:#FFFDF8;
+  --theme-nav-text:#2A2A33;
+  --theme-nav-dim:rgba(42,42,51,.62);
+  --theme-active-bg:#F5EBC7;
+  --theme-active-text:#7A6320;
 
   /* ── DESIGN SYSTEM: TYPE SCALE (6 sizes, 2 weights) ── */
   --fs-display:28px;  /* hero numbers, big time-since */
@@ -119,7 +119,8 @@ body.night-mode .note-icon-btn:active{background:rgba(255,255,255,.08);}
 .now-tile-wrap:nth-child(5){animation-delay:.14s;}
 /* Tactile press on tappable tiles */
 .now-tile:active,.stat-card:active{transform:scale(.985);transition:transform .08s;}
-.loghist-row{display:grid;align-items:center;column-gap:8px;padding:11px 14px;border-bottom:1px solid var(--hairline,#f0f0f0);font-size:13px;}
+.loghist-row{display:grid;align-items:center;column-gap:8px;padding:11px 14px;border-bottom:1px solid var(--hairline,#f0f0f0);font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.loghist-row:active{background:rgba(45,143,143,.06);}
 @media (prefers-reduced-motion: reduce){.now-tile-wrap,.stat-card{animation:none;}}
 /* ── SUCCESS TOAST CHECKMARK ── */
 .toast-check{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--teal,#2D8F8F);border-radius:50%;flex-shrink:0;}
@@ -228,6 +229,10 @@ body.night-mode .glance-lbl{color:#a5a08f;}
 .cfd-card{background:#fff;border-radius:18px;padding:22px 20px 16px;width:100%;max-width:340px;transform:scale(.96);transition:transform .18s;box-shadow:0 18px 50px rgba(0,0,0,.3);}
 .cfd-ov.show .cfd-card{transform:scale(1);}
 .cfd-title{font-size:16px;font-weight:800;color:#2A2A33;line-height:1.35;}
+.cfd-icon{font-size:38px;line-height:1;text-align:center;margin-bottom:10px;}
+.cfd-card[role="alertdialog"]{text-align:center;}
+.cfd-card[role="alertdialog"] .cfd-body{text-align:center;}
+body.night-mode .cfd-title{color:#f0ede2;}
 .cfd-body{font-size:13.5px;color:#5c5c66;line-height:1.5;margin-top:8px;}
 .cfd-btns{display:flex;gap:10px;margin-top:20px;}
 .cfd-btn{flex:1;min-height:46px;border-radius:12px;font-size:14.5px;font-weight:700;font-family:var(--font);cursor:pointer;border:1.5px solid transparent;-webkit-tap-highlight-color:transparent;}
@@ -371,7 +376,7 @@ body{font-family:var(--font);font-size:15px;background:var(--theme-bg);color:#1a
 .landing-card select option{background:#1B3A6B;color:#fff;}
 .landing-gender-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
 .gender-btn{padding:10px 4px;border-radius:10px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);text-align:center;transition:all .15s;}
-.gender-btn.selected{background:rgba(255,255,255,.3);border-color:rgba(255,255,255,.8);color:#fff;}
+.gender-btn.selected{background:var(--teal,#2D8F8F);border-color:#5cd1c8;color:#fff;box-shadow:0 3px 12px -2px rgba(45,143,143,.55);}
 .gender-btn div{font-size:20px;margin-bottom:3px;}
 body.night-mode [id^="bsg-"]{background:#2a2a38 !important;border-color:rgba(255,255,255,.18) !important;color:#e8e4d8 !important;}
 body.night-mode [id^="bsg-"][style*="teal"]{background:#123528 !important;border-color:#2D8F8F !important;color:#5cd1a8 !important;}
@@ -385,10 +390,26 @@ body.night-mode [id^="bsg-"][style*="teal"]{background:#123528 !important;border
 .landing-divider::before,.landing-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.2);}
 
 /* ── SYNC STATUS ── */
-.sync-dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;margin-right:5px;transition:background .3s;}
-.sync-dot.synced{background:#4CAF50;}
-.sync-dot.syncing{background:#FFC107;animation:pulse .8s infinite;}
-.sync-dot.error{background:#f44336;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#c9c2b2;flex-shrink:0;transition:background .3s;}
+.sync-pill{display:inline-flex;align-items:center;gap:0;background:none;border:none;padding:2px 2px 2px 4px;margin-left:6px;cursor:pointer;border-radius:999px;font-family:var(--font);-webkit-tap-highlight-color:transparent;transition:background .2s;vertical-align:middle;}
+.sync-pill:active{background:rgba(120,95,50,.1);}
+.sync-label{font-size:10px;font-weight:600;letter-spacing:.2px;max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .28s ease,opacity .2s ease,margin .28s ease;color:var(--theme-text-dim);}
+.sync-pill.show-label .sync-label{max-width:64px;opacity:1;margin-left:5px;}
+.sync-pill.synced .sync-dot{background:#2E9E6B;}
+.sync-pill.synced .sync-label{color:#2E9E6B;}
+.sync-pill.syncing .sync-dot{background:#C98A2E;animation:syncPulse .9s ease-in-out infinite;}
+.sync-pill.syncing .sync-label{color:#C98A2E;}
+.sync-pill.error .sync-dot{background:#C4574B;}
+.sync-pill.error .sync-label{color:#C4574B;}
+@keyframes syncPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.82);}}
+@media (prefers-reduced-motion: reduce){.sync-pill.syncing .sync-dot{animation:none;}}
+body.night-mode .sync-pill.synced .sync-dot{background:#4fd18a;}
+body.night-mode .sync-pill.synced .sync-label{color:#4fd18a;}
+body.night-mode .sync-pill.syncing .sync-dot{background:#e0a94e;}
+body.night-mode .sync-pill.syncing .sync-label{color:#e0a94e;}
+body.night-mode .sync-pill.error .sync-dot{background:#e07a6d;}
+body.night-mode .sync-pill.error .sync-label{color:#e07a6d;}
+body.night-mode .sync-pill:active{background:rgba(255,255,255,.08);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* ── TOP BAR ── */
@@ -428,6 +449,11 @@ body.night-mode .bottom-nav.collapsed .bnav-item.active .bnav-icon{color:#5fd4d4
 .drawer-header h1{font-size:16px;font-weight:700;color:var(--theme-text);}
 .drawer-header p{font-size:11px;color:var(--theme-text-dim);margin-top:3px;}
 .drawer-close{background:none;border:none;color:var(--theme-text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.drawer-night{background:none;border:none;color:var(--theme-text);cursor:pointer;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;-webkit-tap-highlight-color:transparent;transition:background .18s,color .18s;}
+.drawer-night:active{background:rgba(120,95,50,.12);}
+.drawer-night.is-active{color:#C98A2E;}
+body.night-mode .drawer-night.is-active{color:#e0b060;}
+body.night-mode .drawer-night:active{background:rgba(255,255,255,.1);}
 .drawer-section{position:relative;padding:14px 16px 5px 24px;font-size:10.5px;font-weight:750;color:var(--theme-nav-dim);text-transform:uppercase;letter-spacing:.12em;}
 .drawer-section::before{content:'';position:absolute;left:14px;top:15px;bottom:6px;width:3px;border-radius:3px;background:linear-gradient(180deg,#D98E7A 0%,#2D8F8F 55%,#2A2E55 100%);}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;margin:2px 8px;border-radius:10px;cursor:pointer;color:var(--theme-nav-text);font-size:13px;font-weight:500;border:none;background:transparent;font-family:var(--font);width:calc(100% - 16px);text-align:left;transition:background .12s,color .12s;}
@@ -574,6 +600,13 @@ body.night-mode .bd-row-name{color:#e8e4d8;}
 .arc-now{position:absolute;top:2px;bottom:2px;width:2px;background:#fff;border-radius:2px;box-shadow:0 0 6px 1px rgba(255,255,255,.8);transform:translateX(-50%);}
 .arc-hours{display:flex;justify-content:space-between;margin-top:7px;font-size:10px;color:var(--ink-3);letter-spacing:.3px;}
 .arc-empty{font-size:12px;color:var(--ink-3);margin-top:9px;line-height:1.45;}
+/* One-time coach mark: teaches that arc moments are tappable */
+.coach-mark{position:relative;margin-top:12px;background:var(--teal,#2D8F8F);border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:10px;transition:opacity .18s,transform .18s;box-shadow:0 4px 14px -4px rgba(45,143,143,.5);}
+.coach-arrow{position:absolute;top:-5px;left:26px;width:9px;height:9px;background:var(--teal,#2D8F8F);transform:rotate(45deg);border-radius:2px;}
+.coach-body{flex:1;font-size:12.5px;font-weight:600;color:#fff;line-height:1.4;}
+.coach-dismiss{flex-shrink:0;background:rgba(255,255,255,.22);border:none;border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--font);min-height:30px;}
+.coach-dismiss:active{background:rgba(255,255,255,.34);}
+body.night-mode .coach-mark,body.night-mode .coach-arrow{background:#237E7E;}
 body.night-mode .day-arc{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
 body.night-mode .arc-dot{background:rgba(240,237,226,.92);}
 /* Week as stacked story bands */
@@ -606,6 +639,95 @@ body.night-mode .story-band{box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);}
 .gk-date{font-size:11px;color:var(--ink-3);margin-top:2px;}
 body.night-mode .gk-val{color:#f0ede2;}
 body.night-mode .gk-delta.up{color:#4fd1a1;} body.night-mode .gk-delta.down{color:#e88a6a;}
+/* Settings page rows */
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;cursor:pointer;min-height:44px;border-bottom:1px solid rgba(120,95,50,.08);}
+.settings-row:last-child{border-bottom:none;}
+/* Rows whose control needs breathing room stack it below the label instead of
+   crowding the same line — prevents cramped 3-line wrapping with long values. */
+.settings-row.stacked{flex-direction:column;align-items:stretch;gap:9px;}
+.settings-row.stacked .settings-row-main{width:100%;}
+.settings-row.stacked .settings-code{align-self:flex-start;}
+.settings-row.stacked .settings-seg{align-self:stretch;}
+.settings-row.stacked .settings-seg-btn{flex:1;text-align:center;}
+.settings-row-main{flex:1;min-width:0;}
+.settings-row-lbl{font-size:14.5px;font-weight:600;color:var(--ink);}
+.settings-row-sub{font-size:12px;color:var(--ink-3);margin-top:2px;}
+.settings-chev{color:var(--ink-3);font-size:18px;flex-shrink:0;}
+.settings-code{font-family:monospace;font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--teal,#2D8F8F);background:rgba(45,143,143,.1);padding:5px 9px;border-radius:8px;flex-shrink:0;}
+body.night-mode .settings-code{color:#5cd1c8;background:rgba(92,209,200,.12);}
+.settings-row-danger .settings-row-lbl{color:#C4362B;}
+.settings-seg{display:flex;gap:4px;background:rgba(120,95,50,.07);border-radius:10px;padding:3px;flex-shrink:0;}
+.settings-seg-btn{padding:6px 10px;border:none;border-radius:8px;background:none;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:var(--font);min-height:30px;}
+.settings-seg-btn.on{background:var(--teal,#2D8F8F);color:#fff;box-shadow:0 2px 6px -1px rgba(45,143,143,.4);}
+.settings-mark{text-align:center;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink-3);opacity:.5;margin:18px 0 8px;}
+body.night-mode .settings-row{border-bottom-color:rgba(255,255,255,.07);}
+body.night-mode .settings-row-lbl{color:#f0ede2;}
+body.night-mode .settings-row-danger .settings-row-lbl{color:#e88a6a;}
+body.night-mode .settings-seg{background:rgba(255,255,255,.06);}
+body.night-mode .settings-seg-btn{color:#a5a08f;}
+/* Milestones as a timeline, not a checklist */
+.mil-timeline{position:relative;margin:4px 0 2px;}
+.mil-timeline::before{content:'';position:absolute;left:9px;top:4px;bottom:4px;width:2px;border-radius:2px;background:linear-gradient(180deg,#D98E7A,#2D8F8F 45%,#2A2E55);opacity:.3;}
+.mil-node{position:relative;padding-left:26px;margin:20px 0 10px;}
+.mil-node::before{content:'';position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--teal,#2D8F8F);box-shadow:0 0 0 4px var(--theme-bg,#FBF6EC);}
+.mil-node-label{font-family:var(--font-display);font-size:15.5px;font-weight:650;color:var(--ink);}
+.mil-node-frac{font-size:11px;color:var(--ink-3);margin-left:7px;font-weight:600;}
+.mil-row{padding:12px 14px;border-bottom:1px solid var(--hairline,#f0f0f0);}
+.mil-row.mil-done{opacity:.6;}
+.mil-text{font-size:13px;font-weight:600;line-height:1.4;color:var(--ink);}
+.mil-row.mil-done .mil-text{text-decoration:line-through;color:var(--ink-3);}
+.mil-text.mil-redflag{color:#A6402F;}
+.mil-donedate{font-size:11px;color:#0F6E56;font-weight:600;}
+.mil-note{font-size:11px;color:var(--ink-3);font-style:italic;margin-top:4px;line-height:1.4;}
+.mil-btn-done{padding:5px 11px;border-radius:8px;border:1.5px solid #ddd;background:#fff;color:#666;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;min-height:28px;}
+.mil-btn-done.on{border-color:#0F6E56;background:#E1F5EE;color:#0F6E56;}
+.mil-btn-flag{padding:4px 10px;border-radius:8px;border:1.5px solid #eee;background:#fff;color:#aaa;font-size:11px;cursor:pointer;font-family:var(--font);white-space:nowrap;min-height:26px;}
+.mil-btn-flag.on{border-color:#A6402F;background:#FBEAE7;color:#A6402F;}
+body.night-mode .mil-node::before{box-shadow:0 0 0 4px #131320;}
+body.night-mode .mil-row{border-bottom-color:rgba(255,255,255,.07);}
+body.night-mode .mil-text{color:#f0ede2;}
+body.night-mode .mil-row.mil-done .mil-text{color:#8a8578;}
+body.night-mode .mil-text.mil-redflag{color:#e88a6a;}
+body.night-mode .mil-donedate{color:#4fd1a1;}
+body.night-mode .mil-note{color:#a5a08f;}
+body.night-mode .mil-btn-done{background:#262634;border-color:rgba(255,255,255,.15);color:#c4bca8;}
+body.night-mode .mil-btn-done.on{background:#123528;border-color:#2D8F8F;color:#5cd1a8;}
+body.night-mode .mil-btn-flag{background:#262634;border-color:rgba(255,255,255,.12);color:#8a8578;}
+body.night-mode .mil-btn-flag.on{background:#3a1e1a;border-color:#e88a6a;color:#e88a6a;}
+/* Vaccines: progress ring instead of a plain fraction in text */
+.vax-ring-card{display:flex;align-items:center;gap:16px;position:relative;}
+.vax-ring{flex-shrink:0;}
+.vax-ring-track{stroke:rgba(120,95,50,.12);}
+.vax-ring-fill{stroke:var(--teal,#2D8F8F);transition:stroke-dasharray .5s ease;}
+.vax-ring-num{position:absolute;left:16px;top:16px;width:84px;height:84px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:22px;font-weight:750;color:var(--ink);font-variant-numeric:oldstyle-nums;}
+.vax-ring-den{font-size:13px;font-weight:600;color:var(--ink-3);margin-left:1px;}
+.vax-ring-side{flex:1;display:flex;flex-direction:column;gap:6px;}
+.vax-ring-flag{font-size:12px;font-weight:600;color:var(--ink-3);line-height:1.4;}
+.vax-ring-flag span{font-size:11px;font-weight:500;color:var(--ink-3);}
+.vax-ring-flag.overdue{color:#A6402F;}
+.vax-ring-flag.next{color:var(--ink);}
+.vax-ring-flag.done{color:#0F6E56;}
+body.night-mode .vax-ring-track{stroke:rgba(255,255,255,.08);}
+body.night-mode .vax-ring-fill{stroke:#5cd1c8;}
+body.night-mode .vax-ring-num{color:#f0ede2;}
+body.night-mode .vax-ring-den{color:#a5a08f;}
+body.night-mode .vax-ring-flag{color:#a5a08f;}
+body.night-mode .vax-ring-flag span{color:#a5a08f;}
+body.night-mode .vax-ring-flag.overdue{color:#e88a6a;}
+body.night-mode .vax-ring-flag.next{color:#f0ede2;}
+body.night-mode .vax-ring-flag.done{color:#4fd1a1;}
+/* Magazine treatment for long-form reference pages (Philosophy, Situations, Montessori, RIE) */
+.ref-lead{font-family:var(--font-display);font-style:italic;font-size:17.5px;font-weight:500;color:var(--ink);line-height:1.55;margin:2px 4px 18px;padding-left:14px;border-left:3px solid transparent;border-image:linear-gradient(180deg,#D98E7A,#2D8F8F 55%,#2A2E55) 1;}
+.ref-card-title{font-size:12.5px;font-weight:700;letter-spacing:.02em;margin-bottom:5px;}
+.ref-body{font-size:13px;color:var(--ink-3);line-height:1.7;}
+.ref-rule{font-size:13.5px;font-weight:650;color:var(--ink);margin-bottom:5px;}
+.ref-divider{border-bottom:1px solid var(--hairline,#f0f0f0);}
+body.night-mode .ref-lead{color:#f0ede2;}
+body.night-mode .ref-body{color:#a5a08f;}
+body.night-mode .ref-rule{color:#f0ede2;}
+body.night-mode .ref-divider{border-bottom-color:rgba(255,255,255,.07);}
+.ref-principle-box{margin-bottom:12px;padding:10px 12px;background:#F4F0E4;border-radius:8px;color:var(--ink);}
+body.night-mode .ref-principle-box{background:#242435;color:#e8e4d8;}
 /* Data app: numerals align in every table and card */
 .card{font-variant-numeric:tabular-nums;}
 /* Accessibility: visible keyboard focus everywhere interactive */
@@ -619,6 +741,26 @@ body.night-mode button:focus-visible,body.night-mode [role="button"]:focus-visib
 @keyframes nowPulse{0%,100%{opacity:.85;}50%{opacity:1;}}
 .arc-now{animation:nowPulse 3.2s ease-in-out infinite;}
 @keyframes pageIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+@keyframes dotIn{from{opacity:0;transform:translate(-50%,-50%) scale(.3);}}
+/* Pull-to-refresh indicator */
+#ptr-ind{position:fixed;top:-46px;left:50%;transform:translateX(-50%);z-index:900;width:38px;height:38px;border-radius:50%;background:#FFFDF8;border:1px solid rgba(120,95,50,.12);box-shadow:0 4px 14px -4px rgba(60,45,20,.25);display:flex;align-items:center;justify-content:center;color:var(--teal,#2D8F8F);transition:transform .22s ease;pointer-events:none;}
+#ptr-ind.armed{color:#1F7373;border-color:rgba(45,143,143,.4);}
+#ptr-ind.spin svg{animation:ptrSpin .65s linear infinite;}
+@keyframes ptrSpin{to{transform:rotate(360deg);}}
+/* Primary-action ripple */
+.log-ripple{position:fixed;width:44px;height:44px;border-radius:50%;border:2.5px solid rgba(45,143,143,.6);pointer-events:none;z-index:9999;animation:rippleOut .55s cubic-bezier(.2,.6,.3,1) forwards;}
+@keyframes rippleOut{from{transform:scale(.35);opacity:.95;}to{transform:scale(2.4);opacity:0;}}
+body.night-mode .log-ripple{border-color:rgba(92,209,200,.65);}
+/* Growth chart tap tooltip */
+.chart-tip{position:fixed;z-index:950;background:#2A2A33;color:#FFFDF8;font-size:12px;padding:7px 11px;border-radius:10px;box-shadow:0 6px 18px -4px rgba(20,15,5,.4);pointer-events:none;animation:tipIn .18s ease;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.chart-tip b{font-weight:750;}
+.chart-tip::after{content:'';position:absolute;left:50%;bottom:-4px;transform:translateX(-50%) rotate(45deg);width:8px;height:8px;background:#2A2A33;border-radius:1px;}
+@keyframes tipIn{from{opacity:0;transform:translateY(3px);}}
+body.night-mode .chart-tip{background:#f0ede2;color:#1d1d2c;}
+body.night-mode .chart-tip::after{background:#f0ede2;}
+.stat-card .val{font-family:var(--font-display);font-weight:750;font-variant-numeric:oldstyle-nums;letter-spacing:-.3px;}
+body.night-mode #ptr-ind{background:#1d1d2c;border-color:rgba(255,255,255,.12);color:#5cd1c8;}
+@media (prefers-reduced-motion: reduce){#ptr-ind.spin svg{animation:none;}}
 .page-in{animation:pageIn .26s ease;}
 @media (prefers-reduced-motion: reduce){.sky-orb,.sky-stars,.arc-now,.page-in{animation:none !important;}}
 .now-hero:active{transform:scale(.985);}
@@ -731,7 +873,8 @@ body.night-mode .feed-type-btn.active{background:#1d4d4d !important;border-color
 body.night-mode .feed-pill{background:#262635;border-color:rgba(255,255,255,.12);}
 body.night-mode .fp-val{color:#e8e4d8;}
 body.night-mode .fp-div{background:rgba(255,255,255,.12);}
-.feed-hist-row{display:grid;grid-template-columns:48px 46px 46px 44px 1fr 28px;align-items:center;column-gap:8px;padding:11px 12px;border-bottom:1px solid var(--hairline,#f0f0f0);font-size:13px;}
+.feed-hist-row{display:grid;grid-template-columns:48px 46px 46px 44px 1fr 28px;align-items:center;column-gap:8px;padding:11px 12px;border-bottom:1px solid var(--hairline,#f0f0f0);font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.feed-hist-row:active{background:rgba(45,143,143,.06);}
 .feed-hist-row span{font-family:var(--font);font-size:12px;}
 .fh-date{color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums;}
 .fh-time{color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums;}
@@ -964,10 +1107,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 /* ── MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:680px;padding:20px 18px 36px;max-height:88vh;overflow-y:auto;animation:slideUp .22s ease;}
+.modal-sheet{background:#FFFDF8;border-radius:24px 24px 0 0;width:100%;max-width:680px;padding:20px 18px 36px;max-height:88vh;overflow-y:auto;animation:slideUp .22s ease;box-shadow:0 -8px 30px -8px rgba(60,45,20,.18);}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-handle{width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 14px;}
-.modal-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:14px;}
+.modal-handle{width:36px;height:4px;background:rgba(120,95,50,.22);border-radius:2px;margin:0 auto 14px;}
+.modal-title{font-family:var(--font-display);font-size:19px;font-weight:650;color:var(--ink);margin-bottom:15px;letter-spacing:-.2px;}
 .modal-actions{display:flex;gap:8px;margin-top:14px;}
 .modal-actions .btn{flex:1;}
 
@@ -1132,7 +1275,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
     <div class="landing-divider"><span>or</span></div>
     <div style="margin-bottom:8px">
       <label>Join with a Family Code</label>
-      <input type="text" id="join-code-input" placeholder="e.g. RAFFA2026" style="text-transform:uppercase;letter-spacing:.1em">
+      <input type="text" id="join-code-input" placeholder="e.g. REZA-UJ76JA" style="text-transform:uppercase;letter-spacing:.1em">
     </div>
     <button class="landing-btn" onclick="joinFamily()" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4)">Join existing family</button>
   </div>
@@ -1172,6 +1315,11 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
       <label>Has baby arrived? If yes, enter birth date:</label>
       <input type="date" id="l-dob">
     </div>
+    <div>
+      <label>Family code <span style="opacity:.6">(optional — for syncing with your partner)</span></label>
+      <input type="text" id="l-code" placeholder="Leave blank for a secure random code" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.06em;font-family:monospace">
+      <div id="l-code-err" style="font-size:12px;color:#ffd0cb;min-height:15px;margin-top:3px"></div>
+    </div>
     <button class="landing-btn" onclick="completeLandingSetup()">🚀 Let's go!</button>
     <button onclick="showLandingStep(2)" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;width:100%;text-align:center;margin-top:10px;cursor:pointer;font-family:var(--font)">← Back</button>
   </div>
@@ -1186,8 +1334,10 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <div class="top-bar-left" onclick="navTo('dashboard')">
     <div class="top-bar-title" id="top-bar-title"><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</div>
     <div class="top-bar-sub" id="top-bar-sub">
-      <span class="sync-dot synced" id="sync-dot"></span>
       <span id="top-bar-sub-text">Loading...</span>
+      <button class="sync-pill synced" id="sync-pill" onclick="manualSync(event)" aria-label="Sync status — tap to refresh">
+        <span class="sync-dot" id="sync-dot"></span><span class="sync-label" id="sync-label"></span>
+      </button>
     </div>
   </div>
   <div id="baby-switch-wrap" style="display:none"><button class="baby-switch-btn" id="baby-switch-btn" onclick="toggleBabyDropdown(event)" aria-haspopup="true"></button></div>
@@ -1202,14 +1352,16 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
       <h1 id="drawer-title"><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</h1>
       <p id="drawer-sub">Loading...</p>
     </div>
-    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div style="display:flex;align-items:center;gap:4px">
+      <button class="drawer-night" id="drawer-night-btn" onclick="toggleNightMode();updateDrawerNightIcon()" aria-label="Toggle night mode"></button>
+      <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
   </div>
   <div class="drawer-section">Overview</div>
   <button class="nav-item" onclick="navTo('now')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></span> Now</button>
   <button class="nav-item" onclick="navTo('dashboard')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg></span> Home</button>
   <button class="nav-item" onclick="navTo('rhythm')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 14l3-4 3 3 4-6"/></svg></span> Insights</button>
   <button class="nav-item" onclick="navTo('notes')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-4-3-3 2-3-2-4 3Z"/><path d="M9 8h6M9 12h6"/></svg></span> Notes</button>
-  <button class="nav-item" onclick="navTo('settings')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span> Settings</button>
   <div id="phase-suggest"></div>
   <div id="drawer-prebirth">
   <div class="drawer-section drawer-section-toggle" id="prebirth-header" onclick="togglePrebirthSection()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePrebirthSection();}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
@@ -1249,16 +1401,10 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('budget')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10c0-1 1-1.7 2.5-1.7s2.5.7 2.5 1.7-1 1.5-2.5 1.5-2.5.5-2.5 1.5 1 1.7 2.5 1.7 2.5-.7 2.5-1.7"/></svg></span> Budget</button>
   <button class="nav-item" onclick="navTo('knowledge')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span> Knowledge Base</button>
   <div class="drawer-section" style="border-top:1px solid rgba(0,0,0,.06);margin-top:8px;padding-top:12px">Settings</div>
-  <button class="nav-item" onclick="toggleNightMode()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/></svg></span> <span id="night-mode-label">Night mode</span></button>
+  <button class="nav-item" onclick="navTo('settings')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span> Settings</button>
   <button class="nav-item" onclick="openNavCustomizer()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></span> Customise tabs</button>
-  <button class="nav-item" onclick="closeDrawer();openBabySettings()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M6 21c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M10 8h.01M14 8h.01"/></svg></span> Baby profile</button>
-  <button class="nav-item" onclick="closeDrawer();showFamilyCode()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></span> Family sync code</button>
-
-  <div class="drawer-section">Data &amp; Backup</div>
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
-  <button class="nav-item" onclick="closeDrawer();backupAllData()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span> Back up all data</button>
-  <button class="nav-item" onclick="closeDrawer();restoreDataPrompt()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><path d="M12 8v4l3 2"/></svg></span> Restore from backup</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 18 Jul 2026, 03:30</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 24 Jul 2026, 10:27</div>
   <div style="height:20px"></div>
 </div>
 
@@ -1419,18 +1565,53 @@ async function pushToCloud(key, value) {
 }
 
 function setSyncStatus(status) {
-  const dot = document.getElementById('sync-dot');
-  if (dot) { dot.className = 'sync-dot ' + status; }
+  const pill = document.getElementById('sync-pill');
+  const label = document.getElementById('sync-label');
+  if (!pill) return;
+  pill.className = 'sync-pill ' + status;
+  const LABELS = { syncing:'Syncing\u2026', synced:'Synced', error:'Offline' };
+  if (label) label.textContent = LABELS[status] || '';
+  const prev = window._lastSyncStatus;
+  clearTimeout(window._syncLabelTimer);
+  if (status === 'error') {
+    pill.classList.add('show-label');            // problems always stay visible
+  } else if (status === 'syncing') {
+    // Only announce syncing when it follows a real change/recovery or a user tap —
+    // the routine 8s idle poll stays silent so the bar is calm at rest.
+    if (prev === 'error' || prev === undefined || window._syncUserAction) pill.classList.add('show-label');
+    else pill.classList.remove('show-label');
+  } else if (status === 'synced') {
+    // Flash "Synced" only when arriving from a non-synced state, then collapse to a
+    // quiet dot — never blink on every idle re-confirmation.
+    if (prev && prev !== 'synced') {
+      pill.classList.add('show-label');
+      window._syncLabelTimer = setTimeout(() => { pill.classList.remove('show-label'); }, 1600);
+    } else {
+      pill.classList.remove('show-label');
+    }
+  }
+  window._syncUserAction = false;
+  window._lastSyncStatus = status;
 }
+
+// Tapping the pill forces an immediate sync — gives the user agency when they
+// want certainty their partner's device is up to date.
+window.manualSync = function(e) {
+  if (e) e.stopPropagation();
+  if (window._lastSyncStatus === 'syncing') return;
+  window._syncUserAction = true;
+  if (typeof syncFromCloud === 'function') syncFromCloud();
+};
 
 // ══════════════════════════════════════════════════════════════════════════════
 // STATE — localStorage + Firebase
 // ══════════════════════════════════════════════════════════════════════════════
 const LOCAL_KEY = 'babyos_v2';
-let state = {
+function defaultState() {
+  return {
   familyId: null, familyCode: null,
   momName: '', dadName: '',
-  babyName: null, babyGender: null, babyDOB: null,
+  babyName: null, babyNickname: null, babyGender: null, babyDOB: null,
   edd: '2026-06-19',
   caesarianDate: null,  // planned C-section date if different from EDD
   lmpDate: null,        // last menstrual period — overrides EDD for week calc if set
@@ -1462,12 +1643,19 @@ let state = {
   notesLog: [],          // [{id, date, time, text, tag, pinned, ageLabel}]
   customFoods: [],       // user-added foods [{id,name,group,age,texture,allergen,prep}]
   weightUnit: 'kg',      // display unit: 'kg' | 'g' | 'lboz'
+  // Shared cross-phone timers: kept in synced state so either parent's phone can
+  // see, tick and stop a timer the other started. ALWAYS an object, never null
+  // (Firebase RTDB deletes null keys, which would break stop-propagation).
+  activeFeedTimer: { running:false },   // or {running:true, start:ms, side}
+  activeSleepTimer: { running:false },  // or {running:true, start:ms}
   // Nav
   navSlots: ['now','feeding','sleep','diaper'],
   // Budget
   budgetItems: [],
   // Bilingual
-};
+  };
+}
+let state = defaultState();
 
 function loadLocal() {
   try {
@@ -1536,11 +1724,41 @@ function generateFamilyId() {
   return Math.random().toString(36).substr(2,6).toUpperCase() + Date.now().toString(36).substr(-3).toUpperCase();
 }
 
+// Family codes are the ONLY thing protecting a family's cloud data, so they must
+// not be guessable. We keep a short memorable prefix (a name fragment) but append
+// cryptographically-random characters from an unambiguous alphabet (no O/0/I/1).
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function randomCodeChars(n) {
+  let out = '';
+  const buf = new Uint32Array(n);
+  (window.crypto || window.msCrypto).getRandomValues(buf);
+  for (let i = 0; i < n; i++) out += CODE_ALPHABET[buf[i] % CODE_ALPHABET.length];
+  return out;
+}
 function generateFamilyCode(momName, dadName, edd) {
-  // Create a memorable code from names + due year
-  const part1 = (dadName || 'FAMILY').substring(0,4).toUpperCase().replace(/[^A-Z]/g,'');
-  const year = edd ? edd.split('-')[0].substr(2) : '26';
-  return part1 + year;
+  // Memorable prefix from a parent's name, then a 6-char random suffix (~1 in 10^9).
+  const prefix = ((dadName || momName || 'FAM').toUpperCase().replace(/[^A-Z]/g,'') + 'FAM').substring(0,4);
+  return prefix + '-' + randomCodeChars(6);
+}
+// Validate a user-chosen custom code: 6–24 chars, letters/digits/hyphens only.
+function validateCustomCode(raw) {
+  const code = (raw || '').trim().toUpperCase();
+  if (code.length < 6) return { ok:false, reason:'Codes must be at least 6 characters.' };
+  if (code.length > 24) return { ok:false, reason:'Codes must be 24 characters or fewer.' };
+  if (!/^[A-Z0-9-]+$/.test(code)) return { ok:false, reason:'Use only letters, numbers and hyphens.' };
+  return { ok:true, code };
+}
+// Is a code already taken by another family in the cloud?
+async function codeInUse(code, exceptFamilyId) {
+  try {
+    const families = await fbRead('/families');
+    if (!families) return false;
+    for (const [id, data] of Object.entries(families)) {
+      if (id === exceptFamilyId) continue;
+      if ((data.state?.familyCode || '').toUpperCase() === code.toUpperCase()) return true;
+    }
+  } catch(e){}
+  return false;
 }
 
 async function joinFamily() {
@@ -1578,8 +1796,22 @@ async function completeLandingSetup() {
   }
   if (n===1) { babyName=babies[0]?.name||null; babyGender=babies[0]?.gender||'surprise'; }
   const familyId = generateFamilyId();
-  const familyCode = generateFamilyCode(dadName, momName, edd);
-  
+  // Family code: use the parent's custom choice if they entered one, otherwise a
+  // secure random code. Custom codes are validated and checked for collisions.
+  let familyCode;
+  const rawCode = (document.getElementById('l-code')?.value || '').trim();
+  const codeErrEl = document.getElementById('l-code-err');
+  if (codeErrEl) codeErrEl.textContent = '';
+  if (rawCode) {
+    const v = validateCustomCode(rawCode);
+    if (!v.ok) { if (codeErrEl) codeErrEl.textContent = v.reason; return; }
+    if (codeErrEl) codeErrEl.textContent = 'Checking code\u2026';
+    if (await codeInUse(v.code, null)) { if (codeErrEl) codeErrEl.textContent = 'That code is already taken \u2014 try another.'; return; }
+    if (codeErrEl) codeErrEl.textContent = '';
+    familyCode = v.code;
+  } else {
+    familyCode = generateFamilyCode(dadName, momName, edd);
+  }
   // Set default lists — adjust inventory + bag for multiples
   state = {
     ...state, familyId, familyCode,
@@ -2108,12 +2340,12 @@ let currentBabyIdx = 0;
 function nBabies() { return Math.min(2, state.numberOfBabies || 1); }  // capped at twins
 function isMulti() { return nBabies() > 1; }
 function babyAt(i) {
-  // Returns a normalised {name, gender, dob} for baby i, falling back to the legacy single fields.
+  // Returns a normalised {name, nickname, gender, dob} for baby i, falling back to the legacy single fields.
   if (isMulti() && state.babies && state.babies[i]) {
     const b = state.babies[i];
-    return { name: b.name || ('Baby '+['A','B'][i]), gender: b.gender || 'surprise', dob: b.dob || state.babyDOB || null };
+    return { name: b.name || ('Baby '+['A','B'][i]), nickname: b.nickname || '', gender: b.gender || 'surprise', dob: b.dob || state.babyDOB || null };
   }
-  return { name: state.babyName || 'Baby', gender: state.babyGender || 'surprise', dob: state.babyDOB || null };
+  return { name: state.babyName || 'Baby', nickname: state.babyNickname || '', gender: state.babyGender || 'surprise', dob: state.babyDOB || null };
 }
 function setCurrentBaby(i) {
   if (i === 'both') { currentBabyIdx = 'both'; }
@@ -2263,13 +2495,29 @@ function babySwitcherHTML() {
   '</div>';
 }
 function curIdxSafe() { return currentBabyIdx === 'both' ? 0 : currentBabyIdx; }
-function babyName() { return currentBabyIdx==='both' ? bothLabel() : babyAt(curIdxSafe()).name; }
+// In-app references (greetings, insights, coaching examples) use the nickname
+// when one is set, falling back to the full name. The dashboard title uses the
+// full name via babyFullName().
+function babyName() {
+  if (currentBabyIdx==='both') return bothLabel();
+  const b = babyAt(curIdxSafe());
+  return (b && b.nickname) ? b.nickname : (b ? b.name : null);
+}
+function babyFullName() {
+  if (currentBabyIdx==='both') return bothLabel();
+  const b = babyAt(curIdxSafe());
+  return b ? b.name : null;
+}
 function bothLabel() {
   return 'Babies';
 }
 // Grammatically-correct possessive: "Dakarai's", "Babies'"
 function babyPossessive() {
   const n = babyName() || 'Baby';
+  return n.match(/s$/i) ? n + '\u2019' : n + '\u2019s';
+}
+function babyFullPossessive() {
+  const n = babyFullName() || 'Baby';
   return n.match(/s$/i) ? n + '\u2019' : n + '\u2019s';
 }
 // Central per-baby log filter. For singletons or 'both' mode, returns all entries.
@@ -2409,6 +2657,43 @@ function confirmDialog(opts, onConfirm) {
   ov.onclick = (e) => { if (e.target === ov) closeConfirmDialog(); };
   requestAnimationFrame(() => ov.classList.add('show'));
 }
+
+// A blocking, single-button alert — used when a save is refused, so the user
+// must physically dismiss it and can never mistake a rejection for a success.
+function alertDialog(title, body, opts) {
+  opts = opts || {};
+  let ov = document.getElementById('confirm-dialog');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'confirm-dialog';
+  ov.className = 'cfd-ov';
+  ov.innerHTML =
+    '<div class="cfd-card" role="alertdialog" aria-modal="true">' +
+      (opts.icon ? '<div class="cfd-icon">' + opts.icon + '</div>' : '') +
+      '<div class="cfd-title"></div>' +
+      (body ? '<div class="cfd-body"></div>' : '') +
+      '<div class="cfd-btns">' +
+        '<button type="button" class="cfd-btn cfd-ok" style="flex:1"></button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(ov);
+  ov.querySelector('.cfd-title').textContent = title || 'Heads up';
+  if (body) ov.querySelector('.cfd-body').textContent = body;
+  const okBtn = ov.querySelector('.cfd-ok');
+  okBtn.textContent = opts.okLabel || 'Got it';
+  okBtn.onclick = () => { closeConfirmDialog(); try { opts.onClose && opts.onClose(); } catch(e){} };
+  ov.onclick = (e) => { if (e.target === ov) closeConfirmDialog(); };
+  if (navigator.vibrate) { try { navigator.vibrate([15,40,15]); } catch(e){} }
+  requestAnimationFrame(() => ov.classList.add('show'));
+}
+// Convenience wrapper for the "time hasn't happened yet" refusal.
+function futureEntryAlert() {
+  alertDialog(
+    'That time hasn\u2019t happened yet',
+    'This entry\u2019s date and time are in the future, so it wasn\u2019t saved. Check the date and time \u2014 for example, a late-night feed still belongs to today\u2019s date, not tomorrow\u2019s.',
+    { icon: '\u23f0', okLabel: 'Fix it' }
+  );
+}
 // ── Weekly digest: a keepsake summary of the last 7 days ──
 function weeklyDigestHTML() {
   const tp = (today()||'').split('-').map(Number);
@@ -2448,7 +2733,8 @@ window.editEntrySheet = function(kind, idx) {
     feed:  { arr:'feedingLog', label:'Edit feed' },
     sleep: { arr:'sleepLog',   label:'Edit sleep' },
     diaper:{ arr:'diaperLog',  label:'Edit diaper' },
-    meal:  { arr:'solidsLog',  label:'Edit meal' }
+    meal:  { arr:'solidsLog',  label:'Edit meal' },
+    weight:{ arr:'weightLog',  label:'Edit weight' }
   }[kind];
   if (!cfg) return;
   const e = (state[cfg.arr]||[])[idx];
@@ -2466,12 +2752,17 @@ window.editEntrySheet = function(kind, idx) {
     body += fld('Type', sel('ee-type',['Nap','Night'], e.type||'Nap'));
   } else if (kind==='diaper') {
     body += fld('Time', inp('ee-time','time',e.time));
-    body += fld('Type', sel('ee-type',['wet','dirty','both'], e.type||'wet'));
+    const curKind = (e.wet && e.dirty) ? 'both' : e.dirty ? 'dirty' : 'wet';
+    body += fld('Type', sel('ee-type',['wet','dirty','both'], curKind));
   } else if (kind==='meal') {
     body += fld('Time', inp('ee-time','time',e.time));
     body += fld('Meal', sel('ee-meal',['Breakfast','Lunch','Dinner','Snack'], e.meal||'Breakfast'));
     body += fld('Grams', inp('ee-grams','number',e.grams||''));
     body += fld('Reaction', sel('ee-react',['loved','liked','neutral','disliked'], e.reaction||'liked'));
+  } else if (kind==='weight') {
+    const u = state.weightUnit||'kg';
+    const dispVal = u==='g' ? e.grams : u==='lboz' ? Math.round((e.grams/453.592)*100)/100 : Math.round((e.grams/1000)*100)/100;
+    body += fld('Weight ('+(u==='lboz'?'lb':u)+')', inp('ee-weight','number',dispVal));
   }
   let ov = document.getElementById('confirm-dialog');
   if (ov) ov.remove();
@@ -2486,15 +2777,21 @@ window.editEntrySheet = function(kind, idx) {
   ov.querySelector('.cfd-cancel').onclick = () => closeConfirmDialog();
   ov.querySelector('.cfd-ok').onclick = () => {
     const v = id => { const el=document.getElementById(id); return el?el.value:undefined; };
+    { const _d = v('ee-date') || e.date;
+      const _t = v('ee-time') || v('ee-start') || '';
+      if (entryInFuture(_d, _t)) { futureEntryAlert(); return; } }
     e.date = v('ee-date') || e.date;
     if (kind==='feed') { e.time=v('ee-time')||e.time;
       if (e.type==='bottle') e.ml=parseInt(v('ee-ml'))||0;
       else { e.durL=parseInt(v('ee-durL'))||0; e.durR=parseInt(v('ee-durR'))||0; } }
     if (kind==='sleep') { e.start=v('ee-start')||e.start; e.end=v('ee-end')||e.end; e.type=v('ee-type')||e.type; }
-    if (kind==='diaper'){ e.time=v('ee-time')||e.time; e.type=v('ee-type')||e.type; }
+    if (kind==='diaper'){ e.time=v('ee-time')||e.time;
+      const t=v('ee-type'); if(t){ e.wet = (t==='wet'||t==='both'); e.dirty = (t==='dirty'||t==='both'); } }
     if (kind==='meal')  { e.time=v('ee-time')||e.time; e.meal=v('ee-meal')||e.meal;
       e.grams=parseInt(v('ee-grams'))||0; e.reaction=v('ee-react')||e.reaction;
       try { recomputeAllFoodStats(); saveState('foods'); } catch(err){} }
+    if (kind==='weight') { const u=state.weightUnit||'kg'; const raw=parseFloat(v('ee-weight'))||0;
+      e.grams = u==='g' ? Math.round(raw) : u==='lboz' ? Math.round(raw*453.592) : Math.round(raw*1000); }
     saveState(cfg.arr);
     closeConfirmDialog();
     try { navTo(_currentPage); } catch(err){}
@@ -2506,6 +2803,7 @@ window.editEntrySheet = function(kind, idx) {
 
 // Tap a moment on Today's Story → see it, edit it, or jump to its page
 window.arcDotDetail = function(kind, idx) {
+  dismissArcCoachMark();
   const cfg = {
     feed:  { arr:'feedingLog', page:'feeding', label:'Feed' },
     sleep: { arr:'sleepLog',   page:'sleep',   label:'Sleep' },
@@ -2518,7 +2816,7 @@ window.arcDotDetail = function(kind, idx) {
   let detail = e.time || '';
   if (kind==='feed') detail += e.type==='bottle' ? (' · Bottle'+(e.ml?(' · '+e.ml+'ml'):'')) : (' · Breast'+(((e.durL||0)+(e.durR||0))?(' · '+((e.durL||0)+(e.durR||0))+' min'):''));
   if (kind==='sleep') detail = (e.start||'') + '–' + (e.end||'…') + (e.type?(' · '+e.type):'');
-  if (kind==='diaper') detail += ' · ' + (e.type||'');
+  if (kind==='diaper') { const dk = (e.wet&&e.dirty)?'Both':e.dirty?'Dirty':e.wet?'Wet':'—'; detail += ' \u00b7 ' + dk + (e.dirty && e.color && e.color!=='N/A' ? (' \u00b7 '+e.color) : ''); }
   if (kind==='meal') detail += ' · ' + (e.meal||'') + (e.grams?(' · '+e.grams+'g'):'') + (e.reaction?(' · '+e.reaction):'');
   let ov = document.getElementById('confirm-dialog');
   if (ov) ov.remove();
@@ -2603,8 +2901,24 @@ function dayArcHTML() {
     '<div class="day-arc">' + marks + '<div class="arc-now" style="left:'+pct(nowM)+'%"></div></div>' +
     '<div class="arc-hours"><span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>12am</span></div>' +
     (empty ? '<div class="arc-empty">Each feed, nap and change you log becomes a moment on today\u2019s arc.</div>' : '') +
+    (!empty && !arcCoachSeen() ? arcCoachMarkHTML() : '') +
   '</div>';
 }
+
+// One-time coach mark teaching that moments on the arc are tappable — shown once, ever.
+function arcCoachSeen() { try { return localStorage.getItem('babyos_coachmark_arc_seen')==='1'; } catch(e){ return false; } }
+function arcCoachMarkHTML() {
+  return '<div class="coach-mark" id="arc-coach">' +
+    '<div class="coach-arrow"></div>' +
+    '<div class="coach-body">Tap any moment to see details or edit it</div>' +
+    '<button type="button" class="coach-dismiss" onclick="event.stopPropagation();dismissArcCoachMark()">Got it</button>' +
+  '</div>';
+}
+window.dismissArcCoachMark = function() {
+  try { localStorage.setItem('babyos_coachmark_arc_seen','1'); } catch(e){}
+  const el = document.getElementById('arc-coach');
+  if (el) { el.style.opacity='0'; el.style.transform='translateY(-4px)'; setTimeout(()=>el.remove(), 180); }
+};
 
 // The week as stacked story bands — one slim 24h sky per day, moments on it.
 function weekStoryHTML(opts) {
@@ -2726,11 +3040,24 @@ function toggleNightMode() {
 }
 function updateNightLabel() {
   const lbl = document.getElementById('night-mode-label');
+  updateDrawerNightIcon();
   if (!lbl) return;
   const pref = getNightPref();
   lbl.textContent = pref==='auto' ? 'Night mode: Auto' : pref==='on' ? 'Night mode: On' : 'Night mode: Off';
 }
-// Night mode threshold: auto-on between 7pm and 6am
+// The drawer-header quick toggle shows a glyph for the current preference:
+// sun (off), moon (always on), or moon-with-a-tick (auto), plus a tooltip.
+function updateDrawerNightIcon() {
+  const btn = document.getElementById('drawer-night-btn');
+  if (!btn) return;
+  const pref = (typeof getNightPref==='function') ? getNightPref() : 'auto';
+  const SUN = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>';
+  const MOON = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/></svg>';
+  const AUTO = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/><path d="M14.5 8.5l1.4 1.4 2.6-2.8"/></svg>';
+  btn.innerHTML = pref==='off' ? SUN : pref==='auto' ? AUTO : MOON;
+  btn.title = pref==='auto' ? 'Night mode: Auto (7pm–6am)' : pref==='on' ? 'Night mode: On' : 'Night mode: Off';
+  btn.classList.toggle('is-active', document.body.classList.contains('night-mode'));
+}
 const NIGHT_START = 19; // 7pm
 const NIGHT_END = 6;    // 6am
 function isNightTime() {
@@ -2760,16 +3087,22 @@ function applyNightModeOnLoad() {
 function applyTheme() {
   const theme = getThemeGender();
   const root = document.documentElement;
+  // The page canvas, top bar, and drawer are now universal — warm paper by day,
+  // nursery indigo by night (handled separately via body.night-mode). Gender no
+  // longer washes the whole app in a pastel; it survives only as a small accent
+  // (the active-nav pill, the baby avatar ring) so personalization doesn't fight
+  // the product's own identity.
   const themes = {
-    boy:     { bg:'#b6e9ff', topbar:'#7FCDEC', accent:'#4A95C4', cardTint:'#E3F5FE', text:'#143B4D', dim:'rgba(20,59,77,.6)' },
-    girl:    { bg:'#FFC5D3', topbar:'#FF9FB5', accent:'#C75E7E', cardTint:'#FFE2EA', text:'#5A2435', dim:'rgba(90,36,53,.6)' },
-    neutral: { bg:'#FFFFA7', topbar:'#FFF06A', accent:'#B89530', cardTint:'#FFFFD6', text:'#4A4420', dim:'rgba(74,68,32,.6)' },
+    boy:     { bg:'#FBF6EC', topbar:'#FFFDF8', accent:'#4A95C4', cardTint:'#E3F5FE', text:'#2A2A33', dim:'rgba(42,42,51,.6)' },
+    girl:    { bg:'#FBF6EC', topbar:'#FFFDF8', accent:'#C75E7E', cardTint:'#FFE2EA', text:'#2A2A33', dim:'rgba(42,42,51,.6)' },
+    neutral: { bg:'#FBF6EC', topbar:'#FFFDF8', accent:'#B89530', cardTint:'#FFFFD6', text:'#2A2A33', dim:'rgba(42,42,51,.6)' },
   };
-  // Drawer styling per theme: soft tinted bg, pill-shaped active state in theme color
+  // Drawer: same paper background for everyone; only the active-item pill keeps
+  // a soft, desaturated gender tint — enough to feel personal, not a wash.
   const drawerThemes = {
-    boy:     { drawerBg:'#F2FBFF', navText:'#2C5266', navDim:'rgba(44,82,102,.62)', activeBg:'#B6E9FF', activeText:'#0E3344' },
-    girl:    { drawerBg:'#FFF6F9', navText:'#6E2E42', navDim:'rgba(110,46,66,.62)', activeBg:'#FFC5D3', activeText:'#5A2435' },
-    neutral: { drawerBg:'#FFFEF2', navText:'#5C541F', navDim:'rgba(92,84,31,.65)', activeBg:'#FFF06A', activeText:'#4A4420' },
+    boy:     { drawerBg:'#FFFDF8', navText:'#2A2A33', navDim:'rgba(42,42,51,.62)', activeBg:'#DCEFF7', activeText:'#1F5A78' },
+    girl:    { drawerBg:'#FFFDF8', navText:'#2A2A33', navDim:'rgba(42,42,51,.62)', activeBg:'#FBE3EA', activeText:'#8A3B54' },
+    neutral: { drawerBg:'#FFFDF8', navText:'#2A2A33', navDim:'rgba(42,42,51,.62)', activeBg:'#F5EBC7', activeText:'#7A6320' },
   };
   const t = themes[theme] || themes.neutral;
   const dt = drawerThemes[theme] || drawerThemes.neutral;
@@ -2789,7 +3122,7 @@ function applyTheme() {
 function updateSubtitles() {
   applyTheme();
   try { updateBabySwitchButton(); } catch(e) {}
-  const name = babyName(); const emoji = babyEmoji();
+  const name = babyFullName(); const emoji = babyEmoji();
   const titleEl = document.getElementById('top-bar-title');
   const sideTitle = document.getElementById('sidebar-title');
   const drawerTitle = document.getElementById('drawer-title');
@@ -2845,6 +3178,7 @@ function togglePrebirthSection() {
 
 function openDrawer() {
   renderPhaseSuggest();
+  try { updateDrawerNightIcon(); } catch(e){}
   // Post-birth: collapse pre-birth tools (still accessible), but keep them expanded pre-birth
   const born = (typeof getPhase==='function' && getPhase()!=='pregnancy');
   const pbItems = document.getElementById('prebirth-items');
@@ -3031,7 +3365,161 @@ function navTo(pid) {
     // Gentle settle-in on real page changes only (in-place re-renders stay still)
     const pgEl = document.getElementById('page-'+pid);
     if (pgEl) { pgEl.classList.remove('page-in'); void pgEl.offsetWidth; pgEl.classList.add('page-in'); }
+    try { runEntranceAnimations(pid); } catch(e){}
   }
+  window._lastRenderTs = Date.now();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// FRESHNESS: relative times ("48m ago") are computed at render, so a webview
+// left open goes stale. Two fixes:
+//   1. Auto re-render when the app becomes visible again after >60s away.
+//   2. Pull-to-refresh (drag down at the very top) for on-demand certainty.
+// ══════════════════════════════════════════════════════════════════════════
+function refreshCurrentPage() {
+  try { if (typeof _currentPage !== 'undefined' && _currentPage) navTo(_currentPage); } catch(e){}
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  if (!state || !state.familyId) return;
+  if (Date.now() - (window._lastRenderTs||0) > 60000) refreshCurrentPage();
+});
+
+// ── Primary-action ripple: a soft teal ring expands from the touch point on
+//    save/confirm buttons. Fixed-position on <body> so it survives the instant
+//    re-render that follows a successful log. ──
+document.addEventListener('click', (e) => {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const btn = e.target && e.target.closest ? e.target.closest('.btn-teal, .now-save, .cfd-ok, .celebrate-btn') : null;
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const x = e.clientX || (rect.left + rect.width/2);
+  const y = e.clientY || (rect.top + rect.height/2);
+  const r = document.createElement('span');
+  r.className = 'log-ripple';
+  r.style.left = (x-22)+'px'; r.style.top = (y-22)+'px';
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 620);
+}, true);
+
+(function initPullToRefresh(){
+  const ind = document.createElement('div');
+  ind.id = 'ptr-ind';
+  ind.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>';
+  document.body.appendChild(ind);
+  let y0=null, pulling=false, armed=false, busy=false;
+  const THRESH = 72;
+
+  const blocked = () => {
+    // Don't hijack the gesture over the landing screen, an open drawer, or any modal
+    const landing = document.getElementById('landing');
+    if (landing && getComputedStyle(landing).display !== 'none') return true;
+    if (document.querySelector('.drawer.open')) return true;
+    if (document.querySelector('.cfd-ov.show')) return true;
+    if (document.querySelector('.modal-overlay[style*="flex"]')) return true;
+    return false;
+  };
+
+  document.addEventListener('touchstart', (e) => {
+    if (busy || blocked()) { y0=null; return; }
+    y0 = (window.scrollY <= 0) ? e.touches[0].clientY : null;
+    pulling=false; armed=false;
+  }, {passive:true});
+
+  document.addEventListener('touchmove', (e) => {
+    if (y0===null || busy) return;
+    const dy = e.touches[0].clientY - y0;
+    if (dy <= 0 || window.scrollY > 0) {
+      if (pulling) { pulling=false; ind.style.transform=''; ind.classList.remove('armed'); }
+      return;
+    }
+    pulling = true;
+    if (e.cancelable) e.preventDefault();
+    const pull = Math.min(dy*0.45, 96);
+    armed = pull >= THRESH*0.62;
+    ind.classList.toggle('armed', armed);
+    ind.style.transform = 'translate(-50%,'+(pull+52)+'px) rotate('+(pull*2.6)+'deg)';
+  }, {passive:false});
+
+  document.addEventListener('touchend', () => {
+    if (y0===null) return;
+    y0=null;
+    if (!pulling) return;
+    pulling=false;
+    if (armed && !busy) {
+      busy = true;
+      ind.classList.add('spin');
+      ind.style.transform = 'translate(-50%,64px)';
+      setTimeout(() => {
+        refreshCurrentPage();
+        setTimeout(() => {
+          ind.classList.remove('spin','armed');
+          ind.style.transform='';
+          busy=false;
+        }, 350);
+      }, 220);
+    } else {
+      ind.classList.remove('armed');
+      ind.style.transform='';
+    }
+  }, {passive:true});
+})();
+
+// ── Entrance animations: data arriving, not decoration. Page-change only,
+//    so in-place re-renders (planner taps, edit-saves) stay perfectly still. ──
+function runEntranceAnimations(pid) {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const pg = document.getElementById('page-'+pid);
+  if (!pg) return;
+  // 1. Numerals count up from zero (glance stats, digest, growth keepsake)
+  pg.querySelectorAll('.glance-val,.nts-val,.dg-val,.gk-val').forEach(el => countUpEl(el));
+  // The vaccine ring numeral: animate only the leading number text node ("3" in "3/27")
+  pg.querySelectorAll('.vax-ring-num').forEach(el => {
+    const tn = el.childNodes[0];
+    if (tn && tn.nodeType===3) countUpNode(tn, 450);
+  });
+  // 2. The ring sweeps from empty to its fraction
+  pg.querySelectorAll('.vax-ring-fill').forEach(ring => {
+    const final = ring.getAttribute('stroke-dasharray');
+    if (!final) return;
+    const total = final.split(' ')[1];
+    ring.style.transition = 'none';
+    ring.setAttribute('stroke-dasharray', '0 ' + total);
+    void ring.getBoundingClientRect();
+    ring.style.transition = 'stroke-dasharray .7s cubic-bezier(.3,.7,.3,1)';
+    ring.setAttribute('stroke-dasharray', final);
+  });
+  // 3. Today's Story dots arrive left-to-right
+  const dots = pg.querySelectorAll('.arc-dot');
+  dots.forEach((d,i) => {
+    d.style.animation = 'none'; void d.offsetWidth;
+    d.style.animation = 'dotIn .32s ease backwards';
+    d.style.animationDelay = Math.min(i*28, 400) + 'ms';
+  });
+}
+
+function countUpEl(el) {
+  const tn = el.childNodes[0];
+  if (tn && tn.nodeType===3) countUpNode(tn, 450);
+}
+function countUpNode(tn, dur) {
+  const orig = tn.textContent;
+  const m = orig.match(/^(\d+(?:\.\d+)?)/);
+  if (!m) return;
+  const target = parseFloat(m[1]);
+  if (!isFinite(target) || target===0) return;
+  const decimals = (m[1].split('.')[1]||'').length;
+  const suffix = orig.slice(m[1].length);
+  const t0 = performance.now();
+  const step = (now) => {
+    const p = Math.min((now-t0)/dur, 1);
+    const eased = 1-Math.pow(1-p,3);
+    tn.textContent = (target*eased).toFixed(decimals) + suffix;
+    if (p<1) requestAnimationFrame(step);
+    else tn.textContent = orig;
+  };
+  requestAnimationFrame(step);
 }
 
 function showPage(id) {
@@ -3200,12 +3688,6 @@ function openBabySettings() {
   t.textContent = '👶 Baby Profile';
   sheet.appendChild(t);
 
-  // Baby name
-  const nf = document.createElement('div');
-  nf.className = 'form-field';
-  nf.innerHTML = '<label>Baby name</label><input type="text" id="bs-name" value="' + (state.babyName||'') + '" placeholder="e.g. Raffa">';
-  sheet.appendChild(nf);
-
   // Gender
   const gf = document.createElement('div');
   gf.className = 'form-field';
@@ -3241,15 +3723,17 @@ function openBabySettings() {
     const babies = state.babies||[];
     let html = '';
     if (n === 1) {
-      html = '<div class="form-field"><label>Baby name</label><input type="text" id="bs-name-0" value="'+(state.babyName||'')+'" placeholder="e.g. Raffa"></div>';
+      html = '<div class="form-field"><label>Full name</label><input type="text" id="bs-name-0" value="'+(state.babyName||'')+'" placeholder="e.g. Rafathar Malik"></div>'
+           + '<div class="form-field"><label>Nickname <span style="opacity:.6">(what you call them day to day)</span></label><input type="text" id="bs-nick-0" value="'+(state.babyNickname||'')+'" placeholder="e.g. Raffa"></div>';
     } else {
       for (let i=0; i<n; i++) {
         const b = babies[i]||{};
         const lbl = ['Baby A','Baby B','Baby C','Baby D','Baby E','Baby F'][i];
         html += '<div style="background:#f8f8f8;border-radius:8px;padding:10px 12px;margin-bottom:8px">';
         html += '<div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px">'+lbl+'</div>';
-        html += '<div class="form-row"><div><label>Name</label><input type="text" id="bs-name-'+i+'" value="'+(b.name||'')+'" placeholder="optional"></div>';
-        html += '<div><label>Gender</label><select id="bs-gender-'+i+'"><option value="boy" '+(b.gender==='boy'?'selected':'')+'>👦 Boy</option><option value="girl" '+(b.gender==='girl'?'selected':'')+'>👧 Girl</option><option value="surprise" '+(!b.gender||b.gender==='surprise'?'selected':'')+'>🎁 Surprise</option></select></div></div>';
+        html += '<div class="form-row"><div><label>Full name</label><input type="text" id="bs-name-'+i+'" value="'+(b.name||'')+'" placeholder="optional"></div>';
+        html += '<div><label>Nickname</label><input type="text" id="bs-nick-'+i+'" value="'+(b.nickname||'')+'" placeholder="optional"></div></div>';
+        html += '<div class="form-field" style="margin-top:6px"><label>Gender</label><select id="bs-gender-'+i+'"><option value="boy" '+(b.gender==='boy'?'selected':'')+'>👦 Boy</option><option value="girl" '+(b.gender==='girl'?'selected':'')+'>👧 Girl</option><option value="surprise" '+(!b.gender||b.gender==='surprise'?'selected':'')+'>🎁 Surprise</option></select></div>';
         html += '</div>';
       }
     }
@@ -3331,18 +3815,22 @@ async function saveBabyProfile() {
   if (dad) state.dadName = dad;
   if (n === 1) {
     const name = (document.getElementById('bs-name-0')?.value||'').trim()||null;
+    const nick = (document.getElementById('bs-nick-0')?.value||'').trim()||null;
     state.babyName = name;
+    state.babyNickname = nick;
     state.babyGender = _bsGender||state.babyGender;
     state.babies = [];
   } else {
     const babies = [];
     for (let i=0;i<n;i++) {
       const nm = (document.getElementById('bs-name-'+i)?.value||'').trim()||null;
+      const nk = (document.getElementById('bs-nick-'+i)?.value||'').trim()||null;
       const g = document.getElementById('bs-gender-'+i)?.value||'surprise';
-      babies.push({name:nm,gender:g,dob,emoji:g==='boy'?'👦':g==='girl'?'👧':'🍼'});
+      babies.push({name:nm,nickname:nk,gender:g,dob,emoji:g==='boy'?'👦':g==='girl'?'👧':'🍼'});
     }
     state.babies = babies;
     state.babyName = babies[0]?.name||null;
+    state.babyNickname = babies[0]?.nickname||null;
     state.babyGender = babies[0]?.gender||'surprise';
   }
   await saveState();
@@ -4269,6 +4757,7 @@ function nowSaveFeed() {
     durMin = (eh*60+em) - (sh*60+sm);
     if (durMin < 0) durMin += 1440;
   }
+  if (entryInFuture(today(), start) || (endT && endT > start && entryInFuture(today(), endT))) { futureEntryAlert(); return; }
   const entry = { date: today(), time: start, endTime: endT, feedType: type,
     leftMin:0, rightMin:0, formulaMl:0, storedMl:0, pumpedMl:0, notes:'', babyIdx:0 };
   if (type==='left') entry.leftMin = durMin || amt;
@@ -4287,6 +4776,7 @@ function nowSaveSleep() {
   const end = document.getElementById('ns-end')?.value;
   if (!start) { toast('Enter a start time'); return; }
   if (!state.sleepLog) state.sleepLog=[];
+  if (entryInFuture(today(), start) || (end && end > start && entryInFuture(today(), end))) { futureEntryAlert(); return; }
   state.sleepLog.push({ date:today(), start, end:end||'', type:window._nowSleepType||'Nap', quality:'Good', notes:'', babyIdx: logBabyIdx() });
   saveState('sleepLog');
   window._nowOpen='';
@@ -4508,7 +4998,7 @@ PAGES['dashboard'] = function(el) {
 
   el.innerHTML = `
     <div class="page-header">
-      <h2>${hasBaby&&babyName()?babyEmoji()+' '+babyPossessive()+' Dashboard':'🍼 Baby OS'}</h2>
+      <h2>${hasBaby&&babyFullName()?babyEmoji()+' '+babyFullPossessive()+' Dashboard':'🍼 Baby OS'}</h2>
       <p>${hasBaby?babyRef()+' is '+babyAgeLbl()+' · Born '+formatDate(state.babyDOB):'EDD: '+formatDate(getEDD())+' · Jakarta · Indonesian–English'}</p>
     </div>
 
@@ -4640,9 +5130,9 @@ PAGES['dashboard'] = function(el) {
       const logs = [...state.weightLog].sort((a,b)=>a.date.localeCompare(b.date)).slice(-14);
       const unit = state.weightUnit||'kg';
       const toY = (g)=> unit==='g'?g:unit==='lboz'?g/453.592:g/1000;
-      drawLine('dash-weight-chart', logs.map(l=>{ const d=new Date(l.date+'T00:00:00'); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }),
-        [{label:'Weight', data:logs.map(l=>Math.round(toY(l.grams)*100)/100), color:'#2D8F8F'}],
-        unit==='g'?'grams':unit==='lboz'?'lb':'kg', {trend:true});
+      drawGrowthArt('dash-weight-chart', logs.map(l=>{ const d=new Date(l.date+'T00:00:00'); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }),
+        logs.map(l=>Math.round(toY(l.grams)*100)/100),
+        {unit: unit==='g'?'g':unit==='lboz'?'lb':'kg'});
     });
   }
 };PAGES['keyDates'] = function(el) {
@@ -5397,7 +5887,8 @@ function drawBar(id, labels, datasets, yLabel) {
   const isHourly = labels.length >= 20;
   const pad = {t:20, r:10, b:isHourly?26:34, l:yLabel?44:34};
   const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
-  const maxVal = Math.max(...datasets.flatMap(d => d.data), 1);
+  const _bnt = niceTicks(0, Math.max(...datasets.flatMap(d => d.data), 1), 4);
+  const maxVal = _bnt.max;
   const nBars = labels.length;
   const groupW = cw / nBars;
   const barsPerGroup = datasets.length;
@@ -5406,20 +5897,18 @@ function drawBar(id, labels, datasets, yLabel) {
 
   ctx.clearRect(0, 0, w, h);
 
-  // Grid lines + y-axis values
-  const gridSteps = 4;
-  for (let i = 0; i <= gridSteps; i++) {
-    const y = pad.t + ch * (1 - i/gridSteps);
+  // Grid lines + y-axis values — round, even steps from the shared nice-ticks scale
+  _bnt.ticks.forEach((tv, i) => {
+    const y = pad.t + ch * (1 - (maxVal ? tv/maxVal : 0));
     ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y);
     ctx.strokeStyle = i === 0 ? '#e9ecef' : '#f1f3f5';
     ctx.lineWidth = 1; ctx.stroke();
     if (i > 0) {
-      const val = Math.round(maxVal * i / gridSteps * 10) / 10;
       ctx.fillStyle = '#adb5bd'; ctx.font = '9px -apple-system,sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(val % 1 === 0 ? val : val.toFixed(1), pad.l - 5, y + 3);
+      ctx.fillText(tv.toFixed(_bnt.decimals), pad.l - 5, y + 3);
     }
-  }
+  });
 
   // Y-axis caption (rotated)
   if (yLabel) {
@@ -5491,28 +5980,86 @@ function drawBar(id, labels, datasets, yLabel) {
   }
 }
 
+// Round, evenly-spaced axis ticks: picks a step of 1/2/5 × 10^k so labels read
+// as 4.1, 4.2, 4.3 (or 4100, 4200, 4300) — never 4205.7. Shared by all charts.
+// A logged moment must already have happened. Blocks entries whose date+time is
+// in the future (2-minute grace for clock rounding) — a 23:00 feed entered on
+// tomorrow's date corrupts "next feed" predictions and interval math.
+function entryInFuture(dateStr, timeStr) {
+  if (!dateStr) return false;
+  const t = (timeStr && /^\d{1,2}:\d{2}/.test(timeStr)) ? timeStr.padStart(5,'0') : '00:00';
+  const dt = new Date(dateStr + 'T' + t + ':00');
+  return isFinite(dt.getTime()) && dt.getTime() > Date.now() + 120000;
+}
+
+function niceTicks(minV, maxV, target) {
+  if (!isFinite(minV) || !isFinite(maxV)) return {ticks:[0], min:0, max:1, step:1, decimals:0};
+  if (maxV - minV < 1e-9) { minV -= 1; maxV += 1; }
+  const rawStep = (maxV - minV) / Math.max(2, target||4);
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  let step = mag * 10;
+  for (const m of [1, 2, 5, 10]) { if (mag * m >= rawStep - 1e-12) { step = mag * m; break; } }
+  const lo = Math.floor(minV / step) * step;
+  const hi = Math.ceil(maxV / step) * step;
+  const decimals = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+  const ticks = [];
+  for (let v = lo; v <= hi + step * 1e-6; v += step) ticks.push(parseFloat(v.toFixed(decimals)));
+  return {ticks, min: lo, max: hi, step, decimals};
+}
+
 // ── Growth chart, redesigned as a keepsake illustration rather than a spreadsheet chart:
 // a smooth hand-drawn-feeling curve, a soft feathered WHO band, and one glowing "you are here" point. ──
 function drawGrowthArt(id, labels, data, opts) {
   opts = opts || {};
+  // The curve draws itself left-to-right like handwriting (~650ms), then settles.
+  // Re-entrant safe: a token per canvas cancels any in-flight sweep on re-render.
+  if (!opts._noanim) {
+    const cv0 = document.getElementById(id);
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (cv0 && !reduce) {
+      const tok = (cv0._ga = (cv0._ga||0) + 1);
+      const t0 = performance.now();
+      const step = (now) => {
+        if (cv0._ga !== tok || !document.getElementById(id)) return;
+        const p = Math.min((now - t0) / 650, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        drawGrowthArt(id, labels, data, Object.assign({}, opts, {_noanim:true, _reveal: p < 1 ? eased : null}));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+      return;
+    }
+  }
   const cc = getCanvasCtx(id); if (!cc) return;
   const { ctx, w, h } = cc;
   const _night = document.body.classList.contains('night-mode');
   const GRID = _night ? 'rgba(255,255,255,.06)' : 'rgba(20,20,30,.05)';
   const LBL  = _night ? '#8f8b7e' : '#adb5bd';
-  const pad = { t:14, r:10, b:22, l:8 };
-  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  const pad = { t:14, r:10, b:24, l:8 };
+  let cw = w - pad.l - pad.r; const ch = h - pad.t - pad.b;
   ctx.clearRect(0,0,w,h);
 
   const pts0 = data.map((v,i)=> v==null?null:[i,v]);
   const valid = pts0.filter(Boolean);
   if (valid.length===0) return;
   let minV = Math.min(...valid.map(p=>p[1])), maxV = Math.max(...valid.map(p=>p[1]));
-  if (opts.band && opts.band.low!=null) minV = Math.min(minV, opts.band.low);
-  if (opts.band && opts.band.high!=null) maxV = Math.max(maxV, opts.band.high);
+  // The reference band may extend far beyond the baby's current range; let it pull
+  // the scale only modestly (≤50% of the data span each way) so the curve keeps
+  // most of the vertical room, and the visible slice of the band shows the rest.
+  if (opts.band && opts.band.low!=null && opts.band.high!=null) {
+    const dspan = Math.max(maxV - minV, 0.02*Math.abs(maxV) || 1);
+    minV = Math.min(minV, Math.max(opts.band.low,  minV - dspan*0.5));
+    maxV = Math.max(maxV, Math.min(opts.band.high, maxV + dspan*0.5));
+  }
   let range = maxV - minV;
   if (range <= 0) { const mid=(maxV+minV)/2; minV=mid-1; maxV=mid+1; range=2; }
-  minV -= range*0.14; maxV += range*0.14;
+  const nt = niceTicks(minV - range*0.05, maxV + range*0.05, 4);
+  minV = nt.min; maxV = nt.max;
+  const unitSfx = opts.unit || '';
+  const fmtTick = v => v.toFixed(nt.decimals) + unitSfx;
+  ctx.font = '600 9px -apple-system,sans-serif';
+  pad.l = Math.ceil(Math.max.apply(null, nt.ticks.map(t => ctx.measureText(fmtTick(t)).width))) + 12;
+  cw = w - pad.l - pad.r;
   const n = labels.length;
   const xAt = i => pad.l + (n<=1 ? cw/2 : cw*i/(n-1));
   const yAt = v => pad.t + ch*(1-(v-minV)/(maxV-minV));
@@ -5529,14 +6076,34 @@ function drawGrowthArt(id, labels, data, opts) {
     ctx.fillText('typical range', pad.l+2, yTop+9);
   }
 
-  // Minimal horizontal guides — two only, no numeric clutter (the keepsake header carries the number)
-  [0.5].forEach(f => {
-    const y = pad.t + ch*f;
-    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y);
-    ctx.strokeStyle = GRID; ctx.lineWidth=1; ctx.setLineDash([2,4]); ctx.stroke(); ctx.setLineDash([]);
+  // Quiet but readable: a dashed gridline and a round-number label per tick
+  nt.ticks.forEach(tv => {
+    const y = yAt(tv);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y);
+    ctx.strokeStyle = GRID; ctx.lineWidth = 1; ctx.setLineDash([2,4]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = LBL; ctx.font = '600 9px -apple-system,sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(fmtTick(tv), pad.l - 6, y + 3);
   });
 
   const P = valid.map(([i,v]) => [xAt(i), yAt(v)]);
+
+  // Remember tappable points on the canvas element (CSS-pixel coords + payload)
+  const cvEl = cc.canvas;
+  cvEl._growthPts = valid.map(([i,v],k) => ({ x:P[k][0], y:P[k][1], label:labels[i], value:v }));
+  cvEl._growthUnit = opts.unit || '';
+  if (!cvEl._tapBound) {
+    cvEl._tapBound = true;
+    cvEl.addEventListener('click', (e) => {
+      const pts = cvEl._growthPts || [];
+      let best=null, bd=1e9;
+      pts.forEach(pt => { const d=Math.hypot(e.offsetX-pt.x, e.offsetY-pt.y); if (d<bd){bd=d;best=pt;} });
+      if (!best || bd > 26) { const t=document.querySelector('.chart-tip'); if(t) t.remove(); return; }
+      showChartTip(cvEl, best);
+    });
+  }
+
+  const _rv = (opts._reveal != null && opts._reveal < 1) ? opts._reveal : null;
+  if (_rv != null) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w*_rv, h); ctx.clip(); }
 
   // Smooth the line through a Catmull-Rom → cubic-Bezier conversion so it reads as
   // a drawn curve (a life's growth) rather than a jagged data series.
@@ -5580,10 +6147,32 @@ function drawGrowthArt(id, labels, data, opts) {
   ctx.fillStyle = _night ? '#5cd1c8' : '#2D8F8F'; ctx.fill();
   ctx.lineWidth=2; ctx.strokeStyle = _night ? '#1d1d2c' : '#FFFDF8'; ctx.stroke();
 
-  // Sparse date labels — first, middle, last only, so the axis stays quiet
+  if (_rv != null) ctx.restore();
+
+  // Date labels at a uniform step, walked back from the latest reading so the
+  // most recent date is always labelled and spacing never collides
   ctx.fillStyle = LBL; ctx.font = '9px -apple-system,sans-serif'; ctx.textAlign='center';
-  const idxs = n<=1 ? [0] : n===2 ? [0,1] : [0, Math.floor((n-1)/2), n-1];
-  [...new Set(idxs)].forEach(i => ctx.fillText(labels[i], xAt(i), h-6));
+  const lblW = Math.max.apply(null, labels.map(l => ctx.measureText(String(l)).width).concat([20]));
+  const stepX = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(cw / (lblW + 16)))));
+  for (let i = n-1; i >= 0; i -= stepX) ctx.fillText(String(labels[i]), xAt(i), h-6);
+}
+
+// Tap a reading on the growth curve → a small bubble with its date and weight.
+function showChartTip(cv, pt) {
+  const old = document.querySelector('.chart-tip');
+  if (old) old.remove();
+  const rect = cv.getBoundingClientRect();
+  const tip = document.createElement('div');
+  tip.className = 'chart-tip';
+  tip.innerHTML = '<b>' + pt.value + (cv._growthUnit ? ' ' + cv._growthUnit : '') + '</b> \u00b7 ' + pt.label;
+  document.body.appendChild(tip);
+  const tw = tip.offsetWidth;
+  let x = rect.left + pt.x - tw/2;
+  x = Math.max(8, Math.min(x, window.innerWidth - tw - 8));
+  tip.style.left = x + 'px';
+  tip.style.top = (rect.top + pt.y - 44) + 'px';
+  clearTimeout(window._chartTipTimer);
+  window._chartTipTimer = setTimeout(() => tip.remove(), 2600);
 }
 
 function drawLine(id, labels, datasets, yLabel, opts) {
@@ -5612,6 +6201,8 @@ function drawLine(id, labels, datasets, yLabel, opts) {
     range = maxV - minV;
   }
   minV = minV - range*0.12; maxV = maxV + range*0.12;
+  const _nt = niceTicks(minV, maxV, 4);
+  minV = _nt.min; maxV = _nt.max;
   const n = labels.length;
   const xAt = (i) => pad.l + (n<=1 ? cw/2 : (cw * i/(n-1)));
   const yAt = (v) => pad.t + ch * (1 - (v-minV)/(maxV-minV));
@@ -5630,16 +6221,14 @@ function drawLine(id, labels, datasets, yLabel, opts) {
     ctx.fillText('healthy range', w - pad.r - 2, yHigh + 9);
   }
 
-  // Grid + y labels
-  const steps = 4;
-  for (let i=0;i<=steps;i++){
-    const y = pad.t + ch*(1-i/steps);
+  // Grid + y labels — round, evenly-spaced values via the shared nice-ticks scale
+  _nt.ticks.forEach((tv, i) => {
+    const y = yAt(tv);
     ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y);
     ctx.strokeStyle = i===0?AXIS:GRID; ctx.lineWidth=1; ctx.stroke();
-    const val = minV + (maxV-minV)*i/steps;
     ctx.fillStyle=LBL; ctx.font='9px -apple-system,sans-serif'; ctx.textAlign='right';
-    ctx.fillText(Math.round(val*100)/100, pad.l-5, y+3);
-  }
+    ctx.fillText(tv.toFixed(_nt.decimals), pad.l-5, y+3);
+  });
 
   // Y-axis caption
   if (yLabel) {
@@ -6027,13 +6616,13 @@ PAGES['feeding'] = function(el) {
       const type = feedTypeLabel(l);
       const amt = feedAmount(l);
       const feedCell = amt ? (type + ' · ' + amt) : type;
-      rows += '<div class="feed-hist-row">' +
+      rows += '<div class="feed-hist-row" onclick="editEntrySheet(\'feed\',' + idx + ')" role="button" tabindex="0">' +
         '<span class="fh-date">' + dateShort + '</span>' +
         '<span class="fh-time">' + start + '</span>' +
         '<span class="fh-time">' + endT + '</span>' +
         '<span class="fh-dur">' + dur + '</span>' +
         '<span class="fh-feed">' + feedCell + '</span>' +
-        '<button class="fh-del" onclick="delFeed(' + idx + ')" aria-label="Delete feed entry">×</button>' +
+        '<button class="fh-del" onclick="event.stopPropagation();delFeed(' + idx + ')" aria-label="Delete feed entry">×</button>' +
       '</div>';
     });
     return '<div class="feed-hist-head">' +
@@ -6110,16 +6699,21 @@ PAGES['feeding'] = function(el) {
   window.renderFeedTimer = () => {
     const box = document.getElementById('feed-timer-box');
     if (!box) return;
-    const t = window._feedTimer;
-    if (t && t.running) {
-      const elapsed = Math.floor((Date.now() - t.start)/1000);
+    const t = state.activeFeedTimer;
+    if (t && t.running && t.start) {
+      // Self-healing ticker: this timer may have arrived via sync from the partner's
+      // phone rather than a local tap, so start our own 1s display tick if needed.
+      if (!window._feedTimerInterval) window._feedTimerInterval = setInterval(() => { if(window.renderFeedTimer) window.renderFeedTimer(); }, 1000);
+      const elapsed = Math.max(0, Math.floor((Date.now() - t.start)/1000));
       const mm = Math.floor(elapsed/60), ss = elapsed%60;
+      const sinceStr = new Date(t.start).toTimeString().slice(0,5);
       box.innerHTML = '<div style="background:linear-gradient(135deg,#2D8F8F,#1F7373);border-radius:16px;padding:16px;text-align:center;color:#fff">' +
-        '<div style="font-size:13px;opacity:.85;margin-bottom:4px">Feeding ' + (t.side==='left'?'💙 left':t.side==='right'?'💗 right':'') + '</div>' +
+        '<div style="font-size:13px;opacity:.85;margin-bottom:4px">Feeding ' + (t.side==='left'?'💙 left':t.side==='right'?'💗 right':'') + ' · since ' + sinceStr + '</div>' +
         '<div style="font-size:36px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums">' + String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0') + '</div>' +
         '<button onclick="stopFeedTimer()" aria-label="Stop feeding timer" style="margin-top:10px;width:100%;background:#fff;color:#1F7373;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;font-family:var(--font);cursor:pointer">⏹ Stop &amp; review</button>' +
       '</div>';
     } else {
+      if (window._feedTimerInterval) { clearInterval(window._feedTimerInterval); window._feedTimerInterval = null; }
       box.innerHTML = '<div style="display:flex;gap:8px">' +
         '<button class="timer-btn timer-btn-left" onclick="startFeedTimer(\'left\')" aria-label="Start timing left breast feed" style="flex:1;background:#E6F5F5;color:#1F7373;border:1.5px solid #2D8F8F;border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Time 💙 Left</button>' +
         '<button class="timer-btn timer-btn-right" onclick="startFeedTimer(\'right\')" aria-label="Start timing right breast feed" style="flex:1;background:#FBEAF0;color:#993556;border:1.5px solid #D4537E;border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Time 💗 Right</button>' +
@@ -6127,15 +6721,17 @@ PAGES['feeding'] = function(el) {
     }
   };
   window.startFeedTimer = (side) => {
-    window._feedTimer = { running:true, start:Date.now(), side };
-    try { localStorage.setItem('babyos_feed_timer', JSON.stringify(window._feedTimer)); } catch(e){}
-    if (window._feedTimerInterval) clearInterval(window._feedTimerInterval);
-    window._feedTimerInterval = setInterval(() => { if(window.renderFeedTimer) window.renderFeedTimer(); }, 1000);
+    // A running timer's start time is immutable — re-tapping start (double-tap,
+    // stale render, returning to the page) must never reset the clock.
+    const cur = state.activeFeedTimer;
+    if (cur && cur.running) { toast('Timer already running \u2014 it may be on your partner\u2019s phone. Stop it first.'); renderFeedTimer(); return; }
+    state.activeFeedTimer = { running:true, start:Date.now(), side };
+    saveState('activeFeedTimer');
     renderFeedTimer();
     if (navigator.vibrate) navigator.vibrate(15);
   };
   window.stopFeedTimer = () => {
-    const t = window._feedTimer;
+    const t = state.activeFeedTimer;
     if (!t || !t.running) return;
     if (window._feedTimerInterval) { clearInterval(window._feedTimerInterval); window._feedTimerInterval=null; }
     const startD = new Date(t.start), endD = new Date();
@@ -6145,8 +6741,8 @@ PAGES['feeding'] = function(el) {
     const de = document.getElementById('f-endtime'); if (de) de.value = fmt(endD);
     selectFeedType(t.side);
     if (window.updateFeedDuration) updateFeedDuration();
-    window._feedTimer = { running:false };
-    try { localStorage.removeItem('babyos_feed_timer'); } catch(e){}
+    state.activeFeedTimer = { running:false };
+    saveState('activeFeedTimer');
     renderFeedTimer();
     if (navigator.vibrate) navigator.vibrate([15,40,15]);
     toast('Timer stopped — review and save');
@@ -6184,6 +6780,7 @@ PAGES['feeding'] = function(el) {
       entry.storedMl = amt;
       state.pumpedStash = Math.max(0, (state.pumpedStash||0) - amt);
     }
+    if (entryInFuture(entry.date, entry.time) || (endT && endT > start && entryInFuture(entry.date, endT))) { futureEntryAlert(); return; }
     state.feedingLog.push(entry);
     saveState('feedingLog'); render(); toastSuccess('Feed logged! 🍼');
   };
@@ -6344,13 +6941,13 @@ PAGES['sleep'] = function(el) {
       const dur = calcDur(l);
       const dateShort = (l.date||'').slice(5).replace('-','/');
       const typeIcon = l.type==='Night' ? '🌙 Night' : '☀️ Nap';
-      rows += '<div class="loghist-row">' +
+      rows += '<div class="loghist-row" onclick="editEntrySheet(\'sleep\','+idx+')" role="button" tabindex="0">' +
         '<span class="lh-date">'+dateShort+'</span>' +
         '<span class="lh-time">'+(l.start||'—')+'</span>' +
         '<span class="lh-time">'+(l.end||'—')+'</span>' +
         '<span class="lh-dur">'+dur.toFixed(1)+'h</span>' +
         '<span class="lh-main">'+typeIcon+'</span>' +
-        '<button class="lh-del" onclick="delSleep('+idx+')" aria-label="Delete sleep entry">×</button>' +
+        '<button class="lh-del" onclick="event.stopPropagation();delSleep('+idx+')" aria-label="Delete sleep entry">×</button>' +
       '</div>';
     });
     return '<div class="lh-v-sleep"><div class="loghist-head">' +
@@ -6365,30 +6962,32 @@ PAGES['sleep'] = function(el) {
   window.renderSleepTimer = () => {
     const box = document.getElementById('sleep-timer-box');
     if (!box) return;
-    const t = window._sleepTimer;
-    if (t && t.running) {
-      const elapsed = Math.floor((Date.now() - t.start)/1000);
+    const t = state.activeSleepTimer;
+    if (t && t.running && t.start) {
+      if (!window._sleepTimerInterval) window._sleepTimerInterval = setInterval(() => { if(window.renderSleepTimer) window.renderSleepTimer(); }, 1000);
+      const elapsed = Math.max(0, Math.floor((Date.now() - t.start)/1000));
       const hh = Math.floor(elapsed/3600), mm = Math.floor((elapsed%3600)/60), ss = elapsed%60;
       const disp = hh>0 ? (hh+':'+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0')) : (String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0'));
       box.innerHTML = '<div style="background:linear-gradient(135deg,#534AB7,#3F3896);border-radius:16px;padding:16px;text-align:center;color:#fff">' +
-        '<div style="font-size:13px;opacity:.85;margin-bottom:4px">😴 Sleeping…</div>' +
+        '<div style="font-size:13px;opacity:.85;margin-bottom:4px">😴 Sleeping · since ' + new Date(t.start).toTimeString().slice(0,5) + '</div>' +
         '<div style="font-size:36px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums">' + disp + '</div>' +
         '<button onclick="stopSleepTimer()" aria-label="Stop sleep timer" style="margin-top:10px;width:100%;background:#fff;color:#3F3896;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;font-family:var(--font);cursor:pointer">⏹ Woke up</button>' +
       '</div>';
     } else {
+      if (window._sleepTimerInterval) { clearInterval(window._sleepTimerInterval); window._sleepTimerInterval = null; }
       box.innerHTML = '<button onclick="startSleepTimer()" aria-label="Start sleep timer" style="width:100%;background:#EEEDFE;color:#3F3896;border:1.5px solid #534AB7;border-radius:12px;padding:15px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">▶ Start sleep timer</button>';
     }
   };
   window.startSleepTimer = () => {
-    window._sleepTimer = { running:true, start:Date.now() };
-    try { localStorage.setItem('babyos_sleep_timer', JSON.stringify(window._sleepTimer)); } catch(e){}
-    if (window._sleepTimerInterval) clearInterval(window._sleepTimerInterval);
-    window._sleepTimerInterval = setInterval(() => { if(window.renderSleepTimer) window.renderSleepTimer(); }, 1000);
+    const cur = state.activeSleepTimer;
+    if (cur && cur.running) { toast('Timer already running \u2014 it may be on your partner\u2019s phone. Stop it first.'); renderSleepTimer(); return; }
+    state.activeSleepTimer = { running:true, start:Date.now() };
+    saveState('activeSleepTimer');
     renderSleepTimer();
     if (navigator.vibrate) navigator.vibrate(15);
   };
   window.stopSleepTimer = () => {
-    const t = window._sleepTimer;
+    const t = state.activeSleepTimer;
     if (!t || !t.running) return;
     if (window._sleepTimerInterval) { clearInterval(window._sleepTimerInterval); window._sleepTimerInterval=null; }
     const startD = new Date(t.start), endD = new Date();
@@ -6399,8 +6998,8 @@ PAGES['sleep'] = function(el) {
     const hr = startD.getHours();
     const st = document.getElementById('s-type');
     if (st) st.value = (hr >= 19 || hr < 6) ? 'Night' : 'Day nap';
-    window._sleepTimer = { running:false };
-    try { localStorage.removeItem('babyos_sleep_timer'); } catch(e){}
+    state.activeSleepTimer = { running:false };
+    saveState('activeSleepTimer');
     renderSleepTimer();
     if (navigator.vibrate) navigator.vibrate([15,40,15]);
     toastSuccess('Sleep timed — review and save');
@@ -6410,6 +7009,8 @@ PAGES['sleep'] = function(el) {
     const sStart = document.getElementById('s-start')?.value||'';
     const sEnd = document.getElementById('s-end')?.value||'';
     if (!sStart) { toast('Add a start time'); return; }
+    { const _sd = document.getElementById('s-date')?.value||today();
+      if (entryInFuture(_sd, sStart) || (sEnd && sEnd > sStart && entryInFuture(_sd, sEnd))) { futureEntryAlert(); return; } }
     state.sleepLog.push({date:document.getElementById('s-date')?.value||today(),start:sStart,end:sEnd,type:document.getElementById('s-type')?.value||'Night',quality:document.getElementById('s-qual')?.value||'Good',notes:document.getElementById('s-notes')?.value||'',babyIdx:bi});
     saveState('sleepLog'); render(); toastSuccess('Sleep logged! 😴');
   };
@@ -6552,6 +7153,7 @@ PAGES['diaper'] = function(el) {
   window.setDBaby = (i) => { const h=document.getElementById('d-baby'); if(h) h.value=i; };
   window.addDiaper = () => {
     const bi=parseInt(document.getElementById('d-baby')?.value||'0');
+    if (entryInFuture(document.getElementById('d-date')?.value||today(), document.getElementById('d-time')?.value||'')) { futureEntryAlert(); return; }
     state.diaperLog.push({date:document.getElementById('d-date')?.value||today(),time:document.getElementById('d-time')?.value||'',wet:document.getElementById('d-wet')?.value==='Yes',dirty:document.getElementById('d-dirty')?.value==='Yes',color:document.getElementById('d-color')?.value||'N/A',notes:document.getElementById('d-notes')?.value||'',babyIdx:bi});
     saveState('diaperLog'); render(); toastSuccess('Diaper logged! 💧');
   };
@@ -6574,11 +7176,11 @@ PAGES['diaper'] = function(el) {
       else if (l.dirty) kind = '💩 Dirty';
       else kind = '—';
       const color = (l.dirty && l.color && l.color!=='N/A') ? l.color : '';
-      rows += '<div class="loghist-row">' +
+      rows += '<div class="loghist-row" onclick="editEntrySheet(\'diaper\','+idx+')" role="button" tabindex="0">' +
         '<span class="lh-date">'+dateShort+'</span>' +
         '<span class="lh-time">'+(l.time||'—')+'</span>' +
         '<span class="lh-main">'+kind+(color?' · '+color:'')+'</span>' +
-        '<button class="lh-del" onclick="delDiaper('+idx+')" aria-label="Delete diaper entry">×</button>' +
+        '<button class="lh-del" onclick="event.stopPropagation();delDiaper('+idx+')" aria-label="Delete diaper entry">×</button>' +
       '</div>';
     });
     return '<div class="lh-v-diaper"><div class="loghist-head">' +
@@ -6750,6 +7352,7 @@ PAGES['reading'] = function(el) {
     const mins=parseInt(document.getElementById('rl-min')?.value)||0;
     if(!mins){toast('Please enter duration');return;}
     if(!state.readingLog) state.readingLog=[];
+    if (entryInFuture(document.getElementById('rl-date')?.value||today(), '')) { futureEntryAlert(); return; }
     state.readingLog.push({date:document.getElementById('rl-date')?.value||today(),minutes:mins,book:document.getElementById('rl-book')?.value?.trim()||'',lang:document.getElementById('rl-lang')?.value||'',response:document.getElementById('rl-resp')?.value||'',notes:''});
     saveState('readingLog'); render(); toast('📚 Reading logged!');
   };
@@ -6920,7 +7523,7 @@ PAGES['weight'] = function(el) {
         const toY = (g)=> unit==='g'?g:unit==='lboz'?g/453.592:g/1000;
         band = { low: Math.round(toY(ref.low)*100)/100, high: Math.round(toY(ref.high)*100)/100 };
       }
-      requestAnimationFrame(() => drawGrowthArt('weight-chart', cd.labels, cd.datasets[0].data, {band:band}));
+      requestAnimationFrame(() => drawGrowthArt('weight-chart', cd.labels, cd.datasets[0].data, {band:band, unit: unit==='g'?'g':unit==='lboz'?'lb':'kg'}));
     }
   }
 
@@ -6931,11 +7534,11 @@ PAGES['weight'] = function(el) {
     logs.slice(0,100).forEach((l)=>{
       const realIdx = state.weightLog.indexOf(l);
       const dateShort = (l.date||'').slice(5).replace('-','/');
-      rows += '<div class="loghist-row">' +
+      rows += '<div class="loghist-row" onclick="editEntrySheet(\'weight\','+realIdx+')" role="button" tabindex="0">' +
         '<span class="lh-date">'+dateShort+'</span>' +
         '<span class="lh-main" style="font-weight:600">'+gramsToDisplay(l.grams, unit)+'</span>' +
         (l.notes?'<span class="lh-note">'+l.notes+'</span>':'<span class="lh-note"></span>') +
-        '<button class="lh-del" onclick="delWeight('+realIdx+')" aria-label="Delete weight entry">×</button>' +
+        '<button class="lh-del" onclick="event.stopPropagation();delWeight('+realIdx+')" aria-label="Delete weight entry">×</button>' +
       '</div>';
     });
     return '<div class="lh-v-weight"><div class="loghist-head">' +
@@ -6957,6 +7560,7 @@ PAGES['weight'] = function(el) {
     // Plausibility guard: catches unit mixups (e.g. entering grams as kg)
     if (grams < 500 || grams > 30000) { toast('Double-check the weight — that seems off for a baby'); return; }
     const date = document.getElementById('w-date')?.value||today();
+    if (entryInFuture(date, '')) { futureEntryAlert(); return; }
     const bi = parseInt(document.getElementById('w-baby')?.value||'0');
     // Replace same-day entry for same baby if exists
     const existing = logsFor(state.weightLog).findIndex(l=>l.date===date && (l.babyIdx||0)===bi);
@@ -7089,6 +7693,7 @@ PAGES['pump'] = function(el) {
     const total = left + right;
     if (total <= 0) { toast('Enter an amount'); return; }
     if (!state.pumpLog) state.pumpLog = [];
+    if (entryInFuture(document.getElementById('pump-date')?.value||today(), document.getElementById('pump-time')?.value||'')) { futureEntryAlert(); return; }
     state.pumpLog.push({
       date: document.getElementById('pump-date')?.value||today(),
       time: document.getElementById('pump-time')?.value||'',
@@ -7177,6 +7782,7 @@ PAGES['meds'] = function(el) {
     const name = (document.getElementById('meds-name')?.value||'').trim();
     if (!name) { toast('Enter a medication name'); return; }
     if (!state.medsLog) state.medsLog = [];
+    if (entryInFuture(document.getElementById('meds-date')?.value||today(), document.getElementById('meds-time')?.value||'')) { futureEntryAlert(); return; }
     state.medsLog.push({
       date: document.getElementById('meds-date')?.value||today(),
       time: document.getElementById('meds-time')?.value||'',
@@ -7560,10 +8166,34 @@ function svgIcon2b(id, size){
 
 PAGES['vaccines'] = function(el) {
   if(!state.customVaccines) state.customVaccines=[];
+  const fmtVaxDate = (d) => d ? d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
   function render() {
     const allVax=[...VACCINES,...(state.customVaccines||[])];
     const givenCount=allVax.filter((_,i)=>state.vaccines[i]?.given).length;
-    let html=`<div class="page-header"><h2>💉 Vaccination Schedule</h2><p>Indonesia (Kemenkes + IDAI 2024) · ${givenCount}/${allVax.length} given</p></div>
+    const pct = allVax.length ? givenCount/allVax.length : 0;
+    // Find the next upcoming (not given, not overdue) and count overdue, for the ring's caption
+    const withDue = allVax.map((v,i)=>{
+      const s=state.vaccines[i]||{};
+      const dueDate=v.daysFromBirth!=null&&state.babyDOB?new Date(new Date(state.babyDOB).getTime()+v.daysFromBirth*86400000):v.dueDate?new Date(v.dueDate):null;
+      return {v,i,s,dueDate,overdue:!s.given&&dueDate&&dueDate<new Date()};
+    });
+    const overdueCount = withDue.filter(x=>x.overdue).length;
+    const next = withDue.filter(x=>!x.s.given && !x.overdue && x.dueDate).sort((a,b)=>a.dueDate-b.dueDate)[0];
+    const R=30, C=2*Math.PI*R, dash = C*pct;
+    let html=`<div class="page-header"><h2>💉 Vaccination Schedule</h2><p>Indonesia (Kemenkes + IDAI 2024)</p></div>
+      <div class="card vax-ring-card">
+        <svg width="84" height="84" viewBox="0 0 84 84" class="vax-ring">
+          <circle cx="42" cy="42" r="${R}" fill="none" stroke-width="8" class="vax-ring-track"/>
+          <circle cx="42" cy="42" r="${R}" fill="none" stroke-width="8" stroke-linecap="round" class="vax-ring-fill"
+            stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 42 42)"/>
+        </svg>
+        <div class="vax-ring-num">${givenCount}<span class="vax-ring-den">/${allVax.length}</span></div>
+        <div class="vax-ring-side">
+          ${overdueCount ? `<div class="vax-ring-flag overdue">⚠ ${overdueCount} overdue</div>` : ''}
+          ${next ? `<div class="vax-ring-flag next">Next: ${next.v.name}<br><span>${fmtVaxDate(next.dueDate)}</span></div>` : (!overdueCount && givenCount<allVax.length ? '<div class="vax-ring-flag">No due dates set yet</div>' : '')}
+          ${givenCount===allVax.length ? '<div class="vax-ring-flag done">✓ All caught up</div>' : ''}
+        </div>
+      </div>
       <div class="card" style="background:#FFF9E6;border:1px solid #F0C060;margin-bottom:12px;padding:10px 14px;font-size:12px"><b>Note:</b> All vaccines recommended by Kemenkes & IDAI. Discuss any concerns with your pediatrician.</div>`;
     allVax.forEach((v,i)=>{
       const s=state.vaccines[i]||{};
@@ -7579,7 +8209,7 @@ PAGES['vaccines'] = function(el) {
             </div>
             <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
               <span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E6F1FB;color:#185FA5">${v.age}</span>
-              ${dueDate?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:${overdue?'#FCEBEB':'#f0f0f0'};color:${overdue?'#C0392B':'#666'}">${overdue?'⚠ Overdue · ':'Due: '}${formatDate(dueDate)}</span>`:''}
+              ${dueDate?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:${overdue?'#FCEBEB':'#f0f0f0'};color:${overdue?'#C0392B':'#666'}">${overdue?'⚠ Overdue · ':'Due: '}${fmtVaxDate(dueDate)}</span>`:''}
               ${s.given?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E1F5EE;color:#0F6E56">✓ Given ${s.date?'· '+formatDate(s.date):''}</span>`:''}
             </div>
             ${v.notes?`<div style="font-size:11px;color:#767680;margin-top:4px;line-height:1.4">${v.notes}</div>`:''}
@@ -9000,7 +9630,7 @@ PAGES['budget'] = function(el) {
         <div class="card-title">Expense log</div>
         ${state.budgetItems.map((item,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f5f5f5">
           <div style="flex:1"><div style="font-size:13px;font-weight:500">${item.name}</div><div style="font-size:11px;color:#767680">${item.cat} · ${item.date||''}</div></div>
-          <div style="font-size:13px;font-weight:700;color:#1B3A6B">Rp ${parseInt(item.actual||0).toLocaleString('id-ID')}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--ink)">Rp ${parseInt(item.actual||0).toLocaleString('id-ID')}</div>
           <button onclick="delBudget(${i})" class="del-btn">✕</button>
         </div>`).join('')}
         <div style="padding:8px 0 0;font-size:13px;font-weight:700;color:#0F6E56;text-align:right">Total: Rp ${totalSpent.toLocaleString('id-ID')}</div>
@@ -9008,7 +9638,7 @@ PAGES['budget'] = function(el) {
       <button class="btn btn-teal btn-block" onclick="openBudgetModal()" style="margin-bottom:12px">+ Log expense</button>
       <div class="card">
         <div class="card-title">Cost reference (IDR)</div>
-        ${[['Hospital','C-Section room (1–3 days, mid-range private)','Rp 5–15 juta','Varies by hospital class'],['Hospital','Surgeon fee (OBGYN)','Rp 3–10 juta',''],['Hospital','Anesthesiologist fee','Rp 2–5 juta',''],['Hospital','Medications & supplies','Rp 2 juta','Post-op meds, IV'],['Hospital','Lab tests (pre-op + newborn)','Rp 1.5 juta',''],['Monthly','Diapers (~200/month)','Rp 800 rb',''],['Monthly','Baby wipes (4–5 packs)','Rp 300 rb',''],['Monthly','Pediatrician visits','Rp 200–500 rb/visit',''],['Monthly','Baby nurse (suster bayi)','Rp 3–5 juta/month','Highly recommended 3 months'],['Monthly','BPJS (baby)','Rp 100 rb/month','Register within 28 days'],['Admin','Birth certificate (Dukcapil)','Free',''],].map(([cat,item,cost,notes])=>`<div style="padding:8px 0;border-bottom:1px solid #f5f5f5"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1"><span class="badge" style="background:${cat==='Hospital'?'#FCEBEB':cat==='Monthly'?'#FAEEDA':'#E6F1FB'};color:${cat==='Hospital'?'#C0392B':cat==='Monthly'?'#854F0B':'#185FA5'}">${cat}</span><div style="font-size:13px;font-weight:500;margin-top:3px">${item}</div>${notes?`<div style="font-size:11px;color:#767680;margin-top:1px">${notes}</div>`:''}</div><div style="font-size:13px;font-weight:700;color:#1B3A6B;white-space:nowrap;flex-shrink:0">${cost}</div></div></div>`).join('')}
+        ${[['Hospital','C-Section room (1–3 days, mid-range private)','Rp 5–15 juta','Varies by hospital class'],['Hospital','Surgeon fee (OBGYN)','Rp 3–10 juta',''],['Hospital','Anesthesiologist fee','Rp 2–5 juta',''],['Hospital','Medications & supplies','Rp 2 juta','Post-op meds, IV'],['Hospital','Lab tests (pre-op + newborn)','Rp 1.5 juta',''],['Monthly','Diapers (~200/month)','Rp 800 rb',''],['Monthly','Baby wipes (4–5 packs)','Rp 300 rb',''],['Monthly','Pediatrician visits','Rp 200–500 rb/visit',''],['Monthly','Baby nurse (suster bayi)','Rp 3–5 juta/month','Highly recommended 3 months'],['Monthly','BPJS (baby)','Rp 100 rb/month','Register within 28 days'],['Admin','Birth certificate (Dukcapil)','Free',''],].map(([cat,item,cost,notes])=>`<div style="padding:8px 0;border-bottom:1px solid #f5f5f5"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1"><span class="badge" style="background:${cat==='Hospital'?'#FCEBEB':cat==='Monthly'?'#FAEEDA':'#E6F1FB'};color:${cat==='Hospital'?'#A6402F':cat==='Monthly'?'#8F5E23':'#185FA5'}">${cat}</span><div style="font-size:13px;font-weight:500;margin-top:3px">${item}</div>${notes?`<div style="font-size:11px;color:#767680;margin-top:1px">${notes}</div>`:''}</div><div style="font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;flex-shrink:0">${cost}</div></div></div>`).join('')}
       </div>
     `;
   }
@@ -9096,7 +9726,10 @@ function restoreDataPrompt() {
       try {
         const parsed = JSON.parse(ev.target.result);
         const restored = parsed.data || parsed; // accept raw state too
-        if (!restored || typeof restored !== 'object') { toast('Invalid backup file'); return; }
+        if (!restored || typeof restored !== 'object' || Array.isArray(restored)) { alertDialog('That file isn\u2019t a BabyOS backup', 'It couldn\u2019t be read as a valid backup. Make sure you\u2019re choosing a file that BabyOS created (its name starts with \u201cBabyOS_backup_\u201d).', {icon:'\u26a0\ufe0f'}); return; }
+        // Sanity check: a real backup has at least one recognisable log array or the baby profile
+        const looksLikeBackup = ['feedingLog','sleepLog','diaperLog','weightLog','babyName','milestones'].some(k => k in restored);
+        if (!looksLikeBackup) { alertDialog('That file isn\u2019t a BabyOS backup', 'The file is valid JSON but doesn\u2019t contain BabyOS data. Please pick a file that BabyOS created.', {icon:'\u26a0\ufe0f'}); return; }
         const when = parsed._exportedAt ? new Date(parsed._exportedAt).toLocaleString('en-GB') : 'unknown date';
         const counts = [
           (restored.feedingLog||[]).length + ' feeds',
@@ -9106,19 +9739,31 @@ function restoreDataPrompt() {
         ].join(', ');
         confirmDialog({
           title:'Restore backup from ' + when + '?',
-          body:'Contains: ' + counts + '. This will REPLACE all current data on this device and sync to your other phone.',
-          confirmLabel:'Replace all data'
+          body:'Contains: ' + counts + '. This replaces the logged data on THIS device (and syncs to your other phone). Your family sign-in stays the same.',
+          confirmLabel:'Replace data'
         }, () => {
-        // Merge restored data over the default state shape
-        Object.keys(restored).forEach(k => { state[k] = restored[k]; });
+        // CRITICAL: a backup carries the family identity of the phone that made it.
+        // Blindly restoring it would hijack this device into that family and could
+        // overwrite the other parent's cloud data. So we keep THIS device's current
+        // family identity and only bring across the baby/log content.
+        const keepFamilyId   = state.familyId;
+        const keepFamilyCode = state.familyCode;
+        // Merge restored content onto a fresh default state shape, so any field the
+        // backup predates (e.g. a newer setting) keeps its proper default, not undefined.
+        const base = (typeof defaultState === 'function') ? defaultState() : {};
+        const merged = Object.assign({}, base, restored);
+        merged.familyId   = keepFamilyId;
+        merged.familyCode = keepFamilyCode;
+        Object.keys(state).forEach(k => { delete state[k]; });
+        Object.assign(state, merged);
         saveLocal();
-        // Push to cloud so both phones get it
+        // Push to cloud so both phones get it (under THIS family's path, unchanged)
         if (typeof saveState === 'function') saveState();
-        toast('Restored! ✓ Reloading...');
+        toast('Restored! \u2713 Reloading\u2026');
         setTimeout(()=>location.reload(), 800);
         });
       } catch(err) {
-        toast('Could not read backup: ' + err.message);
+        alertDialog('Could not read that backup', 'The file may be incomplete or corrupted. If you have another backup, try that one. (' + err.message + ')', {icon:'\u26a0\ufe0f'});
       }
     };
     reader.readAsText(file);
@@ -9331,10 +9976,10 @@ PAGES['milestones'] = function(el) {
 
     let html = `
       <div class="grid-4" style="margin-bottom:14px">
-        <div class="stat-card" style="background:#1B3A6B"><div class="val">${achieved}</div><div class="lbl">Achieved</div></div>
-        <div class="stat-card" style="background:#2D8F8F"><div class="val">${MILESTONES.length - achieved}</div><div class="lbl">Pending</div></div>
-        <div class="stat-card" style="background:#C0392B"><div class="val">${redFlagsAchieved}</div><div class="lbl">Red flags pending</div></div>
-        <div class="stat-card" style="background:#854F0B"><div class="val">${concerns}</div><div class="lbl">Flagged</div></div>
+        <div class="stat-card" style="background:#1F7373"><div class="val">${achieved}</div><div class="lbl">Achieved</div></div>
+        <div class="stat-card" style="background:#2A2E55"><div class="val">${MILESTONES.length - achieved}</div><div class="lbl">Pending</div></div>
+        <div class="stat-card" style="background:#A6402F"><div class="val">${redFlagsAchieved}</div><div class="lbl">Red flags pending</div></div>
+        <div class="stat-card" style="background:#8F5E23"><div class="val">${concerns}</div><div class="lbl">Flagged</div></div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
         ${['all','Gross Motor','Fine Motor','Language','Social','Cognitive','Emotional'].map(d =>
@@ -9346,6 +9991,7 @@ PAGES['milestones'] = function(el) {
           `<button class="tab-btn ${filterAchieved===v?'active':''}" onclick="setMilFilter('${v}')">${l}</button>`
         ).join('')}
       </div>
+      <div class="mil-timeline">
     `;
 
     ageGroups.forEach(age => {
@@ -9353,28 +9999,28 @@ PAGES['milestones'] = function(el) {
       if (!ageMils || !ageMils.length) return;
       const total = MILESTONES.filter(m => m[0] === age).length;
       const done = MILESTONES.filter((m,i) => m[0] === age && state.milestones[i]?.achieved).length;
-      html += `<div class="section-hdr" style="background:#1B3A6B">${age} <span style="font-size:11px;opacity:.7;margin-left:6px">${done}/${total} achieved</span></div>
+      html += `<div class="mil-node"><span class="mil-node-label">${age}</span><span class="mil-node-frac">${done}/${total} achieved</span></div>
         <div class="card" style="padding:0;margin-bottom:8px;overflow:hidden">
         ${ageMils.map(m => {
           const i = MILESTONES.indexOf(m);
           const s = state.milestones[i] || {};
           const color = DOMAIN_COLORS[m[3]] || '#888';
-          return `<div style="padding:12px 14px;border-bottom:1px solid #f0f0f0;${s.achieved?'opacity:.6':''}">
+          return `<div class="mil-row ${s.achieved?'mil-done':''}">
             <div style="display:flex;align-items:flex-start;gap:10px">
               <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;margin-top:4px"></div>
               <div style="flex:1;min-width:0">
-                <div style="font-size:13px;font-weight:600;line-height:1.4;color:${m[5]?'#C0392B':s.achieved?'#aaa':'#1a1a1a'};${s.achieved?'text-decoration:line-through':''}">${m[2]}${m[5]?' 🚨':''}</div>
+                <div class="mil-text ${m[5]?'mil-redflag':''}">${m[2]}${m[5]?' 🚨':''}</div>
                 <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;align-items:center">
                   <span class="badge" style="background:${color}22;color:${color};font-size:11px">${m[3]}</span>
-                  ${s.date ? `<span style="font-size:11px;color:#0F6E56">✓ ${s.date}</span>` : ''}
+                  ${s.date ? `<span class="mil-donedate">✓ ${s.date}</span>` : ''}
                 </div>
-                ${m[4] ? `<div style="font-size:11px;color:#767680;font-style:italic;margin-top:4px;line-height:1.4">${m[4].substring(0,80)}${m[4].length>80?'…':''}</div>` : ''}
+                ${m[4] ? `<div class="mil-note">${m[4].substring(0,80)}${m[4].length>80?'…':''}</div>` : ''}
               </div>
               <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:4px">
-                <button onclick="toggleMilestone(${i})" style="padding:5px 11px;border-radius:8px;border:1.5px solid ${s.achieved?'#0F6E56':'#ddd'};background:${s.achieved?'#E1F5EE':'#fff'};color:${s.achieved?'#0F6E56':'#666'};font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">
+                <button onclick="toggleMilestone(${i})" class="mil-btn-done ${s.achieved?'on':''}">
                   ${s.achieved?'✓ Done':'Mark done'}
                 </button>
-                <button onclick="toggleConcern(${i})" style="padding:4px 10px;border-radius:8px;border:1.5px solid ${s.concern?'#C0392B':'#eee'};background:${s.concern?'#FCEBEB':'#fff'};color:${s.concern?'#C0392B':'#aaa'};font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">
+                <button onclick="toggleConcern(${i})" class="mil-btn-flag ${s.concern?'on':''}">
                   ${s.concern?'⚠ Flagged':'Flag'}
                 </button>
               </div>
@@ -9383,13 +10029,14 @@ PAGES['milestones'] = function(el) {
         }).join('')}
         </div>`;
     });
+    html += `</div>`;
 
     if (!Object.keys(byAge).length) html += '<div class="card" style="text-align:center;color:#767680;padding:24px">No milestones match this filter.</div>';
 
   // Custom milestones
   const customMils = state.customMilestones || [];
   if (customMils.length > 0 && filterAchieved !== 'concern') {
-    html += `<div class="section-hdr" style="background:#534AB7">⭐ Custom Milestones & Notes</div><div class="card" style="padding:0;margin-bottom:8px;overflow:hidden">`;
+    html += `<div class="mil-timeline"><div class="mil-node"><span class="mil-node-label">⭐ Custom &amp; notes</span></div></div><div class="card" style="padding:0;margin-bottom:8px;overflow:hidden">`;
     customMils.forEach((m, ci) => {
       const idx = MILESTONES.length + ci;
       const s = state.milestones[idx] || {};
@@ -9397,10 +10044,10 @@ PAGES['milestones'] = function(el) {
         <div class="domain-dot" style="background:#534AB7"></div>
         <div style="flex:1" onclick="toggleCustomMil(${ci})">
           <div class="mtext" style="font-size:13px">${m.text}</div>
-          <div style="font-size:11px;color:#767680;margin-top:2px">${m.age||''}${s.date?' · '+s.date:''}</div>
+          <div class="mil-note" style="font-style:normal">${m.age||''}${s.date?' · '+s.date:''}</div>
         </div>
         <div style="display:flex;gap:6px;margin-left:8px">
-          <button onclick="toggleCustomMil(${ci})" style="padding:4px 10px;border-radius:10px;border:1.5px solid ${s.achieved?'#0F6E56':'#ddd'};background:${s.achieved?'#E1F5EE':'#fff'};color:${s.achieved?'#0F6E56':'#888'};font-size:11px;cursor:pointer;white-space:nowrap;font-family:inherit">
+          <button onclick="toggleCustomMil(${ci})" class="mil-btn-done ${s.achieved?'on':''}">
             ${s.achieved?'✓ Done':'Mark done'}
           </button>
           <button onclick="delCustomMil(${ci})" class="del-btn">✕</button>
@@ -9718,6 +10365,7 @@ PAGES['philosophy'] = function(el) {
       <h2>📖 Parenting Philosophy</h2>
       <p>40% Montessori · 30% RIE · 20% Authoritative · 10% Developmental Science</p>
     </div>
+    <div class="ref-lead">Four traditions, one thread: a baby who is trusted to communicate, to struggle a little, and to be met with warmth rather than managed.</div>
     <div class="grid-4" style="margin-bottom:16px">
       ${[
         {name:'Montessori',pct:40,color:'#534AB7',bg:'#EEEDFE',core:'Independence, prepared environment, freedom within limits, self-directed learning'},
@@ -9729,7 +10377,7 @@ PAGES['philosophy'] = function(el) {
           <div style="width:40px;height:40px;border-radius:50%;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:${p.color}">${p.pct}%</div>
           <div style="font-size:15px;font-weight:700;color:${p.color}">${p.name}</div>
         </div>
-        <div style="font-size:11px;color:#555;line-height:1.6">${p.core}</div>
+        <div class="ref-body">${p.core}</div>
         ${pctBar(p.pct, p.color, 6)}
       </div>`).join('')}
     </div>
@@ -9743,9 +10391,9 @@ PAGES['philosophy'] = function(el) {
         {rule:'Prioritise conversation over teaching',detail:'Back-and-forth interaction wires 700–1,000 neural connections per second. No toy, class, or programme replicates this.'},
         {rule:'Read aloud every single day',detail:'Non-negotiable from birth. Children exposed to 5 books/day from birth hear ~1.4 million more words before kindergarten. Read in BOTH languages.'},
         {rule:'Name emotions, always',detail:'"I\'m feeling happy when I see you smile. Papa senang sekali." Name yours and baby\'s — in both languages. This is the foundation of emotional regulation.'},
-      ].map(({rule,detail}) => `<div style="padding:10px 0;border-bottom:1px solid #f5f5f5">
-        <div style="font-size:13px;font-weight:600;color:#1B3A6B;margin-bottom:4px">${rule}</div>
-        <div style="font-size:12px;color:#555;line-height:1.5">${detail}</div>
+      ].map(({rule,detail}) => `<div class="ref-divider" style="padding:12px 0">
+        <div class="ref-rule">${rule}</div>
+        <div class="ref-body">${detail}</div>
       </div>`).join('')}
     </div>
   `;
@@ -9763,9 +10411,9 @@ PAGES['situations'] = function(el) {
     let html = `
       <div class="grid-2" style="margin-bottom:4px">
         ${SITUATIONS.map((s,i) => `
-          <div onclick="selectSit(${i})" class="card" style="cursor:pointer;border:${selected===i?'2px solid #1B3A6B':'1px solid #eee'};padding:12px 14px">
-            <div style="font-size:15px;font-weight:600;color:#1B3A6B;margin-bottom:4px">${s.title}</div>
-            <div style="font-size:11px;color:#777">Lead: ${s.lead}</div>
+          <div onclick="selectSit(${i})" class="card" style="cursor:pointer;border:${selected===i?'2px solid var(--teal,#2D8F8F)':'1px solid var(--hairline,#eee)'};padding:12px 14px">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px">${s.title}</div>
+            <div class="ref-body" style="font-size:11px">Lead: ${s.lead}</div>
           </div>
         `).join('')}
       </div>
@@ -9773,25 +10421,25 @@ PAGES['situations'] = function(el) {
 
     if (selected !== null) {
       const s = SITUATIONS[selected];
-      html += `<div class="card" style="border-left:4px solid #1B3A6B">
-        <div style="font-size:16px;font-weight:700;color:#1B3A6B;margin-bottom:4px">${s.title}</div>
-        <div style="font-size:11px;color:#777;margin-bottom:14px">Lead approach: ${s.lead}</div>
+      html += `<div class="card" style="border-left:3px solid var(--teal,#2D8F8F)">
+        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:4px">${s.title}</div>
+        <div class="ref-body" style="font-size:11px;margin-bottom:14px">Lead approach: ${s.lead}</div>
         ${s.steps.map((step,i) => `
           <div style="display:flex;gap:10px;margin-bottom:12px">
             <div style="width:26px;height:26px;border-radius:50%;background:${PHI_BG[step.phi]};color:${PHI_COLORS[step.phi]};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${i+1}</div>
             <div>
               <div class="badge" style="background:${PHI_BG[step.phi]};color:${PHI_COLORS[step.phi]};margin-bottom:4px">${step.phi}</div>
-              <div style="font-size:13px;color:#333;line-height:1.5">${step.text}</div>
+              <div class="ref-body" style="color:var(--ink);font-size:13px">${step.text}</div>
             </div>
           </div>
         `).join('')}
-        <div style="background:#FFF5F5;border-radius:6px;padding:8px 12px;font-size:12px;color:#C0392B;border-left:3px solid #C0392B">⚠ ${s.dont}</div>
+        <div style="background:#FBEAE7;border-radius:8px;padding:9px 12px;font-size:12px;color:#A6402F;border-left:3px solid #A6402F">⚠ ${s.dont}</div>
       </div>`;
     }
 
     const c = document.getElementById('sit-content');
     if (c) c.innerHTML = html;
-    else el.innerHTML = `<div class="page-header"><h2>🧩 Situations Guide</h2><p>How all four philosophies blend in real parenting moments</p></div><div id="sit-content">${html}</div>`;
+    else el.innerHTML = `<div class="page-header"><h2>🧩 Situations Guide</h2><p>How all four philosophies blend in real parenting moments</p></div><div class="ref-lead">Every framework sounds tidy on paper. Real moments — a meltdown at the shoe rack, a bitten sibling — need all four at once. This is where they meet.</div><div id="sit-content">${html}</div>`;
   }
 
   window.selectSit = (i) => { selected = selected === i ? null : i; render(); };
@@ -9818,16 +10466,17 @@ PAGES['montessori'] = function(el) {
       <h2>🔵 Montessori Development Plan</h2>
       <p>Environment, activities, and independence opportunities — Birth through Age 5</p>
     </div>
+    <div class="ref-lead">Prepare the environment, then get out of the way. The child's task is to build themselves — ours is to make that possible.</div>
     ${stages.map(s => `
       <div class="card" style="margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
           <div style="background:#534AB7;color:#fff;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700">${s.age}</div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-          ${[['🏠 Environment',s.env,'#534AB7'],['🎯 Activities',s.activities,'#0F6E56'],['🔄 Toy rotation',s.toys,'#185FA5'],['🌱 Independence',s.independence,'#854F0B'],['👨‍👩‍👦 Parent\'s role',s.parent,'#993556']].map(([lbl,text,color]) => `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+          ${[['🏠 Environment',s.env,'#534AB7'],['🎯 Activities',s.activities,'#0F6E56'],['🔄 Toy rotation',s.toys,'#185FA5'],['🌱 Independence',s.independence,'#8F5E23'],['👨‍👩‍👦 Parent\'s role',s.parent,'#993556']].map(([lbl,text,color]) => `
             <div>
-              <div style="font-size:11px;font-weight:700;color:${color};margin-bottom:4px">${lbl}</div>
-              <div style="font-size:12px;color:#444;line-height:1.5">${text}</div>
+              <div class="ref-card-title" style="color:${color}">${lbl}</div>
+              <div class="ref-body">${text}</div>
             </div>`).join('')}
         </div>
       </div>
@@ -9850,21 +10499,22 @@ PAGES['rie'] = function(el) {
 
   el.innerHTML = `
     <div class="page-header"><h2>💚 RIE Parenting Guide</h2><p>Respectful communication · Age-based · Real phrase examples</p></div>
+    <div class="ref-lead">Babies are capable of far more than we assume — of understanding, of struggling productively, of being told the truth. Talk to them like it.</div>
     ${rieData.map(r => `
       <div class="card" style="margin-bottom:12px">
         <div style="background:#0F6E56;color:#fff;border-radius:6px;padding:6px 12px;display:inline-block;font-size:12px;font-weight:600;margin-bottom:10px">${r.age}</div>
-        <div style="font-size:12px;color:#444;margin-bottom:12px;padding:8px 12px;background:#f9f9f9;border-radius:6px;line-height:1.5"><b>Principle:</b> ${r.principle}</div>
+        <div class="ref-body ref-principle-box"><b>Principle:</b> ${r.principle}</div>
         <div class="grid-2">
           <div>
-            <div style="font-size:11px;font-weight:700;color:#0F6E56;margin-bottom:6px">✓ What TO say</div>
-            ${r.say.map(s => `<div style="padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:12px;color:#333">${s}</div>`).join('')}
+            <div class="ref-card-title" style="color:#0F6E56">✓ What TO say</div>
+            ${r.say.map(s => `<div class="ref-divider ref-body" style="padding:5px 0;color:var(--ink)">${s}</div>`).join('')}
           </div>
           <div>
-            <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:6px">✗ What NOT to say (& why)</div>
-            ${r.notSay.map(s => `<div style="padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:12px;color:#C0392B">${s}</div>`).join('')}
+            <div class="ref-card-title" style="color:#A6402F">✗ What NOT to say (& why)</div>
+            ${r.notSay.map(s => `<div class="ref-divider ref-body" style="padding:5px 0;color:#A6402F">${s}</div>`).join('')}
           </div>
         </div>
-        <div style="margin-top:10px;padding:8px 12px;background:#E1F5EE;border-radius:6px;font-size:12px;color:#0F6E56"><b>Observation practice:</b> ${r.obs}</div>
+        <div style="margin-top:10px;padding:9px 12px;background:#E1F5EE;border-radius:8px;font-size:12px;color:#0F6E56"><b>Observation practice:</b> ${r.obs}</div>
       </div>
     `).join('')}
   `;
@@ -9887,11 +10537,19 @@ PAGES['settings'] = function(el) {
         <div class="settings-row-sub">Name, birthday, gender</div></div>
         <span class="settings-chev">\u203a</span>
       </div>
+      <div class="settings-row stacked" onclick="copyFamilyCode()" role="button" tabindex="0">
+        <div class="settings-row-main"><div class="settings-row-lbl">Family code</div><div class="settings-row-sub">Tap to copy \u00b7 share so your partner's device syncs</div></div>
+        <span class="settings-code">${state.familyCode||'\u2014'}</span>
+      </div>
+      <div class="settings-row" onclick="changeFamilyCodePrompt()" role="button" tabindex="0">
+        <div class="settings-row-main"><div class="settings-row-lbl">Change family code</div><div class="settings-row-sub">Pick your own, or shuffle to a new random one</div></div>
+        <span class="settings-chev">\u203a</span>
+      </div>
     </div>
 
     <div class="card">
       <div class="card-title">Preferences</div>
-      <div class="settings-row" role="group" aria-label="Weight unit">
+      <div class="settings-row stacked" role="group" aria-label="Weight unit">
         <div class="settings-row-main"><div class="settings-row-lbl">Weight unit</div><div class="settings-row-sub">Used across growth &amp; feeding</div></div>
         <div class="settings-seg">
           <button class="settings-seg-btn ${unit==='kg'?'on':''}" onclick="setAppWeightUnit('kg')">kg</button>
@@ -9925,11 +10583,64 @@ PAGES['settings'] = function(el) {
       </div>
     </div>
 
-    <div class="settings-mark">BabyOS \u00b7 ${(typeof BUILD_STAMP!=='undefined'?BUILD_STAMP:'')}</div>
+    <div class="settings-mark">BabyOS</div>
   `;
 };
 
+window.copyFamilyCode = () => {
+  const code = state.familyCode;
+  if (!code) { toast('No family code yet'); return; }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(()=>toast('Copied \u2713')).catch(()=>toast('Family code: '+code));
+  } else { toast('Family code: '+code); }
+};
 window.setAppWeightUnit = (u) => { state.weightUnit = u; saveState('weightUnit'); navTo('settings'); toast('Weight unit: '+ (u==='lboz'?'lb/oz':u)); };
+
+// Change the family code — either type a custom one or shuffle to a fresh random
+// one. Writing the new code to the cloud is what lets the partner re-join with it.
+window.changeFamilyCodePrompt = () => {
+  const cur = state.familyCode || '';
+  let ov = document.getElementById('confirm-dialog');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'confirm-dialog'; ov.className = 'cfd-ov';
+  ov.innerHTML =
+    '<div class="cfd-card" role="dialog" aria-modal="true" style="text-align:left">' +
+      '<div class="cfd-title" style="margin-bottom:6px">Change family code</div>' +
+      '<div class="cfd-body" style="margin-bottom:12px">Your partner will need the new code to stay synced. Choose your own, or shuffle to a random secure one.</div>' +
+      '<label style="display:block;font-size:11px;font-weight:700;color:var(--dgray);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">New code</label>' +
+      '<div style="display:flex;gap:8px;margin-bottom:6px">' +
+        '<input id="fc-new" type="text" value="' + cur.replace(/"/g,'&quot;') + '" autocapitalize="characters" autocomplete="off" spellcheck="false" style="flex:1;text-transform:uppercase;font-family:monospace;letter-spacing:.06em">' +
+        '<button type="button" class="cfd-btn" id="fc-shuffle" style="flex:0 0 auto;padding:0 14px" title="Random secure code">\u21bb</button>' +
+      '</div>' +
+      '<div id="fc-err" style="font-size:12px;color:#C4362B;min-height:16px;margin-bottom:8px"></div>' +
+      '<div class="cfd-btns"><button type="button" class="cfd-btn cfd-cancel">Cancel</button>' +
+      '<button type="button" class="cfd-btn cfd-ok">Save code</button></div>' +
+    '</div>';
+  document.body.appendChild(ov);
+  const input = ov.querySelector('#fc-new');
+  const err = ov.querySelector('#fc-err');
+  ov.querySelector('#fc-shuffle').onclick = () => {
+    input.value = generateFamilyCode(state.momName, state.dadName, state.edd);
+    err.textContent = '';
+  };
+  ov.querySelector('.cfd-cancel').onclick = () => closeConfirmDialog();
+  ov.querySelector('.cfd-ok').onclick = async () => {
+    const v = validateCustomCode(input.value);
+    if (!v.ok) { err.textContent = v.reason; return; }
+    if (v.code === (cur || '').toUpperCase()) { closeConfirmDialog(); return; }
+    err.textContent = 'Checking\u2026';
+    if (await codeInUse(v.code, state.familyId)) { err.textContent = 'That code is already taken \u2014 try another.'; return; }
+    state.familyCode = v.code;
+    saveLocal();
+    if (typeof saveState === 'function') saveState();   // writes new code to cloud
+    closeConfirmDialog();
+    navTo('settings');
+    alertDialog('Family code updated', 'Your new code is ' + v.code + '. Share it with your partner so their device can reconnect \u2014 their old code will no longer work.', { icon:'\ud83d\udd11', okLabel:'Done' });
+  };
+  ov.onclick = (e) => { if (e.target === ov) closeConfirmDialog(); };
+  requestAnimationFrame(() => ov.classList.add('show'));
+};
 
 // Sign out: this device forgets the family and returns to the landing screen.
 // Cloud data is untouched — signing back in with the family code brings it all back.
@@ -10367,22 +11078,22 @@ function restoreTimers() {
     const ft = localStorage.getItem('babyos_feed_timer');
     if (ft) {
       const t = JSON.parse(ft);
-      if (t && t.running && t.start) {
-        window._feedTimer = t;
-        if (window._feedTimerInterval) clearInterval(window._feedTimerInterval);
-        window._feedTimerInterval = setInterval(() => { if(window.renderFeedTimer) window.renderFeedTimer(); }, 1000);
+      if (t && t.running && t.start && !(state.activeFeedTimer && state.activeFeedTimer.running)) {
+        state.activeFeedTimer = { running:true, start:t.start, side:t.side };
+        saveState('activeFeedTimer');
       }
+      localStorage.removeItem('babyos_feed_timer');
     }
   } catch(e){}
   try {
     const st = localStorage.getItem('babyos_sleep_timer');
     if (st) {
       const t = JSON.parse(st);
-      if (t && t.running && t.start) {
-        window._sleepTimer = t;
-        if (window._sleepTimerInterval) clearInterval(window._sleepTimerInterval);
-        window._sleepTimerInterval = setInterval(() => { if(window.renderSleepTimer) window.renderSleepTimer(); }, 1000);
+      if (t && t.running && t.start && !(state.activeSleepTimer && state.activeSleepTimer.running)) {
+        state.activeSleepTimer = { running:true, start:t.start };
+        saveState('activeSleepTimer');
       }
+      localStorage.removeItem('babyos_sleep_timer');
     }
   } catch(e){}
 }
