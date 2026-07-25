@@ -1608,7 +1608,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('settings')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span> Settings</button>
   <button class="nav-item" onclick="openNavCustomizer()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></span> Customise tabs</button>
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 25 Jul 2026, 12:26</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 25 Jul 2026, 12:44</div>
   <div style="height:20px"></div>
 </div>
 
@@ -2101,13 +2101,21 @@ const LOG_ARRAY_KEYS = ['feedingLog','sleepLog','diaperLog','weightLog','pumpLog
 function entrySig(e) {
   if (!e || typeof e !== 'object') return String(e);
   // Build the signature from the entry's own fields, ignoring _id and any transient
-  // keys, so two copies of the same logged event always match.
-  const keys = Object.keys(e).filter(k => k !== '_id').sort();
+  // keys, so two copies of the same logged event always match. Normalize aggressively:
+  // treat missing/empty/0/false as the same "no value" so entries that differ only by
+  // a field being absent-vs-empty still dedupe. This is what makes it robust to the
+  // subtle shape drift that Firebase and different code paths introduce.
+  const IGNORE = { _id:1 };
+  const keys = Object.keys(e).filter(k => !IGNORE[k]).sort();
   const parts = [];
   for (const k of keys) {
-    const v = e[k];
-    if (v === null || v === undefined) continue;
-    parts.push(k + '=' + (typeof v === 'object' ? JSON.stringify(v) : String(v)));
+    let v = e[k];
+    // Normalize "empty-ish" values to nothing so absent vs '' vs 0 vs false collapse.
+    if (v === null || v === undefined || v === '' || v === 0 || v === false) continue;
+    if (typeof v === 'object') v = JSON.stringify(v);
+    else v = String(v).trim();
+    if (v === '') continue;
+    parts.push(k + '=' + v);
   }
   return parts.join('|');
 }
@@ -2211,6 +2219,8 @@ function dedupeAllLogs() {
 }
 
 function saveState(changedKey) {
+  dedupeAllLogs();   // collapse any duplicate log entries before persisting — covers
+                     // every path (sync, manual log, restore) so dupes can't linger
   stampEntryIds();   // ensure every log entry has a stable _id before persisting
   // Always save locally first — instant, never fails
   saveLocal();
