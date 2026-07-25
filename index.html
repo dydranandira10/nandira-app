@@ -588,6 +588,11 @@ body.night-mode .bd-row-name{color:#e8e4d8;}
 .sky-orb.moon{background:radial-gradient(circle at 62% 38%,#F4F1E0,#C9C6B8 70%);box-shadow:0 0 20px 6px rgba(240,238,220,.22);}
 .sky-orb.moon::after{content:'';position:absolute;top:6px;left:5px;width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.08);}
 .now-hero>*:not(.sky-orb):not(.sky-stars):not(.now-hero-glow){position:relative;z-index:1;}
+/* When the "feeding in progress" banner is showing, hide the decorative sun/moon
+   so it can't collide with the banner — the banner is the hero's focus while a
+   feed is timing. Stars stay (they're ambient, full-width, no collision). */
+.now-hero.feeding-live .sky-orb{display:none;}
+.now-hero.feeding-live .now-hero-glow{opacity:.5;}
 .sky-stars{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.2px 1.2px at 18% 30%,rgba(255,255,255,.8),transparent),radial-gradient(1px 1px at 42% 15%,rgba(255,255,255,.6),transparent),radial-gradient(1.4px 1.4px at 68% 38%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 85% 22%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 30% 60%,rgba(255,255,255,.4),transparent);}
 /* ── Today's story: a 24h sky band with the day's moments on it ── */
 .day-arc-card{padding-bottom:12px;}
@@ -1603,7 +1608,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('settings')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span> Settings</button>
   <button class="nav-item" onclick="openNavCustomizer()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></span> Customise tabs</button>
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 25 Jul 2026, 09:32</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 25 Jul 2026, 12:26</div>
   <div style="height:20px"></div>
 </div>
 
@@ -1734,7 +1739,15 @@ async function syncFromCloud() {
     }
     const prevPage = _currentPage;
     state = merged;
+    // Repair duplicates on every sync (idempotent). If this pull brought in dupes
+    // from a cloud copy that predates the fix, collapse them and push the clean
+    // version back up so both devices and the cloud converge on de-duplicated data.
+    const removedDupes = (typeof dedupeAllLogs === 'function') ? dedupeAllLogs() : 0;
     saveLocal();
+    if (removedDupes > 0 && state.familyId) {
+      // Push the cleaned full state up so the cloud stops serving duplicates.
+      fbPatch('/families/' + state.familyId + '/state', state).then(()=>{ _lastSyncHash=''; });
+    }
     updateSubtitles();
     // Re-render current page smoothly (only if content changed)
     // Don't re-render if a modal/form is open, or the user is actively editing a
@@ -1895,6 +1908,9 @@ function loadLocal() {
     if (s) state = {...state, ...JSON.parse(s)};
   } catch(e) {}
   migrateData();
+  // Repair any duplicate log entries left by the earlier random-id sync merge.
+  // Content-based dedupe is idempotent, so this is safe to run every load.
+  if (typeof dedupeAllLogs === 'function') dedupeAllLogs();
 }
 
 function migrateData() {
@@ -2077,13 +2093,23 @@ const LOG_ARRAY_KEYS = ['feedingLog','sleepLog','diaperLog','weightLog','pumpLog
   'medsLog','notesLog','calendarEvents','solidsLog','mealLog','growthLog','tummyLog',
   'readingLog','stashLog'];
 
-// A stable identity for a log entry. Uses _id when present; otherwise a signature
-// built from its own fields so pre-existing (un-stamped) entries still dedupe
-// sensibly instead of duplicating on every sync.
+// A stable identity for a log entry, derived from its CONTENT — not a random id.
+// This is critical: the same entry logged on/synced to two phones must produce the
+// SAME signature so a union-merge dedupes it. An earlier version keyed on a random
+// _id, which meant the same pre-existing entry got different ids on each device and
+// showed up duplicated. Content-based identity fixes that at the root.
 function entrySig(e) {
   if (!e || typeof e !== 'object') return String(e);
-  if (e._id) return e._id;
-  return JSON.stringify(e);
+  // Build the signature from the entry's own fields, ignoring _id and any transient
+  // keys, so two copies of the same logged event always match.
+  const keys = Object.keys(e).filter(k => k !== '_id').sort();
+  const parts = [];
+  for (const k of keys) {
+    const v = e[k];
+    if (v === null || v === undefined) continue;
+    parts.push(k + '=' + (typeof v === 'object' ? JSON.stringify(v) : String(v)));
+  }
+  return parts.join('|');
 }
 
 // Delete an entry from a log array by index AND record a tombstone so the
@@ -2094,10 +2120,15 @@ function deleteLogEntry(key, index) {
   if (!Array.isArray(arr) || index < 0 || index >= arr.length) return;
   const entry = arr[index];
   stampEntryIds();                       // make sure the entry has an _id first
-  if (entry && entry._id) {
+  if (entry && typeof entry === 'object') {
     if (!Array.isArray(state.deletedIds)) state.deletedIds = [];
-    if (!state.deletedIds.includes(entry._id)) state.deletedIds.push(entry._id);
-    // Keep the tombstone list from growing without bound (cap at 2000 most recent).
+    // Tombstone BOTH the _id and the content signature. The signature is what makes
+    // a deletion stick even if the other device holds the same entry under a
+    // different _id (which is exactly how the old duplication arose).
+    if (entry._id && !state.deletedIds.includes(entry._id)) state.deletedIds.push(entry._id);
+    const sig = entrySig(entry);
+    if (sig && !state.deletedIds.includes(sig)) state.deletedIds.push(sig);
+    // Keep the tombstone list bounded (cap at 2000 most recent).
     if (state.deletedIds.length > 2000) state.deletedIds = state.deletedIds.slice(-2000);
   }
   arr.splice(index, 1);
@@ -2107,6 +2138,7 @@ function deleteLogEntry(key, index) {
 // every save so IDs are assigned exactly once and then travel with the entry.
 function stampEntryIds() {
   let stamped = 0;
+  const dead = Array.isArray(state.deletedIds) ? state.deletedIds : null;
   for (const key of LOG_ARRAY_KEYS) {
     const arr = state[key];
     if (!Array.isArray(arr)) continue;
@@ -2114,6 +2146,14 @@ function stampEntryIds() {
       if (e && typeof e === 'object' && !e._id) {
         e._id = 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
         stamped++;
+        // A freshly-logged entry means the user WANTS it — if its content matches a
+        // prior tombstone (e.g. they re-logged an identical feed after deleting one),
+        // lift that tombstone so the union-merge won't suppress the new entry.
+        if (dead) {
+          const sig = entrySig(e);
+          const idx = dead.indexOf(sig);
+          if (idx >= 0) dead.splice(idx, 1);
+        }
       }
     }
   }
@@ -2132,8 +2172,9 @@ function unionLogArrays(localArr, remoteArr, tombstones) {
     if (!Array.isArray(arr)) return;
     for (const e of arr) {
       const sig = entrySig(e);
-      if (seen.has(sig)) continue;
-      if (e && e._id && dead.has(e._id)) continue;   // deleted somewhere — skip
+      if (seen.has(sig)) continue;                        // same content already kept — dedupe
+      if (e && e._id && dead.has(e._id)) continue;        // deleted by id — skip
+      if (dead.has(sig)) continue;                        // deleted by content — skip
       seen.add(sig);
       out.push(e);
     }
@@ -2146,6 +2187,27 @@ function unionLogArrays(localArr, remoteArr, tombstones) {
     return ka.localeCompare(kb);
   });
   return out;
+}
+
+// One-time (and idempotent) cleanup: collapse any duplicate entries already
+// present in a log array, keeping the first occurrence of each content signature.
+// This repairs data that the earlier random-id union may have duplicated.
+function dedupeAllLogs() {
+  let removed = 0;
+  for (const key of LOG_ARRAY_KEYS) {
+    const arr = state[key];
+    if (!Array.isArray(arr) || arr.length < 2) continue;
+    const seen = new Set();
+    const cleaned = [];
+    for (const e of arr) {
+      const sig = entrySig(e);
+      if (seen.has(sig)) { removed++; continue; }
+      seen.add(sig);
+      cleaned.push(e);
+    }
+    if (cleaned.length !== arr.length) state[key] = cleaned;
+  }
+  return removed;
 }
 
 function saveState(changedKey) {
@@ -5216,7 +5278,7 @@ PAGES['now'] = function(el) {
         }).join('');
       })()}
       <!-- FEEDING HERO (collapsible quick-log) -->
-      <div class="now-hero ${skyState().cls}">${skyDecorHTML()}
+      <div class="now-hero ${skyState().cls}${(state.activeFeedTimer && state.activeFeedTimer.running)?' feeding-live':''}">${skyDecorHTML()}
         <div class="now-hero-glow"></div>
         ${(() => {
           // Live "feeding in progress" banner when a timer is running — otherwise
