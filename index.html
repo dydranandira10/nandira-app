@@ -575,7 +575,7 @@ body.night-mode .bd-row + .bd-row{border-color:rgba(255,255,255,.08);}
 body.night-mode .bd-row-name{color:#e8e4d8;}
 .now-greet{margin-bottom:16px;padding:0 4px;}
 .now-greet-text{font-family:var(--font-display);font-size:26px;font-weight:650;color:#2A2A33;letter-spacing:-0.3px;line-height:1.15;}
-.now-greet-sub{font-size:13px;color:#9a9a9a;margin-top:2px;}
+.now-greet-sub{font-size:13px;color:#7d7d7d;margin-top:2px;}
 
 .now-hero{position:relative;isolation:isolate;background:linear-gradient(150deg,#2D8F8F,#1F7373);border-radius:24px;padding:20px 20px 18px;margin-bottom:14px;overflow:hidden;cursor:pointer;box-shadow:0 10px 28px -8px rgba(45,143,143,.45);transition:transform .15s;}
 /* Time-of-day skies — the BabyOS signature. The hero looks like the hour you're living. */
@@ -681,7 +681,7 @@ body.night-mode .settings-seg-btn{color:#a5a08f;}
 .mil-note{font-size:11px;color:var(--ink-3);font-style:italic;margin-top:4px;line-height:1.4;}
 .mil-btn-done{padding:5px 11px;border-radius:8px;border:1.5px solid #ddd;background:#fff;color:#666;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;min-height:28px;}
 .mil-btn-done.on{border-color:#0F6E56;background:#E1F5EE;color:#0F6E56;}
-.mil-btn-flag{padding:4px 10px;border-radius:8px;border:1.5px solid #eee;background:#fff;color:#aaa;font-size:11px;cursor:pointer;font-family:var(--font);white-space:nowrap;min-height:26px;}
+.mil-btn-flag{padding:4px 10px;border-radius:8px;border:1.5px solid #ddd;background:#fff;color:#777;font-size:11px;cursor:pointer;font-family:var(--font);white-space:nowrap;min-height:26px;}
 .mil-btn-flag.on{border-color:#A6402F;background:#FBEAE7;color:#A6402F;}
 body.night-mode .mil-node::before{box-shadow:0 0 0 4px #131320;}
 body.night-mode .mil-row{border-bottom-color:rgba(255,255,255,.07);}
@@ -724,6 +724,8 @@ body.night-mode .vax-ring-flag.done{color:#4fd1a1;}
 .ref-divider{border-bottom:1px solid var(--hairline,#f0f0f0);}
 body.night-mode .ref-lead{color:#f0ede2;}
 body.night-mode .ref-body{color:#a5a08f;}
+.phil-name{color:#2A2A33;}
+body.night-mode .phil-name{color:#f0ede2 !important;}
 body.night-mode .ref-rule{color:#f0ede2;}
 body.night-mode .ref-divider{border-bottom-color:rgba(255,255,255,.07);}
 .ref-principle-box{margin-bottom:12px;padding:10px 12px;background:#F4F0E4;border-radius:8px;color:var(--ink);}
@@ -793,6 +795,202 @@ body.night-mode #ptr-ind{background:#1d1d2c;border-color:rgba(255,255,255,.12);c
 .now-tile-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;}
 
 .now-today{background:#fff;border-radius:16px;padding:16px;border:0.5px solid rgba(0,0,0,.05);box-shadow:0 2px 8px -4px rgba(0,0,0,.08);margin-bottom:14px;}
+/* ── "Due today" reminder card on the Now page ── */
+.now-due-wrap{position:relative;margin-bottom:10px;border-radius:13px;overflow:hidden;}
+.now-due-action{position:absolute;inset:0;display:flex;align-items:center;color:#fff;font-weight:750;font-size:14px;border-radius:13px;opacity:0;transition:opacity .12s;}
+/* ── "Feeding in progress" live banner on the Now hero ── */
+.now-feeding-live{position:relative;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:14px;padding:12px 14px;margin-bottom:14px;cursor:pointer;backdrop-filter:blur(4px);}
+.nfl-pulse{width:11px;height:11px;border-radius:50%;background:#fff;flex-shrink:0;box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:nflPulse 1.6s infinite;}
+@keyframes nflPulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.6)}70%{box-shadow:0 0 0 9px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+.nfl-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;color:#fff;}
+.nfl-label{font-size:12px;font-weight:600;opacity:.9;}
+.nfl-time{font-size:22px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.05;}
+.nfl-since{font-size:11px;opacity:.75;}
+.nfl-stop{flex-shrink:0;background:#fff;color:#1F7373;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:750;font-family:var(--font);cursor:pointer;min-height:40px;}
+.nfl-stop:active{transform:scale(.96);}
+.now-due-action-done{background:linear-gradient(90deg,#26a06f,#2D8F8F);justify-content:flex-start;padding-left:22px;}
+.now-due-action-dismiss{background:linear-gradient(90deg,#8a8578,#6b6b78);justify-content:flex-end;padding-right:22px;}
+.now-due-swipe{position:relative;z-index:1;touch-action:pan-y;will-change:transform;}
+.now-due{display:flex;align-items:center;gap:11px;width:100%;background:#fff;border:0.5px solid rgba(0,0,0,.06);border-left:3px solid #2D8F8F;border-radius:13px;padding:11px 13px;cursor:pointer;font-family:var(--font);text-align:left;box-shadow:0 2px 8px -5px rgba(0,0,0,.12);}
+.now-due:active{transform:scale(.99);}
+.now-due-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.now-due-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.now-due-title{font-size:14px;font-weight:650;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.now-due-sub{font-size:11.5px;color:var(--ink-3);}
+.now-due-badge{flex-shrink:0;font-size:10.5px;font-weight:750;color:#1F6E6E !important;background:#E6F5F5 !important;padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;}
+body.night-mode .now-due{background:#1d1d2c;border-color:rgba(255,255,255,.06);border-left-color:#2D8F8F;}
+body.night-mode .now-due-title{color:#f0ede2;}
+body.night-mode .now-due-sub{color:#a5a08f;}
+body.night-mode .now-due-badge{background:#173d38 !important;color:#7fd4c4 !important;}
+/* ── Now-page "Coming up" module ── */
+.now-up{background:#fff;border-radius:16px;padding:14px 14px 12px;border:0.5px solid rgba(0,0,0,.05);box-shadow:0 2px 8px -4px rgba(0,0,0,.08);margin-bottom:14px;}
+.now-up-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.now-up-head>span{font-size:13px;font-weight:750;color:var(--ink);letter-spacing:.01em;}
+.now-up-all{background:none;border:none;color:#2D8F8F;font-size:12px;font-weight:650;cursor:pointer;font-family:var(--font);padding:2px 4px;}
+.now-up-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.now-up-row{display:flex;align-items:center;gap:10px;width:100%;background:#FBF8F2;border:0.5px solid rgba(0,0,0,.04);border-radius:12px;padding:9px 11px;cursor:pointer;font-family:var(--font);text-align:left;transition:transform .12s,background .15s;}
+.now-up-row:active{transform:scale(.98);}
+.now-up-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.now-up-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.now-up-title{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.now-up-sub{font-size:11.5px;color:var(--ink-3);}
+.now-up-chev{color:var(--ink-3);font-size:17px;flex-shrink:0;}
+.now-up-empty{font-size:13px;color:var(--ink-3);text-align:center;padding:14px 0 16px;}
+.now-up-add{width:100%;background:#E6F5F5;color:#1F7373;border:1px dashed #7FbfbF;border-radius:11px;padding:10px;font-size:13px;font-weight:650;cursor:pointer;font-family:var(--font);}
+.now-up-add:active{background:#d5eeee;}
+body.night-mode .now-up{background:#1d1d2c;border-color:rgba(255,255,255,.06);}
+body.night-mode .now-up-head>span{color:#f0ede2;}
+body.night-mode .now-up-row{background:#262635;border-color:rgba(255,255,255,.05);}
+body.night-mode .now-up-title{color:#f0ede2;}
+body.night-mode .now-up-sub,body.night-mode .now-up-chev{color:#a5a08f;}
+body.night-mode .now-up-add{background:#173d38;color:#7fd4c4;border-color:#2D8F8F;}
+
+/* ── Calendar page (month grid + compact agenda) ── */
+.cal-whoseg{display:flex;gap:6px;background:#F2EFE7;border-radius:12px;padding:4px;margin-bottom:12px;}
+.cal-whoseg-btn{flex:1;background:none;border:none;border-radius:9px;padding:9px 6px;font-size:13px;font-weight:650;color:var(--ink-2);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-whoseg-btn.on{background:#fff;color:#1F6E6E;box-shadow:0 2px 6px -2px rgba(0,0,0,.15);}
+body.night-mode .cal-whoseg{background:#242435;}
+body.night-mode .cal-whoseg-btn{color:#c4bca8;}
+body.night-mode .cal-whoseg-btn.on{background:#2D8F8F;color:#fff;}
+.cal-filters{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 12px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.cal-filters::-webkit-scrollbar{display:none;}
+.cal-fchip{flex:0 0 auto;background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all .15s;}
+.cal-fchip.on{background:var(--cc,#1F6E6E) !important;border-color:var(--cc,#1F6E6E) !important;color:#fff !important;}
+body.night-mode .cal-fchip{background:#262635;border-color:rgba(255,255,255,.12);color:#c4bca8;}
+.cal-group{margin-bottom:16px;}
+.cal-group-head{display:flex;align-items:baseline;gap:9px;margin-bottom:8px;padding-left:2px;}
+.cal-group-rel{font-size:14px;font-weight:750;color:var(--ink) !important;font-family:var(--font-display);}
+.cal-group-date{font-size:11.5px;color:var(--ink-3) !important;}
+.cal-more{display:block;width:100%;text-align:center;color:#1F6E6E;background:#E6F5F5;border:none;border-radius:11px;font-size:13px;font-weight:650;padding:11px;cursor:pointer;font-family:var(--font);margin-top:4px;}
+.cal-more:active{background:#d5eeee;}
+body.night-mode .cal-more{background:#173d38;color:#7fd4c4;}
+.cal-empty{text-align:center;padding:40px 18px;background:#fff;border-radius:16px;border:0.5px solid rgba(0,0,0,.05);}
+.cal-past-sec{margin-top:8px;}
+.cal-past-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;color:var(--ink-2);font-size:13px;font-weight:650;padding:12px 4px;cursor:pointer;font-family:var(--font);}
+.cal-past-count{font-size:11px;font-weight:700;color:var(--ink-3);background:#F2EFE7;padding:2px 9px;border-radius:999px;}
+.cal-past-list{padding-top:4px;}
+.cal-row-past{opacity:.72;}
+.cal-past-hint{font-size:11px;color:var(--ink-3);text-align:center;padding:8px 0 2px;}
+body.night-mode .cal-past-toggle{color:#c4bca8;}
+body.night-mode .cal-past-count{background:#2a2a3a;color:#a5a08f;}
+body.night-mode .cal-empty{background:#1d1d2c;}
+body.night-mode .cal-group-rel{color:#f0ede2 !important;}
+body.night-mode .cal-group-date{color:#a5a08f !important;}
+.cal-cal{background:#fff;border-radius:18px;padding:12px 12px 14px;border:0.5px solid rgba(0,0,0,.05);box-shadow:0 2px 10px -5px rgba(0,0,0,.1);margin-bottom:14px;}
+.cal-monthbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-monthlabel{background:none;border:none;font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--ink);cursor:pointer;font-family:var(--font-display);padding:4px 10px;border-radius:8px;}
+.cal-monthlabel:active{background:rgba(45,143,143,.1);}
+.cal-navbtn{width:36px;height:36px;border-radius:10px;border:none;background:#F2EFE7;color:var(--ink-2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.cal-navbtn:active{background:#e5e1d5;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-grid-dow{margin-bottom:4px;}
+.cal-dow{text-align:center;font-size:11px;font-weight:700;color:var(--ink-3);padding:4px 0;}
+.cal-cell{aspect-ratio:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5px 0 0;border-radius:11px;position:relative;font-family:var(--font);transition:background .12s;}
+.cal-cell-num{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1;}
+.cal-cell-out .cal-cell-num{color:transparent;}
+.cal-cell-out{pointer-events:none;}
+.cal-cell-today .cal-cell-num{color:#2D8F8F;font-weight:800;}
+.cal-cell-today{background:rgba(45,143,143,.08);}
+.cal-cell-sel{background:#2D8F8F;}
+.cal-cell-sel .cal-cell-num{color:#fff;font-weight:800;}
+.cal-cell-dots{display:flex;gap:2.5px;margin-top:3px;height:5px;align-items:center;}
+.cal-cell-dot{width:5px;height:5px;border-radius:50%;}
+.cal-cell-sel .cal-cell-dot{background:#fff !important;opacity:.9;}
+.cal-cell:active{background:rgba(45,143,143,.12);}
+body.night-mode .cal-cal{background:#1d1d2c;border-color:rgba(255,255,255,.06);}
+body.night-mode .cal-monthlabel,body.night-mode .cal-cell-num{color:#f0ede2;}
+body.night-mode .cal-navbtn{background:#2a2a3a;color:#c4bca8;}
+body.night-mode .cal-dow{color:#8a8578;}
+body.night-mode .cal-cell-today{background:rgba(92,209,200,.12);}
+body.night-mode .cal-cell-today .cal-cell-num{color:#5cd1c8;}
+body.night-mode .cal-cell-sel{background:#2D8F8F;}
+body.night-mode .cal-cell-sel .cal-cell-num{color:#fff;}
+/* Selected-day list */
+.cal-day{margin-bottom:16px;}
+.cal-day-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding-left:2px;}
+.cal-day-head>span{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--ink);}
+.cal-day-addbtn,.cal-day-add{background:#E6F5F5;color:#1F6E6E;border:none;border-radius:9px;padding:6px 12px;font-size:12.5px;font-weight:650;cursor:pointer;font-family:var(--font);}
+.cal-day-addbtn:active{background:#d5eeee;}
+.cal-day-empty{text-align:center;color:var(--ink-3);font-size:13px;padding:18px 0;background:#fff;border-radius:13px;border:0.5px dashed rgba(0,0,0,.12);}
+.cal-day-add{margin-left:6px;padding:5px 10px;}
+body.night-mode .cal-day-head>span{color:#f0ede2;}
+body.night-mode .cal-day-addbtn,body.night-mode .cal-day-add{background:#173d38;color:#7fd4c4;}
+body.night-mode .cal-day-empty{background:#1d1d2c;border-color:rgba(255,255,255,.12);color:#a5a08f;}
+.cal-row{display:flex;align-items:center;gap:11px;background:#fff;border:0.5px solid rgba(0,0,0,.05);border-radius:13px;padding:11px 13px;box-shadow:0 2px 7px -5px rgba(0,0,0,.1);margin-bottom:7px;}
+.cal-row-done{opacity:.55;}
+.cal-row-done .cal-row-title{text-decoration:line-through;}
+.cal-row-check{width:22px;height:22px;border-radius:50%;border:2px solid #cfc9bd;background:#fff;flex-shrink:0;cursor:pointer;padding:0;transition:all .15s;position:relative;}
+.cal-row-check.on{background:#2D8F8F;border-color:#2D8F8F;}
+.cal-row-check.on::after{content:'\2713';color:#fff;font-size:13px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.cal-row-check-lock{display:flex;align-items:center;justify-content:center;border:none;background:transparent;font-size:15px;width:22px;flex-shrink:0;}
+.cal-row-main{flex:1;min-width:0;background:none;border:none;text-align:left;cursor:pointer;font-family:var(--font);display:flex;flex-direction:column;gap:4px;padding:0;}
+.cal-row-title{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-row-meta{font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.cal-row-pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:650;}
+body.night-mode .cal-row{background:#1d1d2c;border-color:rgba(255,255,255,.05);}
+body.night-mode .cal-row-title{color:#f0ede2;}
+body.night-mode .cal-row-meta{color:#a5a08f;}
+body.night-mode .cal-row-check{background:#262635;border-color:#4a4636;}
+/* Compact "next few" */
+.cal-upnext{background:#fff;border-radius:16px;padding:12px 12px 8px;border:0.5px solid rgba(0,0,0,.05);box-shadow:0 2px 8px -5px rgba(0,0,0,.1);}
+.cal-upnext-head{font-size:12px;font-weight:750;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;padding-left:2px;}
+.cal-up-row{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;border-radius:10px;padding:8px 6px;cursor:pointer;font-family:var(--font);text-align:left;border-bottom:0.5px solid rgba(0,0,0,.05);}
+.cal-up-row:last-child{border-bottom:none;}
+.cal-up-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.cal-up-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.cal-up-title{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-up-sub{font-size:11.5px;color:var(--ink-3);}
+body.night-mode .cal-upnext{background:#1d1d2c;border-color:rgba(255,255,255,.06);}
+body.night-mode .cal-up-title{color:#f0ede2;}
+body.night-mode .cal-up-sub{color:#a5a08f;}
+body.night-mode .cal-up-row{border-bottom-color:rgba(255,255,255,.06);}
+.cal-fab{position:fixed;right:18px;bottom:88px;width:56px;height:56px;border-radius:50%;background:linear-gradient(145deg,#2D8F8F,#1F7373);color:#fff;border:none;font-size:30px;font-weight:300;line-height:1;cursor:pointer;box-shadow:0 8px 22px -6px rgba(45,143,143,.6);z-index:60;display:flex;align-items:center;justify-content:center;transition:transform .15s;}
+.cal-fab:active{transform:scale(.92);}
+
+/* ── Bottom sheet (calendar add/edit) ── */
+.sheet-ov{position:fixed;inset:0;background:rgba(30,22,10,.42);z-index:600;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s;}
+.sheet-ov.show{opacity:1;}
+.sheet{background:#FFFDF8;width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:8px 18px 30px;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1);box-shadow:0 -8px 30px -8px rgba(60,45,20,.25);}
+.sheet-ov.show .sheet{transform:translateY(0);}
+.sheet-handle{width:38px;height:4px;background:rgba(120,95,50,.25);border-radius:2px;margin:6px auto 14px;}
+.sheet-title{font-family:var(--font-display);font-size:19px;font-weight:650;color:var(--ink);margin-bottom:14px;}
+.cal-chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 14px;}
+.cal-chip{background:#fff;border:1.5px solid rgba(0,0,0,.12);border-radius:999px;padding:8px 13px;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;font-family:var(--font);transition:all .14s;}
+.cal-chip.on{background:var(--cc);border-color:var(--cc);color:#fff;box-shadow:0 3px 10px -3px var(--cc);}
+.cal-who{display:flex;gap:8px;}
+.cal-who-btn{flex:1;background:#fff;border:1.5px solid rgba(0,0,0,.1);border-radius:11px;padding:10px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;font-family:var(--font);transition:all .14s;}
+.cal-who-btn.on{background:#E6F5F5;border-color:#2D8F8F;color:#1F7373;}
+.sheet-btns{display:flex;gap:9px;margin-top:18px;}
+.sheet-btn{flex:1;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);border:none;}
+.sheet-cancel{background:#EEF0F3;color:var(--ink-2);}
+.sheet-save{background:linear-gradient(145deg,#2D8F8F,#1F7373);color:#fff;}
+.sheet-del{background:#FBEAE7;color:#C4362B;flex:0 0 auto;padding:13px 16px;}
+.sheet-done{width:100%;background:#E6F5F5;color:#1F6E6E;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:6px;}
+.rec-intro{font-size:12.5px;color:var(--ink-2);line-height:1.5;margin-bottom:14px;}
+.rec-list{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto;}
+.rec-row{display:flex;align-items:center;gap:10px;width:100%;background:#FBF8F2;border:0.5px solid rgba(0,0,0,.06);border-radius:12px;padding:12px 13px;cursor:pointer;font-family:var(--font);text-align:left;}
+.rec-row:active{background:#f2ede2;}
+.rec-row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.rec-row-when{font-size:14px;font-weight:650;color:var(--ink);}
+.rec-row-sub{font-size:11.5px;color:var(--ink-3);}
+.rec-row-count{flex-shrink:0;font-size:11.5px;font-weight:700;color:#1F6E6E;background:#E6F5F5;padding:4px 10px;border-radius:999px;}
+.rec-empty{text-align:center;color:var(--ink-3);font-size:13px;padding:28px 12px;line-height:1.5;}
+body.night-mode .rec-intro{color:#c4bca8;}
+body.night-mode .rec-row{background:#262635;border-color:rgba(255,255,255,.06);}
+body.night-mode .rec-row-when{color:#f0ede2;}
+body.night-mode .rec-row-sub,body.night-mode .rec-empty{color:#a5a08f;}
+body.night-mode .rec-row-count{background:#173d38;color:#7fd4c4;}
+.sheet-done:active{background:#d5eeee;}
+.sheet-done.is-done{background:#F2EFE7;color:#6b6b78;}
+body.night-mode .sheet-done{background:#173d38;color:#7fd4c4;}
+body.night-mode .sheet-done.is-done{background:#2a2a3a;color:#a5a08f;}
+body.night-mode .sheet{background:#1d1d2c;}
+body.night-mode .sheet-title{color:#f0ede2;}
+body.night-mode .cal-chip,body.night-mode .cal-who-btn{background:#262635;border-color:rgba(255,255,255,.12);color:#c4bca8;}
+body.night-mode .cal-chip.on{background:var(--cc);border-color:var(--cc);color:#fff;}
+body.night-mode .cal-who-btn.on{background:#173d38;border-color:#2D8F8F;color:#7fd4c4;}
+body.night-mode .sheet-cancel{background:#2a2a3a;color:#c4bca8;}
+body.night-mode .sheet-del{background:#3a1e1a;color:#e88a6a;}
 .now-today-head{font-size:13px;font-weight:700;color:#2A2A33;margin-bottom:14px;}
 .now-today-grid{display:flex;align-items:center;justify-content:space-between;}
 .now-today-stat{text-align:center;flex:1;}
@@ -1362,6 +1560,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('dashboard')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg></span> Home</button>
   <button class="nav-item" onclick="navTo('rhythm')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 14l3-4 3 3 4-6"/></svg></span> Insights</button>
   <button class="nav-item" onclick="navTo('notes')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-4-3-3 2-3-2-4 3Z"/><path d="M9 8h6M9 12h6"/></svg></span> Notes</button>
+  <button class="nav-item" onclick="navTo('calendar')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/></svg></span> Calendar</button>
   <div id="phase-suggest"></div>
   <div id="drawer-prebirth">
   <div class="drawer-section drawer-section-toggle" id="prebirth-header" onclick="togglePrebirthSection()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePrebirthSection();}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
@@ -1404,7 +1603,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('settings')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span> Settings</button>
   <button class="nav-item" onclick="openNavCustomizer()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></span> Customise tabs</button>
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 24 Jul 2026, 10:27</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 25 Jul 2026, 09:32</div>
   <div style="height:20px"></div>
 </div>
 
@@ -1524,17 +1723,28 @@ async function syncFromCloud() {
     const hash = remoteStr.length + '_' + (remote.momName||'') + (remote.edd||'');
     if (hash === _lastSyncHash) { setSyncStatus('synced'); return; }
     _lastSyncHash = hash;
-    // Remote wins — merge into local state
+    // Merge remote into local (union-merges log arrays so nothing is lost).
+    const beforeCount = _countEntries(state);
     const merged = deepMerge(state, remote);
+    // Defense-in-depth: if a merge ever ends up with FEWER entries than we had
+    // (it shouldn't, given the union-merge), snapshot the pre-merge state first so
+    // it's always recoverable, and flag it.
+    if (_countEntries(merged) < beforeCount) {
+      takeSnapshot('before-sync-shrink');
+    }
     const prevPage = _currentPage;
     state = merged;
     saveLocal();
     updateSubtitles();
     // Re-render current page smoothly (only if content changed)
-    // Don't re-render if a modal/form is open (would lose user input or reset tabs)
+    // Don't re-render if a modal/form is open, or the user is actively editing a
+    // field on this page — a background sync re-render would wipe their in-progress
+    // input (e.g. a just-stopped feed timer's Start time, or a half-typed amount).
     const modalOpen = document.querySelector('.modal-overlay.open');
+    const ae = document.activeElement;
+    const editing = ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT');
     const cur = document.getElementById('page-' + prevPage);
-    if (cur && PAGES[prevPage] && !modalOpen) PAGES[prevPage](cur);
+    if (cur && PAGES[prevPage] && !modalOpen && !editing) PAGES[prevPage](cur);
     setSyncStatus('synced');
   } catch(e) {
     setSyncStatus('error');
@@ -1542,14 +1752,34 @@ async function syncFromCloud() {
 }
 
 function deepMerge(local, remote) {
-  // Remote (Firebase) is source of truth — overrides local completely
-  // This ensures both devices stay in sync
+  // Merge remote (Firebase) into local WITHOUT ever destroying local data.
+  // - Log arrays (feeds, sleep, diapers, weight, etc.): UNION by entry identity,
+  //   so entries logged on either device are always kept. This is the fix for the
+  //   data-loss bug where a stale cloud copy replaced a fuller local log.
+  // - Nested objects (vaccines, milestones, settings): shallow-merge as before.
+  // - Scalars (name, DOB, toggles): remote wins (last edit propagates).
   if (!remote || typeof remote !== 'object') return local;
   const result = {...local, ...remote};
-  // For nested objects (vaccines, milestones, foods etc) do deep merge
+  // Union the tombstone (deleted-id) lists from both sides first, so a deletion
+  // made on either device is respected when we union the log arrays below.
+  const deadIds = new Set([...(local.deletedIds||[]), ...(remote.deletedIds||[])]);
+  result.deletedIds = [...deadIds];
   for (const key of Object.keys(remote)) {
-    if (remote[key] && typeof remote[key] === 'object' && !Array.isArray(remote[key])) {
+    if (LOG_ARRAY_KEYS.includes(key)) {
+      // Never replace a log array — union it (minus tombstoned entries).
+      result[key] = unionLogArrays(local[key], remote[key], deadIds);
+    } else if (key === 'deletedIds') {
+      // handled above
+    } else if (remote[key] && typeof remote[key] === 'object' && !Array.isArray(remote[key])) {
       result[key] = {...(local[key]||{}), ...remote[key]};
+    }
+  }
+  // Safety backstop: a merged log array may only be shorter than local if the
+  // difference is explained by tombstones. Otherwise keep local (never lose data).
+  for (const key of LOG_ARRAY_KEYS) {
+    if (Array.isArray(local[key]) && Array.isArray(result[key]) && result[key].length < local[key].length) {
+      const localKept = local[key].filter(e => !(e && e._id && deadIds.has(e._id)));
+      if (result[key].length < localKept.length) result[key] = localKept;
     }
   }
   return result;
@@ -1623,6 +1853,8 @@ function defaultState() {
   pregTasks: [],          // [{id,week,cat,task,pri,done}]
   inventoryItems: [],     // [{id,cat,item,qty,pri,purchased,cost}]
   keyDates: [],           // [{id,label,date}]
+  calendarEvents: [],     // [{id,title,date,time,cat,who,notes,done}] — appointments, playdates, etc.
+  deletedIds: [],         // tombstones — ids of entries deleted on any device (for sync)
   // Tracking
   vaccines: {},           // idx→{given,date}
   customVaccines: [],
@@ -1672,7 +1904,8 @@ function migrateData() {
   if (!Array.isArray(state.stashLog)) state.stashLog = [];
   if (!Array.isArray(state.notesLog)) state.notesLog = [];
   if (!Array.isArray(state.customFoods)) state.customFoods = [];
-  // Migrate users still on the original default nav to the daily-actions nav
+  if (!Array.isArray(state.calendarEvents)) state.calendarEvents = [];
+  if (!Array.isArray(state.deletedIds)) state.deletedIds = [];
   if (state.navSlots && state.navSlots.join(',') === 'dashboard,feeding,milestones,foods') {
     state.navSlots = ['now','feeding','sleep','diaper'];
   }
@@ -1702,7 +1935,221 @@ function saveLocal() {
   try { localStorage.setItem(LOCAL_KEY, JSON.stringify(state)); } catch(e) {}
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// LOCAL SNAPSHOTS — automatic on-device recovery points.
+// The app quietly keeps rolling snapshots of your data in separate localStorage
+// keys, so if a sync or restore ever loses entries, you can roll back to a
+// snapshot from before it happened. Snapshots are LOCAL to this device (they
+// don't sync), which is exactly why they survive a bad cloud merge.
+// ══════════════════════════════════════════════════════════════════════════════
+const SNAP_PREFIX = 'babyos_snap_';
+const SNAP_INDEX_KEY = 'babyos_snap_index';
+const SNAP_MAX = 14;   // keep the most recent 14 snapshots
+
+function _snapIndex() {
+  try { return JSON.parse(localStorage.getItem(SNAP_INDEX_KEY) || '[]'); } catch(e) { return []; }
+}
+function _writeSnapIndex(idx) {
+  try { localStorage.setItem(SNAP_INDEX_KEY, JSON.stringify(idx)); } catch(e) {}
+}
+
+// Count log entries in a state object — used to label snapshots so you can tell
+// at a glance which one has your data.
+function _countEntries(st) {
+  let n = 0;
+  for (const k of LOG_ARRAY_KEYS) if (Array.isArray(st && st[k])) n += st[k].length;
+  return n;
+}
+
+// Take a snapshot now. `reason` labels why (e.g. 'daily', 'before-restore').
+// Deduped so we don't snapshot many times a day for the routine 'daily' reason.
+function takeSnapshot(reason) {
+  try {
+    const now = new Date();
+    const idx = _snapIndex();
+    // For routine daily snapshots, skip if we already have one from today.
+    if (reason === 'daily') {
+      const todayStr = now.toISOString().slice(0,10);
+      if (idx.some(s => s.reason === 'daily' && s.at.slice(0,10) === todayStr)) return;
+    }
+    const id = Date.now().toString(36);
+    const snapKey = SNAP_PREFIX + id;
+    const payload = { at: now.toISOString(), reason: reason || 'auto', data: state };
+    localStorage.setItem(snapKey, JSON.stringify(payload));
+    idx.push({ id, key: snapKey, at: now.toISOString(), reason: reason || 'auto', entries: _countEntries(state) });
+    // Trim to the most recent SNAP_MAX, deleting older snapshot blobs.
+    idx.sort((a,b) => a.at.localeCompare(b.at));
+    while (idx.length > SNAP_MAX) {
+      const old = idx.shift();
+      try { localStorage.removeItem(old.key); } catch(e) {}
+    }
+    _writeSnapIndex(idx);
+  } catch(e) { /* snapshots are best-effort; never break the app */ }
+}
+
+window.openRecoverySheet = function() {
+  const snaps = listSnapshots();
+  const REASON_LABEL = {
+    'daily':'Daily auto-save', 'before-restore':'Before a restore',
+    'before-recover':'Before a recovery', 'before-sync-shrink':'Before a risky sync',
+    'auto':'Auto-save', 'manual':'Manual'
+  };
+  let ov = document.getElementById('recovery-ov');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'recovery-ov'; ov.className = 'sheet-ov';
+  const rows = snaps.length ? snaps.map(s => {
+    const when = new Date(s.at).toLocaleString('en-GB', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const flag = (s.reason && s.reason.indexOf('before')===0) ? ' \u2022 safety point' : '';
+    return '<button class="rec-row" onclick="restoreFromSnapshot(\''+s.id+'\')">'+
+      '<span class="rec-row-main"><span class="rec-row-when">'+when+'</span>'+
+        '<span class="rec-row-sub">'+(REASON_LABEL[s.reason]||s.reason)+flag+'</span></span>'+
+      '<span class="rec-row-count">'+s.entries+' entries</span>'+
+    '</button>';
+  }).join('') : '<div class="rec-empty">No snapshots yet. The app saves one automatically each day you use it.</div>';
+  ov.innerHTML =
+    '<div class="sheet" role="dialog" aria-modal="true">'+
+      '<div class="sheet-handle"></div>'+
+      '<div class="sheet-title">Recover your data</div>'+
+      '<div class="rec-intro">These are automatic, on-device recovery points. Recovering merges missing entries back in \u2014 it never removes newer ones. Pick the one with the entry count you expect.</div>'+
+      '<div class="rec-list">'+rows+'</div>'+
+      '<div class="sheet-btns"><button type="button" class="sheet-btn sheet-cancel" onclick="closeRecoverySheet()">Close</button></div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  ov.onclick = (e) => { if (e.target === ov) closeRecoverySheet(); };
+  requestAnimationFrame(() => ov.classList.add('show'));
+};
+window.closeRecoverySheet = function(){ const ov=document.getElementById('recovery-ov'); if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.remove(),200);} };
+
+function listSnapshots() {
+  return _snapIndex().slice().sort((a,b) => b.at.localeCompare(a.at)); // newest first
+}
+function readSnapshot(id) {
+  const meta = _snapIndex().find(s => s.id === id);
+  if (!meta) return null;
+  try { return JSON.parse(localStorage.getItem(meta.key)); } catch(e) { return null; }
+}
+
+// Restore data from a local snapshot. Like backup-restore, this UNIONS the
+// snapshot's logs with current data (so you never lose anything by rolling back —
+// it can only bring entries back, not remove newer ones), and keeps this device's
+// family identity. Tombstones are respected so genuinely-deleted items stay gone.
+window.restoreFromSnapshot = function(id) {
+  const snap = readSnapshot(id);
+  if (!snap || !snap.data) { toast('Snapshot not found'); return; }
+  const snapData = snap.data;
+  const when = new Date(snap.at).toLocaleString('en-GB');
+  const snapEntries = _countEntries(snapData);
+  const nowEntries = _countEntries(state);
+  confirmDialog({
+    title: 'Recover from ' + when + '?',
+    body: 'This snapshot has ' + snapEntries + ' logged entries (you currently have ' + nowEntries + '). Recovering merges any missing entries back in — it never removes newer ones. Your family sign-in stays the same.',
+    confirmLabel: 'Recover data'
+  }, () => {
+    // Take a safety snapshot of the current state first, then union snapshot into it.
+    takeSnapshot('before-recover');
+    const keepFamilyId = state.familyId, keepFamilyCode = state.familyCode;
+    // Union each log array (current + snapshot) so nothing is lost either way.
+    const merged = deepMerge(state, snapData);
+    // deepMerge treats `remote` (snapData) as authoritative for scalars; but for a
+    // recovery we want to KEEP current profile/settings and only bring back log
+    // entries. So overlay current non-log fields back on top.
+    for (const k of Object.keys(state)) {
+      if (!LOG_ARRAY_KEYS.includes(k) && k !== 'deletedIds') merged[k] = state[k];
+    }
+    merged.familyId = keepFamilyId; merged.familyCode = keepFamilyCode;
+    Object.keys(state).forEach(k => { delete state[k]; });
+    Object.assign(state, merged);
+    saveState();
+    toast('Recovered! \u2713 Reloading\u2026');
+    setTimeout(()=>location.reload(), 800);
+  });
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DATA-LOSS PROTECTION
+// Log arrays (feeds, sleep, diapers, etc.) must NEVER be lost when two devices
+// sync. The old merge let a stale cloud copy replace a fuller local array,
+// destroying recent entries. Now: every entry carries a stable _id, and syncing
+// UNIONS the two arrays (keeping everything from both sides) instead of replacing.
+// ══════════════════════════════════════════════════════════════════════════════
+const LOG_ARRAY_KEYS = ['feedingLog','sleepLog','diaperLog','weightLog','pumpLog',
+  'medsLog','notesLog','calendarEvents','solidsLog','mealLog','growthLog','tummyLog',
+  'readingLog','stashLog'];
+
+// A stable identity for a log entry. Uses _id when present; otherwise a signature
+// built from its own fields so pre-existing (un-stamped) entries still dedupe
+// sensibly instead of duplicating on every sync.
+function entrySig(e) {
+  if (!e || typeof e !== 'object') return String(e);
+  if (e._id) return e._id;
+  return JSON.stringify(e);
+}
+
+// Delete an entry from a log array by index AND record a tombstone so the
+// deletion propagates across devices (instead of being resurrected by a sync).
+// Use this instead of a bare state[key].splice(i,1) for synced log arrays.
+function deleteLogEntry(key, index) {
+  const arr = state[key];
+  if (!Array.isArray(arr) || index < 0 || index >= arr.length) return;
+  const entry = arr[index];
+  stampEntryIds();                       // make sure the entry has an _id first
+  if (entry && entry._id) {
+    if (!Array.isArray(state.deletedIds)) state.deletedIds = [];
+    if (!state.deletedIds.includes(entry._id)) state.deletedIds.push(entry._id);
+    // Keep the tombstone list from growing without bound (cap at 2000 most recent).
+    if (state.deletedIds.length > 2000) state.deletedIds = state.deletedIds.slice(-2000);
+  }
+  arr.splice(index, 1);
+}
+
+// Give every entry in every log array a stable _id if it lacks one. Called before
+// every save so IDs are assigned exactly once and then travel with the entry.
+function stampEntryIds() {
+  let stamped = 0;
+  for (const key of LOG_ARRAY_KEYS) {
+    const arr = state[key];
+    if (!Array.isArray(arr)) continue;
+    for (const e of arr) {
+      if (e && typeof e === 'object' && !e._id) {
+        e._id = 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+        stamped++;
+      }
+    }
+  }
+  return stamped;
+}
+
+// Union two log arrays by entry identity, preserving order (older first) and
+// keeping ALL unique entries from both. Never shrinks below either input.
+// Tombstoned IDs (deleted on some device) are excluded so deletions propagate
+// instead of a still-holding device resurrecting the entry on the next sync.
+function unionLogArrays(localArr, remoteArr, tombstones) {
+  const out = [];
+  const seen = new Set();
+  const dead = tombstones instanceof Set ? tombstones : new Set();
+  const add = (arr) => {
+    if (!Array.isArray(arr)) return;
+    for (const e of arr) {
+      const sig = entrySig(e);
+      if (seen.has(sig)) continue;
+      if (e && e._id && dead.has(e._id)) continue;   // deleted somewhere — skip
+      seen.add(sig);
+      out.push(e);
+    }
+  };
+  add(localArr);   // local first so nothing local is ever dropped
+  add(remoteArr);  // then anything new from remote
+  out.sort((a,b) => {
+    const ka = (a && (a.date||'')) + 'T' + (a && (a.time||a.start||''));
+    const kb = (b && (b.date||'')) + 'T' + (b && (b.time||b.start||''));
+    return ka.localeCompare(kb);
+  });
+  return out;
+}
+
 function saveState(changedKey) {
+  stampEntryIds();   // ensure every log entry has a stable _id before persisting
   // Always save locally first — instant, never fails
   saveLocal();
   // Push to Firebase in background — never block the UI
@@ -1855,6 +2302,8 @@ function proceedToApp() {
   const startPage = state.babyDOB ? 'now' : 'dashboard';
   renderBottomNav(startPage);
   navTo(startPage);
+  // Take a rolling daily snapshot so there's always a recent recovery point.
+  takeSnapshot('daily');
   // Start sync in background after a short delay
   setTimeout(() => startSync(), 1000);
 }
@@ -4450,6 +4899,204 @@ function ageInWeeksLabel() {
   return wk + ' week' + (wk!==1?'s':'') + ' old';
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// CALENDAR — appointments, vaccines, playdates, mom's dates, and more.
+// Manual events live in state.calendarEvents; upcoming vaccines are woven in
+// automatically (read-only) so the calendar is a single source of "what's next".
+// ═══════════════════════════════════════════════════════════════════════════
+const CAL_CATS = {
+  appointment: { label:'Appointment', emoji:'\ud83e\ude7a', color:'#2D8F8F', deep:'#1F6E6E', bg:'#E6F5F5' },
+  vaccine:     { label:'Vaccine',     emoji:'\ud83d\udc89', color:'#C4574B', deep:'#B23A2E', bg:'#FBEAE7' },
+  playdate:    { label:'Playdate',    emoji:'\ud83e\uddf8', color:'#B8860B', deep:'#8A6608', bg:'#F7EFD6' },
+  mom:         { label:'For mom',     emoji:'\ud83d\udc9b', color:'#C75E7E', deep:'#B04467', bg:'#FBE3EA' },
+  milestone:   { label:'Milestone',   emoji:'\ud83c\udf1f', color:'#7A5AC9', deep:'#6544B0', bg:'#EEEDFE' },
+  reminder:    { label:'Reminder',    emoji:'\ud83d\udd14', color:'#185FA5', deep:'#12508C', bg:'#E6F1FB' },
+  other:       { label:'Other',       emoji:'\ud83d\udccc', color:'#5B6270', deep:'#4A5160', bg:'#EEF0F3' },
+};
+function calCat(c){ return CAL_CATS[c] || CAL_CATS.other; }
+
+// Local YYYY-MM-DD for a Date (avoids UTC off-by-one from toISOString).
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+// Upcoming vaccines derived from the schedule + baby DOB, as read-only cal events.
+function derivedVaccineEvents() {
+  if (!state.babyDOB || typeof VACCINES === 'undefined') return [];
+  const born = new Date(state.babyDOB + 'T00:00:00');
+  const out = [];
+  const all = [...VACCINES, ...(state.customVaccines||[])];
+  all.forEach((v, i) => {
+    const s = state.vaccines[i];
+    if (s && s.given) return; // already done — don't clutter the calendar
+    let due = null;
+    if (v.daysFromBirth != null) due = new Date(born.getTime() + v.daysFromBirth*86400000);
+    else if (v.dueDate) due = new Date(v.dueDate + 'T00:00:00');
+    if (!due) return;
+    out.push({ id:'vax-'+i, title:v.name, date:ymd(due), time:'', cat:'vaccine',
+               who:'baby', notes:v.notes||'', _derived:true });
+  });
+  return out;
+}
+
+// All events (manual + derived), optionally from a start date, sorted by date+time.
+function allCalEvents() {
+  const manual = (state.calendarEvents||[]).map(e => ({...e}));
+  return manual.concat(derivedVaccineEvents())
+    .sort((a,b) => (a.date+ (a.time||'')).localeCompare(b.date+(b.time||'')));
+}
+
+// The next N upcoming (today onward, not done), for the Now-page peek.
+function upcomingCalEvents(n) {
+  const today = ymd(new Date());
+  return allCalEvents()
+    .filter(e => e.date >= today && !e.done)
+    .slice(0, n || 3);
+}
+
+// Friendly relative day label: Today / Tomorrow / Wed / 12 Aug.
+function relDayLabel(dateStr) {
+  const today = new Date(ymd(new Date())+'T00:00:00');
+  const d = new Date(dateStr+'T00:00:00');
+  const diff = Math.round((d - today)/86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tomorrow';
+  if (diff === -1) return 'Yesterday';
+  if (diff > 1 && diff < 7) return d.toLocaleDateString('en-GB',{weekday:'long'});
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+
+window.saveCalEvent = function(ev, closeAfter) {
+  if (!ev.title || !ev.date) { toast('Add a title and a date'); return false; }
+  if (!Array.isArray(state.calendarEvents)) state.calendarEvents = [];
+  if (ev.id) {
+    const i = state.calendarEvents.findIndex(x => x.id === ev.id);
+    if (i >= 0) state.calendarEvents[i] = ev; else state.calendarEvents.push(ev);
+  } else {
+    ev.id = 'ce-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+    state.calendarEvents.push(ev);
+  }
+  saveState('calendarEvents');
+  return true;
+};
+window.deleteCalEvent = function(id) {
+  const ev = (state.calendarEvents||[]).find(e => e.id === id);
+  if (ev) {
+    stampEntryIds();
+    if (!Array.isArray(state.deletedIds)) state.deletedIds = [];
+    // Tombstone both the calendar id and the sync _id so it can't be resurrected.
+    if (ev._id && !state.deletedIds.includes(ev._id)) state.deletedIds.push(ev._id);
+  }
+  state.calendarEvents = (state.calendarEvents||[]).filter(e => e.id !== id);
+  saveState('calendarEvents');
+  toast('Event removed');
+  if (_currentPage === 'calendar') navTo('calendar');
+};
+// Stop the timer from the Now page: go to the feeding page first (its review form
+// holds the prefilled start/end fields), then stop so the review flow works. Defined
+// globally (not inside a page) so the Now-page banner's Stop button always works,
+// even before the feeding page has ever been rendered this session.
+window.goStopFeedTimer = function() {
+  if (_currentPage !== 'feeding') {
+    navTo('feeding');
+    setTimeout(() => { if (window.stopFeedTimer) window.stopFeedTimer(); }, 80);
+  } else {
+    if (window.stopFeedTimer) window.stopFeedTimer();
+  }
+};
+
+window.toggleCalDone = function(id) {
+  const e = (state.calendarEvents||[]).find(x => x.id === id);
+  if (!e) return;
+  e.done = !e.done;
+  saveState('calendarEvents');
+  if (_currentPage === 'calendar') navTo('calendar');
+};
+
+function escapeHtml(s) {
+  return String(s==null?'':s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// Add / edit an event via a bottom sheet. Pass an id to edit, or nothing to add.
+window.openCalEventSheet = function(id, presetDate) {
+  const existing = id ? (state.calendarEvents||[]).find(e => e.id === id) : null;
+  const ev = existing ? {...existing} : { title:'', date: presetDate || ymd(new Date()), time:'', cat:'appointment', who:'baby', notes:'' };
+  let ov = document.getElementById('cal-sheet-ov');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'cal-sheet-ov'; ov.className = 'sheet-ov';
+  const catChips = Object.keys(CAL_CATS).map(k => {
+    const c = CAL_CATS[k];
+    return '<button type="button" class="cal-chip'+(ev.cat===k?' on':'')+'" data-cat="'+k+'" onclick="_calPickCat(this)" style="--cc:'+c.deep+';--cb:'+c.bg+'">'+c.emoji+' '+c.label+'</button>';
+  }).join('');
+  ov.innerHTML =
+    '<div class="sheet" role="dialog" aria-modal="true">'+
+      '<div class="sheet-handle"></div>'+
+      '<div class="sheet-title">'+(existing?'Edit event':'New event')+'</div>'+
+      '<div class="form-field"><label>What is it?</label><input type="text" id="ce-title" value="'+escapeHtml(ev.title)+'" placeholder="e.g. 4-month check-up" autocomplete="off"></div>'+
+      '<div class="cal-chips">'+catChips+'</div>'+
+      '<div class="form-row">'+
+        '<div style="flex:1"><label class="ff-lbl">Date</label><input type="date" id="ce-date" value="'+ev.date+'"></div>'+
+        '<div style="flex:1"><label class="ff-lbl">Time <span style="opacity:.5">(optional)</span></label><input type="time" id="ce-time" value="'+(ev.time||'')+'"></div>'+
+      '</div>'+
+      '<div class="form-field" style="margin-top:10px"><label>Who\u2019s it for?</label>'+
+        '<div class="cal-who">'+
+          '<button type="button" class="cal-who-btn'+(ev.who==='baby'?' on':'')+'" data-who="baby" onclick="_calPickWho(this)">'+(babyName()||'Baby')+'</button>'+
+          '<button type="button" class="cal-who-btn'+(ev.who==='mom'?' on':'')+'" data-who="mom" onclick="_calPickWho(this)">Mom</button>'+
+          '<button type="button" class="cal-who-btn'+(ev.who==='family'?' on':'')+'" data-who="family" onclick="_calPickWho(this)">Family</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="form-field"><label>Notes <span style="opacity:.5">(optional)</span></label><textarea id="ce-notes" rows="2" placeholder="Location, doctor, what to bring\u2026">'+escapeHtml(ev.notes||'')+'</textarea></div>'+
+      (existing ? '<button type="button" class="sheet-done'+(ev.done?' is-done':'')+'" onclick="_calToggleDoneFromSheet(\''+existing.id+'\')">'+(ev.done?'\u21ba Mark as not done':'\u2713 Mark as done')+'</button>' : '')+
+      '<div class="sheet-btns">'+
+        (existing?'<button type="button" class="sheet-btn sheet-del" onclick="_calDeleteFromSheet(\''+existing.id+'\')">Delete</button>':'')+
+        '<button type="button" class="sheet-btn sheet-cancel" onclick="closeCalSheet()">Cancel</button>'+
+        '<button type="button" class="sheet-btn sheet-save" onclick="_calSaveFromSheet()">'+(existing?'Save':'Add event')+'</button>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  ov._editId = existing ? existing.id : null;
+  ov._cat = ev.cat; ov._who = ev.who;
+  ov.onclick = (e) => { if (e.target === ov) closeCalSheet(); };
+  requestAnimationFrame(() => ov.classList.add('show'));
+  setTimeout(() => { const t=document.getElementById('ce-title'); if(t && !existing) t.focus(); }, 120);
+};
+window._calPickCat = function(btn){ const ov=document.getElementById('cal-sheet-ov'); ov._cat=btn.dataset.cat; ov.querySelectorAll('.cal-chip').forEach(c=>c.classList.toggle('on', c===btn)); };
+window._calPickWho = function(btn){ const ov=document.getElementById('cal-sheet-ov'); ov._who=btn.dataset.who; ov.querySelectorAll('.cal-who-btn').forEach(c=>c.classList.toggle('on', c===btn)); };
+window.closeCalSheet = function(){ const ov=document.getElementById('cal-sheet-ov'); if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.remove(),200);} };
+window._calSaveFromSheet = function(){
+  const ov = document.getElementById('cal-sheet-ov');
+  const ev = {
+    id: ov._editId || null,
+    title: (document.getElementById('ce-title')?.value||'').trim(),
+    date: document.getElementById('ce-date')?.value||'',
+    time: document.getElementById('ce-time')?.value||'',
+    cat: ov._cat||'appointment',
+    who: ov._who||'baby',
+    notes: (document.getElementById('ce-notes')?.value||'').trim(),
+    done: false,
+  };
+  if (saveCalEvent(ev)) {
+    closeCalSheet();
+    toast(ov._editId ? 'Event updated' : 'Event added \u2713');
+    if (_currentPage === 'calendar') navTo('calendar');
+    else if (_currentPage === 'now') navTo('now');
+  }
+};
+window._calToggleDoneFromSheet = function(id){
+  const e = (state.calendarEvents||[]).find(x => x.id === id);
+  if (!e) return;
+  e.done = !e.done;
+  saveState('calendarEvents');
+  closeCalSheet();
+  toast(e.done ? 'Marked done \u2713' : 'Marked not done');
+  if (_currentPage === 'calendar') navTo('calendar');
+  else if (_currentPage === 'now') navTo('now');
+};
+window._calDeleteFromSheet = function(id){
+  confirmDialog({ title:'Delete this event?', body:'This can\u2019t be undone.', confirmLabel:'Delete', danger:true }, () => {
+    deleteCalEvent(id); closeCalSheet();
+  });
+};
+
 PAGES['now'] = function(el) {
   const hasBaby = !!state.babyDOB;
 
@@ -4538,9 +5185,56 @@ PAGES['now'] = function(el) {
       ${isMulti() && currentBabyIdx==='both' ? bothSummaryHTML() + bothDetailHTML() : ''}
 
       <div class="single-baby-block">
+      ${(() => {
+        // Small reminder card(s) for calendar events due TODAY, shown above Last feed.
+        const todayStr = ymd(new Date());
+        // Snoozed cards ("dismiss for now") hide until their snooze timestamp passes
+        // (~4h), then reappear. Kept in memory so it's a soft, temporary dismissal.
+        if (!window._calSnoozed) window._calSnoozed = {};
+        const nowMs = Date.now();
+        const dueToday = (typeof allCalEvents==='function' ? allCalEvents() : [])
+          .filter(e => e.date === todayStr && !e.done)
+          .filter(e => !(window._calSnoozed[e.id] && window._calSnoozed[e.id] > nowMs))
+          .sort((a,b) => (a.time||'99').localeCompare(b.time||'99'));
+        if (!dueToday.length) return '';
+        return dueToday.map(e => {
+          const c = calCat(e.cat);
+          const tap = e._derived ? "navTo('vaccines')" : "openCalEventSheet('"+e.id+"')";
+          // Derived vaccine events are read-only; manual events get a swipe-left-to-
+          // dismiss affordance (temporary snooze) so a busy day doesn't push Last feed down.
+          const swipeable = !e._derived;
+          return '<div class="now-due-wrap"'+(swipeable?' data-ceid="'+e.id+'"':'')+'>'+
+            (swipeable ? '<div class="now-due-action now-due-action-done"><span>\u2713 Done</span></div>'+
+                         '<div class="now-due-action now-due-action-dismiss"><span>Dismiss \u2192</span></div>' : '')+
+            '<button class="now-due'+(swipeable?' now-due-swipe':'')+'" onclick="'+tap+'">'+
+              '<span class="now-due-ico" style="background:'+c.bg+' !important;color:'+c.deep+' !important">'+c.emoji+'</span>'+
+              '<span class="now-due-main"><span class="now-due-title">'+escapeHtml(e.title)+'</span>'+
+                '<span class="now-due-sub">Today'+(e.time?' \u00b7 '+e.time:'')+(e.who==='mom'?' \u00b7 mom':e.who==='family'?' \u00b7 family':'')+'</span></span>'+
+              '<span class="now-due-badge">Today</span>'+
+            '</button>'+
+          '</div>';
+        }).join('');
+      })()}
       <!-- FEEDING HERO (collapsible quick-log) -->
       <div class="now-hero ${skyState().cls}">${skyDecorHTML()}
         <div class="now-hero-glow"></div>
+        ${(() => {
+          // Live "feeding in progress" banner when a timer is running — otherwise
+          // starting a timer then leaving this page hides that it's still going.
+          const t = state.activeFeedTimer;
+          if (!t || !t.running || !t.start) return '';
+          const elapsed = Math.max(0, Math.floor((Date.now() - t.start)/1000));
+          const mm = String(Math.floor(elapsed/60)).padStart(2,'0'), ss = String(elapsed%60).padStart(2,'0');
+          const sinceStr = new Date(t.start).toTimeString().slice(0,5);
+          const sideLbl = t.side==='left'?'\ud83d\udc99 left':t.side==='right'?'\ud83d\udc97 right':'';
+          return '<div class="now-feeding-live" onclick="goStopFeedTimer()">'+
+            '<div class="nfl-pulse"></div>'+
+            '<div class="nfl-main"><span class="nfl-label">Feeding in progress'+(sideLbl?' \u00b7 '+sideLbl:'')+'</span>'+
+              '<span class="nfl-time" id="now-live-timer">'+mm+':'+ss+'</span>'+
+              '<span class="nfl-since">since '+sinceStr+'</span></div>'+
+            '<button class="nfl-stop" onclick="event.stopPropagation();goStopFeedTimer()">\u23f9 Stop</button>'+
+          '</div>';
+        })()}
         <div onclick="nowToggle('feed')" style="cursor:pointer;position:relative">
           <div class="now-hero-top">
             <span class="now-hero-label">Last feed</span>
@@ -4687,6 +5381,27 @@ PAGES['now'] = function(el) {
         </div>` : ''}
       </div>
 
+      <!-- COMING UP (calendar peek + quick add) -->
+      ${(() => {
+        const up = upcomingCalEvents(3);
+        const rows = up.map(e => {
+          const c = calCat(e.cat);
+          return '<button class="now-up-row" onclick="'+(e._derived?"navTo('calendar')":"openCalEventSheet('"+e.id+"')")+'">'+
+            '<span class="now-up-ico" style="background:'+c.bg+';color:'+c.color+'">'+c.emoji+'</span>'+
+            '<span class="now-up-main"><span class="now-up-title">'+escapeHtml(e.title)+'</span>'+
+            '<span class="now-up-sub">'+relDayLabel(e.date)+(e.time?' \u00b7 '+e.time:'')+(e.who==='mom'?' \u00b7 mom':'')+'</span></span>'+
+            '<span class="now-up-chev">\u203a</span>'+
+          '</button>';
+        }).join('');
+        return '<div class="now-up">'+
+          '<div class="now-up-head"><span>Coming up</span>'+
+            '<button class="now-up-all" onclick="navTo(\'calendar\')">Calendar \u2192</button></div>'+
+          (up.length ? '<div class="now-up-list">'+rows+'</div>'
+                     : '<div class="now-up-empty">Nothing scheduled yet</div>')+
+          '<button class="now-up-add" onclick="openCalEventSheet()">+ Add event</button>'+
+        '</div>';
+      })()}
+
       <!-- TODAY SUMMARY -->
       <div class="now-today">
         <div class="now-today-head"><span>Today so far</span></div>
@@ -4705,6 +5420,104 @@ PAGES['now'] = function(el) {
       </div>
 
     </div>`;
+  if (window._attachDueSwipe) requestAnimationFrame(() => window._attachDueSwipe());
+  // Keep the "feeding in progress" banner ticking on the Now page. Self-healing so
+  // it works whether the timer was started here or arrived via sync from a partner.
+  if (state.activeFeedTimer && state.activeFeedTimer.running) {
+    if (!window._nowLiveTimerInterval) {
+      window._nowLiveTimerInterval = setInterval(() => {
+        const t = state.activeFeedTimer;
+        const elLive = document.getElementById('now-live-timer');
+        if (!t || !t.running || !t.start || !elLive) {
+          clearInterval(window._nowLiveTimerInterval); window._nowLiveTimerInterval = null;
+          return;
+        }
+        const s = Math.max(0, Math.floor((Date.now() - t.start)/1000));
+        elLive.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+      }, 1000);
+    }
+  } else if (window._nowLiveTimerInterval) {
+    clearInterval(window._nowLiveTimerInterval); window._nowLiveTimerInterval = null;
+  }
+};
+
+// Swipe-left-to-done on the Now-page "due today" reminder cards. Keeps the day's
+// agenda from pushing the Last-feed section down: swipe a card away once handled.
+window._attachDueSwipe = function() {
+  document.querySelectorAll('.now-due-wrap[data-ceid]').forEach(wrap => {
+    if (wrap._swipeBound) return;
+    wrap._swipeBound = true;
+    const card = wrap.querySelector('.now-due-swipe');
+    const id = wrap.getAttribute('data-ceid');
+    if (!card) return;
+    const actionL = wrap.querySelector('.now-due-action-dismiss'); // revealed by swiping LEFT
+    const actionR = wrap.querySelector('.now-due-action-done');    // revealed by swiping RIGHT
+    let startX = 0, startY = 0, dx = 0, dragging = false, decided = false, horizontal = false;
+    const W = () => wrap.offsetWidth;
+    card.addEventListener('touchstart', (ev) => {
+      const t = ev.touches[0]; startX = t.clientX; startY = t.clientY;
+      dx = 0; dragging = true; decided = false; horizontal = false;
+      card.style.transition = 'none';
+    }, {passive:true});
+    card.addEventListener('touchmove', (ev) => {
+      if (!dragging) return;
+      const t = ev.touches[0];
+      const mx = t.clientX - startX, my = t.clientY - startY;
+      if (!decided) {
+        if (Math.abs(mx) > 8 || Math.abs(my) > 8) { decided = true; horizontal = Math.abs(mx) > Math.abs(my); }
+      }
+      if (!horizontal) return;
+      ev.preventDefault();                 // we own the horizontal gesture
+      dx = mx;                             // allow BOTH directions
+      // Show the correct action panel behind the card based on drag direction.
+      if (actionL) actionL.style.opacity = dx < 0 ? '1' : '0';
+      if (actionR) actionR.style.opacity = dx > 0 ? '1' : '0';
+      card.style.transform = 'translateX(' + dx + 'px)';
+    }, {passive:false});
+    const finish = () => {
+      if (!dragging) return;
+      dragging = false;
+      card.style.transition = 'transform .2s ease';
+      const TH = W() * 0.4;
+      if (dx < -TH) {
+        // Swipe LEFT past threshold → dismiss for now (soft snooze, reappears in ~4h).
+        card.style.transform = 'translateX(-100%)';
+        setTimeout(() => {
+          if (!window._calSnoozed) window._calSnoozed = {};
+          window._calSnoozed[id] = Date.now() + 4*60*60*1000;   // 4 hours
+          if (typeof toastUndo === 'function') {
+            toastUndo('Dismissed for now', () => {
+              if (window._calSnoozed) delete window._calSnoozed[id];
+              if (_currentPage === 'now') navTo('now');
+            });
+          } else { toast('Dismissed for now'); }
+          if (_currentPage === 'now') navTo('now');
+        }, 180);
+      } else if (dx > TH) {
+        // Swipe RIGHT past threshold → mark done (reversible via undo + calendar).
+        card.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          const e = (state.calendarEvents||[]).find(x => x.id === id);
+          if (e) { e.done = true; saveState('calendarEvents'); }
+          if (typeof toastUndo === 'function') {
+            toastUndo('Marked done', () => {
+              const ev2 = (state.calendarEvents||[]).find(x => x.id === id);
+              if (ev2) { ev2.done = false; saveState('calendarEvents'); }
+              if (_currentPage === 'now') navTo('now');
+            });
+          } else { toast('Done \u2713'); }
+          if (_currentPage === 'now') navTo('now');
+        }, 180);
+      } else {
+        // Not past threshold — snap back and hide both action panels.
+        card.style.transform = 'translateX(0)';
+        if (actionL) actionL.style.opacity = '0';
+        if (actionR) actionR.style.opacity = '0';
+      }
+    };
+    card.addEventListener('touchend', finish);
+    card.addEventListener('touchcancel', finish);
+  });
 };
 
 // ── Now page quick-log actions ──
@@ -6507,8 +7320,8 @@ PAGES['feeding'] = function(el) {
           <div style="flex:1;min-width:0"><label class="ff-lbl">Date</label><input type="date" id="f-date" max="${today()}" value="${today()}"></div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:6px">
-          <div style="flex:1;min-width:0"><label class="ff-lbl">Start time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" oninput="updateFeedDuration()"></div>
-          <div style="flex:1;min-width:0"><label class="ff-lbl">End time</label><input type="time" id="f-endtime" oninput="updateFeedDuration()"></div>
+          <div style="flex:1;min-width:0"><label class="ff-lbl">Start time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" oninput="window._pendingTimedFeed=null;updateFeedDuration()"></div>
+          <div style="flex:1;min-width:0"><label class="ff-lbl">End time</label><input type="time" id="f-endtime" oninput="window._pendingTimedFeed=null;updateFeedDuration()"></div>
         </div>
         <div id="feed-dur-display" style="font-size:12px;color:#2D8F8F;font-weight:600;margin-bottom:14px;min-height:16px;text-align:center"></div>
 
@@ -6527,7 +7340,7 @@ PAGES['feeding'] = function(el) {
         </div>
 
         <input type="hidden" id="f-ftype" value="">
-        <div class="form-field"><label class="ff-lbl">Notes <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="f-notes" placeholder="Latch quality, mood, side started..."></div>
+        <div class="form-field"><label class="ff-lbl">Notes <span style="color:#8a8a8a;font-weight:400">(optional)</span></label><input type="text" id="f-notes" placeholder="Latch quality, mood, side started..."></div>
         <button class="btn btn-teal btn-block" onclick="addFeed()" style="margin-top:4px">Save feed</button>
       </div>
 
@@ -6562,6 +7375,15 @@ PAGES['feeding'] = function(el) {
     `;
     requestAnimationFrame(() => {
       if (window.renderFeedTimer) window.renderFeedTimer();
+      // Restore a stopped-timer's timed values if the user hasn't saved yet, so a
+      // background sync re-render can't reset Start time to "now".
+      const ptf = window._pendingTimedFeed;
+      if (ptf) {
+        const ds = document.getElementById('f-time'); if (ds) ds.value = ptf.start;
+        const de = document.getElementById('f-endtime'); if (de) de.value = ptf.end;
+        if (ptf.side && window.selectFeedType) selectFeedType(ptf.side);
+        if (window.updateFeedDuration) updateFeedDuration();
+      }
       const cd = getChartData(chartView, chartMetric);
       drawBar('feed-chart', cd.labels, cd.datasets, cd.yLabel);
     });
@@ -6736,6 +7558,11 @@ PAGES['feeding'] = function(el) {
     if (window._feedTimerInterval) { clearInterval(window._feedTimerInterval); window._feedTimerInterval=null; }
     const startD = new Date(t.start), endD = new Date();
     const fmt = (d) => d.toTimeString().slice(0,5);
+    // Stash the timed values so a background-sync re-render (which rebuilds this
+    // whole form) can restore them instead of resetting Start to "now". Without
+    // this, an 8-second poll firing between stop and save silently loses the
+    // real start time.
+    window._pendingTimedFeed = { start: fmt(startD), end: fmt(endD), side: t.side };
     // Pre-fill the form with the timed values
     const ds = document.getElementById('f-time'); if (ds) ds.value = fmt(startD);
     const de = document.getElementById('f-endtime'); if (de) de.value = fmt(endD);
@@ -6782,6 +7609,7 @@ PAGES['feeding'] = function(el) {
     }
     if (entryInFuture(entry.date, entry.time) || (endT && endT > start && entryInFuture(entry.date, endT))) { futureEntryAlert(); return; }
     state.feedingLog.push(entry);
+    window._pendingTimedFeed = null;   // consumed — don't restore onto the next feed
     saveState('feedingLog'); render(); toastSuccess('Feed logged! 🍼');
   };
   window.quickFeed = (type, amt) => {
@@ -6791,7 +7619,7 @@ PAGES['feeding'] = function(el) {
     state.feedingLog.push(e); saveState('feedingLog'); render();
     toast((isMultiples()?babyLabel(bi)+': ':'')+(type==='formula'?amt+'ml':type==='left'?'L '+amt+'m':'R '+amt+'m')+' logged!');
   };
-  window.delFeed = (i) => { confirmDialog({title:'Delete this feed entry?', body:'This cannot be undone.'}, () => { state.feedingLog.splice(i,1); saveState('feedingLog'); render(); toast('Feed deleted'); }); };
+  window.delFeed = (i) => { confirmDialog({title:'Delete this feed entry?', body:'This cannot be undone.'}, () => { deleteLogEntry('feedingLog',i); saveState('feedingLog'); render(); toast('Feed deleted'); }); };
   render();
 };
 
@@ -7022,7 +7850,7 @@ PAGES['sleep'] = function(el) {
     saveState('sleepLog'); render();
     toast((isMultiples()?babyLabel(bi)+': ':'')+(mins>=60?Math.floor(mins/60)+'h'+(mins%60?mins%60+'m':''):mins+'m')+' '+type.toLowerCase()+' logged!');
   };
-  window.delSleep = (i) => { confirmDialog({title:'Delete this sleep entry?', body:'This cannot be undone.'}, () => { state.sleepLog.splice(i,1); saveState('sleepLog'); render(); toast('Sleep deleted'); }); };
+  window.delSleep = (i) => { confirmDialog({title:'Delete this sleep entry?', body:'This cannot be undone.'}, () => { deleteLogEntry('sleepLog',i); saveState('sleepLog'); render(); toast('Sleep deleted'); }); };
   render();
 };
 
@@ -7189,7 +8017,7 @@ PAGES['diaper'] = function(el) {
       '</div><div class="loghist-scroll">'+rows+'</div></div>';
   }
   window.toggleDiaperHist = () => { window._diaperHistOpen = !window._diaperHistOpen; render(); };
-  window.delDiaper = (i) => { confirmDialog({title:'Delete this diaper entry?', body:'This cannot be undone.'}, () => { state.diaperLog.splice(i,1); saveState('diaperLog'); render(); toast('Diaper deleted'); }); };
+  window.delDiaper = (i) => { confirmDialog({title:'Delete this diaper entry?', body:'This cannot be undone.'}, () => { deleteLogEntry('diaperLog',i); saveState('diaperLog'); render(); toast('Diaper deleted'); }); };
   render();
 };
 
@@ -7356,7 +8184,7 @@ PAGES['reading'] = function(el) {
     state.readingLog.push({date:document.getElementById('rl-date')?.value||today(),minutes:mins,book:document.getElementById('rl-book')?.value?.trim()||'',lang:document.getElementById('rl-lang')?.value||'',response:document.getElementById('rl-resp')?.value||'',notes:''});
     saveState('readingLog'); render(); toast('📚 Reading logged!');
   };
-  window.delReading = (i) => { confirmDialog({title:'Delete this reading entry?'}, () => { state.readingLog.splice(i,1); saveState('readingLog'); render(); toast('Reading deleted'); }); };
+  window.delReading = (i) => { confirmDialog({title:'Delete this reading entry?'}, () => { deleteLogEntry('readingLog',i); saveState('readingLog'); render(); toast('Reading deleted'); }); };
   render();
 };
 
@@ -7568,7 +8396,7 @@ PAGES['weight'] = function(el) {
     if (existing>=0) state.weightLog[existing]=entry; else state.weightLog.push(entry);
     saveState('weightLog'); render(); toastSuccess('Weight logged! ⚖️');
   };
-  window.delWeight = (i) => { confirmDialog({title:'Delete this weight entry?', body:'This cannot be undone.'}, () => { state.weightLog.splice(i,1); saveState('weightLog'); render(); toast('Weight deleted'); }); };
+  window.delWeight = (i) => { confirmDialog({title:'Delete this weight entry?', body:'This cannot be undone.'}, () => { deleteLogEntry('weightLog',i); saveState('weightLog'); render(); toast('Weight deleted'); }); };
 
   render();
 };
@@ -7611,7 +8439,7 @@ PAGES['pump'] = function(el) {
         <div style="flex:1;min-width:0"><label class="ff-lbl">Left (ml)</label><input type="number" id="pump-left" inputmode="numeric" placeholder="0"></div>
         <div style="flex:1;min-width:0"><label class="ff-lbl">Right (ml)</label><input type="number" id="pump-right" inputmode="numeric" placeholder="0"></div>
       </div>
-      <div class="form-field"><label class="ff-lbl">Notes <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="pump-notes" placeholder="e.g. after morning feed"></div>
+      <div class="form-field"><label class="ff-lbl">Notes <span style="color:#8a8a8a;font-weight:400">(optional)</span></label><input type="text" id="pump-notes" placeholder="e.g. after morning feed"></div>
       <button class="btn btn-teal btn-block" onclick="addPump()">Save & add to stash</button>
       <div style="font-size:11px;color:var(--ink-3);margin-top:6px;text-align:center">Total pumped is added to your stash</div>
     </div>
@@ -7629,7 +8457,7 @@ PAGES['pump'] = function(el) {
 
     <div class="card" style="padding:0;overflow:hidden">
       <div onclick="togglePumpHist()" role="button" tabindex="0" aria-expanded="${window._pumpHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePumpHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
-        <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${logs.length})</span></div>
+        <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#777;font-size:12px">(${logs.length})</span></div>
         <span style="color:#aaa;font-size:13px">${window._pumpHistOpen?'▾':'▸'}</span>
       </div>
       <div style="display:${window._pumpHistOpen?'block':'none'}">${renderPumpHistory()}</div>
@@ -7708,7 +8536,7 @@ PAGES['pump'] = function(el) {
   window.delStashRemoval = (i) => { confirmDialog({title:'Delete this stash adjustment?', body:'The removed amount will be added back to your stash.'}, () => {
     const e = state.stashLog[i];
     if (e && e.ml) state.pumpedStash = (state.pumpedStash||0) + e.ml; // restore the removed amount
-    state.stashLog.splice(i,1); saveState('stashLog'); saveState('pumpedStash'); render(); toast('Adjustment removed'); }); };
+    deleteLogEntry('stashLog',i); saveState('stashLog'); saveState('pumpedStash'); render(); toast('Adjustment removed'); }); };
   window.delPump = (i) => {
     confirmDialog({title:'Delete this pumping entry?', body:'This cannot be undone.'}, () => {
     const e = state.pumpLog[i];
@@ -7744,14 +8572,14 @@ PAGES['meds'] = function(el) {
         <div style="flex:1;min-width:0"><label class="ff-lbl">Date</label><input type="date" id="meds-date" max="${today_}" value="${today_}"></div>
         <div style="flex:1;min-width:0"><label class="ff-lbl">Time</label><input type="time" id="meds-time" value="${new Date().toTimeString().slice(0,5)}"></div>
       </div>
-      <div class="form-field"><label class="ff-lbl">Dose <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="meds-dose" placeholder="e.g. 5ml, 1 drop, 2.5mg"></div>
-      <div class="form-field"><label class="ff-lbl">Notes <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="meds-notes" placeholder="e.g. for fever"></div>
+      <div class="form-field"><label class="ff-lbl">Dose <span style="color:#8a8a8a;font-weight:400">(optional)</span></label><input type="text" id="meds-dose" placeholder="e.g. 5ml, 1 drop, 2.5mg"></div>
+      <div class="form-field"><label class="ff-lbl">Notes <span style="color:#8a8a8a;font-weight:400">(optional)</span></label><input type="text" id="meds-notes" placeholder="e.g. for fever"></div>
       <button class="btn btn-teal btn-block" onclick="addMeds()">Save dose</button>
     </div>
 
     <div class="card" style="padding:0;overflow:hidden">
       <div onclick="toggleMedsHist()" role="button" tabindex="0" aria-expanded="${window._medsHistOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMedsHist();}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
-        <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#999;font-size:12px">(${logs.length})</span></div>
+        <div class="card-title" style="margin:0">History <span style="font-weight:400;color:#777;font-size:12px">(${logs.length})</span></div>
         <span style="color:#aaa;font-size:13px">${window._medsHistOpen?'▾':'▸'}</span>
       </div>
       <div style="display:${window._medsHistOpen?'block':'none'}">${renderMedsHistory()}</div>
@@ -8076,7 +8904,7 @@ PAGES['notes'] = function(el) {
         <textarea id="note-input" rows="3" placeholder="Type anything — a question, a symptom, a memory..." style="width:100%;resize:vertical;font-family:var(--font);font-size:15px;padding:12px;border-radius:10px;border:1.5px solid #e0e0e0;box-sizing:border-box;margin-bottom:10px">${(window._noteDraft||"").replace(/</g,"&lt;")}</textarea>
         <div style="font-size:11px;font-weight:600;color:var(--ink-3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px">Tag</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
-          ${TAGS.map(([id,label,fg,bg]) => `<button class="note-tag-btn ${window._notesTag===id?'on':''}" data-tag="${id}" onclick="setNoteTag('${id}')" style="${window._notesTag===id?('background:'+fg+';color:#fff;border-color:'+fg):('background:'+bg+';color:'+fg+';border-color:transparent')}">${label}</button>`).join('')}
+          ${TAGS.map(([id,label,fg,bg]) => `<button class="note-tag-btn ${window._notesTag===id?'on':''}" data-tag="${id}" onclick="setNoteTag('${id}')" style="${window._notesTag===id?('background:'+fg+' !important;color:#fff !important;border-color:'+fg):('background:'+bg+' !important;color:'+fg+' !important;border-color:transparent')}">${label}</button>`).join('')}
         </div>
         <button class="btn btn-teal btn-block" onclick="addNote()">Save note</button>
       </div>
@@ -8153,6 +8981,120 @@ PAGES['notes'] = function(el) {
   render();
 };
 
+PAGES['calendar'] = function(el) {
+  // "Who" is the primary lens: baby / mom / everyone. Category chips shown depend
+  // on who — baby sees vaccines/appointments/playdates/milestones; mom sees her
+  // relevant ones. No standalone "for mom" category — that's expressed via who.
+  if (!window._calWho) window._calWho = 'all';
+  const WHO_CATS = {
+    baby: ['appointment','vaccine','playdate','milestone','reminder','other'],
+    mom:  ['appointment','reminder','other'],
+    all:  ['appointment','vaccine','playdate','milestone','reminder','other'],
+  };
+  const babyLabel = (babyName() || 'Baby');
+
+  function render() {
+    const who = window._calWho;
+    const today = ymd(new Date());
+    let events = allCalEvents().filter(e => e.date >= today && !e.done);
+    // Filter by who: baby events (who==='baby' or a derived vaccine), mom, or all.
+    if (who === 'baby') events = events.filter(e => (e.who||'baby') === 'baby');
+    else if (who === 'mom') events = events.filter(e => e.who === 'mom');
+    // category sub-filter
+    if (window._calCat && window._calCat !== 'all') events = events.filter(e => e.cat === window._calCat);
+
+    // Show the next few by default; let the user expand to see everything.
+    const LIMIT = 5;
+    const expanded = !!window._calExpanded;
+    const shown = expanded ? events : events.slice(0, LIMIT);
+    const more = events.length - shown.length;
+
+    // Group the shown events by date.
+    const byDate = {};
+    shown.forEach(e => { (byDate[e.date] = byDate[e.date]||[]).push(e); });
+    const groupsHTML = Object.keys(byDate).sort().map(date => {
+      const dObj = new Date(date+'T00:00:00');
+      const rows = byDate[date].map(e => {
+        const cc = calCat(e.cat);
+        const tap = e._derived ? "navTo('vaccines')" : "openCalEventSheet('"+e.id+"')";
+        return '<div class="cal-row'+(e.done?' cal-row-done':'')+'">'+
+          (e._derived ? '<span class="cal-row-check cal-row-check-lock">\ud83d\udc89</span>'
+                      : '<button class="cal-row-check'+(e.done?' on':'')+'" onclick="toggleCalDone(\''+e.id+'\')" aria-label="Mark done"></button>')+
+          '<button class="cal-row-main" onclick="'+tap+'">'+
+            '<span class="cal-row-title">'+escapeHtml(e.title)+'</span>'+
+            '<span class="cal-row-meta"><span class="cal-row-pill" style="background:'+cc.bg+' !important;color:'+cc.deep+' !important">'+cc.emoji+' '+cc.label+'</span>'+(e.time?' '+e.time:'')+(e.who==='mom'?' \u00b7 mom':e.who==='family'?' \u00b7 family':'')+'</span>'+
+          '</button>'+
+        '</div>';
+      }).join('');
+      return '<div class="cal-group">'+
+        '<div class="cal-group-head"><span class="cal-group-rel">'+relDayLabel(date)+'</span>'+
+          '<span class="cal-group-date">'+dObj.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+'</span></div>'+
+        rows +
+      '</div>';
+    }).join('');
+
+    // Who selector (segmented)
+    const whoSeg = '<div class="cal-whoseg">'+
+      '<button class="cal-whoseg-btn'+(who==='all'?' on':'')+'" onclick="_calSetWho(\'all\')">Everyone</button>'+
+      '<button class="cal-whoseg-btn'+(who==='baby'?' on':'')+'" onclick="_calSetWho(\'baby\')">'+escapeHtml(babyLabel)+'</button>'+
+      '<button class="cal-whoseg-btn'+(who==='mom'?' on':'')+'" onclick="_calSetWho(\'mom\')">Mom</button>'+
+    '</div>';
+
+    // Category chips relevant to the selected who
+    const cats = WHO_CATS[who] || WHO_CATS.all;
+    if (window._calCat && cats.indexOf(window._calCat) < 0) window._calCat = 'all';
+    const catChips = '<div class="cal-filters">'+
+      '<button class="cal-fchip'+(!window._calCat||window._calCat==='all'?' on':'')+'" onclick="_calSetCat(\'all\')">All</button>'+
+      cats.map(k => '<button class="cal-fchip'+(window._calCat===k?' on':'')+'" onclick="_calSetCat(\''+k+'\')" style="--cc:'+CAL_CATS[k].deep+'">'+CAL_CATS[k].emoji+' '+CAL_CATS[k].label+'</button>').join('')+
+    '</div>';
+
+    const body = shown.length
+      ? groupsHTML + (more>0 ? '<button class="cal-more" onclick="_calToggleExpand()">Show all '+events.length+' upcoming \u203a</button>' : (expanded && events.length>LIMIT ? '<button class="cal-more" onclick="_calToggleExpand()">Show less \u2039</button>' : ''))
+      : '<div class="cal-empty"><div style="font-size:32px;margin-bottom:8px">\ud83d\uddd3\ufe0f</div><div style="font-weight:650;color:var(--ink)">Nothing coming up</div><div style="font-size:13px;color:var(--ink-3);margin-top:3px">Tap + to add an appointment, vaccine, or playdate.</div></div>';
+
+    // Done & past: completed events, plus past-dated ones that weren't marked done.
+    // Kept viewable (and restorable) so nothing is ever lost by tapping "done".
+    let pastDone = allCalEvents().filter(e => (e.done || e.date < today) && !e._derived);
+    if (who === 'baby') pastDone = pastDone.filter(e => (e.who||'baby') === 'baby');
+    else if (who === 'mom') pastDone = pastDone.filter(e => e.who === 'mom');
+    if (window._calCat && window._calCat !== 'all') pastDone = pastDone.filter(e => e.cat === window._calCat);
+    pastDone.sort((a,b) => (b.date+(b.time||'')).localeCompare(a.date+(a.time||''))); // most recent first
+
+    let pastHTML = '';
+    if (pastDone.length) {
+      const open = !!window._calPastOpen;
+      const rows = open ? pastDone.slice(0, window._calPastExpanded ? pastDone.length : 8).map(e => {
+        const cc = calCat(e.cat);
+        const dObj = new Date(e.date+'T00:00:00');
+        return '<div class="cal-row cal-row-past">'+
+          '<button class="cal-row-check on" onclick="toggleCalDone(\''+e.id+'\')" title="Restore to upcoming" aria-label="Restore"></button>'+
+          '<button class="cal-row-main" onclick="openCalEventSheet(\''+e.id+'\')">'+
+            '<span class="cal-row-title">'+escapeHtml(e.title)+'</span>'+
+            '<span class="cal-row-meta"><span class="cal-row-pill" style="background:'+cc.bg+' !important;color:'+cc.deep+' !important">'+cc.emoji+' '+cc.label+'</span> '+dObj.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+(e.done?' \u00b7 done':'')+'</span>'+
+          '</button>'+
+        '</div>';
+      }).join('') + (open && pastDone.length>8 && !window._calPastExpanded ? '<button class="cal-more" onclick="_calPastExpand()">Show all '+pastDone.length+' \u203a</button>' : '') : '';
+      pastHTML = '<button class="cal-past-toggle" onclick="_calTogglePast()">'+
+          '<span>'+(open?'\u25be':'\u25b8')+' Done &amp; past</span><span class="cal-past-count">'+pastDone.length+'</span>'+
+        '</button>'+
+        (open ? '<div class="cal-past-list">'+rows+'<div class="cal-past-hint">Tap the circle to restore \u00b7 tap the event to view or delete</div></div>' : '');
+    }
+
+    el.innerHTML =
+      '<div class="page-header"><h2>\ud83d\uddd3\ufe0f Calendar</h2><p>What\u2019s coming up next</p></div>'+
+      whoSeg + catChips +
+      '<div class="cal-agenda">'+body+'</div>'+
+      (pastHTML ? '<div class="cal-past-sec">'+pastHTML+'</div>' : '')+
+      '<button class="cal-fab" onclick="openCalEventSheet()" aria-label="Add event">+</button>';
+  }
+  window._calSetWho = (w) => { window._calWho = w; window._calCat = 'all'; window._calExpanded = false; render(); };
+  window._calSetCat = (cat) => { window._calCat = cat; window._calExpanded = false; render(); };
+  window._calToggleExpand = () => { window._calExpanded = !window._calExpanded; render(); };
+  window._calTogglePast = () => { window._calPastOpen = !window._calPastOpen; render(); };
+  window._calPastExpand = () => { window._calPastExpanded = true; render(); };
+  render();
+};
+
 function svgIcon2b(id, size){
   const P = {
     'stethoscope':'<path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M6 3H4M14 3h2"/><path d="M10 16v1a4 4 0 0 0 8 0v-1"/><circle cx="18" cy="14" r="2"/>',
@@ -8209,7 +9151,7 @@ PAGES['vaccines'] = function(el) {
             </div>
             <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
               <span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E6F1FB;color:#185FA5">${v.age}</span>
-              ${dueDate?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:${overdue?'#FCEBEB':'#f0f0f0'};color:${overdue?'#C0392B':'#666'}">${overdue?'⚠ Overdue · ':'Due: '}${fmtVaxDate(dueDate)}</span>`:''}
+              ${dueDate?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:${overdue?'#FCEBEB':'#f0f0f0'} !important;color:${overdue?'#C0392B':'#555'} !important">${overdue?'⚠ Overdue · ':'Due: '}${fmtVaxDate(dueDate)}</span>`:''}
               ${s.given?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E1F5EE;color:#0F6E56">✓ Given ${s.date?'· '+formatDate(s.date):''}</span>`:''}
             </div>
             ${v.notes?`<div style="font-size:11px;color:#767680;margin-top:4px;line-height:1.4">${v.notes}</div>`:''}
@@ -9742,6 +10684,9 @@ function restoreDataPrompt() {
           body:'Contains: ' + counts + '. This replaces the logged data on THIS device (and syncs to your other phone). Your family sign-in stays the same.',
           confirmLabel:'Replace data'
         }, () => {
+        // Snapshot current data BEFORE the restore overwrites it, so a wrong-file
+        // restore is itself recoverable.
+        takeSnapshot('before-restore');
         // CRITICAL: a backup carries the family identity of the phone that made it.
         // Blindly restoring it would hijack this device into that family and could
         // overwrite the other parent's cloud data. So we keep THIS device's current
@@ -10374,8 +11319,8 @@ PAGES['philosophy'] = function(el) {
         {name:'Dev Science',pct:10,color:'#185FA5',bg:'#E6F1FB',core:'AAP-aligned, serve-and-return, safe sleep, play is the work of childhood'},
       ].map(p => `<div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div style="width:40px;height:40px;border-radius:50%;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:${p.color}">${p.pct}%</div>
-          <div style="font-size:15px;font-weight:700;color:${p.color}">${p.name}</div>
+          <div style="width:40px;height:40px;border-radius:50%;background:${p.bg} !important;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:${p.color} !important">${p.pct}%</div>
+          <div class="phil-name" style="font-size:15px;font-weight:700">${p.name}</div>
         </div>
         <div class="ref-body">${p.core}</div>
         ${pctBar(p.pct, p.color, 6)}
@@ -10571,6 +11516,10 @@ PAGES['settings'] = function(el) {
       </div>
       <div class="settings-row" onclick="restoreDataPrompt()" role="button" tabindex="0">
         <div class="settings-row-main"><div class="settings-row-lbl">Restore from backup</div><div class="settings-row-sub">Replace this device's data from a file</div></div>
+        <span class="settings-chev">\u203a</span>
+      </div>
+      <div class="settings-row" onclick="openRecoverySheet()" role="button" tabindex="0">
+        <div class="settings-row-main"><div class="settings-row-lbl">Recover from a snapshot</div><div class="settings-row-sub">Roll back to an automatic recovery point</div></div>
         <span class="settings-chev">\u203a</span>
       </div>
     </div>
