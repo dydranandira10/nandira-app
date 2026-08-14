@@ -86,6 +86,82 @@ const FB_URL = 'https://nandira-app-default-rtdb.firebaseio.com';
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
 .now-streak{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:600;color:var(--status-good);background:var(--status-good-bg);padding:5px 12px;border-radius:999px;}
+/* ── Now-page celebration banners ──
+   Birthday tier: full warm treatment — gradient card, big sparkle, two lines.
+   Monthiversary tier: one quiet line, soft background, no gradient/glow — it
+   should read as a gentle aside, never as loud as the birthday card. */
+/* ── Persistent app frame during a celebration day ──
+   Fixed, non-interactive, sits above all page content at every scroll position.
+   Birthday gets a richer double-line gold frame with corner sparkles; month gets
+   a single thin gold line — same "special day" cue, clearly lower intensity. */
+.celebrate-frame{position:fixed;inset:0;z-index:9985;pointer-events:none;border-radius:28px;}
+.celebrate-frame-birthday{box-shadow:inset 0 0 0 2px #C99A3B,inset 0 0 0 5px rgba(212,115,154,.35),inset 0 0 26px rgba(201,154,59,.22);}
+.celebrate-frame-birthday::before,.celebrate-frame-birthday::after{content:'\2728';position:fixed;font-size:15px;opacity:.85;}
+.celebrate-frame-birthday::before{top:12px;left:16px;}
+.celebrate-frame-birthday::after{top:12px;right:16px;}
+.celebrate-frame-month{box-shadow:inset 0 0 0 1.5px rgba(122,90,10,.55),inset 0 0 16px rgba(201,154,59,.12);}
+body.night-mode .celebrate-frame-birthday{box-shadow:inset 0 0 0 2px #E0C68A,inset 0 0 0 5px rgba(212,115,154,.3),inset 0 0 26px rgba(224,198,138,.18);}
+body.night-mode .celebrate-frame-month{box-shadow:inset 0 0 0 1.5px rgba(224,198,138,.5),inset 0 0 16px rgba(224,198,138,.12);}
+.now-celebrate{border-radius:16px;margin:14px 0;cursor:default;}
+/* Slim celebration strip — appears at the top of every page EXCEPT Now/Dashboard
+   (which have the full banner). Same birthday-vs-monthiversary tone distinction,
+   just compact: a single tappable line instead of a full card. */
+.slim-celebrate{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:11px;margin-bottom:12px;cursor:pointer;}
+.slim-celebrate:active{transform:scale(.99);}
+.slim-celebrate-ico{font-size:14px;flex-shrink:0;}
+.slim-celebrate-text{flex:1;min-width:0;font-size:12.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slim-celebrate-chev{font-size:14px;flex-shrink:0;opacity:.6;}
+.slim-celebrate-birthday{background:linear-gradient(135deg,#FCE8F0,#FBF1DC 70%);border:1px solid rgba(201,154,59,.3);}
+.slim-celebrate-birthday .slim-celebrate-text{color:#8A3D5F;}
+.slim-celebrate-month{background:#F7E7BE;border:1px solid rgba(122,90,10,.22);}
+.slim-celebrate-month .slim-celebrate-text{color:#6E5008;}
+body.night-mode .slim-celebrate-birthday{background:linear-gradient(135deg,#3a1e2c,#3a3020 70%);border-color:rgba(224,198,138,.28);}
+body.night-mode .slim-celebrate-birthday .slim-celebrate-text{color:#f0c8dc !important;}
+body.night-mode .slim-celebrate-month{background:#33291a;border-color:rgba(224,198,138,.25);}
+body.night-mode .slim-celebrate-month .slim-celebrate-text{color:#F0DBA0 !important;}
+.now-celebrate-big{padding:14px 16px 16px;background:linear-gradient(135deg,#FCE8F0,#FBF1DC 60%,#FCE8F0);border:1px solid rgba(201,154,59,.35);box-shadow:0 6px 18px -8px rgba(168,68,111,.25);cursor:pointer;border-radius:16px;}
+.now-celebrate-body{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;}
+.ncb-bunting{display:flex;justify-content:center;margin-bottom:8px;}
+.ncb-pennants{position:relative;display:flex;gap:3px;padding-top:6px;}
+.ncb-pennants::before{content:'';position:absolute;top:0;left:4px;right:4px;height:1.5px;background:rgba(168,68,111,.4);}
+.ncb-pennants i{width:12px;height:14px;display:block;clip-path:polygon(0 0,100% 0,50% 100%);}
+.ncb-pennants i:nth-child(4n+1){background:#D4739A;}
+.ncb-pennants i:nth-child(4n+2){background:#C99A3B;}
+.ncb-pennants i:nth-child(4n+3){background:#8EC6D9;}
+.ncb-pennants i:nth-child(4n+4){background:#F0D896;}
+body.night-mode .ncb-pennants::before{background:rgba(224,198,138,.4);}
+.now-celebrate-big:active{transform:scale(.99);}
+.now-celebrate-sparkle{font-size:30px;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(168,68,111,.2));}
+.now-celebrate-main{width:100%;}
+.now-celebrate-title{font-family:var(--font-display);font-size:17px;font-weight:750;color:#8A3D5F;line-height:1.25;text-align:center;}
+.now-celebrate-sub{font-size:12.5px;color:#A8446F;opacity:.85;margin-top:2px;line-height:1.4;text-align:center;}
+/* Monthiversary: its OWN full banner — gold-only (no pink), bunting/pennant top
+   strip as the signature detail so it reads as a genuine mini-celebration, not
+   an afterthought. Deliberately calmer than birthday (single-tone gold vs.
+   birthday's pink+gold, moon vs. party emoji) so the hierarchy still holds. */
+.now-celebrate-month{position:relative;padding:14px 16px 16px;background:linear-gradient(160deg,#FBF1DC,#F7E7BE 55%,#FBF1DC);border:1px solid rgba(122,90,10,.28);border-radius:16px;box-shadow:0 6px 16px -8px rgba(122,90,10,.22);cursor:pointer;overflow:hidden;}
+.now-celebrate-month:active{transform:scale(.99);}
+.ncm-bunting{display:flex;justify-content:center;margin-bottom:10px;}
+.ncm-pennants{position:relative;display:flex;gap:3px;padding-top:6px;}
+.ncm-pennants::before{content:'';position:absolute;top:0;left:4px;right:4px;height:1.5px;background:rgba(122,90,10,.35);}
+.ncm-pennants i{width:11px;height:13px;display:block;clip-path:polygon(0 0,100% 0,50% 100%);}
+.ncm-pennants i:nth-child(5n+1){background:#C99A3B;}
+.ncm-pennants i:nth-child(5n+2){background:#D4739A;}
+.ncm-pennants i:nth-child(5n+3){background:#8EC6D9;}
+.ncm-pennants i:nth-child(5n+4){background:#F0D896;}
+.ncm-pennants i:nth-child(5n+5){background:#B8860B;}
+body.night-mode .ncm-pennants::before{background:rgba(224,198,138,.35);}
+.ncm-body{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;}
+.ncm-moon{font-size:28px;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(122,90,10,.22));}
+.ncm-main{width:100%;}
+.ncm-title{font-family:var(--font-display);font-size:16px;font-weight:750;color:#6E5008;line-height:1.25;text-align:center;}
+.ncm-sub{font-size:12px;color:#8A6608;opacity:.85;margin-top:2px;line-height:1.4;text-align:center;}
+body.night-mode .now-celebrate-month{background:linear-gradient(160deg,#3a3020,#33291a 55%,#3a3020);border-color:rgba(224,198,138,.3);}
+body.night-mode .ncm-title{color:#F0DBA0;}
+body.night-mode .ncm-sub{color:#D9BE84;}
+body.night-mode .now-celebrate-big{background:linear-gradient(135deg,#3a1e2c,#3a3020 60%,#3a1e2c);border-color:rgba(224,198,138,.3);}
+body.night-mode .now-celebrate-title{color:#f0c8dc;}
+body.night-mode .now-celebrate-sub{color:#e0a8c4;}
 body.night-mode .now-streak{background:rgba(95,212,212,.12);color:#7fd4c4;}
 /* ══ NIGHT-CONTEXT HOME (2am cognitive-load reduction) ══ */
 .now-page.night-context .now-tile-wrap,
@@ -149,6 +225,38 @@ body.night-mode .food-dup-banner.error{background:#3a1818;border-color:#8a3838;c
 .toast-undo:active{background:rgba(255,255,255,.28);}
 /* ══ CELEBRATION MOMENT ══ */
 .celebrate-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(20,20,30,.55);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s;}
+/* ── Celebration mode (birthday / birth day / first-year monthiversary) ──
+   Two tiers on purpose: birthday is the full warm treatment; monthiversary is
+   visibly quieter (fewer, smaller, cooler-toned pieces; no top-bar glow) so it
+   reads as a gentle nod rather than competing with an actual birthday. Both are
+   purely additive over the existing UI — no layout ever shifts to make room. */
+.celebrate-confetti-layer{position:fixed;inset:0;z-index:9990;pointer-events:none;overflow:hidden;}
+/* App-wide bunting garland — floats across the very top of the screen (below the
+   status bar, above all page content), fixed to the viewport so it appears
+   regardless of which page or scroll position, timed with the confetti burst. */
+.celebrate-bunting-layer{position:fixed;top:0;left:0;right:0;z-index:9988;pointer-events:none;display:flex;justify-content:center;padding-top:6px;opacity:0;transform:translateY(-6px);transition:opacity .4s ease,transform .4s ease;}
+.celebrate-bunting-layer.show{opacity:1;transform:translateY(0);}
+.cbl-pennants{position:relative;display:flex;gap:4px;padding-top:7px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.15));}
+.cbl-pennants::before{content:'';position:absolute;top:0;left:5px;right:5px;height:2px;border-radius:1px;}
+.cbl-pennants i{width:14px;height:17px;display:block;clip-path:polygon(0 0,100% 0,50% 100%);}
+.cbl-birthday .cbl-pennants::before{background:rgba(168,68,111,.55);}
+.cbl-birthday .cbl-pennants i:nth-child(4n+1){background:#D4739A;}
+.cbl-birthday .cbl-pennants i:nth-child(4n+2){background:#C99A3B;}
+.cbl-birthday .cbl-pennants i:nth-child(4n+3){background:#8EC6D9;}
+.cbl-birthday .cbl-pennants i:nth-child(4n+4){background:#F0D896;}
+.cbl-month .cbl-pennants::before{background:rgba(122,90,10,.5);}
+.cbl-month .cbl-pennants i:nth-child(3n+1){background:#C99A3B;}
+.cbl-month .cbl-pennants i:nth-child(3n+2){background:#F0D896;}
+.cbl-month .cbl-pennants i:nth-child(3n+3){background:#B8860B;}
+.confetti-bit{position:absolute;top:-24px;display:flex;align-items:center;justify-content:center;animation-name:confettiDrop;animation-timing-function:cubic-bezier(.25,.46,.45,.94);animation-fill-mode:forwards;opacity:.95;}
+@keyframes confettiDrop{0%{transform:translateY(0) rotate(0deg);opacity:0;}8%{opacity:.95;}100%{transform:translateY(105vh) rotate(340deg);opacity:0;}}
+/* Birthday: warm glow behind the top bar + soft gold wash at the very top of the
+   page, so the "special day" feeling is present even after the confetti settles. */
+body.celebrate-birthday .top-bar{background:linear-gradient(180deg,rgba(212,115,154,.09),rgba(201,154,59,.05) 60%,transparent);}
+body.celebrate-birthday.night-mode .top-bar{background:linear-gradient(180deg,rgba(212,115,154,.14),rgba(201,154,59,.08) 60%,transparent);}
+/* Monthiversary: barely-there — a hint of cool sparkle tint, no confetti glow. */
+body.celebrate-month .top-bar{background:linear-gradient(180deg,rgba(133,147,176,.06),transparent 70%);}
+body.celebrate-month.night-mode .top-bar{background:linear-gradient(180deg,rgba(133,147,176,.1),transparent 70%);}
 .celebrate-overlay.show{opacity:1;pointer-events:auto;}
 .celebrate-card{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(160deg,#1B2140 0%,#2A2E55 60%,#3D3A63 100%);border-radius:26px;padding:34px 26px 24px;text-align:center;max-width:310px;margin:20px;transform:scale(.85);transition:transform .4s cubic-bezier(.2,1.3,.4,1);box-shadow:0 24px 70px -14px rgba(0,0,0,.55);}
 .celebrate-card.sky-dawn{background:linear-gradient(160deg,#3E5C8A 0%,#8A6D9E 45%,#D98E7A 100%);}
@@ -811,7 +919,12 @@ body.night-mode #ptr-ind{background:#1d1d2c;border-color:rgba(255,255,255,.12);c
 .nfl-label{font-size:12px;font-weight:600;opacity:.9;}
 .nfl-time{font-size:22px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.05;}
 .nfl-since{font-size:11px;opacity:.75;}
-.nfl-stop{flex-shrink:0;background:#fff;color:#1F7373;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:750;font-family:var(--font);cursor:pointer;min-height:40px;}
+.nfl-stop{flex-shrink:0;background:#fff !important;color:#1F7373 !important;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:750;font-family:var(--font);cursor:pointer;min-height:40px;}
+/* The app-wide night-mode rule (body.night-mode .page *) forces light text on
+   every page descendant with equal !important weight — for elements with their
+   OWN white/light background (like this button), that makes text unreadable.
+   A more specific night-mode selector is needed to unambiguously win. */
+body.night-mode .nfl-stop{background:#fff !important;color:#1F7373 !important;}
 .nfl-stop:active{transform:scale(.96);}
 .now-due-action-done{background:linear-gradient(90deg,#26a06f,#2D8F8F);justify-content:flex-start;padding-left:22px;}
 .now-due-action-dismiss{background:linear-gradient(90deg,#8a8578,#6b6b78);justify-content:flex-end;padding-right:22px;}
@@ -896,12 +1009,32 @@ body.night-mode .cal-group-date{color:#a5a08f !important;}
 .cal-cell-out{pointer-events:none;}
 .cal-cell-today .cal-cell-num{color:#2D8F8F;font-weight:800;}
 .cal-cell-today{background:rgba(45,143,143,.08);}
+/* Premium gold ring for the two "big" life markers — birth day and birthdays.
+   A gradient border (not flat gold) reads as more considered/special, and a soft
+   glow underneath lifts it further without being loud. Monthiversaries deliberately
+   do NOT get this treatment — see the emotional-hierarchy note on CAL_CATS. */
+.cal-cell-gold{position:relative;}
+.cal-cell-gold::before{content:'';position:absolute;inset:1px;border-radius:10px;padding:1.5px;background:linear-gradient(135deg,#F0D896,#C99A3B 45%,#F0D896 90%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;}
+.cal-cell-gold.cal-cell-today{background:linear-gradient(160deg,rgba(240,216,150,.22),rgba(201,154,59,.1));}
+body.night-mode .cal-cell-gold::before{background:linear-gradient(135deg,#E0C68A,#96721F 45%,#E0C68A 90%);}
+body.night-mode .cal-cell-gold.cal-cell-today{background:linear-gradient(160deg,rgba(224,198,138,.16),rgba(150,114,31,.1));}
 .cal-cell-sel{background:#2D8F8F;}
 .cal-cell-sel .cal-cell-num{color:#fff;font-weight:800;}
 .cal-cell-dots{display:flex;gap:2.5px;margin-top:3px;height:5px;align-items:center;}
 .cal-cell-dot{width:5px;height:5px;border-radius:50%;}
 .cal-cell-sel .cal-cell-dot{background:#fff !important;opacity:.9;}
 .cal-cell:active{background:rgba(45,143,143,.12);}
+.cal-cell-has{background:rgba(45,143,143,.05);}
+.cal-cell-ico{font-size:14px;line-height:1;margin-top:2px;position:relative;}
+.cal-cell-extra{position:absolute;bottom:-3px;right:-7px;background:#5B6270;color:#fff;font-size:8px;font-weight:800;border-radius:999px;padding:1px 3px;min-width:11px;text-align:center;line-height:1.3;}
+.cal-grid-sec{margin-top:6px;}
+.cal-grid-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px;}
+.cal-grid-head>span{font-size:12px;font-weight:750;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;}
+.cal-grid-jump{background:#FBF1DC;color:#7A5A0A;border:none;border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.cal-grid-jump:active{background:#f7d5e4;}
+body.night-mode .cal-grid-head>span{color:#8a8578;}
+body.night-mode .cal-grid-jump{background:#3a3020;color:#e0c68a;}
+body.night-mode .cal-cell-has{background:rgba(92,209,200,.06);}
 body.night-mode .cal-cal{background:#1d1d2c;border-color:rgba(255,255,255,.06);}
 body.night-mode .cal-monthlabel,body.night-mode .cal-cell-num{color:#f0ede2;}
 body.night-mode .cal-navbtn{background:#2a2a3a;color:#c4bca8;}
@@ -1020,6 +1153,8 @@ body.night-mode .sheet-del{background:#3a1e1a;color:#e88a6a;}
 .now-ftype{padding:11px;border:1.5px solid rgba(255,255,255,.3);border-radius:11px;background:rgba(255,255,255,.12);color:#fff;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all .15s;}
 .now-ftype.on{background:#fff;color:#2D8F8F;border-color:#fff;}
 .now-save{width:100%;background:#fff;color:#1F7373;border:none;border-radius:11px;padding:13px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;margin-top:4px;}
+.now-save-alt{width:100%;background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:11px;padding:11px;font-size:13.5px;font-weight:650;font-family:var(--font);cursor:pointer;margin-top:8px;}
+.now-save-alt:active{background:rgba(255,255,255,.22);}
 .now-tile-wrap .now-save{background:#2D8F8F;color:#fff;}
 .now-seg{display:flex;gap:7px;}
 .now-seg-btn{flex:1;padding:13px 10px;min-height:46px;border:1.5px solid #e0e0e0;border-radius:10px;background:#fff;color:#666;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}.now-seg-btn:active{transform:scale(.97);}
@@ -1346,6 +1481,50 @@ body.night-mode .chart-wrap{background:#1d1d2c;border:1px solid rgba(255,255,255
 
 /* ── VAX CARDS ── */
 .vax-card{background:#fff;border-radius:var(--r);border:1.5px solid #eee;padding:12px 14px;margin-bottom:8px;}
+/* ── Vaccine due/given date boxes — visually separated, tap-to-edit (not a
+   bare live input) so an accidental brush of the finger can't change a medical
+   date. Due = teal (schedule), Given = green (completed), distinct at a glance. ── */
+.vax-datebox{border-radius:11px;padding:9px 11px;margin-top:7px;}
+.vax-datebox-due{background:#E6F5F5;border:1px solid #BFE3E3;}
+.vax-datebox-given{background:#EDF7F1;border:1px solid #BEE3CE;}
+.vax-datebox-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.vax-datebox-lbl{font-size:11px;font-weight:750;letter-spacing:.02em;}
+.vax-datebox-due .vax-datebox-lbl{color:#1F6E6E;}
+.vax-datebox-given .vax-datebox-lbl{color:#1E7A4C;}
+.vax-datebox-reset{background:none;border:none;color:#1F6E6E;font-size:10.5px;font-weight:650;text-decoration:underline;cursor:pointer;font-family:var(--font);padding:2px;}
+.vax-datebox-val{display:flex;align-items:center;justify-content:space-between;width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:9px;padding:9px 11px;cursor:pointer;font-family:var(--font);font-size:13.5px;font-weight:600;color:var(--ink);}
+.vax-datebox-val:active{background:#f7f5ee;}
+.vax-datebox-edit{font-size:11px;font-weight:700;color:#767680;background:#F2EFE7;padding:3px 9px;border-radius:999px;}
+body.night-mode .vax-datebox-due{background:#132e2e;border-color:#1F6E6E;}
+body.night-mode .vax-datebox-given{background:#122e1f;border-color:#1E7A4C;}
+body.night-mode .vax-datebox-due .vax-datebox-lbl{color:#7fd4c4;}
+body.night-mode .vax-datebox-given .vax-datebox-lbl{color:#7fd49a;}
+body.night-mode .vax-datebox-reset{color:#7fd4c4;}
+body.night-mode .vax-datebox-val{background:#1d1d2c;border-color:rgba(255,255,255,.1);color:#f0ede2;}
+body.night-mode .vax-datebox-edit{background:#2a2a3a;color:#a5a08f;}
+.vaxd-name{font-size:14px;font-weight:650;color:var(--ink);margin-bottom:6px;}
+.vaxd-hint{font-size:12px;color:var(--ink-2);line-height:1.5;margin-bottom:14px;}
+.vaxact-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px;}
+.calact-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:12px;}
+.calact-head-main{flex:1;min-width:0;padding-top:2px;}
+.calact-head-sub{font-size:12px;color:var(--ink-3);}
+.calact-details{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:16px;padding-bottom:16px;border-bottom:0.5px solid rgba(0,0,0,.08);}
+.calact-notes{width:100%;font-size:13px;color:var(--ink-2);line-height:1.5;margin-top:6px;background:#FBF8F2;border-radius:10px;padding:9px 11px;}
+body.night-mode .calact-head-sub{color:#a5a08f;}
+body.night-mode .calact-details{border-bottom-color:rgba(255,255,255,.1);}
+body.night-mode .calact-notes{background:#262635;color:#c4bca8;}
+.vaxact-row{display:flex;align-items:center;gap:12px;width:100%;background:#FBF8F2;border:0.5px solid rgba(0,0,0,.05);border-radius:13px;padding:11px 12px;cursor:pointer;font-family:var(--font);text-align:left;}
+.vaxact-row:active{background:#f2ede2;}
+.vaxact-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.vaxact-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.vaxact-title{font-size:14px;font-weight:650;color:var(--ink);}
+.vaxact-sub{font-size:11.5px;color:var(--ink-3);}
+.vaxact-chev{color:var(--ink-3);font-size:17px;flex-shrink:0;}
+body.night-mode .vaxact-row{background:#262635;border-color:rgba(255,255,255,.06);}
+body.night-mode .vaxact-title{color:#f0ede2;}
+body.night-mode .vaxact-sub{color:#a5a08f;}
+body.night-mode .vaxd-name{color:#f0ede2;}
+body.night-mode .vaxd-hint{color:#c4bca8;}
 .vax-card.given{background:#F0FFF8;border-color:#9FE1CB;}
 .vax-card.overdue{border-color:#F0C0C0;background:#FFF8F8;}
 .vax-check{width:24px;height:24px;border-radius:6px;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;font-size:13px;transition:all .15s;}
@@ -1533,6 +1712,14 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="app" id="app" style="display:none" role="main">
 
+<!-- Floating action buttons (FABs) render HERE, not inside .page — the page-entry
+     animation leaves a lingering CSS transform on .page (matrix(1,0,0,1,0,0), the
+     identity matrix) that never gets removed, and ANY transform on an ancestor
+     turns position:fixed children into "fixed relative to that ancestor" instead
+     of the viewport. Keeping this container as a direct, untransformed sibling of
+     .page is what makes position:fixed actually float over the whole screen. -->
+<div id="page-fab-layer"></div>
+
 <div class="top-bar">
   <div class="top-bar-left" onclick="navTo('dashboard')">
     <div class="top-bar-title" id="top-bar-title"><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='width:1.15em;height:1.15em;vertical-align:-0.22em;display:inline-block'><defs><radialGradient id='bodyG' cx='50%' cy='40%' r='65%'><stop offset='0%' stop-color='#FFE375'/><stop offset='100%' stop-color='#FFC93C'/></radialGradient></defs><ellipse cx='50' cy='88' rx='30' ry='6' fill='#000' opacity='0.06'/><path d='M22 64 Q20 50 28 44 L72 44 Q80 50 78 64 Z' fill='#FFF6E9'/><circle cx='50' cy='42' r='26' fill='url(#bodyG)'/><path d='M44 17 Q47 8 50 16 Q53 8 56 17 Z' fill='#FFC93C'/><circle cx='42' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='58' cy='40' r='3.6' fill='#3A2E2A'/><circle cx='43.2' cy='38.8' r='1.2' fill='#fff'/><circle cx='59.2' cy='38.8' r='1.2' fill='#fff'/><path d='M46 47 L54 47 L50 52 Z' fill='#FF9E3D'/><circle cx='33' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><circle cx='67' cy='47' r='4' fill='#FFB3B3' opacity='0.6'/><path d='M20 62 L26 56 L32 62 L38 56 L44 62 L50 56 L56 62 L62 56 L68 62 L74 56 L80 62 L80 78 Q80 84 74 84 L26 84 Q20 84 20 78 Z' fill='#FFFFFF' stroke='#EFE7D6' stroke-width='1'/><path d='M34 58 Q42 54 50 58' fill='none' stroke='#FFE0AA' stroke-width='1.5' opacity='0.5'/></svg> Baby OS</div>
@@ -1608,7 +1795,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('settings')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span> Settings</button>
   <button class="nav-item" onclick="openNavCustomizer()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></span> Customise tabs</button>
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 25 Jul 2026, 12:44</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 13 Aug 2026, 19:17</div>
   <div style="height:20px"></div>
 </div>
 
@@ -1749,15 +1936,21 @@ async function syncFromCloud() {
       fbPatch('/families/' + state.familyId + '/state', state).then(()=>{ _lastSyncHash=''; });
     }
     updateSubtitles();
+    // A sync can bring in a DOB change from a partner's phone, or the day can have
+    // simply turned over while the app sat open — either way, re-check whether
+    // today is now a celebration day rather than relying on the once-at-load check.
+    try { initCelebrationMode(); } catch(e) {}
     // Re-render current page smoothly (only if content changed)
-    // Don't re-render if a modal/form is open, or the user is actively editing a
-    // field on this page — a background sync re-render would wipe their in-progress
-    // input (e.g. a just-stopped feed timer's Start time, or a half-typed amount).
+    // Don't re-render if a modal/form is open, the user is actively editing a field
+    // on this page, OR there's a stopped-timer feed still waiting to be reviewed and
+    // saved — even unfocused, that review is in-progress and a re-render must not
+    // touch it. (Belt-and-suspenders alongside the _pendingTimedFeed restore itself.)
     const modalOpen = document.querySelector('.modal-overlay.open');
     const ae = document.activeElement;
     const editing = ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT');
+    const pendingReview = prevPage === 'feeding' && !!window._pendingTimedFeed;
     const cur = document.getElementById('page-' + prevPage);
-    if (cur && PAGES[prevPage] && !modalOpen && !editing) PAGES[prevPage](cur);
+    if (cur && PAGES[prevPage] && !modalOpen && !editing && !pendingReview) PAGES[prevPage](cur);
     setSyncStatus('synced');
   } catch(e) {
     setSyncStatus('error');
@@ -1784,7 +1977,19 @@ function deepMerge(local, remote) {
     } else if (key === 'deletedIds') {
       // handled above
     } else if (remote[key] && typeof remote[key] === 'object' && !Array.isArray(remote[key])) {
-      result[key] = {...(local[key]||{}), ...remote[key]};
+      if (key === 'vaccines' || key === 'milestones') {
+        // These are keyed by index -> {multiple fields}. A one-level merge would let
+        // remote's record for an index REPLACE local's wholesale, silently dropping
+        // sibling fields (e.g. syncing "given" from one phone could erase a "dueDate"
+        // set on the other). Merge each index's record field-by-field instead.
+        const merged = {...(local[key]||{})};
+        for (const idx of Object.keys(remote[key])) {
+          merged[idx] = {...(merged[idx]||{}), ...remote[key][idx]};
+        }
+        result[key] = merged;
+      } else {
+        result[key] = {...(local[key]||{}), ...remote[key]};
+      }
     }
   }
   // Safety backstop: a merged log array may only be shorter than local if the
@@ -2376,9 +2581,109 @@ function proceedToApp() {
   navTo(startPage);
   // Take a rolling daily snapshot so there's always a recent recovery point.
   takeSnapshot('daily');
+  // If today is a birthday, birth day, or first-year monthiversary, turn on the
+  // app-wide celebratory mode (confetti + warm accents), scaled by occasion.
+  try { initCelebrationMode(); } catch(e) {}
   // Start sync in background after a short delay
   setTimeout(() => startSync(), 1000);
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CELEBRATION MODE — app-wide festive treatment for birthdays and first-year
+// monthiversaries. Intentionally two tiers: birthday (and the birth day itself)
+// gets the full warm celebration; monthiversary gets a quieter version so it
+// doesn't compete with an actual birthday. Purely additive — never blocks any
+// existing UI, and turns itself off automatically once the date has passed.
+// ══════════════════════════════════════════════════════════════════════════════
+function initCelebrationMode() {
+  const c = todaysCelebration();
+  document.body.classList.remove('celebrate-birthday','celebrate-month');
+  const oldLayer = document.getElementById('celebrate-confetti-layer');
+  if (oldLayer) oldLayer.remove();
+  const oldFrame = document.getElementById('celebrate-frame');
+  if (oldFrame) oldFrame.remove();
+  if (!c) return;
+  document.body.classList.add(c.level === 'birthday' ? 'celebrate-birthday' : 'celebrate-month');
+  spawnCelebrationConfetti(c.level);
+  // A persistent gold frame around the whole app for the day — fixed to the
+  // viewport (outside any transformed ancestor, same reasoning as the FAB layer)
+  // so it stays put at every scroll position on every page, not just Now.
+  const frame = document.createElement('div');
+  frame.id = 'celebrate-frame';
+  frame.className = 'celebrate-frame ' + (c.level === 'birthday' ? 'celebrate-frame-birthday' : 'celebrate-frame-month');
+  document.body.appendChild(frame);
+}
+
+// A light confetti burst, outside any transformed ancestor (same reasoning as the
+// FAB layer) so it genuinely floats over the whole screen regardless of scroll.
+function spawnCelebrationConfetti(level) {
+  const layer = document.createElement('div');
+  layer.id = 'celebrate-confetti-layer';
+  layer.className = 'celebrate-confetti-layer';
+  document.body.appendChild(layer);
+  const isBig = level === 'birthday';
+  // Monthiversary confetti is now genuinely GOLD (matching its new banner), just
+  // fewer pieces and no party-popper emoji — a warm shimmer, not a full parade.
+  const pieces = isBig ? 26 : 16;
+  const colors = isBig
+    ? ['#D4739A','#F0D896','#C99A3B','#8EC6D9','#B8860B','#FFFFFF']
+    : ['#F0D896','#C99A3B','#F7E7BE','#FFFFFF'];
+  const shapes = isBig ? ['\ud83c\udf89','\ud83c\udf8a','\u2728','\ud83c\udf88'] : ['\u2728','\ud83c\udf1f'];
+  for (let i = 0; i < pieces; i++) {
+    const el = document.createElement('span');
+    const useEmoji = Math.random() < (isBig ? 0.35 : 0.4);
+    el.className = 'confetti-bit';
+    el.style.left = (Math.random()*100) + 'vw';
+    el.style.animationDelay = (Math.random()*(isBig?2.2:1.8)) + 's';
+    el.style.animationDuration = (2.6 + Math.random()*1.8) + 's';
+    if (useEmoji) {
+      el.textContent = shapes[Math.floor(Math.random()*shapes.length)];
+      el.style.fontSize = (isBig ? (14 + Math.random()*10) : (11 + Math.random()*7)) + 'px';
+      el.style.background = 'none';
+    } else {
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.width = el.style.height = (isBig ? (6+Math.random()*5) : (5+Math.random()*4)) + 'px';
+      el.style.borderRadius = Math.random() < 0.5 ? '50%' : '2px';
+    }
+    layer.appendChild(el);
+  }
+  // Confetti is a one-time entrance flourish, not a persistent distraction —
+  // clear the DOM nodes after they've fallen so they don't linger or cost paint.
+  setTimeout(() => { if (layer.parentElement) layer.remove(); }, (isBig?4600:3200));
+  // A floating bunting garland across the very top of the screen, timed with the
+  // confetti — appears at cold start AND whenever the user taps the banner to
+  // replay the burst (via replayCelebrationBurst below). Fixed to the viewport,
+  // above all page content, same reasoning as the FAB/confetti layers.
+  spawnCelebrationBunting(level);
+}
+
+// App-wide bunting strip across the top of the screen. Fades in with the confetti,
+// lingers a little longer than the confetti fall so it reads as a deliberate
+// decoration rather than a flash, then fades out.
+function spawnCelebrationBunting(level) {
+  const old = document.getElementById('celebrate-bunting-layer');
+  if (old) old.remove();
+  const isBig = level === 'birthday';
+  const wrap = document.createElement('div');
+  wrap.id = 'celebrate-bunting-layer';
+  wrap.className = 'celebrate-bunting-layer ' + (isBig ? 'cbl-birthday' : 'cbl-month');
+  const count = isBig ? 15 : 11;
+  wrap.innerHTML = '<span class="cbl-pennants">'+'<i></i>'.repeat(count)+'</span>';
+  document.body.appendChild(wrap);
+  requestAnimationFrame(() => wrap.classList.add('show'));
+  setTimeout(() => {
+    wrap.classList.remove('show');
+    setTimeout(() => { if (wrap.parentElement) wrap.remove(); }, 500);
+  }, isBig ? 5200 : 3800);
+}
+// Re-spawn a small burst when arriving at the Now page during a celebration, so
+// it still feels alive if the user opens the app later in the day (not just once
+// at cold start).
+window.replayCelebrationBurst = function() {
+  const c = todaysCelebration();
+  if (!c) return;
+  if (!document.getElementById('celebrate-confetti-layer')) spawnCelebrationConfetti(c.level);
+};
 
 let _landingGender = 'surprise';
 let _landingNBabies = 1;
@@ -2849,9 +3154,17 @@ function babyAgeLbl() {
   if (d===null) return null;
   if (d<14) return d+' day'+(d!==1?'s':'')+' old';
   if (d<60) return Math.floor(d/7)+' weeks old';
-  const m = Math.floor(d/30.44);
-  if (m<24) return m+' month'+(m!==1?'s':'')+' old';
-  const years = Math.floor(m/12), rem = m%12;
+  // Calendar-based months/years (not an averaged 30.44-day month) — this is what
+  // makes the age label agree with the birthday/monthiversary banners, which also
+  // use real calendar-date arithmetic. An averaged-days approach can under-count
+  // by a month right on the anniversary itself (365 days / 30.44 floors to 11,
+  // not 12, even though the actual calendar date is exactly one year later).
+  const born = new Date(state.babyDOB + 'T00:00:00');
+  const now = new Date();
+  let months = (now.getFullYear() - born.getFullYear()) * 12 + (now.getMonth() - born.getMonth());
+  if (now.getDate() < born.getDate()) months--;   // hasn't hit the day-of-month yet this month
+  if (months < 12) return months+' month'+(months!==1?'s':'')+' old';
+  const years = Math.floor(months/12), rem = months%12;
   return years+' year'+(years!==1?'s':'')+(rem>0?', '+rem+' month'+(rem!==1?'s':''):'')+' old';
 }
 // ── MULTI-BABY CONTEXT ──────────────────────────────────────────────────────
@@ -4044,6 +4357,10 @@ function countUpNode(tn, dur) {
 }
 
 function showPage(id) {
+  // Clear any floating action button from the previous page BEFORE rendering the
+  // new one — pages that want a FAB (like Calendar) re-populate it themselves.
+  const fabLayer = document.getElementById('page-fab-layer');
+  if (fabLayer) fabLayer.innerHTML = '';
   document.querySelectorAll('.nav-item').forEach(el=>{
     const oc=el.getAttribute('onclick')||''; el.classList.toggle('active',oc.includes("'"+id+"'"));
   });
@@ -4056,6 +4373,33 @@ function showPage(id) {
   if (PAGES[id]) PAGES[id](div);
   else div.innerHTML='<div class="empty-state">Page coming soon</div>';
   requestAnimationFrame(()=>{div.style.opacity='1';div.style.transform='translateY(0)';});
+  // Slim celebration reminder on every OTHER page — Now and Dashboard already show
+  // the full banner, so this stays out of their way. Same trigger, smaller footprint.
+  if (id !== 'now' && id !== 'dashboard') renderSlimCelebrateStrip(div); else removeSlimCelebrateStrip();
+}
+
+// A compact, one-line version of the celebration banner for pages that aren't Now
+// or Dashboard — keeps the "it's a special day" feeling present everywhere without
+// the full-size banner competing with each page's own content. Tapping it jumps to
+// Now, where the full banner (and confetti replay) lives.
+function renderSlimCelebrateStrip(pageEl) {
+  removeSlimCelebrateStrip();
+  const cel = (typeof todaysCelebration === 'function') ? todaysCelebration() : null;
+  if (!cel) return;
+  const strip = document.createElement('div');
+  strip.id = 'slim-celebrate-strip';
+  strip.className = cel.level === 'birthday' ? 'slim-celebrate slim-celebrate-birthday' : 'slim-celebrate slim-celebrate-month';
+  strip.onclick = () => navTo('dashboard');
+  const label = cel.level === 'birthday'
+    ? (cel.isBirthDay ? (babyName()||'Baby')+' was born today' : (babyName()||'Baby')+(cel.years===1?'\u2019s 1st birthday!':' turns '+cel.years+' today!'))
+    : (babyName()||'Baby')+' is '+cel.months+' month'+(cel.months>1?'s':'')+' old today';
+  const icon = cel.level === 'birthday' ? '\ud83c\udf82' : '\ud83c\udf19';
+  strip.innerHTML = '<span class="slim-celebrate-ico">'+icon+'</span><span class="slim-celebrate-text">'+label+'</span><span class="slim-celebrate-chev">\u203a</span>';
+  pageEl.insertBefore(strip, pageEl.firstChild);
+}
+function removeSlimCelebrateStrip() {
+  const el = document.getElementById('slim-celebrate-strip');
+  if (el) el.remove();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -4357,6 +4701,10 @@ async function saveBabyProfile() {
   await saveState();
   document.getElementById('baby-settings-modal').classList.remove('open');
   updateSubtitles(); showPage(_currentPage);
+  // Changing the DOB can turn today INTO (or out of) a birthday/monthiversary —
+  // re-check immediately rather than waiting for the next full app load, or the
+  // banner/frame silently never appears until the app is reopened.
+  try { initCelebrationMode(); } catch(e) {}
   toast('Profile saved! '+(isMultiples()?multiplesLabel():babyEmoji()));
 }
 
@@ -4983,28 +5331,291 @@ const CAL_CATS = {
   mom:         { label:'For mom',     emoji:'\ud83d\udc9b', color:'#C75E7E', deep:'#B04467', bg:'#FBE3EA' },
   milestone:   { label:'Milestone',   emoji:'\ud83c\udf1f', color:'#7A5AC9', deep:'#6544B0', bg:'#EEEDFE' },
   reminder:    { label:'Reminder',    emoji:'\ud83d\udd14', color:'#185FA5', deep:'#12508C', bg:'#E6F1FB' },
+  // The three life-marker categories are deliberately differentiated by emotional
+  // weight, not just color: birth is the once-ever, most precious marker (a rarer
+  // symbol, warm gold); birthday is a big yearly celebration (festive, bright);
+  // monthiversary is a quieter, gentler check-in (soft, low-key — shouldn't visually
+  // compete with an actual birthday). All three are auto-generated from babyDOB —
+  // _auto:true marks them as system-only, excluded from the manual "add event"
+  // category picker (see catFilterKeys below), since a user shouldn't be able to
+  // hand-tag an arbitrary event as "birth day."
+  birth:       { label:'Birth day',    emoji:'\u2728', color:'#C99A3B', deep:'#7A5A0A', bg:'#FBF1DC', _auto:true },
+  birthday:    { label:'Birthday',     emoji:'\ud83c\udf82', color:'#D4739A', deep:'#A8446F', bg:'#FCE8F0', _auto:true },
+  monthiversary:{ label:'Month mark',  emoji:'\ud83c\udf19', color:'#8593B0', deep:'#5C6B8C', bg:'#EBEEF5', _auto:true },
   other:       { label:'Other',       emoji:'\ud83d\udccc', color:'#5B6270', deep:'#4A5160', bg:'#EEF0F3' },
 };
+// Category keys selectable by the user (excludes auto-generated life markers).
+const CAL_CATS_SELECTABLE = Object.keys(CAL_CATS).filter(k => !CAL_CATS[k]._auto);
 function calCat(c){ return CAL_CATS[c] || CAL_CATS.other; }
 
 // Local YYYY-MM-DD for a Date (avoids UTC off-by-one from toISOString).
 function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 
 // Upcoming vaccines derived from the schedule + baby DOB, as read-only cal events.
+// Due date for a vaccine, honoring a per-baby manual override (state.vaccines[i].dueDate)
+// over the Kemenkes/IDAI schedule default. A doctor's appointment doesn't always land
+// exactly on the recommended day, so this is editable from either the Vaccines page or
+// the Calendar — both read from this single source, so they always agree.
+function vaxDueDate(v, i) {
+  const override = state.vaccines && state.vaccines[i] && state.vaccines[i].dueDate;
+  if (override) return new Date(override + 'T00:00:00');
+  if (v.daysFromBirth != null && state.babyDOB) {
+    return new Date(new Date(state.babyDOB + 'T00:00:00').getTime() + v.daysFromBirth*86400000);
+  }
+  if (v.dueDate) return new Date(v.dueDate + 'T00:00:00');
+  return null;
+}
+window.setVaxDueDate = function(i, val) {
+  if (!state.vaccines[i]) state.vaccines[i] = {};
+  state.vaccines[i].dueDate = val || '';   // empty clears the override -> back to recommended
+  saveState('vaccines');
+  toast(val ? 'Due date updated' : 'Reset to recommended date');
+  if (_currentPage === 'vaccines') navTo('vaccines');
+  else if (_currentPage === 'calendar') navTo('calendar');
+  else if (_currentPage === 'now') navTo('now');
+};
+window.confirmResetVaxDue = function(i) {
+  const v = [...VACCINES, ...(state.customVaccines||[])][i];
+  confirmDialog({
+    title: 'Reset to recommended date?',
+    body: 'This clears your rescheduled date for ' + (v ? v.name : 'this vaccine') + ' and goes back to the Kemenkes/IDAI schedule.',
+    confirmLabel: 'Reset'
+  }, () => setVaxDueDate(i, ''));
+};
+
+// A deliberate bottom-sheet editor for a vaccine's due date or given date. Used
+// instead of a bare, always-live <input type="date"> so a stray tap can't change
+// medical dates by accident — the picker only appears after this explicit open,
+// and nothing is saved until the user taps Save. Reusable from the Vaccines page
+// AND the Calendar (tapping a vaccine event there opens this directly, no redirect).
+// Tapping a vaccine event on the Calendar (or Now page) opens this small menu
+// instead of jumping straight into an editor — lets the user choose what they
+// actually want to do without committing to one path.
+window.openVaxCalActions = function(i) {
+  const all = [...VACCINES, ...(state.customVaccines||[])];
+  const v = all[i];
+  if (!v) return;
+  const s = state.vaccines[i] || {};
+  const due = vaxDueDate(v, i);
+  let ov = document.getElementById('vaxact-ov');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'vaxact-ov'; ov.className = 'sheet-ov';
+  ov.innerHTML =
+    '<div class="sheet" role="dialog" aria-modal="true">'+
+      '<div class="sheet-handle"></div>'+
+      '<div class="sheet-title">'+escapeHtml(v.name)+'</div>'+
+      '<div class="vaxd-hint" style="margin-bottom:16px">'+(due?'Due '+fmtVaxDateStr(due):'No due date set')+'</div>'+
+      '<div class="vaxact-list">'+
+        '<button class="vaxact-row" onclick="closeVaxCalActions();openVaxDateEditor('+i+',\'due\')">'+
+          '<span class="vaxact-ico" style="background:#E6F5F5;color:#1F6E6E">\ud83d\udcc5</span>'+
+          '<span class="vaxact-main"><span class="vaxact-title">Change due date</span><span class="vaxact-sub">Reschedule to match the appointment</span></span>'+
+          '<span class="vaxact-chev">\u203a</span>'+
+        '</button>'+
+        '<button class="vaxact-row" onclick="closeVaxCalActions();confirmMarkVaxDone('+i+')">'+
+          '<span class="vaxact-ico" style="background:#E1F5EE;color:#0F6E56">\u2713</span>'+
+          '<span class="vaxact-main"><span class="vaxact-title">Mark as done</span><span class="vaxact-sub">Record it as given today</span></span>'+
+          '<span class="vaxact-chev">\u203a</span>'+
+        '</button>'+
+        '<button class="vaxact-row" onclick="closeVaxCalActions();navTo(\'vaccines\')">'+
+          '<span class="vaxact-ico" style="background:#EEEDFE;color:#6544B0">\ud83d\udc89</span>'+
+          '<span class="vaxact-main"><span class="vaxact-title">Open Vaccines page</span><span class="vaxact-sub">See the full schedule and history</span></span>'+
+          '<span class="vaxact-chev">\u203a</span>'+
+        '</button>'+
+      '</div>'+
+      '<div class="sheet-btns"><button type="button" class="sheet-btn sheet-cancel" onclick="closeVaxCalActions()">Cancel</button></div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  ov.onclick = (e) => { if (e.target === ov) closeVaxCalActions(); };
+  requestAnimationFrame(() => ov.classList.add('show'));
+};
+window.closeVaxCalActions = function(){ const ov=document.getElementById('vaxact-ov'); if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.remove(),200);} };
+window.confirmMarkVaxDone = function(i) {
+  const all = [...VACCINES, ...(state.customVaccines||[])];
+  const v = all[i];
+  confirmDialog({
+    title: 'Mark as given?',
+    body: (v?v.name:'This vaccine') + ' will be recorded as given today (' + formatDate(today()) + '). You can adjust the exact date afterward from the Vaccines page.',
+    confirmLabel: 'Mark as given'
+  }, () => {
+    if (!state.vaccines[i]) state.vaccines[i] = {};
+    state.vaccines[i].given = true;
+    state.vaccines[i].date = today();
+    saveState('vaccines');
+    toast('Marked as given \u2713');
+    if (_currentPage === 'calendar') navTo('calendar');
+    else if (_currentPage === 'now') navTo('now');
+  });
+};
+
+window.openVaxDateEditor = function(i, kind) {
+  const all = [...VACCINES, ...(state.customVaccines||[])];
+  const v = all[i];
+  if (!v) return;
+  const s = state.vaccines[i] || {};
+  const isDue = kind === 'due';
+  const currentVal = isDue ? (s.dueDate || (vaxDueDate(v,i) ? ymd(vaxDueDate(v,i)) : '')) : (s.date || '');
+  const hasOverride = isDue && !!s.dueDate;
+  let ov = document.getElementById('vaxdate-ov');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'vaxdate-ov'; ov.className = 'sheet-ov';
+  ov.innerHTML =
+    '<div class="sheet" role="dialog" aria-modal="true">'+
+      '<div class="sheet-handle"></div>'+
+      '<div class="sheet-title">'+(isDue?'Edit due date':'Edit date given')+'</div>'+
+      '<div class="vaxd-name">'+escapeHtml(v.name)+'</div>'+
+      (isDue ? '<div class="vaxd-hint">The recommended date is '+(v.daysFromBirth!=null&&state.babyDOB?fmtVaxDateStr(new Date(new Date(state.babyDOB+'T00:00:00').getTime()+v.daysFromBirth*86400000)):'\u2014')+'. Change this only if your doctor\u2019s appointment falls on a different day.</div>'
+             : '<div class="vaxd-hint">Set the date this vaccine was actually given.</div>')+
+      '<div class="form-field"><label>'+(isDue?'Due date':'Date given')+'</label><input type="date" id="vaxd-input" value="'+currentVal+'"></div>'+
+      '<div class="sheet-btns">'+
+        (isDue && hasOverride ? '<button type="button" class="sheet-btn sheet-del" onclick="closeVaxDateEditor();confirmResetVaxDue('+i+')">Reset</button>' : '')+
+        (!isDue && s.date ? '<button type="button" class="sheet-btn sheet-del" onclick="closeVaxDateEditor();clearVaxDate('+i+')">Clear</button>' : '')+
+        '<button type="button" class="sheet-btn sheet-cancel" onclick="closeVaxDateEditor()">Cancel</button>'+
+        '<button type="button" class="sheet-btn sheet-save" onclick="_vaxDateSave('+i+',\''+kind+'\')">Save</button>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  ov.onclick = (e) => { if (e.target === ov) closeVaxDateEditor(); };
+  requestAnimationFrame(() => ov.classList.add('show'));
+};
+window.closeVaxDateEditor = function(){ const ov=document.getElementById('vaxdate-ov'); if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.remove(),200);} };
+window._vaxDateSave = function(i, kind) {
+  const val = document.getElementById('vaxd-input')?.value || '';
+  closeVaxDateEditor();
+  if (kind === 'due') setVaxDueDate(i, val);
+  else { if (!state.vaccines[i]) state.vaccines[i] = {}; state.vaccines[i].date = val; saveState('vaccines'); toast('Date given updated'); if (_currentPage === 'vaccines') navTo('vaccines'); else if (_currentPage === 'calendar') navTo('calendar'); }
+};
+function fmtVaxDateStr(d) { return d ? d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '\u2014'; }
+
+// Birth day, month-by-month "monthiversaries" through the first year, and yearly
+// birthdays after — generated automatically from babyDOB so they always appear on
+// the calendar without being logged by hand. These are historical/celebratory
+// markers, not tasks, so they're always shown as "done" (no swipe/dismiss needed)
+// and read-only (the birth date itself is edited via Settings, not here).
+function derivedLifeEvents() {
+  if (!state.babyDOB) return [];
+  const born = new Date(state.babyDOB + 'T00:00:00');
+  const name = babyName() || 'Baby';
+  const out = [];
+  out.push({ id:'life-birth', title:name+'\u2019s birth day', date:ymd(born), time:'', cat:'birth',
+             who:'baby', notes:'The day it all began \u2728', _derived:true, _lifeEvent:true, done:true });
+  // Monthiversaries for months 1–11 (12th month = 1st birthday, handled below).
+  // Quieter category on purpose — a monthly check-in, not a celebration.
+  for (let m = 1; m <= 11; m++) {
+    const d = new Date(born); d.setMonth(d.getMonth() + m);
+    out.push({ id:'life-month-'+m, title:name+' turns '+m+' month'+(m>1?'s':'')+' old', date:ymd(d), time:'', cat:'monthiversary',
+               who:'baby', notes:'', _derived:true, _lifeEvent:true, done:d < new Date() });
+  }
+  // Yearly birthdays — from 1st up through age 6, past or future, so the whole
+  // first year (and beyond) is browsable on the calendar. Its own festive category.
+  for (let y = 1; y <= 6; y++) {
+    const d = new Date(born); d.setFullYear(d.getFullYear() + y);
+    out.push({ id:'life-birthday-'+y, title:name+'\u2019s '+y+(y===1?'st':y===2?'nd':y===3?'rd':'th')+' birthday', date:ymd(d), time:'', cat:'birthday',
+               who:'baby', notes:'\ud83c\udf82', _derived:true, _lifeEvent:true, done:d < new Date() });
+  }
+  return out;
+}
+
+// Is TODAY a birthday or a first-year monthiversary? Drives the app-wide festive
+// mode. Birthday is the big one; monthiversary (year 1 only, per design) is a
+// deliberately subtler celebration — see the CSS split below (confetti + banner
+// treatment differ by level). Not a birthday/monthiversary on any other day, and
+// nothing at all once the celebration date has passed for the day (checked live,
+// not cached, so it turns off automatically at midnight on next render).
+function todaysCelebration() {
+  if (!state.babyDOB) return null;
+  const todayStr = ymd(new Date());
+  const life = derivedLifeEvents();
+  const bday = life.find(e => e.cat === 'birthday' && e.date === todayStr);
+  if (bday) {
+    const years = parseInt(bday.id.replace('life-birthday-','')) || 1;
+    return { level:'birthday', title:bday.title, years };
+  }
+  const month = life.find(e => e.cat === 'monthiversary' && e.date === todayStr);
+  if (month) {
+    const months = parseInt(month.id.replace('life-month-','')) || 1;
+    return { level:'monthiversary', title:month.title, months };
+  }
+  const birth = life.find(e => e.cat === 'birth' && e.date === todayStr);
+  if (birth) return { level:'birthday', title:birth.title, years:0, isBirthDay:true }; // the day itself — full celebration
+  return null;
+}
+
+// Shared banner markup for the celebration — used on both the Now page and the
+// Dashboard so the "it's a special day" feeling shows up wherever the user lands,
+// not just one screen. Single source so the two stay visually identical.
+// Subtitle copy that actually varies by age, not one template with a number
+// plugged in — a newborn's first birthday reads very differently from a
+// 5-year-old's, and month 1 is a different moment than month 9.
+function birthdaySubtitle(years, name) {
+  const n = name || 'little one';
+  if (years === 1) return 'A whole year of firsts \u2014 happy birthday, '+n+'.';
+  if (years === 2) return 'The toddler years are here. Happy birthday, '+n+'.';
+  if (years === 3) return 'Big kid energy, one year older. Happy birthday, '+n+'.';
+  if (years <= 5) return years+' years of stories, already. Happy birthday, '+n+'.';
+  return years+' years old today \u2014 happy birthday, '+n+'.';
+}
+function monthiversarySubtitle(months, name) {
+  const n = name || 'Baby';
+  const MSG = {
+    1: n+' has been in the world one whole month \u2014 look at that.',
+    2: 'Two months in, and already so much has changed.',
+    3: 'A quarter of a year with '+n+'. What a ride.',
+    4: 'Four months of getting to know each other.',
+    5: 'Five months \u2014 halfway to the first birthday.',
+    6: 'Half a year with '+n+'. Here\u2019s to the next half.',
+    7: 'Seven months of firsts, big and small.',
+    8: 'Eight months in \u2014 personality is really showing now.',
+    9: 'Nine months earthside \u2014 as long as the wait before.',
+    10: 'Ten months down, two to go until the big one.',
+    11: 'One more month until the 1st birthday. Almost there.',
+  };
+  return MSG[months] || 'Another month of firsts in the books \u2014 look how far you\u2019ve come.';
+}
+
+function celebrationBannerHTML() {
+  const cel = todaysCelebration();
+  if (!cel) return '';
+  if (cel.level === 'birthday') {
+    const isBirthDay = !!cel.isBirthDay;
+    const heading = isBirthDay ? (babyName()||'Baby')+' was born today \u2728'
+                  : cel.years===1 ? (babyName()||'Baby')+'\u2019s 1st birthday! \ud83c\udf82'
+                  : (babyName()||'Baby')+' turns '+cel.years+' today! \ud83c\udf82';
+    const sub = isBirthDay ? 'Happy birth day \u2014 the whole story started today.'
+              : birthdaySubtitle(cel.years, babyName());
+    return '<div class="now-celebrate now-celebrate-big" onclick="replayCelebrationBurst()">'+
+      '<div class="ncb-bunting"><span class="ncb-pennants">'+'<i></i>'.repeat(9)+'</span></div>'+
+      '<div class="now-celebrate-body">'+
+        '<div class="now-celebrate-sparkle">\ud83c\udf89</div>'+
+        '<div class="now-celebrate-main"><div class="now-celebrate-title">'+heading+'</div>'+
+          '<div class="now-celebrate-sub">'+sub+'</div></div>'+
+      '</div>'+
+    '</div>';
+  }
+  const monthLabel = cel.months+' Month'+(cel.months>1?'s':'');
+  return '<div class="now-celebrate now-celebrate-month" onclick="replayCelebrationBurst()">'+
+    '<div class="ncm-bunting"><span class="ncm-pennants">'+'<i></i>'.repeat(7)+'</span></div>'+
+    '<div class="ncm-body">'+
+      '<div class="ncm-moon">\ud83c\udf19</div>'+
+      '<div class="ncm-main"><div class="ncm-title">Happy '+monthLabel+', '+(babyName()||'Baby')+'! \u2728</div>'+
+        '<div class="ncm-sub">'+monthiversarySubtitle(cel.months, babyName())+'</div></div>'+
+    '</div>'+
+  '</div>';
+}
+
 function derivedVaccineEvents() {
   if (!state.babyDOB || typeof VACCINES === 'undefined') return [];
-  const born = new Date(state.babyDOB + 'T00:00:00');
   const out = [];
   const all = [...VACCINES, ...(state.customVaccines||[])];
   all.forEach((v, i) => {
     const s = state.vaccines[i];
     if (s && s.given) return; // already done — don't clutter the calendar
-    let due = null;
-    if (v.daysFromBirth != null) due = new Date(born.getTime() + v.daysFromBirth*86400000);
-    else if (v.dueDate) due = new Date(v.dueDate + 'T00:00:00');
+    const due = vaxDueDate(v, i);
     if (!due) return;
+    const overridden = !!(s && s.dueDate);
     out.push({ id:'vax-'+i, title:v.name, date:ymd(due), time:'', cat:'vaccine',
-               who:'baby', notes:v.notes||'', _derived:true });
+               who:'baby', notes:v.notes||'', _derived:true, _vaxIdx:i, _vaxRescheduled:overridden });
   });
   return out;
 }
@@ -5012,7 +5623,7 @@ function derivedVaccineEvents() {
 // All events (manual + derived), optionally from a start date, sorted by date+time.
 function allCalEvents() {
   const manual = (state.calendarEvents||[]).map(e => ({...e}));
-  return manual.concat(derivedVaccineEvents())
+  return manual.concat(derivedVaccineEvents(), derivedLifeEvents())
     .sort((a,b) => (a.date+ (a.time||'')).localeCompare(b.date+(b.time||'')));
 }
 
@@ -5020,7 +5631,7 @@ function allCalEvents() {
 function upcomingCalEvents(n) {
   const today = ymd(new Date());
   return allCalEvents()
-    .filter(e => e.date >= today && !e.done)
+    .filter(e => e.date >= today && !e.done && !e._lifeEvent)
     .slice(0, n || 3);
 }
 
@@ -5074,6 +5685,85 @@ window.goStopFeedTimer = function() {
     if (window.stopFeedTimer) window.stopFeedTimer();
   }
 };
+// Tapping the banner ITSELF (not the Stop button) just takes you to the Feeding
+// page to see the running timer — it must NOT stop it. Only the explicit Stop
+// button stops the timer. These were previously the same function, which meant
+// glancing at the timer accidentally ended it.
+window.goViewFeedTimer = function() {
+  navTo('feeding');
+};
+
+// Start a feed timer directly from the Now page's quick-log form, without needing
+// to visit the Feeding page first. Defined globally (mirrors the guard logic in
+// the feeding-page startFeedTimer) so "Start timer instead" always works.
+window.nowStartTimerFromForm = function(side) {
+  const cur = state.activeFeedTimer;
+  if (cur && cur.running) {
+    toast('Timer already running \u2014 it may be on your partner\u2019s phone.');
+    window._nowOpen = ''; window._nowFeedType = '';
+    const el = document.getElementById('page-now'); if (el && PAGES.now) PAGES.now(el);
+    return;
+  }
+  state.activeFeedTimer = { running:true, start:Date.now(), side };
+  saveState('activeFeedTimer');
+  window._nowOpen = ''; window._nowFeedType = '';
+  const el = document.getElementById('page-now'); if (el && PAGES.now) PAGES.now(el);
+  if (navigator.vibrate) navigator.vibrate(15);
+  toastSuccess((side==='left'?'\ud83d\udc99 Left':'\ud83d\udc97 Right')+' timer started');
+};
+
+// Tapping a manual (non-vaccine) calendar event opens this small menu instead of
+// jumping straight to editing — shows the details expanded, then lets the user
+// choose to edit, mark done/undone, or delete. Mirrors openVaxCalActions.
+window.openCalEventActions = function(id) {
+  const ev = (state.calendarEvents||[]).find(e => e.id === id);
+  if (!ev) return;
+  const cc = calCat(ev.cat);
+  const dObj = new Date(ev.date+'T00:00:00');
+  let ov = document.getElementById('calact-ov');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'calact-ov'; ov.className = 'sheet-ov';
+  ov.innerHTML =
+    '<div class="sheet" role="dialog" aria-modal="true">'+
+      '<div class="sheet-handle"></div>'+
+      '<div class="calact-head">'+
+        '<span class="vaxact-ico" style="background:'+cc.bg+';color:'+cc.deep+';width:44px;height:44px;font-size:20px">'+cc.emoji+'</span>'+
+        '<div class="calact-head-main">'+
+          '<div class="sheet-title" style="margin-bottom:2px">'+escapeHtml(ev.title)+'</div>'+
+          '<div class="calact-head-sub">'+dObj.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+(ev.time?' \u00b7 '+ev.time:'')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="calact-details">'+
+        '<span class="cal-row-pill" style="background:'+cc.bg+' !important;color:'+cc.deep+' !important">'+cc.emoji+' '+cc.label+'</span>'+
+        (ev.who==='mom'?'<span class="cal-row-pill" style="background:#FBE3EA !important;color:#B04467 !important">For mom</span>':ev.who==='family'?'<span class="cal-row-pill" style="background:#EEF0F3 !important;color:#4A5160 !important">Family</span>':'')+
+        (ev.done?'<span class="cal-row-pill" style="background:#E1F5EE !important;color:#0F6E56 !important">\u2713 Done</span>':'')+
+        (ev.notes?'<div class="calact-notes">'+escapeHtml(ev.notes)+'</div>':'')+
+      '</div>'+
+      '<div class="vaxact-list">'+
+        '<button class="vaxact-row" onclick="closeCalEventActions();openCalEventSheet(\''+id+'\')">'+
+          '<span class="vaxact-ico" style="background:#E6F1FB;color:#12508C">\u270f\ufe0f</span>'+
+          '<span class="vaxact-main"><span class="vaxact-title">Edit details</span><span class="vaxact-sub">Change the title, date, time, or notes</span></span>'+
+          '<span class="vaxact-chev">\u203a</span>'+
+        '</button>'+
+        '<button class="vaxact-row" onclick="closeCalEventActions();toggleCalDone(\''+id+'\')">'+
+          '<span class="vaxact-ico" style="background:#E1F5EE;color:#0F6E56">'+(ev.done?'\u21ba':'\u2713')+'</span>'+
+          '<span class="vaxact-main"><span class="vaxact-title">'+(ev.done?'Mark as not done':'Mark as done')+'</span><span class="vaxact-sub">'+(ev.done?'Move it back to upcoming':'File it under Done & past')+'</span></span>'+
+          '<span class="vaxact-chev">\u203a</span>'+
+        '</button>'+
+        '<button class="vaxact-row" onclick="closeCalEventActions();_calDeleteFromSheet(\''+id+'\')">'+
+          '<span class="vaxact-ico" style="background:#FBEAE7;color:#C4362B">\ud83d\uddd1\ufe0f</span>'+
+          '<span class="vaxact-main"><span class="vaxact-title">Delete</span><span class="vaxact-sub">Remove this event permanently</span></span>'+
+          '<span class="vaxact-chev">\u203a</span>'+
+        '</button>'+
+      '</div>'+
+      '<div class="sheet-btns"><button type="button" class="sheet-btn sheet-cancel" onclick="closeCalEventActions()">Close</button></div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  ov.onclick = (e) => { if (e.target === ov) closeCalEventActions(); };
+  requestAnimationFrame(() => ov.classList.add('show'));
+};
+window.closeCalEventActions = function(){ const ov=document.getElementById('calact-ov'); if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.remove(),200);} };
 
 window.toggleCalDone = function(id) {
   const e = (state.calendarEvents||[]).find(x => x.id === id);
@@ -5095,7 +5785,7 @@ window.openCalEventSheet = function(id, presetDate) {
   if (ov) ov.remove();
   ov = document.createElement('div');
   ov.id = 'cal-sheet-ov'; ov.className = 'sheet-ov';
-  const catChips = Object.keys(CAL_CATS).map(k => {
+  const catChips = CAL_CATS_SELECTABLE.map(k => {
     const c = CAL_CATS[k];
     return '<button type="button" class="cal-chip'+(ev.cat===k?' on':'')+'" data-cat="'+k+'" onclick="_calPickCat(this)" style="--cc:'+c.deep+';--cb:'+c.bg+'">'+c.emoji+' '+c.label+'</button>';
   }).join('');
@@ -5254,6 +5944,8 @@ PAGES['now'] = function(el) {
         ${(() => { if (isNightContext) return ''; const s=streakMessage(loggingStreak()); return s ? '<div class="now-streak">'+s.emoji+' '+s.text+'</div>' : ''; })()}
       </div>
 
+      ${celebrationBannerHTML()}
+
       ${isMulti() && currentBabyIdx==='both' ? bothSummaryHTML() + bothDetailHTML() : ''}
 
       <div class="single-baby-block">
@@ -5271,9 +5963,10 @@ PAGES['now'] = function(el) {
         if (!dueToday.length) return '';
         return dueToday.map(e => {
           const c = calCat(e.cat);
-          const tap = e._derived ? "navTo('vaccines')" : "openCalEventSheet('"+e.id+"')";
-          // Derived vaccine events are read-only; manual events get a swipe-left-to-
-          // dismiss affordance (temporary snooze) so a busy day doesn't push Last feed down.
+          const tap = e._derived ? "openVaxCalActions("+e._vaxIdx+")" : "openCalEventActions('"+e.id+"')";
+          // Derived vaccine events open the date editor directly (no page redirect);
+          // manual events get a swipe-left-to-dismiss affordance (temporary snooze)
+          // so a busy day doesn't push Last feed down.
           const swipeable = !e._derived;
           return '<div class="now-due-wrap"'+(swipeable?' data-ceid="'+e.id+'"':'')+'>'+
             (swipeable ? '<div class="now-due-action now-due-action-done"><span>\u2713 Done</span></div>'+
@@ -5299,7 +5992,7 @@ PAGES['now'] = function(el) {
           const mm = String(Math.floor(elapsed/60)).padStart(2,'0'), ss = String(elapsed%60).padStart(2,'0');
           const sinceStr = new Date(t.start).toTimeString().slice(0,5);
           const sideLbl = t.side==='left'?'\ud83d\udc99 left':t.side==='right'?'\ud83d\udc97 right':'';
-          return '<div class="now-feeding-live" onclick="goStopFeedTimer()">'+
+          return '<div class="now-feeding-live" onclick="goViewFeedTimer()">'+
             '<div class="nfl-pulse"></div>'+
             '<div class="nfl-main"><span class="nfl-label">Feeding in progress'+(sideLbl?' \u00b7 '+sideLbl:'')+'</span>'+
               '<span class="nfl-time" id="now-live-timer">'+mm+':'+ss+'</span>'+
@@ -5344,6 +6037,7 @@ PAGES['now'] = function(el) {
             <input type="number" id="nf-amt" inputmode="numeric" placeholder="0">
           </div>
           <button class="now-save" onclick="nowSaveFeed()">Save feed</button>
+          ${(window._nowFeedType==='left'||window._nowFeedType==='right')?`<button class="now-save-alt" onclick="nowStartTimerFromForm('${window._nowFeedType}')">\u25b6 Start timer instead</button>`:''}
         </div>` : ''}
       </div>
 
@@ -5458,7 +6152,7 @@ PAGES['now'] = function(el) {
         const up = upcomingCalEvents(3);
         const rows = up.map(e => {
           const c = calCat(e.cat);
-          return '<button class="now-up-row" onclick="'+(e._derived?"navTo('calendar')":"openCalEventSheet('"+e.id+"')")+'">'+
+          return '<button class="now-up-row" onclick="'+(e._derived?"navTo('calendar')":"openCalEventActions('"+e.id+"')")+'">'+
             '<span class="now-up-ico" style="background:'+c.bg+';color:'+c.color+'">'+c.emoji+'</span>'+
             '<span class="now-up-main"><span class="now-up-title">'+escapeHtml(e.title)+'</span>'+
             '<span class="now-up-sub">'+relDayLabel(e.date)+(e.time?' \u00b7 '+e.time:'')+(e.who==='mom'?' \u00b7 mom':'')+'</span></span>'+
@@ -5607,6 +6301,24 @@ function nowSetFeed(type) {
   document.querySelectorAll('.now-ftype').forEach(b=>b.classList.remove('on'));
   const btn = [...document.querySelectorAll('.now-ftype')].find(b=>b.textContent.toLowerCase().includes(type==='left'?'left':type==='right'?'right':type));
   if (btn) btn.classList.add('on');
+  // "Start timer instead" only makes sense for a live breastfeeding side, not a
+  // one-shot amount entry (formula/stored) — add/remove it to match, without a
+  // full page re-render (which would cost focus on any field mid-edit).
+  const saveBtn = document.querySelector('.now-save');
+  let altBtn = document.querySelector('.now-save-alt');
+  if ((type==='left'||type==='right')) {
+    if (!altBtn && saveBtn) {
+      altBtn = document.createElement('button');
+      altBtn.className = 'now-save-alt';
+      altBtn.textContent = '\u25b6 Start timer instead';
+      altBtn.onclick = () => nowStartTimerFromForm(type);
+      saveBtn.insertAdjacentElement('afterend', altBtn);
+    } else if (altBtn) {
+      altBtn.onclick = () => nowStartTimerFromForm(type);
+    }
+  } else if (altBtn) {
+    altBtn.remove();
+  }
   if (!wrap) return;
   if (type==='left'||type==='right') { wrap.style.display='none'; nowUpdateDuration(); }
   else if (type==='stored') { wrap.style.display='block'; lbl.textContent='Stored milk (ml)'; amt.placeholder='e.g. 60'; if(amt) amt.focus(); }
@@ -5886,6 +6598,8 @@ PAGES['dashboard'] = function(el) {
       <h2>${hasBaby&&babyFullName()?babyEmoji()+' '+babyFullPossessive()+' Dashboard':'🍼 Baby OS'}</h2>
       <p>${hasBaby?babyRef()+' is '+babyAgeLbl()+' · Born '+formatDate(state.babyDOB):'EDD: '+formatDate(getEDD())+' · Jakarta · Indonesian–English'}</p>
     </div>
+
+    ${hasBaby ? celebrationBannerHTML() : ''}
 
     ${hasBaby ? `
     <div class="card" style="background:linear-gradient(135deg,#FFF9EC,#FFFCE8);border:0.5px solid #F0E0B8;margin-bottom:12px;text-align:center;padding:16px">
@@ -7392,8 +8106,8 @@ PAGES['feeding'] = function(el) {
           <div style="flex:1;min-width:0"><label class="ff-lbl">Date</label><input type="date" id="f-date" max="${today()}" value="${today()}"></div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:6px">
-          <div style="flex:1;min-width:0"><label class="ff-lbl">Start time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" oninput="window._pendingTimedFeed=null;updateFeedDuration()"></div>
-          <div style="flex:1;min-width:0"><label class="ff-lbl">End time</label><input type="time" id="f-endtime" oninput="window._pendingTimedFeed=null;updateFeedDuration()"></div>
+          <div style="flex:1;min-width:0"><label class="ff-lbl">Start time</label><input type="time" id="f-time" value="${new Date().toTimeString().slice(0,5)}" oninput="if(!window._restoringTimedFeed){window._pendingTimedFeed=null;} updateFeedDuration()"></div>
+          <div style="flex:1;min-width:0"><label class="ff-lbl">End time</label><input type="time" id="f-endtime" oninput="if(!window._restoringTimedFeed){window._pendingTimedFeed=null;} updateFeedDuration()"></div>
         </div>
         <div id="feed-dur-display" style="font-size:12px;color:#2D8F8F;font-weight:600;margin-bottom:14px;min-height:16px;text-align:center"></div>
 
@@ -7448,13 +8162,18 @@ PAGES['feeding'] = function(el) {
     requestAnimationFrame(() => {
       if (window.renderFeedTimer) window.renderFeedTimer();
       // Restore a stopped-timer's timed values if the user hasn't saved yet, so a
-      // background sync re-render can't reset Start time to "now".
+      // background sync re-render can't reset Start time to "now". The guard flag
+      // stops the field's own oninput handler from mistaking THIS programmatic write
+      // for a user edit and clearing the pending values right back out again — that
+      // was the actual cause of times "appearing then disappearing" on some devices.
       const ptf = window._pendingTimedFeed;
       if (ptf) {
+        window._restoringTimedFeed = true;
         const ds = document.getElementById('f-time'); if (ds) ds.value = ptf.start;
         const de = document.getElementById('f-endtime'); if (de) de.value = ptf.end;
         if (ptf.side && window.selectFeedType) selectFeedType(ptf.side);
         if (window.updateFeedDuration) updateFeedDuration();
+        window._restoringTimedFeed = false;
       }
       const cd = getChartData(chartView, chartMetric);
       drawBar('feed-chart', cd.labels, cd.datasets, cd.yLabel);
@@ -9068,7 +9787,7 @@ PAGES['calendar'] = function(el) {
   function render() {
     const who = window._calWho;
     const today = ymd(new Date());
-    let events = allCalEvents().filter(e => e.date >= today && !e.done);
+    let events = allCalEvents().filter(e => e.date >= today && !e.done && !e._lifeEvent);
     // Filter by who: baby events (who==='baby' or a derived vaccine), mom, or all.
     if (who === 'baby') events = events.filter(e => (e.who||'baby') === 'baby');
     else if (who === 'mom') events = events.filter(e => e.who === 'mom');
@@ -9088,7 +9807,7 @@ PAGES['calendar'] = function(el) {
       const dObj = new Date(date+'T00:00:00');
       const rows = byDate[date].map(e => {
         const cc = calCat(e.cat);
-        const tap = e._derived ? "navTo('vaccines')" : "openCalEventSheet('"+e.id+"')";
+        const tap = e._derived ? "openVaxCalActions("+e._vaxIdx+")" : "openCalEventActions('"+e.id+"')";
         return '<div class="cal-row'+(e.done?' cal-row-done':'')+'">'+
           (e._derived ? '<span class="cal-row-check cal-row-check-lock">\ud83d\udc89</span>'
                       : '<button class="cal-row-check'+(e.done?' on':'')+'" onclick="toggleCalDone(\''+e.id+'\')" aria-label="Mark done"></button>')+
@@ -9126,7 +9845,7 @@ PAGES['calendar'] = function(el) {
 
     // Done & past: completed events, plus past-dated ones that weren't marked done.
     // Kept viewable (and restorable) so nothing is ever lost by tapping "done".
-    let pastDone = allCalEvents().filter(e => (e.done || e.date < today) && !e._derived);
+    let pastDone = allCalEvents().filter(e => (e.done || e.date < today) && !e._derived && !e._lifeEvent);
     if (who === 'baby') pastDone = pastDone.filter(e => (e.who||'baby') === 'baby');
     else if (who === 'mom') pastDone = pastDone.filter(e => e.who === 'mom');
     if (window._calCat && window._calCat !== 'all') pastDone = pastDone.filter(e => e.cat === window._calCat);
@@ -9152,13 +9871,116 @@ PAGES['calendar'] = function(el) {
         (open ? '<div class="cal-past-list">'+rows+'<div class="cal-past-hint">Tap the circle to restore \u00b7 tap the event to view or delete</div></div>' : '');
     }
 
+    // ── Browsable month grid (bottom of page) ──────────────────────────────
+    // Shows the FULL history, not just upcoming: birth day, monthiversaries,
+    // birthdays, vaccines, and anything logged — past or future, any month.
+    if (!window._calGridMonth) {
+      const n = new Date();
+      window._calGridMonth = new Date(n.getFullYear(), n.getMonth(), 1);
+    }
+    const gridAll = allCalEvents(); // includes life events + vaccines + manual, unfiltered by who/cat/date
+    const byDateAll = {};
+    gridAll.forEach(e => { (byDateAll[e.date] = byDateAll[e.date]||[]).push(e); });
+    const gm = window._calGridMonth;
+    const gYear = gm.getFullYear(), gMonth = gm.getMonth();
+    const gLabel = gm.toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+    const firstDow = (new Date(gYear, gMonth, 1).getDay() + 6) % 7; // Mon=0
+    const daysInMonth = new Date(gYear, gMonth+1, 0).getDate();
+    const dows = ['M','T','W','T','F','S','S'];
+    const dowRow = dows.map(d => '<div class="cal-dow">'+d+'</div>').join('');
+    const totalCells = Math.ceil((firstDow + daysInMonth) / 7) * 7;
+    const todayStr = today;
+    let cells = '';
+    for (let i = 0; i < totalCells; i++) {
+      const dayNum = i - firstDow + 1;
+      const inMonth = dayNum >= 1 && dayNum <= daysInMonth;
+      const dObj = new Date(gYear, gMonth, dayNum);
+      const ds = ymd(dObj);
+      const dayEvents = inMonth ? (byDateAll[ds] || []) : [];
+      const isToday = ds === todayStr;
+      // Pick the most "significant" event to represent the day with one icon:
+      // birth/birthday > vaccine > everything else > (multiple = show a count).
+      let icon = '', extra = 0;
+      if (dayEvents.length) {
+        const priority = ['birth','birthday','vaccine','appointment','milestone','playdate','reminder','mom','monthiversary','other'];
+        const sorted = dayEvents.slice().sort((a,b)=>priority.indexOf(a.cat)-priority.indexOf(b.cat));
+        icon = calCat(sorted[0].cat).emoji;
+        extra = dayEvents.length - 1;
+      }
+      // Birth day and birthdays get a premium gold border — the two "big" life
+      // markers. Monthiversaries stay visually quiet on purpose (see cal cats).
+      const isSpecialDay = dayEvents.some(e => e.cat === 'birth' || e.cat === 'birthday');
+      cells += '<button class="cal-cell'+(inMonth?'':' cal-cell-out')+(isToday?' cal-cell-today':'')+(dayEvents.length?' cal-cell-has':'')+(isSpecialDay?' cal-cell-gold':'')+'" '+
+        (inMonth && dayEvents.length ? 'onclick="_calOpenDay(\''+ds+'\')"' : (inMonth ? 'onclick="openCalEventSheet(null,\''+ds+'\')"' : '')) + '>'+
+        '<span class="cal-cell-num">'+(inMonth?dayNum:'')+'</span>'+
+        (icon?'<span class="cal-cell-ico">'+icon+(extra>0?'<span class="cal-cell-extra">+'+extra+'</span>':'')+'</span>':'')+
+      '</button>';
+    }
+    const gridHTML =
+      '<div class="cal-grid-sec">'+
+        '<div class="cal-grid-head">'+
+          '<span>Browse the full calendar</span>'+
+          (state.babyDOB?'<button class="cal-grid-jump" onclick="_calJumpToBirth()">Jump to birth \u2728</button>':'')+
+        '</div>'+
+        '<div class="cal-cal">'+
+          '<div class="cal-monthbar">'+
+            '<button class="cal-navbtn" onclick="_calGridShift(-1)" aria-label="Previous month">\u2039</button>'+
+            '<button class="cal-monthlabel" onclick="_calGridToday()">'+gLabel+'</button>'+
+            '<button class="cal-navbtn" onclick="_calGridShift(1)" aria-label="Next month">\u203a</button>'+
+          '</div>'+
+          '<div class="cal-grid cal-grid-dow">'+dowRow+'</div>'+
+          '<div class="cal-grid cal-grid-days">'+cells+'</div>'+
+        '</div>'+
+      '</div>';
+
     el.innerHTML =
       '<div class="page-header"><h2>\ud83d\uddd3\ufe0f Calendar</h2><p>What\u2019s coming up next</p></div>'+
       whoSeg + catChips +
       '<div class="cal-agenda">'+body+'</div>'+
       (pastHTML ? '<div class="cal-past-sec">'+pastHTML+'</div>' : '')+
-      '<button class="cal-fab" onclick="openCalEventSheet()" aria-label="Add event">+</button>';
+      gridHTML;
+    // Render the add-event FAB into the stable floating layer (a direct sibling of
+    // .page, outside its transform) so it genuinely floats over the viewport at
+    // all scroll positions, instead of anchoring to wherever the page content ends.
+    const fabLayer = document.getElementById('page-fab-layer');
+    if (fabLayer) fabLayer.innerHTML = '<button class="cal-fab" onclick="openCalEventSheet()" aria-label="Add event">+</button>';
   }
+  window._calGridShift = (d) => { window._calGridMonth = new Date(window._calGridMonth.getFullYear(), window._calGridMonth.getMonth()+d, 1); render(); };
+  window._calGridToday = () => { const n=new Date(); window._calGridMonth = new Date(n.getFullYear(), n.getMonth(), 1); render(); };
+  window._calJumpToBirth = () => { if (!state.babyDOB) return; const b=new Date(state.babyDOB+'T00:00:00'); window._calGridMonth = new Date(b.getFullYear(), b.getMonth(), 1); render(); };
+  window._calOpenDay = (ds) => {
+    const all = allCalEvents().filter(e => e.date === ds);
+    if (!all.length) return;
+    let ov = document.getElementById('cal-day-ov');
+    if (ov) ov.remove();
+    ov = document.createElement('div');
+    ov.id = 'cal-day-ov'; ov.className = 'sheet-ov';
+    const dObj = new Date(ds+'T00:00:00');
+    const rows = all.map(e => {
+      const cc = calCat(e.cat);
+      const tap = e._derived ? "closeCalDaySheet();openVaxCalActions("+e._vaxIdx+")"
+                : e._lifeEvent ? "" : "closeCalDaySheet();openCalEventActions('"+e.id+"')";
+      return '<'+(tap?'button':'div')+' class="cal-row'+(e.done?' cal-row-done':'')+'"'+(tap?' onclick="'+tap+'"':'')+' style="width:100%;text-align:left;border:0.5px solid rgba(0,0,0,.05);background:#fff;cursor:'+(tap?'pointer':'default')+'">'+
+        '<span class="vaxact-ico" style="background:'+cc.bg+';color:'+cc.deep+';width:32px;height:32px;font-size:15px">'+cc.emoji+'</span>'+
+        '<span class="cal-row-main" style="pointer-events:none"><span class="cal-row-title">'+escapeHtml(e.title)+'</span>'+
+          '<span class="cal-row-meta"><span class="cal-row-pill" style="background:'+cc.bg+' !important;color:'+cc.deep+' !important">'+cc.label+'</span>'+(e.time?' '+e.time:'')+'</span></span>'+
+      '</'+(tap?'button':'div')+'>';
+    }).join('');
+    ov.innerHTML =
+      '<div class="sheet" role="dialog" aria-modal="true">'+
+        '<div class="sheet-handle"></div>'+
+        '<div class="sheet-title">'+dObj.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</div>'+
+        '<div class="vaxact-list">'+rows+'</div>'+
+        '<div class="sheet-btns">'+
+          '<button type="button" class="sheet-btn sheet-cancel" onclick="closeCalDaySheet()">Close</button>'+
+          '<button type="button" class="sheet-btn sheet-save" onclick="closeCalDaySheet();openCalEventSheet(null,\''+ds+'\')">+ Add to this day</button>'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(ov);
+    ov.onclick = (e) => { if (e.target === ov) closeCalDaySheet(); };
+    requestAnimationFrame(() => ov.classList.add('show'));
+  };
+  window.closeCalDaySheet = () => { const ov=document.getElementById('cal-day-ov'); if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.remove(),200);} };
   window._calSetWho = (w) => { window._calWho = w; window._calCat = 'all'; window._calExpanded = false; render(); };
   window._calSetCat = (cat) => { window._calCat = cat; window._calExpanded = false; render(); };
   window._calToggleExpand = () => { window._calExpanded = !window._calExpanded; render(); };
@@ -9188,7 +10010,7 @@ PAGES['vaccines'] = function(el) {
     // Find the next upcoming (not given, not overdue) and count overdue, for the ring's caption
     const withDue = allVax.map((v,i)=>{
       const s=state.vaccines[i]||{};
-      const dueDate=v.daysFromBirth!=null&&state.babyDOB?new Date(new Date(state.babyDOB).getTime()+v.daysFromBirth*86400000):v.dueDate?new Date(v.dueDate):null;
+      const dueDate=vaxDueDate(v,i);
       return {v,i,s,dueDate,overdue:!s.given&&dueDate&&dueDate<new Date()};
     });
     const overdueCount = withDue.filter(x=>x.overdue).length;
@@ -9212,7 +10034,8 @@ PAGES['vaccines'] = function(el) {
     allVax.forEach((v,i)=>{
       const s=state.vaccines[i]||{};
       const isCustom=i>=VACCINES.length;
-      const dueDate=v.daysFromBirth!=null&&state.babyDOB?new Date(new Date(state.babyDOB).getTime()+v.daysFromBirth*86400000):v.dueDate?new Date(v.dueDate):null;
+      const dueDate=vaxDueDate(v,i);
+      const isRescheduled=!!s.dueDate;
       const overdue=!s.given&&dueDate&&dueDate<new Date();
       html+=`<div class="vax-card ${s.given?'given':''} ${overdue?'overdue':''}">
         <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
@@ -9223,17 +10046,29 @@ PAGES['vaccines'] = function(el) {
             </div>
             <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
               <span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E6F1FB;color:#185FA5">${v.age}</span>
-              ${dueDate?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:${overdue?'#FCEBEB':'#f0f0f0'} !important;color:${overdue?'#C0392B':'#555'} !important">${overdue?'⚠ Overdue · ':'Due: '}${fmtVaxDate(dueDate)}</span>`:''}
+              ${dueDate?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:${overdue?'#FCEBEB':isRescheduled?'#EEEDFE':'#f0f0f0'} !important;color:${overdue?'#C0392B':isRescheduled?'#6544B0':'#555'} !important">${overdue?'⚠ Overdue · ':isRescheduled?'📅 Rescheduled · ':'Due: '}${fmtVaxDate(dueDate)}</span>`:''}
               ${s.given?`<span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;background:#E1F5EE;color:#0F6E56">✓ Given ${s.date?'· '+formatDate(s.date):''}</span>`:''}
             </div>
             ${v.notes?`<div style="font-size:11px;color:#767680;margin-top:4px;line-height:1.4">${v.notes}</div>`:''}
           </div>
           ${isCustom?`<button onclick="delCustomVax(${i})" class="del-btn" style="flex-shrink:0">✕</button>`:''}
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <label style="font-size:11px;font-weight:600;color:#767680;white-space:nowrap">Date given:</label>
-          <input type="date" value="${s.date||''}" onchange="setVaxDate(${i},this.value)" style="flex:1;font-size:13px;padding:7px 10px">
-          ${s.date?`<button onclick="clearVaxDate(${i})" style="background:#FCEBEB;border:1px solid #f0c0c0;color:#C0392B;font-size:11px;padding:6px 9px;border-radius:6px;cursor:pointer;white-space:nowrap;flex-shrink:0">Clear</button>`:''}
+        <div class="vax-datebox vax-datebox-due">
+          <div class="vax-datebox-head">
+            <span class="vax-datebox-lbl">📅 Due date</span>
+            ${isRescheduled?`<button class="vax-datebox-reset" onclick="event.stopPropagation();confirmResetVaxDue(${i})">Reset to recommended</button>`:''}
+          </div>
+          <button class="vax-datebox-val" onclick="openVaxDateEditor(${i},'due')">
+            <span>${dueDate ? fmtVaxDate(dueDate) : 'Not set'}</span>
+            <span class="vax-datebox-edit">Edit</span>
+          </button>
+        </div>
+        <div class="vax-datebox vax-datebox-given">
+          <div class="vax-datebox-head"><span class="vax-datebox-lbl">✓ Date given</span></div>
+          <button class="vax-datebox-val" onclick="openVaxDateEditor(${i},'given')">
+            <span>${s.date ? formatDate(s.date) : 'Not given yet'}</span>
+            <span class="vax-datebox-edit">Edit</span>
+          </button>
         </div>
       </div>`;
     });
