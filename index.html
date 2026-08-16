@@ -102,6 +102,62 @@ html{scroll-behavior:smooth;}
 .celebrate-frame-month{box-shadow:inset 0 0 0 1.5px rgba(122,90,10,.55),inset 0 0 16px rgba(201,154,59,.12);}
 body.night-mode .celebrate-frame-birthday{box-shadow:inset 0 0 0 2px #E0C68A,inset 0 0 0 5px rgba(212,115,154,.3),inset 0 0 26px rgba(224,198,138,.18);}
 body.night-mode .celebrate-frame-month{box-shadow:inset 0 0 0 1.5px rgba(224,198,138,.5),inset 0 0 16px rgba(224,198,138,.12);}
+/* ── Achievement unlock banner (Now/Dashboard) ── */
+.ach-unlock{position:relative;display:flex;align-items:center;gap:12px;padding:14px 38px 14px 14px;border-radius:16px;margin:14px 0;cursor:pointer;background:linear-gradient(135deg,var(--tb),#fff 75%);border:1.5px solid var(--tc);box-shadow:0 8px 20px -8px var(--tg);}
+.ach-unlock:active{transform:scale(.99);}
+.ach-unlock-trophy{font-size:32px;flex-shrink:0;filter:drop-shadow(0 2px 4px var(--tg));}
+.ach-unlock-main{flex:1;min-width:0;}
+.ach-unlock-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--td);}
+.ach-unlock-title{font-family:var(--font-display);font-size:15.5px;font-weight:750;color:var(--td);line-height:1.3;margin-top:1px;}
+.ach-unlock-sub{font-size:11.5px;color:var(--td);opacity:.8;margin-top:2px;}
+.ach-unlock-x{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,.06);color:var(--td);font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.ach-unlock-x:active{background:rgba(0,0,0,.12);}
+body.night-mode .ach-unlock{background:linear-gradient(135deg,#262635,#1d1d2c 75%);}
+body.night-mode .ach-unlock-tag,body.night-mode .ach-unlock-title,body.night-mode .ach-unlock-sub{color:var(--tc) !important;}
+body.night-mode .ach-unlock-x{background:rgba(255,255,255,.1);color:var(--tc) !important;}
+/* ── Achievements page ── */
+.ach-main-card{background:linear-gradient(135deg,#2D8F8F,#1F7373);border-radius:16px;padding:18px;text-align:center;margin-bottom:10px;box-shadow:0 8px 20px -10px rgba(45,143,143,.5);}
+.ach-main-num{display:block;font-family:var(--font-display);font-size:34px;font-weight:800;color:#fff;line-height:1.1;}
+.ach-main-lbl{display:block;font-size:12px;color:rgba(255,255,255,.85);margin-top:4px;font-weight:600;}
+.ach-tier-summary{display:flex;gap:8px;margin-bottom:16px;}
+.ach-tier-summary-card{flex:1;background:var(--tb);border:1px solid var(--tc);border-radius:12px;padding:10px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.ach-tier-summary-trophy{font-size:15px;filter:grayscale(0);}
+.ach-tier-summary-num{font-family:var(--font-display);font-size:19px;font-weight:800;color:var(--td);line-height:1.1;}
+.ach-tier-summary-lbl{font-size:10px;font-weight:700;color:var(--td);opacity:.85;text-transform:uppercase;letter-spacing:.03em;}
+body.night-mode .ach-tier-summary-card{background:#262635;border-color:var(--tc);}
+body.night-mode .ach-tier-summary-num.ach-tier-summary-num,body.night-mode .ach-tier-summary-lbl.ach-tier-summary-lbl{color:var(--tc) !important;}
+.ach-list{display:flex;flex-direction:column;gap:9px;}
+.ach-card{background:#fff;border-radius:15px;border:0.5px solid rgba(0,0,0,.06);box-shadow:0 2px 8px -5px rgba(0,0,0,.1);overflow:hidden;transition:box-shadow .15s;}
+.ach-card.locked{opacity:.55;}
+.ach-card:not(.locked){border-color:var(--tc,rgba(0,0,0,.06));}
+body.night-mode .ach-card{background:#1d1d2c;border-color:rgba(255,255,255,.07);}
+.ach-card-head{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;background:none;border:none;cursor:pointer;text-align:left;font-family:var(--font);}
+.ach-card-icon{position:relative;font-size:26px;flex-shrink:0;width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:var(--tb,#F2EFE7);border-radius:12px;}
+.ach-card.locked .ach-card-icon{background:#F2EFE7;filter:grayscale(1) opacity(.55);}
+.ach-lock-overlay{position:absolute;bottom:-3px;right:-3px;background:#fff;border-radius:50%;font-size:11px;padding:2px;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+body.night-mode .ach-card.locked .ach-card-icon{background:#262635;}
+body.night-mode .ach-lock-overlay{background:#1d1d2c;}
+.ach-card-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+.ach-card-title{font-size:14.5px;font-weight:700;color:var(--ink);}
+body.night-mode .ach-card-title{color:#f0ede2;}
+.ach-card-bar-wrap{width:100%;height:6px;background:#F2EFE7;border-radius:999px;overflow:hidden;}
+body.night-mode .ach-card-bar-wrap{background:#2a2a3a;}
+.ach-card-bar{display:block;height:100%;border-radius:999px;transition:width .3s ease;}
+.ach-card-progress{font-size:11px;color:var(--ink-3);}
+.ach-card-badge{flex-shrink:0;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:750;color:var(--td) !important;background:var(--tb) !important;padding:6px 10px;border-radius:999px;white-space:nowrap;}
+body.night-mode .ach-card-badge.ach-card-badge{color:var(--td) !important;background:var(--tb) !important;}
+.ach-card-chev{flex-shrink:0;color:var(--ink-3);font-size:18px;}
+.ach-card-detail{padding:0 16px 15px 68px;}
+.ach-card-desc{font-size:12.5px;color:var(--ink-2);line-height:1.5;margin:0 0 10px;}
+body.night-mode .ach-card-desc{color:#c4bca8;}
+.ach-tier-row{display:flex;gap:7px;flex-wrap:wrap;}
+.ach-tier-chip{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:10px;background:#F2EFE7;color:#9a9488;font-size:11px;font-weight:650;}
+.ach-tier-chip.on{background:var(--tb);color:var(--td);}
+.ach-tier-trophy{font-size:12px;filter:grayscale(1);opacity:.5;}
+.ach-tier-chip.on .ach-tier-trophy{filter:none;opacity:1;}
+.ach-tier-count{opacity:.75;}
+body.night-mode .ach-tier-chip{background:#262635;color:#6b6b78;}
+body.night-mode .ach-tier-chip.on.on{color:var(--tc) !important;}
 .now-celebrate{border-radius:16px;margin:14px 0;cursor:default;}
 /* Slim celebration strip — appears at the top of every page EXCEPT Now/Dashboard
    (which have the full banner). Same birthday-vs-monthiversary tone distinction,
@@ -778,6 +834,7 @@ body.night-mode .settings-row-lbl{color:#f0ede2;}
 body.night-mode .settings-row-danger .settings-row-lbl{color:#e88a6a;}
 body.night-mode .settings-seg{background:rgba(255,255,255,.06);}
 body.night-mode .settings-seg-btn{color:#a5a08f;}
+body.night-mode .settings-seg-btn.on.on{color:#fff !important;}
 /* Milestones as a timeline, not a checklist */
 .mil-timeline{position:relative;margin:4px 0 2px;}
 .mil-timeline::before{content:'';position:absolute;left:9px;top:4px;bottom:4px;width:2px;border-radius:2px;background:linear-gradient(180deg,#D98E7A,#2D8F8F 45%,#2A2E55);opacity:.3;}
@@ -903,7 +960,7 @@ body.night-mode #ptr-ind{background:#1d1d2c;border-color:rgba(255,255,255,.12);c
 .now-tile.open:active{transform:none;}
 .now-tile-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .now-tile-body{flex:1;min-width:0;}
-.now-tile-label{font-size:11px;color:#9a9a9a;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;}
+.now-tile-label{font-size:11px;color:#767676;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;}
 .now-tile-val{font-size:17px;font-weight:700;color:#2A2A33;}
 .now-tile-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;}
 
@@ -969,7 +1026,7 @@ body.night-mode .now-up-add{background:#173d38;color:#7fd4c4;border-color:#2D8F8
 .cal-whoseg-btn.on{background:#fff;color:#1F6E6E;box-shadow:0 2px 6px -2px rgba(0,0,0,.15);}
 body.night-mode .cal-whoseg{background:#242435;}
 body.night-mode .cal-whoseg-btn{color:#c4bca8;}
-body.night-mode .cal-whoseg-btn.on{background:#2D8F8F;color:#fff;}
+body.night-mode .cal-whoseg-btn.on.on{background:#2D8F8F;color:#fff !important;}
 .cal-filters{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 12px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .cal-filters::-webkit-scrollbar{display:none;}
 .cal-fchip{flex:0 0 auto;background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all .15s;}
@@ -1008,7 +1065,7 @@ body.night-mode .cal-group-date{color:#a5a08f !important;}
 .cal-cell-out .cal-cell-num{color:transparent;}
 .cal-cell-out{pointer-events:none;}
 .cal-cell-today .cal-cell-num{color:#2D8F8F;font-weight:800;}
-.cal-cell-today{background:rgba(45,143,143,.08);}
+.cal-cell-today{box-shadow:inset 0 0 0 2px #2D8F8F;}
 /* Premium gold ring for the two "big" life markers — birth day and birthdays.
    A gradient border (not flat gold) reads as more considered/special, and a soft
    glow underneath lifts it further without being loud. Monthiversaries deliberately
@@ -1039,7 +1096,7 @@ body.night-mode .cal-cal{background:#1d1d2c;border-color:rgba(255,255,255,.06);}
 body.night-mode .cal-monthlabel,body.night-mode .cal-cell-num{color:#f0ede2;}
 body.night-mode .cal-navbtn{background:#2a2a3a;color:#c4bca8;}
 body.night-mode .cal-dow{color:#8a8578;}
-body.night-mode .cal-cell-today{background:rgba(92,209,200,.12);}
+body.night-mode .cal-cell-today{box-shadow:inset 0 0 0 2px #5cd1c8;}
 body.night-mode .cal-cell-today .cal-cell-num{color:#5cd1c8;}
 body.night-mode .cal-cell-sel{background:#2D8F8F;}
 body.night-mode .cal-cell-sel .cal-cell-num{color:#fff;}
@@ -1133,13 +1190,13 @@ body.night-mode .sheet-del{background:#3a1e1a;color:#e88a6a;}
 .now-today-grid{display:flex;align-items:center;justify-content:space-between;}
 .now-today-stat{text-align:center;flex:1;}
 .nts-val{font-family:var(--font-display);font-size:26px;font-weight:750;color:#2D8F8F;letter-spacing:-.5px;line-height:1;font-variant-numeric:oldstyle-nums;}
-.nts-lbl{font-size:11px;color:#9a9a9a;margin-top:4px;}
+.nts-lbl{font-size:11px;color:#767676;margin-top:4px;}
 .now-today-div{width:1px;height:32px;background:#f0f0f0;}
 
-.now-dash-btn{width:100%;background:transparent;border:none;color:#9a9a9a;font-size:15px;font-weight:600;font-family:var(--font);padding:8px;cursor:pointer;}
+.now-dash-btn{width:100%;background:transparent;border:none;color:#767676;font-size:15px;font-weight:600;font-family:var(--font);padding:8px;cursor:pointer;}
 .now-dash-btn:active{color:#2D8F8F;}
 
-.now-hero-pre{text-align:center;padding:32px 20px;background:linear-gradient(135deg,#FFF9EC,#FFFCE8);border-radius:22px;border:0.5px solid #F0E0B8;}
+.now-hero-pre{text-align:center;padding:32px 20px;background:linear-gradient(135deg,#FFF9EC,#FFFCE8) !important;border-radius:22px;border:0.5px solid #F0E0B8;}
 /* Now page inline forms */
 .now-tile-wrap{margin-bottom:10px;}
 .now-tile-wrap .now-tile{margin-bottom:0;}
@@ -1753,6 +1810,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('rhythm')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 14l3-4 3 3 4-6"/></svg></span> Insights</button>
   <button class="nav-item" onclick="navTo('notes')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-4-3-3 2-3-2-4 3Z"/><path d="M9 8h6M9 12h6"/></svg></span> Notes</button>
   <button class="nav-item" onclick="navTo('calendar')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/></svg></span> Calendar</button>
+  <button class="nav-item" onclick="navTo('achievements')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v4a4 4 0 0 1-8 0V4Z"/><path d="M6 5H4v2a3 3 0 0 0 3 3M18 5h2v2a3 3 0 0 1-3 3"/><path d="M9 15h6M10 12v3M14 12v3M8 20h8l-1-4H9l-1 4Z"/></svg></span> Achievements</button>
   <div id="phase-suggest"></div>
   <div id="drawer-prebirth">
   <div class="drawer-section drawer-section-toggle" id="prebirth-header" onclick="togglePrebirthSection()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePrebirthSection();}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
@@ -1795,7 +1853,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('settings')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span> Settings</button>
   <button class="nav-item" onclick="openNavCustomizer()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></span> Customise tabs</button>
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 13 Aug 2026, 19:17</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 15 Aug 2026, 19:36</div>
   <div style="height:20px"></div>
 </div>
 
@@ -2073,6 +2131,9 @@ function defaultState() {
   keyDates: [],           // [{id,label,date}]
   calendarEvents: [],     // [{id,title,date,time,cat,who,notes,done}] — appointments, playdates, etc.
   deletedIds: [],         // tombstones — ids of entries deleted on any device (for sync)
+  seenAchievements: [],   // ids like "feeds-bronze" already shown as an unlock banner (don't repeat)
+  achievementCounts: {},  // last-known count per achievement id, used to detect NEWLY crossed
+                           // tiers — NOT the current count. Updated only after detection runs.
   // Tracking
   vaccines: {},           // idx→{given,date}
   customVaccines: [],
@@ -2127,6 +2188,27 @@ function migrateData() {
   if (!Array.isArray(state.customFoods)) state.customFoods = [];
   if (!Array.isArray(state.calendarEvents)) state.calendarEvents = [];
   if (!Array.isArray(state.deletedIds)) state.deletedIds = [];
+  if (!Array.isArray(state.seenAchievements)) state.seenAchievements = [];
+  if (!state.achievementCounts || Object.keys(state.achievementCounts).length === 0) {
+    // First time this field exists on this device: seed it with CURRENT counts
+    // (not 0), and mark every already-earned tier as "seen" — otherwise an
+    // existing user with, say, 800 logged feeds would suddenly get bombarded
+    // with bronze+silver "just unlocked!" banners for things they did long ago.
+    state.achievementCounts = {};
+    if (!Array.isArray(state.seenAchievements)) state.seenAchievements = [];
+    try {
+      for (const def of ACHIEVEMENTS) {
+        const cur = def.count(state);
+        state.achievementCounts[def.id] = cur;
+        for (const m of def.milestones) {
+          if (cur >= m.count) {
+            const key = def.id+'-'+m.tier;
+            if (!state.seenAchievements.includes(key)) state.seenAchievements.push(key);
+          }
+        }
+      }
+    } catch(e) { /* ACHIEVEMENTS may not be defined yet this early in some load orders — safe to skip, saveState will seed it on first save */ }
+  }
   if (state.navSlots && state.navSlots.join(',') === 'dashboard,feeding,milestones,foods') {
     state.navSlots = ['now','feeding','sleep','diaper'];
   }
@@ -2429,6 +2511,36 @@ function saveState(changedKey) {
   stampEntryIds();   // ensure every log entry has a stable _id before persisting
   // Always save locally first — instant, never fails
   saveLocal();
+
+  // Compare CURRENT counts against the last-known counts PERSISTED IN STATE (not a
+  // snapshot taken here — by the time saveState runs, the caller has already
+  // mutated state.feedingLog/etc, so a same-tick "before" snapshot would already
+  // reflect the new value and never detect anything). state.achievementCounts is
+  // only updated at the end of this block, so it always reflects "as of the last
+  // time we checked" — a true before, however many saves have happened since.
+  // Wrapped defensively so a bug here can never block the actual save.
+  try {
+    if (!state.achievementCounts) state.achievementCounts = {};
+    const before = state.achievementCounts;
+    const unlocks = [];
+    for (const def of ACHIEVEMENTS) {
+      const cur = def.count(state);
+      const beforeCount = before[def.id] || 0;
+      const ms = def.milestones;
+      let beforeTier = null, afterTier = null;
+      for (const m of ms) { if (beforeCount >= m.count) beforeTier = m.tier; if (cur >= m.count) afterTier = m.tier; }
+      if (afterTier && afterTier !== beforeTier) {
+        const beforeIdx = ms.findIndex(m=>m.tier===beforeTier);
+        const afterIdx = ms.findIndex(m=>m.tier===afterTier);
+        for (let i = beforeIdx+1; i <= afterIdx; i++) {
+          unlocks.push({ id:def.id, label:def.label, icon:def.icon, tier:ms[i].tier, count:ms[i].count, unit:def.unit });
+        }
+      }
+      before[def.id] = cur;   // update the cache to the current count either way
+    }
+    if (unlocks.length) queueAchievementUnlocks(unlocks);
+  } catch(e) { /* never let achievement detection break a save */ }
+
   // Push to Firebase in background — never block the UI
   const fid = state.familyId;
   if (fid) {
@@ -3711,7 +3823,7 @@ function dayArcHTML() {
   // stack instead of hiding each other behind one dot.
   const evs = [];
   (state.feedingLog||[]).forEach((e,i)=>{ if(e.date!==t||!mine(e)) return; const m=mins(e.time); if(m!=null) evs.push({mn:m,cls:'feed',emoji:'🍼',kind:'feed',idx:i}); });
-  (state.diaperLog||[]).forEach((e,i)=>{ if(e.date!==t||!mine(e)) return; const m=mins(e.time); if(m!=null) evs.push({mn:m,cls:'diaper',emoji:'💧',kind:'diaper',idx:i}); });
+  (state.diaperLog||[]).forEach((e,i)=>{ if(e.date!==t||!mine(e)) return; const m=mins(e.time); if(m!=null){ const dEmoji = (e.wet&&e.dirty)?'\ud83d\udca7\ud83d\udca9':e.dirty?'\ud83d\udca9':'\ud83d\udca7'; evs.push({mn:m,cls:'diaper',emoji:dEmoji,kind:'diaper',idx:i}); } });
   (state.solidsLog||[]).forEach((e,i)=>{ if(e.date!==t||!mine(e)) return; const m=mins(e.time); if(m!=null) evs.push({mn:m,cls:'meal',emoji:'🥄',kind:'meal',idx:i}); });
   evs.sort((a,b)=>a.mn-b.mn);
   const GAP = 95;              // minutes of arc roughly one dot wide — closer than this collides
@@ -5523,6 +5635,180 @@ function derivedLifeEvents() {
 // treatment differ by level). Not a birthday/monthiversary on any other day, and
 // nothing at all once the celebration date has passed for the day (checked live,
 // not cached, so it turns off automatically at midnight on next render).
+// ══════════════════════════════════════════════════════════════════════════════
+// ACHIEVEMENTS — milestone trophies for logging activity, tiered bronze/silver/gold
+// (or a single tier for one-time firsts). Each definition knows how to compute its
+// own current count from state, so the list is the single source of truth for both
+// the page and the unlock-detection that runs after every save.
+// ══════════════════════════════════════════════════════════════════════════════
+const TROPHY_TIER = {
+  bronze: { label:'Bronze', color:'#B08D57', deep:'#7A5C34', bg:'#F5EBDD', glow:'rgba(176,141,87,.35)' },
+  silver: { label:'Silver', color:'#9CA3AF', deep:'#5B6270', bg:'#EEF0F3', glow:'rgba(156,163,175,.35)' },
+  gold:   { label:'Gold',   color:'#D4A72C', deep:'#7A5A0A', bg:'#FBF1DC', glow:'rgba(212,167,44,.4)' },
+};
+
+// Each achievement: id, label, icon, description, and either:
+//  - milestones: [{tier, count}] for repeatable count-based trophies (bronze at
+//    N, silver at 2N, gold at 3N — each tier unlocks independently), OR
+//  - a single {tier:'gold', count:1} for one-time "firsts".
+// `count(state)` returns the current progress number; `unit` labels it.
+const ACHIEVEMENTS = [
+  { id:'feeds', label:'Feeding Milestones', icon:'\ud83c\udf7c', unit:'feeds',
+    desc:'Every bottle and every feed, logged and counted.',
+    count: s => (s.feedingLog||[]).length,
+    milestones: [ {tier:'bronze',count:100}, {tier:'silver',count:500}, {tier:'gold',count:1000} ] },
+  { id:'diapers', label:'Diaper Duty', icon:'\ud83d\udc76', unit:'changes',
+    desc:'Wet, dirty, or both — every change adds up.',
+    count: s => (s.diaperLog||[]).length,
+    milestones: [ {tier:'bronze',count:100}, {tier:'silver',count:500}, {tier:'gold',count:1000} ] },
+  { id:'sleep', label:'Sleep Tracker', icon:'\ud83d\udcaa', unit:'naps & nights logged',
+    desc:'Every nap and night\u2019s sleep you\u2019ve recorded.',
+    count: s => (s.sleepLog||[]).length,
+    milestones: [ {tier:'bronze',count:50}, {tier:'silver',count:200}, {tier:'gold',count:500} ] },
+  { id:'weight', label:'Growth Watcher', icon:'\ud83d\udcc8', unit:'weigh-ins',
+    desc:'Tracking every step of the growth curve.',
+    count: s => (s.weightLog||[]).length,
+    milestones: [ {tier:'bronze',count:5}, {tier:'silver',count:15}, {tier:'gold',count:30} ] },
+  { id:'firstsolid', label:'First Bite', icon:'\ud83e\udd44', unit:'solid food tried',
+    desc:'The very first taste of solid food \u2014 a big one.',
+    count: s => (s.solidsLog||[]).length > 0 ? 1 : 0,
+    milestones: [ {tier:'gold',count:1} ] },
+  { id:'solids', label:'Foodie in Training', icon:'\ud83e\udd66', unit:'meals logged',
+    desc:'Building up a taste for solid food, one meal at a time.',
+    count: s => (s.solidsLog||[]).length,
+    milestones: [ {tier:'bronze',count:25}, {tier:'silver',count:100}, {tier:'gold',count:250} ] },
+  { id:'vaccines', label:'Fully Protected', icon:'\ud83d\udc89', unit:'vaccines given',
+    desc:'Every vaccine given, keeping them protected.',
+    count: s => Object.values(s.vaccines||{}).filter(v=>v && v.given).length,
+    milestones: [ {tier:'bronze',count:5}, {tier:'silver',count:12}, {tier:'gold',count:20} ] },
+  { id:'notes', label:'Keepsake Keeper', icon:'\ud83d\udcd3', unit:'notes written',
+    desc:'Little moments, written down before they\u2019re forgotten.',
+    count: s => (s.notesLog||[]).length,
+    milestones: [ {tier:'bronze',count:10}, {tier:'silver',count:50}, {tier:'gold',count:150} ] },
+  { id:'pumping', label:'Liquid Gold', icon:'\ud83c\udff7\ufe0f', unit:'pumping sessions',
+    desc:'Every session logged, drop by drop.',
+    count: s => (s.pumpLog||[]).length,
+    milestones: [ {tier:'bronze',count:25}, {tier:'silver',count:100}, {tier:'gold',count:250} ] },
+  { id:'reading', label:'Story Time', icon:'\ud83d\udcda', unit:'reading sessions',
+    desc:'Building a love of books, one story at a time.',
+    count: s => (s.readingLog||[]).length,
+    milestones: [ {tier:'bronze',count:10}, {tier:'silver',count:50}, {tier:'gold',count:150} ] },
+  { id:'firstmonth', label:'One Month Strong', icon:'\ud83c\udf19', unit:'month survived',
+    desc:'Made it through the first month together.',
+    count: s => { const d=s.babyDOB; if(!d) return 0; const days=Math.floor((new Date()-new Date(d+'T00:00:00'))/86400000); return days>=30?1:0; },
+    milestones: [ {tier:'gold',count:1} ] },
+
+  // ── Streaks & consistency ──
+  { id:'streak', label:'Logging Streak', icon:'\ud83d\udd25', unit:'days in a row',
+    desc:'Consecutive days with at least one thing logged \u2014 forgiving by design, a gap doesn\u2019t reset the story.',
+    count: s => (typeof loggingStreak==='function') ? loggingStreak() : 0,
+    milestones: [ {tier:'bronze',count:7}, {tier:'silver',count:30}, {tier:'gold',count:100} ] },
+  { id:'earlybird', label:'Early Bird', icon:'\ud83c\udf05', unit:'feeds before 6am',
+    desc:'Every feed logged in the early hours, before 6am.',
+    count: s => (s.feedingLog||[]).filter(e => { const m=(e.time||'').match(/^(\d{1,2}):/); return m && +m[1] < 6; }).length,
+    milestones: [ {tier:'bronze',count:10}, {tier:'silver',count:50}, {tier:'gold',count:150} ] },
+  { id:'nightowl', label:'Night Owl', icon:'\ud83e\udd89', unit:'feeds between midnight & 4am',
+    desc:'The unglamorous ones deserve recognition too.',
+    count: s => (s.feedingLog||[]).filter(e => { const m=(e.time||'').match(/^(\d{1,2}):/); return m && +m[1] < 4; }).length,
+    milestones: [ {tier:'bronze',count:10}, {tier:'silver',count:50}, {tier:'gold',count:150} ] },
+
+  // ── Growth milestone ──
+  { id:'doubledigits', label:'Growing Strong', icon:'\u2696\ufe0f', unit:'kg (heaviest weigh-in)',
+    desc:'Real weight milestones, tracked from the heaviest weigh-in on record.',
+    count: s => { const gs=(s.weightLog||[]).map(e=>e.grams||0); return gs.length?Math.round(Math.max(...gs)/100)/10:0; },
+    milestones: [ {tier:'bronze',count:5}, {tier:'silver',count:10}, {tier:'gold',count:15} ] },
+  { id:'halfyear', label:'Half a Year', icon:'\ud83c\udf1e', unit:'6-month milestone',
+    desc:'Six months together \u2014 a big one, on its own from the monthly check-ins.',
+    count: s => { const d=s.babyDOB; if(!d) return 0; const days=Math.floor((new Date()-new Date(d+'T00:00:00'))/86400000); return days>=182?1:0; },
+    milestones: [ {tier:'gold',count:1} ] },
+
+  // ── Variety / breadth ──
+  { id:'rainbow', label:'Rainbow Plate', icon:'\ud83c\udf08', unit:'different foods tried',
+    desc:'Not just meals logged \u2014 actual variety on the plate.',
+    count: s => new Set((s.solidsLog||[]).map(e => (e.food||e.name||e.title||'').trim().toLowerCase()).filter(Boolean)).size,
+    milestones: [ {tier:'bronze',count:5}, {tier:'silver',count:10}, {tier:'gold',count:20} ] },
+  { id:'explorer', label:'Explorer', icon:'\ud83c\udf92', unit:'playdates & outings',
+    desc:'Playdates and outings logged on the calendar \u2014 getting out into the world.',
+    count: s => (s.calendarEvents||[]).filter(e => e.cat==='playdate').length,
+    milestones: [ {tier:'bronze',count:3}, {tier:'silver',count:10}, {tier:'gold',count:25} ] },
+
+  // ── Fun / light-hearted personal records ──
+  { id:'diaperchamp', label:'Diaper Duty Champion', icon:'\ud83e\udea3', unit:'changes in one day (best day)',
+    desc:'Your single busiest diaper day on record.',
+    count: s => { const byDay={}; (s.diaperLog||[]).forEach(e=>{ if(e.date) byDay[e.date]=(byDay[e.date]||0)+1; }); const vals=Object.values(byDay); return vals.length?Math.max(...vals):0; },
+    milestones: [ {tier:'bronze',count:6}, {tier:'silver',count:10}, {tier:'gold',count:14} ] },
+  { id:'bottomlesspit', label:'Bottomless Pit', icon:'\ud83c\udf7d\ufe0f', unit:'feeds in one day (best day)',
+    desc:'Your single biggest feeding day on record.',
+    count: s => { const byDay={}; (s.feedingLog||[]).forEach(e=>{ if(e.date) byDay[e.date]=(byDay[e.date]||0)+1; }); const vals=Object.values(byDay); return vals.length?Math.max(...vals):0; },
+    milestones: [ {tier:'bronze',count:8}, {tier:'silver',count:12}, {tier:'gold',count:16} ] },
+  { id:'midnighthero', label:'Middle-of-the-Night Hero', icon:'\ud83c\udf1a', unit:'3am diaper changes',
+    desc:'The 3am changes are the ones nobody sees \u2014 except this.',
+    count: s => (s.diaperLog||[]).filter(e => (e.time||'').startsWith('03:')).length,
+    milestones: [ {tier:'bronze',count:3}, {tier:'silver',count:10}, {tier:'gold',count:25} ] },
+
+  // ── Parent-directed ──
+  { id:'selfcare', label:'Selfcare Sunday', icon:'\ud83d\udc9d', unit:'first "for mom" event',
+    desc:'The first calendar event logged just for mom.',
+    count: s => (s.calendarEvents||[]).some(e => e.who==='mom') ? 1 : 0,
+    milestones: [ {tier:'gold',count:1} ] },
+  { id:'welldocumented', label:'Well-Documented', icon:'\ud83d\udcd6', unit:'day streak of note-writing',
+    desc:'Consecutive days with at least one note written.',
+    count: s => {
+      const dates = new Set((s.notesLog||[]).map(e=>e.date).filter(Boolean));
+      if (!dates.size) return 0;
+      const dayMs=86400000; const startOfDay=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x.getTime();};
+      const ld = (typeof localDateStr==='function') ? localDateStr : (d)=>new Date(d).toISOString().slice(0,10);
+      let cursor = startOfDay(new Date());
+      const todayStr = ld(new Date(cursor)), ydayStr = ld(new Date(cursor-dayMs));
+      if (!dates.has(todayStr) && !dates.has(ydayStr)) return 0;
+      if (!dates.has(todayStr)) cursor -= dayMs;
+      let streak = 0;
+      while (true) { const ds = ld(new Date(cursor)); if (dates.has(ds)) { streak++; cursor -= dayMs; } else break; }
+      return streak;
+    },
+    milestones: [ {tier:'bronze',count:7}, {tier:'silver',count:30}, {tier:'gold',count:90} ] },
+];
+
+// Progress for one achievement: which tiers are unlocked, which is next, and the
+// fraction toward the next tier (or 1.0 if fully maxed out).
+function achievementProgress(def, state) {
+  const cur = def.count(state);
+  const ms = def.milestones;
+  let unlockedTier = null, nextIdx = 0;
+  for (let i = 0; i < ms.length; i++) {
+    if (cur >= ms[i].count) { unlockedTier = ms[i].tier; nextIdx = i+1; }
+    else break;
+  }
+  const next = ms[nextIdx] || null;
+  const prevCount = nextIdx > 0 ? ms[nextIdx-1].count : 0;
+  const frac = next ? Math.min(1, (cur - prevCount) / (next.count - prevCount)) : 1;
+  return { current: cur, unlockedTier, nextTier: next ? next.tier : null, nextCount: next ? next.count : null, frac, maxed: !next };
+}
+
+// All achievements with their computed progress, for rendering the page.
+function allAchievementsProgress() {
+  return ACHIEVEMENTS.map(def => ({ def, progress: achievementProgress(def, state) }));
+}
+
+// Compare a before/after state and return any achievements that crossed into a
+// NEW tier (used to trigger the unlock banner). Called after every save.
+function detectNewUnlocks(beforeState, afterState) {
+  const unlocks = [];
+  for (const def of ACHIEVEMENTS) {
+    const before = achievementProgress(def, beforeState).unlockedTier;
+    const after = achievementProgress(def, afterState).unlockedTier;
+    if (after && after !== before) {
+      // Figure out WHICH tier just unlocked (could skip if count jumped, e.g. sync)
+      const beforeIdx = def.milestones.findIndex(m=>m.tier===before);
+      const afterIdx = def.milestones.findIndex(m=>m.tier===after);
+      for (let i = beforeIdx+1; i <= afterIdx; i++) {
+        unlocks.push({ id:def.id, label:def.label, icon:def.icon, tier:def.milestones[i].tier, count:def.milestones[i].count, unit:def.unit });
+      }
+    }
+  }
+  return unlocks;
+}
+
 function todaysCelebration() {
   if (!state.babyDOB) return null;
   const todayStr = ymd(new Date());
@@ -5573,6 +5859,54 @@ function monthiversarySubtitle(months, name) {
   };
   return MSG[months] || 'Another month of firsts in the books \u2014 look how far you\u2019ve come.';
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ACHIEVEMENT UNLOCK BANNER — shown on Now/Dashboard when a new trophy is earned.
+// Distinct from the daily celebration banner: this is "seen once, then done"
+// (tracked in state.seenAchievements), not date-driven, and can queue several at
+// once (e.g. a sync brings in a burst of logged entries that cross two tiers).
+// ══════════════════════════════════════════════════════════════════════════════
+function queueAchievementUnlocks(unlocks) {
+  const seen = new Set(state.seenAchievements||[]);
+  const fresh = unlocks.filter(u => !seen.has(u.id+'-'+u.tier));
+  if (!fresh.length) return;
+  window._pendingAchievementUnlocks = (window._pendingAchievementUnlocks||[]).concat(fresh);
+  // Re-render Now/Dashboard immediately if the user is looking at either right now.
+  if (_currentPage === 'now' || _currentPage === 'dashboard') {
+    const el = document.getElementById('page-'+_currentPage);
+    if (el && PAGES[_currentPage]) PAGES[_currentPage](el);
+  }
+}
+
+// The banner for the FIRST pending unlock (shown one at a time so multiple don't
+// stack chaotically — dismissing one reveals the next on the following render).
+function achievementUnlockBannerHTML() {
+  const q = window._pendingAchievementUnlocks;
+  if (!q || !q.length) return '';
+  const u = q[0];
+  const t = TROPHY_TIER[u.tier];
+  return '<div class="ach-unlock" style="--tc:'+t.color+';--td:'+t.deep+';--tb:'+t.bg+';--tg:'+t.glow+'" onclick="navTo(\'achievements\')">'+
+    '<button class="ach-unlock-x" onclick="event.stopPropagation();dismissAchievementUnlock()" aria-label="Dismiss">\u00d7</button>'+
+    '<div class="ach-unlock-trophy">\ud83c\udfc6</div>'+
+    '<div class="ach-unlock-main">'+
+      '<div class="ach-unlock-tag">'+t.label+' trophy unlocked</div>'+
+      '<div class="ach-unlock-title">'+u.icon+' '+u.label+'</div>'+
+      '<div class="ach-unlock-sub">'+u.count+' '+u.unit+' \u2014 tap to see all achievements</div>'+
+    '</div>'+
+  '</div>';
+}
+window.dismissAchievementUnlock = function(e) {
+  const q = window._pendingAchievementUnlocks;
+  if (!q || !q.length) return;
+  const u = q.shift();
+  if (!Array.isArray(state.seenAchievements)) state.seenAchievements = [];
+  state.seenAchievements.push(u.id+'-'+u.tier);
+  saveState('seenAchievements');
+  if (_currentPage === 'now' || _currentPage === 'dashboard') {
+    const el = document.getElementById('page-'+_currentPage);
+    if (el && PAGES[_currentPage]) PAGES[_currentPage](el);
+  }
+};
 
 function celebrationBannerHTML() {
   const cel = todaysCelebration();
@@ -5864,14 +6198,14 @@ PAGES['now'] = function(el) {
 
   if (!hasBaby) {
     const edd = getEDD();
-    const daysLeft = edd ? Math.max(0,Math.round((edd-new Date())/86400000)) : null;
+    const daysLeft = edd ? Math.max(0,Math.round((new Date(edd+'T00:00:00')-new Date())/86400000)) : null;
     el.innerHTML = `
       <div style="padding:8px 4px 16px">
         <div class="now-hero-pre">
           <div style="font-size:44px;margin-bottom:12px">${babyEmoji?babyEmoji():'🍼'}</div>
-          <div style="font-size:13px;font-weight:600;color:#998542;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">${daysLeft!=null?'Countdown':'Getting ready'}</div>
-          <div style="font-size:32px;font-weight:800;color:#5A4A1F;letter-spacing:-1px;margin-bottom:6px">${daysLeft!=null?daysLeft+' days':'Soon'}</div>
-          <div style="font-size:13px;color:#998542;line-height:1.5;max-width:280px;margin:0 auto">${state.babyName?state.babyName+' is':'Your baby is'} almost here. One day at a time — you're doing great.</div>
+          <div style="font-size:13px;font-weight:600;color:#998542 !important;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">${daysLeft!=null?'Countdown':'Getting ready'}</div>
+          <div style="font-size:32px;font-weight:800;color:#5A4A1F !important;letter-spacing:-1px;margin-bottom:6px">${daysLeft!=null?daysLeft+' days':'Soon'}</div>
+          <div style="font-size:13px;color:#998542 !important;line-height:1.5;max-width:280px;margin:0 auto">${state.babyName?state.babyName+' is':'Your baby is'} almost here. One day at a time — you're doing great.</div>
         </div>
         <button class="btn btn-teal btn-block" onclick="navTo('dashboard')" style="margin-top:14px">Go to dashboard →</button>
       </div>`;
@@ -5890,8 +6224,8 @@ PAGES['now'] = function(el) {
   if (!freqH && rec && rec.feedFreq) freqH = parseFloat((''+rec.feedFreq).match(/[\d.]+/)?.[0]||'3');
   if (feed && feed.minsAgo!=null && freqH) {
     const dueMins = freqH*60;
-    if (feed.minsAgo >= dueMins) { feedHint = 'Due now'; feedHintColor = '#C9842B'; }
-    else if (feed.minsAgo >= dueMins*0.8) { feedHint = 'Due soon'; feedHintColor = '#C9842B'; }
+    if (feed.minsAgo >= dueMins) { feedHint = 'Due now'; feedHintColor = '#A5661A'; }
+    else if (feed.minsAgo >= dueMins*0.8) { feedHint = 'Due soon'; feedHintColor = '#A5661A'; }
     else {
       const left = Math.round(dueMins - feed.minsAgo);
       const h = Math.floor(left/60), m = left%60;
@@ -5913,7 +6247,7 @@ PAGES['now'] = function(el) {
     const mo = daysOld()/30.44;
     const ref = getWeightReference(mo, state.babyGender);
     if (ref) {
-      if (latestW.grams < ref.low) { wStatus='Below range'; wStatusColor='#C9842B'; }
+      if (latestW.grams < ref.low) { wStatus='Below range'; wStatusColor='#A5661A'; }
       else if (latestW.grams > ref.high) { wStatus='Above range'; wStatusColor='#185FA5'; }
       else { wStatus='Healthy'; wStatusColor='#1D9E75'; }
     }
@@ -5944,6 +6278,7 @@ PAGES['now'] = function(el) {
         ${(() => { if (isNightContext) return ''; const s=streakMessage(loggingStreak()); return s ? '<div class="now-streak">'+s.emoji+' '+s.text+'</div>' : ''; })()}
       </div>
 
+      ${achievementUnlockBannerHTML()}
       ${celebrationBannerHTML()}
 
       ${isMulti() && currentBabyIdx==='both' ? bothSummaryHTML() + bothDetailHTML() : ''}
@@ -6599,6 +6934,7 @@ PAGES['dashboard'] = function(el) {
       <p>${hasBaby?babyRef()+' is '+babyAgeLbl()+' · Born '+formatDate(state.babyDOB):'EDD: '+formatDate(getEDD())+' · Jakarta · Indonesian–English'}</p>
     </div>
 
+    ${hasBaby ? achievementUnlockBannerHTML() : ''}
     ${hasBaby ? celebrationBannerHTML() : ''}
 
     ${hasBaby ? `
@@ -8062,7 +8398,7 @@ PAGES['feeding'] = function(el) {
         if (leftMin <= 0) countdown = 'due now';
         else { const h=Math.floor(leftMin/60), m=leftMin%60; countdown = h>0 ? (m>0? h+'h '+m+'m':h+'h') : m+'m'; }
       }
-      const cdColor = countdown==='due now' ? '#C9842B' : '#2D8F8F';
+      const cdColor = countdown==='due now' ? '#A5661A' : '#2D8F8F';
       feedPill = '<div class="feed-pill">'+
         '<div class="fp-seg"><span class="fp-lbl">Last feed</span><span class="fp-val">'+_pFeed.ago+' ago · '+lastClock+'</span></div>'+
         '<div class="fp-div"></div>'+
@@ -9986,6 +10322,80 @@ PAGES['calendar'] = function(el) {
   window._calToggleExpand = () => { window._calExpanded = !window._calExpanded; render(); };
   window._calTogglePast = () => { window._calPastOpen = !window._calPastOpen; render(); };
   window._calPastExpand = () => { window._calPastExpanded = true; render(); };
+  render();
+};
+
+PAGES['achievements'] = function(el) {
+  if (!window._achExpanded) window._achExpanded = {};
+
+  function render() {
+    const all = allAchievementsProgress();
+    const totalTrophies = all.reduce((sum,a) => sum + (a.progress.unlockedTier ? (a.def.milestones.findIndex(m=>m.tier===a.progress.unlockedTier)+1) : 0), 0);
+    const totalPossible = all.reduce((sum,a) => sum + a.def.milestones.length, 0);
+    // Per-tier counts: an achievement at gold has ALSO earned bronze and silver
+    // along the way, so each earned tier counts toward its own bucket.
+    const tierCounts = { bronze:0, silver:0, gold:0 };
+    all.forEach(a => {
+      if (!a.progress.unlockedTier) return;
+      const idx = a.def.milestones.findIndex(m=>m.tier===a.progress.unlockedTier);
+      for (let i = 0; i <= idx; i++) tierCounts[a.def.milestones[i].tier]++;
+    });
+
+    const cards = all.map(({def, progress}) => {
+      const isOpen = !!window._achExpanded[def.id];
+      const tierInfo = progress.unlockedTier ? TROPHY_TIER[progress.unlockedTier] : null;
+      const locked = !progress.unlockedTier;
+      const single = def.milestones.length === 1;
+
+      // Progress bar toward next tier (or full if maxed)
+      const barPct = Math.round(progress.frac * 100);
+      const barColor = progress.nextTier ? TROPHY_TIER[progress.nextTier].color : (tierInfo ? tierInfo.color : '#ccc');
+      const progressLabel = progress.maxed
+        ? (progress.current)+' '+def.unit+' \u2014 all tiers complete'
+        : single
+          ? progress.current+' / '+progress.nextCount+' '+def.unit
+          : progress.current+' / '+progress.nextCount+' '+def.unit+' for '+TROPHY_TIER[progress.nextTier].label;
+
+      // Tier chips row (bronze/silver/gold or single gold) — filled if unlocked, grey if not
+      const tierChips = def.milestones.map(m => {
+        const t = TROPHY_TIER[m.tier];
+        const on = progress.unlockedTier && def.milestones.findIndex(x=>x.tier===progress.unlockedTier) >= def.milestones.indexOf(m);
+        return '<span class="ach-tier-chip'+(on?' on':'')+'" style="'+(on?'--tc:'+t.color+';--td:'+t.deep+';--tb:'+t.bg:'')+'">'+
+          '<span class="ach-tier-trophy">\ud83c\udfc6</span><span class="ach-tier-lbl">'+t.label+'</span><span class="ach-tier-count">'+m.count+'</span>'+
+        '</span>';
+      }).join('');
+
+      return '<div class="ach-card'+(locked?' locked':'')+(isOpen?' open':'')+'" style="'+(tierInfo?'--tc:'+tierInfo.color+';--td:'+tierInfo.deep+';--tb:'+tierInfo.bg:'')+'">'+
+        '<button class="ach-card-head" onclick="_achToggle(\''+def.id+'\')">'+
+          '<span class="ach-card-icon">'+(locked?'<span class="ach-lock-overlay">\ud83d\udd12</span>':'')+def.icon+'</span>'+
+          '<span class="ach-card-main">'+
+            '<span class="ach-card-title">'+def.label+'</span>'+
+            '<span class="ach-card-bar-wrap"><span class="ach-card-bar" style="width:'+barPct+'%;background:'+barColor+'"></span></span>'+
+            '<span class="ach-card-progress">'+progressLabel+'</span>'+
+          '</span>'+
+          (tierInfo ? '<span class="ach-card-badge" style="--tc:'+tierInfo.color+';--td:'+tierInfo.deep+';--tb:'+tierInfo.bg+'">\ud83c\udfc6 '+tierInfo.label+'</span>' : '<span class="ach-card-chev">\u203a</span>')+
+        '</button>'+
+        (isOpen ? '<div class="ach-card-detail">'+
+          '<p class="ach-card-desc">'+def.desc+'</p>'+
+          '<div class="ach-tier-row">'+tierChips+'</div>'+
+        '</div>' : '')+
+      '</div>';
+    }).join('');
+
+    el.innerHTML =
+      '<div class="page-header"><h2>\ud83c\udfc6 Achievements</h2><p>Milestones earned along the way</p></div>'+
+      '<div class="ach-main-card">'+
+        '<span class="ach-main-num">'+totalTrophies+'</span>'+
+        '<span class="ach-main-lbl">of '+totalPossible+' trophies earned</span>'+
+      '</div>'+
+      '<div class="ach-tier-summary">'+
+        '<div class="ach-tier-summary-card" style="--tc:'+TROPHY_TIER.bronze.color+';--td:'+TROPHY_TIER.bronze.deep+';--tb:'+TROPHY_TIER.bronze.bg+'"><span class="ach-tier-summary-trophy">\ud83c\udfc6</span><span class="ach-tier-summary-num">'+tierCounts.bronze+'</span><span class="ach-tier-summary-lbl">Bronze</span></div>'+
+        '<div class="ach-tier-summary-card" style="--tc:'+TROPHY_TIER.silver.color+';--td:'+TROPHY_TIER.silver.deep+';--tb:'+TROPHY_TIER.silver.bg+'"><span class="ach-tier-summary-trophy">\ud83c\udfc6</span><span class="ach-tier-summary-num">'+tierCounts.silver+'</span><span class="ach-tier-summary-lbl">Silver</span></div>'+
+        '<div class="ach-tier-summary-card" style="--tc:'+TROPHY_TIER.gold.color+';--td:'+TROPHY_TIER.gold.deep+';--tb:'+TROPHY_TIER.gold.bg+'"><span class="ach-tier-summary-trophy">\ud83c\udfc6</span><span class="ach-tier-summary-num">'+tierCounts.gold+'</span><span class="ach-tier-summary-lbl">Gold</span></div>'+
+      '</div>'+
+      '<div class="ach-list">'+cards+'</div>';
+  }
+  window._achToggle = (id) => { window._achExpanded[id] = !window._achExpanded[id]; render(); };
   render();
 };
 
