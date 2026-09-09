@@ -127,6 +127,28 @@ body.night-mode .ach-unlock-x{background:rgba(255,255,255,.1);color:var(--tc) !i
 body.night-mode .ach-tier-summary-card{background:#262635;border-color:var(--tc);}
 body.night-mode .ach-tier-summary-num.ach-tier-summary-num,body.night-mode .ach-tier-summary-lbl.ach-tier-summary-lbl{color:var(--tc) !important;}
 .ach-list{display:flex;flex-direction:column;gap:9px;}
+/* ── What to Watch For (monthly phase guide) ── */
+.wf-intro{font-size:12.5px;color:var(--ink-2);line-height:1.55;margin-bottom:14px;background:#F2EFE7;border-radius:12px;padding:12px 14px;}
+body.night-mode .wf-intro{background:#262635;color:#c4bca8;}
+.wf-card{margin-bottom:9px;padding:14px;}
+.wf-card-current{border:1.5px solid #2D8F8F;}
+.wf-month-label{font-family:var(--font-display);font-size:15.5px;font-weight:750;color:var(--ink);}
+body.night-mode .wf-month-label{color:#f0ede2;}
+.wf-current-badge{background:#E6F5F5;color:#1F6E6E !important;font-size:10px;font-weight:750;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;}
+body.night-mode .wf-current-badge{background:#12403f;}
+.wf-age-label{font-size:11.5px;color:var(--ink-3);margin-top:1px;}
+.wf-note{font-size:12.5px;color:var(--ink-2);line-height:1.5;font-style:italic;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.06);}
+body.night-mode .wf-note{color:#c4bca8;border-top-color:rgba(255,255,255,.08);}
+.wf-list{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+.wf-item{background:#FBF8F2;border-radius:11px;padding:10px 12px;}
+body.night-mode .wf-item{background:#242430;}
+.wf-item-text{font-size:12.5px;color:var(--ink);line-height:1.5;}
+body.night-mode .wf-item-text{color:#e8e4d8;}
+.wf-term-btn{display:inline-flex;align-items:center;gap:3px;background:#EEEDFE;color:#6544B0 !important;border:none;border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700;font-family:var(--font);cursor:pointer;margin-bottom:6px;text-decoration:underline;text-decoration-color:rgba(101,68,176,.4);}
+.wf-term-chev{font-size:9px;}
+body.night-mode .wf-term-btn{background:#2e2a4a;color:#b8a8e8 !important;}
+.wf-term-def{margin-top:8px;font-size:12px;color:var(--ink-2);line-height:1.55;background:#EEEDFE;border-radius:9px;padding:10px 11px;}
+body.night-mode .wf-term-def{background:#2e2a4a;color:#d4cae8;}
 .ach-card{background:#fff;border-radius:15px;border:0.5px solid rgba(0,0,0,.06);box-shadow:0 2px 8px -5px rgba(0,0,0,.1);overflow:hidden;transition:box-shadow .15s;}
 .ach-card.locked{opacity:.55;}
 .ach-card:not(.locked){border-color:var(--tc,rgba(0,0,0,.06));}
@@ -158,6 +180,84 @@ body.night-mode .ach-card-desc{color:#c4bca8;}
 .ach-tier-count{opacity:.75;}
 body.night-mode .ach-tier-chip{background:#262635;color:#6b6b78;}
 body.night-mode .ach-tier-chip.on.on{color:var(--tc) !important;}
+/* ── Feeding: quick review-and-save card, shown at page top right after a timer
+   stop, so confirming a feed doesn't require scrolling past the whole page. ── */
+.feed-review-card{background:linear-gradient(135deg,#E6F5F5,#FBF8F2);border:1.5px solid #2D8F8F;margin-bottom:14px;padding:16px;}
+.feed-review-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.feed-review-badge{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#1F7373;background:#fff;padding:4px 9px;border-radius:999px;}
+.feed-review-dismiss{background:none;border:none;color:#767680;font-size:11.5px;font-weight:650;cursor:pointer;font-family:var(--font);padding:4px;}
+.feed-review-main{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;}
+.feed-review-side{font-family:var(--font-display);font-size:19px;font-weight:750;color:var(--ink);}
+.feed-review-dur{font-size:16px;font-weight:700;color:#1F7373;}
+.feed-review-times{font-size:12.5px;color:var(--ink-3);margin-bottom:14px;}
+.feed-review-save{width:100%;background:#2D8F8F;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:750;font-family:var(--font);cursor:pointer;}
+.feed-review-save:active{background:#1F7373;}
+body.night-mode .feed-review-card{background:linear-gradient(135deg,#12403f,#1d1d2c);border-color:#2D8F8F;}
+body.night-mode .feed-review-badge{background:#1d1d2c;color:#5cd1c8 !important;}
+body.night-mode .feed-review-dismiss{color:#a5a08f !important;}
+body.night-mode .feed-review-side{color:#f0ede2;}
+body.night-mode .feed-review-dur{color:#5cd1c8 !important;}
+body.night-mode .feed-review-times{color:#a5a08f;}
+/* ══ SIMPLE MODE ══ Large-type caregiver screen for a propped-up tablet.
+   Hides all normal app chrome so there's nowhere to wander off to. */
+body.simple-mode .top-bar,
+body.simple-mode .bottom-nav,
+body.simple-mode .drawer,
+body.simple-mode .drawer-scrim,
+body.simple-mode #page-fab-layer{display:none !important;}
+body.simple-mode .main{padding:0;max-width:none;}
+body.simple-mode .page{padding:0;max-width:none;}
+.sm-wrap{padding:18px 16px 28px;max-width:720px;margin:0 auto;}
+.sm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sm-baby{font-family:var(--font-display);font-size:22px;font-weight:750;color:var(--ink);}
+.sm-exit{background:rgba(0,0,0,.06);border:none;border-radius:50%;width:40px;height:40px;font-size:17px;color:#767680;cursor:pointer;}
+.sm-card{background:#fff;border-radius:18px;padding:18px 20px;margin-bottom:12px;box-shadow:0 2px 10px -6px rgba(0,0,0,.15);}
+.sm-label{font-size:13px;font-weight:750;text-transform:uppercase;letter-spacing:.06em;color:#767680;}
+.sm-big{font-family:var(--font-display);font-size:52px;font-weight:800;line-height:1.05;color:var(--ink);margin-top:4px;}
+.sm-mid{font-family:var(--font-display);font-size:26px;font-weight:750;color:var(--ink);margin-top:4px;}
+.sm-sub{font-size:15px;color:var(--ink-2);margin-top:4px;}
+.sm-card-next.sm-tone-due{background:linear-gradient(135deg,#FCEBEB,#fff);border:2px solid #C0392B;}
+.sm-card-next.sm-tone-due .sm-big{color:#C0392B;}
+.sm-card-next.sm-tone-soon{background:linear-gradient(135deg,#FFF6E6,#fff);border:2px solid #A5661A;}
+.sm-card-next.sm-tone-soon .sm-big{color:#A5661A;}
+.sm-card-next.sm-tone-ok{background:linear-gradient(135deg,#E6F5F5,#fff);border:2px solid #2D8F8F;}
+.sm-card-next.sm-tone-ok .sm-big{color:#1F6E6E;}
+.sm-row{display:flex;gap:12px;}
+.sm-card-half{flex:1;min-width:0;}
+.sm-card-weight{display:flex;align-items:center;justify-content:space-between;}
+.sm-weight-val{font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--ink);}
+.sm-actions{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.sm-btn{display:flex;align-items:center;justify-content:center;gap:12px;border:none;border-radius:18px;padding:26px;font-family:var(--font);font-size:24px;font-weight:750;color:#fff;cursor:pointer;box-shadow:0 4px 14px -6px rgba(0,0,0,.3);}
+.sm-btn span{font-size:22px;}
+.sm-btn:active{transform:scale(.98);}
+.sm-btn-feed{background:linear-gradient(135deg,#2D8F8F,#1F7373);}
+.sm-btn-diaper{background:linear-gradient(135deg,#185FA5,#12508C);}
+.sm-btn-weight{background:linear-gradient(135deg,#7A5AC9,#6544B0);}
+body.night-mode .sm-card{background:#1d1d2c;}
+body.night-mode .sm-baby,body.night-mode .sm-big,body.night-mode .sm-mid,body.night-mode .sm-weight-val{color:#f0ede2;}
+body.night-mode .sm-exit{background:rgba(255,255,255,.1);color:#c4bca8 !important;}
+/* Simple-mode sheets — oversized targets, no small text */
+.sm-sheet-ov{position:fixed;inset:0;background:rgba(20,20,30,.6);z-index:9995;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .18s;padding:16px;}
+.sm-sheet-ov.show{opacity:1;}
+.sm-sheet{background:#FFFDF8;border-radius:22px;padding:22px;width:100%;max-width:520px;}
+body.night-mode .sm-sheet{background:#1d1d2c;}
+.sm-sheet-title{font-family:var(--font-display);font-size:22px;font-weight:750;color:var(--ink);margin-bottom:16px;text-align:center;}
+body.night-mode .sm-sheet-title{color:#f0ede2;}
+.sm-sheet-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.sm-sheet-btn{background:#F2EFE7;border:none;border-radius:14px;padding:22px;font-size:22px;font-weight:700;color:var(--ink);cursor:pointer;font-family:var(--font);}
+.sm-sheet-btn:active{background:#e6e1d5;}
+body.night-mode .sm-sheet-btn{background:#262635;color:#f0ede2;}
+.sm-sheet-cancel{width:100%;background:none;border:none;padding:16px;font-size:17px;font-weight:650;color:#767680;cursor:pointer;font-family:var(--font);}
+.sm-amount-display{font-family:var(--font-display);font-size:44px;font-weight:800;text-align:center;color:var(--ink);background:#F2EFE7;border-radius:14px;padding:14px;margin-bottom:14px;}
+body.night-mode .sm-amount-display{background:#262635;color:#f0ede2;}
+.sm-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.sm-key{background:#F2EFE7;border:none;border-radius:14px;padding:20px;font-size:24px;font-weight:700;color:var(--ink);cursor:pointer;font-family:var(--font);}
+.sm-key:active{background:#e6e1d5;}
+body.night-mode .sm-key{background:#262635;color:#f0ede2;}
+.sm-sheet-foot{display:flex;gap:10px;}
+.sm-sheet-foot .sm-sheet-cancel{flex:1;background:#F2EFE7;border-radius:14px;}
+body.night-mode .sm-sheet-foot .sm-sheet-cancel{background:#262635;color:#c4bca8 !important;}
+.sm-sheet-ok{flex:1;background:#2D8F8F;border:none;border-radius:14px;padding:16px;font-size:18px;font-weight:750;color:#fff;cursor:pointer;font-family:var(--font);}
 .now-celebrate{border-radius:16px;margin:14px 0;cursor:default;}
 /* Slim celebration strip — appears at the top of every page EXCEPT Now/Dashboard
    (which have the full banner). Same birthday-vs-monthiversary tone distinction,
@@ -398,6 +498,14 @@ body.night-mode .glance-lbl{color:#a5a08f;}
 .cfd-card[role="alertdialog"] .cfd-body{text-align:center;}
 body.night-mode .cfd-title{color:#f0ede2;}
 .cfd-body{font-size:13.5px;color:#5c5c66;line-height:1.5;margin-top:8px;}
+.cfd-input{border:1.5px solid #e0ddd4;border-radius:10px;padding:11px 12px;font-size:15px;font-family:var(--font);color:#2A2A33;}
+.ee-type-toggle{display:flex;gap:6px;flex-wrap:wrap;}
+.ee-type-btn{background:#F2EFE7;border:none;border-radius:9px;padding:8px 11px;font-size:12.5px;font-weight:650;color:var(--ink-2);cursor:pointer;font-family:var(--font);}
+.ee-type-btn.on{background:#2D8F8F;color:#fff;}
+body.night-mode .ee-type-btn{background:#262635;color:#c4bca8;}
+body.night-mode .ee-type-btn.on{background:#2D8F8F;color:#fff;}
+.cfd-input:focus{outline:none;border-color:#2D8F8F;}
+body.night-mode .cfd-input{background:#262635;border-color:rgba(255,255,255,.15);color:#f0ede2;}
 .cfd-btns{display:flex;gap:10px;margin-top:20px;}
 .cfd-btn{flex:1;min-height:46px;border-radius:12px;font-size:14.5px;font-weight:700;font-family:var(--font);cursor:pointer;border:1.5px solid transparent;-webkit-tap-highlight-color:transparent;}
 .cfd-cancel{background:none;border-color:#d8d8de;color:#5c5c66;}
@@ -765,6 +873,11 @@ body.night-mode .bd-row-name{color:#e8e4d8;}
   background:linear-gradient(90deg,#1B2140 0%,#2A2E55 16%,#8A6D9E 25%,#D98E7A 31%,#7FC0D6 42%,#57A88C 58%,#7FC0D6 66%,#C98A5E 76%,#4A4E82 83%,#1B2140 100%);}
 .arc-span{position:absolute;top:8px;bottom:8px;background:rgba(255,255,255,.28);border-radius:8px;backdrop-filter:blur(1px);}
 .arc-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:rgba(255,253,248,.94);box-shadow:0 1px 4px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;}
+/* "Both" (wet+dirty) diaper dot shows two emoji — a plain circle can't fit two
+   full glyphs without overflow, so this variant widens into a pill instead of
+   stacking oversized icons in a space meant for one. */
+.arc-dot.diaper-both{width:30px;border-radius:11px;gap:0;}
+.arc-dot.diaper-both span{font-size:10px;letter-spacing:-2px;}
 .arc-dot span{font-size:12px;line-height:1;}
 .arc-now{position:absolute;top:2px;bottom:2px;width:2px;background:#fff;border-radius:2px;box-shadow:0 0 6px 1px rgba(255,255,255,.8);transform:translateX(-50%);}
 .arc-hours{display:flex;justify-content:space-between;margin-top:7px;font-size:10px;color:var(--ink-3);letter-spacing:.3px;}
@@ -1424,6 +1537,7 @@ body.night-mode .shop-item{color:#c9c5b8;}
 .lh-v-weight .loghist-row,.lh-v-weight .loghist-head{grid-template-columns:56px 80px 1fr 28px;}
 .lh-v-pump .loghist-row,.lh-v-pump .loghist-head{grid-template-columns:48px 46px 46px 1fr 28px;}
 .lh-v-meds .loghist-row,.lh-v-meds .loghist-head{grid-template-columns:48px 46px 1fr 28px;}
+.lh-v-medsby .loghist-row,.lh-v-medsby .loghist-head{grid-template-columns:44px 44px 1fr;}
 /* Cell styling — no truncation on the detail/notes; let it wrap within its column */
 .loghist-row .lh-date,.loghist-row .lh-time,.loghist-row .lh-dur{color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums;}
 .loghist-row .lh-main{color:var(--ink);font-weight:600;overflow-wrap:anywhere;line-height:1.35;}
@@ -1523,6 +1637,24 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
 
 /* ── CHART CONTAINER ── */
 .chart-wrap{background:#fff;border-radius:var(--r);padding:14px;margin-bottom:12px;overflow-x:auto;}
+/* ── Trend Explorer (shared across all log-history pages) ── */
+.trend-card{padding:16px;}
+.trend-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.trend-range-select{flex-shrink:0;background:#F2EFE7;border:none;border-radius:10px;padding:8px 26px 8px 12px;font-size:12.5px;font-weight:700;color:var(--ink);font-family:var(--font);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23767680' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+body.night-mode .trend-range-select{background-color:#262635;color:#f0ede2;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c4bca8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");}
+.trend-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.meds-by-summary{display:flex;gap:8px;}
+.meds-by-stat{flex:1;background:#F2EFE7;border-radius:12px;padding:11px;text-align:center;}
+.meds-by-num{display:block;font-family:var(--font-display);font-size:20px;font-weight:800;color:#C4362B;line-height:1.1;}
+.meds-by-lbl{display:block;font-size:10.5px;color:var(--ink-3);margin-top:3px;}
+body.night-mode .meds-by-stat{background:#262635;}
+.trend-chips::-webkit-scrollbar{display:none;}
+.trend-chip{flex:0 0 auto;background:#F2EFE7;border:none;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:650;color:var(--ink-2);cursor:pointer;font-family:var(--font);white-space:nowrap;}
+.trend-chip.on{background:#2D8F8F !important;color:#fff !important;}
+.trend-chip-agg{background:#EEF0F3;}
+body.night-mode .trend-chip{background:#262635;color:#c4bca8;}
+body.night-mode .trend-chip-agg{background:#242430;}
+body.night-mode .trend-chip.on{background:#2D8F8F !important;color:#fff !important;}
 body.night-mode .chart-wrap{background:#1d1d2c;border:1px solid rgba(255,255,255,.07);}
 .chart-wrap canvas{max-width:100%;}
 .chart-tabs{display:flex;gap:4px;margin-bottom:10px;}
@@ -1825,6 +1957,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   </div>
   <div class="drawer-section">Every day</div>
   <button class="nav-item" onclick="navTo('first100')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/></svg></span> First 100 Days</button>
+  <button class="nav-item" onclick="navTo('watchfor')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span> What to Watch For</button>
   <button class="nav-item" onclick="navTo('foods')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16c0 5-3.6 9-8 9s-8-4-8-9Z"/><path d="M12 8c0-2.5 1.5-4 4-5"/></svg></span> 100 Foods</button>
   <button class="nav-item" onclick="navTo('solids')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11h18"/><path d="M12 11a8 8 0 0 1-8 8h16a8 8 0 0 1-8-8Z"/><path d="M12 4v3"/><path d="M9 5v2"/><path d="M15 5v2"/></svg></span> Solids</button>
   <button class="nav-item" onclick="navTo('feeding')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6"/><path d="M10 2v3h4V2"/><path d="M8.5 8.5C8.5 6.6 10 5 12 5s3.5 1.6 3.5 3.5V19a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 8.5 19Z"/><path d="M8.5 12h7M8.5 16h7"/></svg></span> Feeding</button>
@@ -1853,7 +1986,7 @@ body.night-mode #add-food-form div[style*="font-weight:700"]{color:#e8e4d8 !impo
   <button class="nav-item" onclick="navTo('settings')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span> Settings</button>
   <button class="nav-item" onclick="openNavCustomizer()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></span> Customise tabs</button>
   <button class="nav-item" onclick="closeDrawer();exportToSheets()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span> Export to Google Sheets</button>
-  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 15 Aug 2026, 19:36</div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--theme-text-dim);opacity:0.6">Build: 04 Sep 2026, 04:46</div>
   <div style="height:20px"></div>
 </div>
 
@@ -2131,6 +2264,7 @@ function defaultState() {
   keyDates: [],           // [{id,label,date}]
   calendarEvents: [],     // [{id,title,date,time,cat,who,notes,done}] — appointments, playdates, etc.
   deletedIds: [],         // tombstones — ids of entries deleted on any device (for sync)
+  simpleMode: false,      // when on, the app shows ONLY the big-button caregiver screen
   seenAchievements: [],   // ids like "feeds-bronze" already shown as an unlock banner (don't repeat)
   achievementCounts: {},  // last-known count per achievement id, used to detect NEWLY crossed
                            // tiers — NOT the current count. Updated only after detection runs.
@@ -2153,6 +2287,7 @@ function defaultState() {
   stashLog: [],          // [{date, time, ml, reason}] — stash removals not counted as feeds
   notesLog: [],          // [{id, date, time, text, tag, pinned, ageLabel}]
   customFoods: [],       // user-added foods [{id,name,group,age,texture,allergen,prep}]
+  customMeds: [],        // user-added medications, alongside the built-in common list [{id,name}]
   weightUnit: 'kg',      // display unit: 'kg' | 'g' | 'lboz'
   // Shared cross-phone timers: kept in synced state so either parent's phone can
   // see, tick and stop a timer the other started. ALWAYS an object, never null
@@ -2186,8 +2321,10 @@ function migrateData() {
   if (!Array.isArray(state.stashLog)) state.stashLog = [];
   if (!Array.isArray(state.notesLog)) state.notesLog = [];
   if (!Array.isArray(state.customFoods)) state.customFoods = [];
+  if (!Array.isArray(state.customMeds)) state.customMeds = [];
   if (!Array.isArray(state.calendarEvents)) state.calendarEvents = [];
   if (!Array.isArray(state.deletedIds)) state.deletedIds = [];
+  if (typeof state.simpleMode !== 'boolean') state.simpleMode = false;
   if (!Array.isArray(state.seenAchievements)) state.seenAchievements = [];
   if (!state.achievementCounts || Object.keys(state.achievementCounts).length === 0) {
     // First time this field exists on this device: seed it with CURRENT counts
@@ -2696,6 +2833,9 @@ function proceedToApp() {
   // If today is a birthday, birth day, or first-year monthiversary, turn on the
   // app-wide celebratory mode (confetti + warm accents), scaled by occasion.
   try { initCelebrationMode(); } catch(e) {}
+  // If the device was left in simple mode (e.g. a tablet on the counter for a
+  // caregiver), go straight back into it rather than the full app.
+  try { applySimpleMode(); } catch(e) {}
   // Start sync in background after a short delay
   setTimeout(() => startSync(), 1000);
 }
@@ -3604,8 +3744,50 @@ function confirmDialog(opts, onConfirm) {
   requestAnimationFrame(() => ov.classList.add('show'));
 }
 
-// A blocking, single-button alert — used when a save is refused, so the user
-// must physically dismiss it and can never mistake a rejection for a success.
+// A text-input dialog, modeled on confirmDialog — native prompt() is dead in this
+// app's embedded webview, so anywhere a short text value is needed from the user
+// (e.g. naming a new medicine) goes through this instead.
+function promptDialog(opts, onSubmit) {
+  opts = opts || {};
+  const title = opts.title || 'Enter a value';
+  const body = opts.body || '';
+  const placeholder = opts.placeholder || '';
+  const confirmLabel = opts.confirmLabel || 'Save';
+  const cancelLabel = opts.cancelLabel || 'Cancel';
+
+  let ov = document.getElementById('prompt-dialog');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'prompt-dialog';
+  ov.className = 'cfd-ov';
+  ov.innerHTML =
+    '<div class="cfd-card" role="dialog" aria-modal="true">' +
+      '<div class="cfd-title"></div>' +
+      (body ? '<div class="cfd-body"></div>' : '') +
+      '<input type="text" class="cfd-input" style="width:100%;margin-top:10px;box-sizing:border-box">' +
+      '<div class="cfd-btns">' +
+        '<button type="button" class="cfd-btn cfd-cancel"></button>' +
+        '<button type="button" class="cfd-btn cfd-ok"></button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(ov);
+  ov.querySelector('.cfd-title').textContent = title;
+  if (body) ov.querySelector('.cfd-body').textContent = body;
+  const input = ov.querySelector('.cfd-input');
+  input.placeholder = placeholder;
+  ov.querySelector('.cfd-cancel').textContent = cancelLabel;
+  ov.querySelector('.cfd-cancel').onclick = () => { closePromptDialog(); try { onSubmit && onSubmit(null); } catch(e){} };
+  const okBtn = ov.querySelector('.cfd-ok');
+  okBtn.textContent = confirmLabel;
+  const submit = () => { const v = input.value; closePromptDialog(); try { onSubmit && onSubmit(v); } catch(e) { console.error(e); } };
+  okBtn.onclick = submit;
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+  ov.onclick = (e) => { if (e.target === ov) { closePromptDialog(); try { onSubmit && onSubmit(null); } catch(err){} } };
+  requestAnimationFrame(() => { ov.classList.add('show'); input.focus(); });
+}
+function closePromptDialog() { const ov=document.getElementById('prompt-dialog'); if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.remove(),200);} }
+
+
 function alertDialog(title, body, opts) {
   opts = opts || {};
   let ov = document.getElementById('confirm-dialog');
@@ -3674,7 +3856,34 @@ function weeklyDigestHTML() {
 }
 
 // ── Edit any logged entry in place (feeds, sleeps, diapers, solid meals) ──
+// Switching the feed-type toggle inside the edit sheet needs to swap which
+// fields show (start+end time for left/right, a single amount for the rest).
+// Writes the in-progress values directly onto the REAL log entry (not a
+// detached copy) — editEntrySheet's save handler mutates whatever object it's
+// given and relies on that being the true array reference; a copy would silently
+// never make it back into state.feedingLog, which is exactly what happened
+// before this fix (switching type, entering an amount, and saving did nothing).
+// This is safe because nothing is persisted to storage until Save is tapped —
+// saveState() is the only thing that writes to localStorage/Firebase.
+window._eeSelectFeedType = function(btn) {
+  const newType = btn.getAttribute('data-eetype');
+  const sheet = btn.closest('.cfd-card');
+  const dateVal = sheet?.querySelector('#ee-date')?.value;
+  const timeVal = sheet?.querySelector('#ee-time')?.value;
+  const kind = window._eeCurrentKind, idx = window._eeCurrentIdx;
+  if (kind == null || idx == null) return;
+  const arr = { feed:'feedingLog' }[kind];
+  const real = (state[arr]||[])[idx];
+  if (!real) return;
+  real.feedType = newType;
+  if (dateVal) real.date = dateVal;
+  if (timeVal) real.time = timeVal;
+  closeConfirmDialog();
+  requestAnimationFrame(() => editEntrySheet(kind, idx));
+};
+
 window.editEntrySheet = function(kind, idx) {
+  window._eeCurrentKind = kind; window._eeCurrentIdx = idx;
   const cfg = {
     feed:  { arr:'feedingLog', label:'Edit feed' },
     sleep: { arr:'sleepLog',   label:'Edit sleep' },
@@ -3685,14 +3894,42 @@ window.editEntrySheet = function(kind, idx) {
   if (!cfg) return;
   const e = (state[cfg.arr]||[])[idx];
   if (!e) return;
+  // The feed-type toggle previews its choice by writing directly onto this real
+  // entry (see _eeSelectFeedType) so the save handler's mutations always land on
+  // the true object. Cancel must explicitly put back whatever was here when the
+  // sheet FIRST opened this session — otherwise switching type then cancelling
+  // would leave a half-changed, un-saved entry sitting in memory (feedType
+  // pointing one way, the amount fields pointing another) that a later unrelated
+  // saveState() call could persist by accident. Only capture on the very first
+  // open (not the toggle's re-open), so Cancel always reverts to what's on disk.
+  if (kind==='feed' && window._eeSnapshotForIdx !== idx) {
+    window._eeSnapshot = { feedType:e.feedType, date:e.date, time:e.time };
+    window._eeSnapshotForIdx = idx;
+  }
   const fld = (lbl, html) => '<div style="margin-bottom:10px"><label style="display:block;font-size:11px;font-weight:700;color:var(--dgray);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">'+lbl+'</label>'+html+'</div>';
   const inp = (id, type, val) => '<input id="'+id+'" type="'+type+'" value="'+(val==null?'':String(val).replace(/"/g,'&quot;'))+'">';
   const sel = (id, opts, cur) => '<select id="'+id+'">'+opts.map(o=>'<option'+(o===cur?' selected':'')+'>'+o+'</option>').join('')+'</select>';
   let body = fld('Date', inp('ee-date','date',e.date));
   if (kind==='feed') {
-    body += fld('Time', inp('ee-time','time',e.time));
-    if (e.type==='bottle') body += fld('Amount (ml)', inp('ee-ml','number',e.ml||''));
-    else body += '<div style="display:flex;gap:8px">'+fld('Left (min)', inp('ee-durL','number',e.durL||''))+fld('Right (min)', inp('ee-durR','number',e.durR||''))+'</div>';
+    // Reads the REAL fields the rest of the app uses (feedType, leftMin/rightMin,
+    // formulaMl/storedMl/pumpedMl, endTime) — this used to read e.type/e.durL/
+    // e.durR/e.ml, none of which exist on an actual feed entry, so every edit
+    // silently did nothing and the form always showed blank Left/Right minutes
+    // regardless of what was actually logged.
+    const curType = e.feedType || (e.leftMin?'left':e.rightMin?'right':e.storedMl?'stored':e.formulaMl?'formula':e.pumpedMl?'pumped':'left');
+    body += fld('Feed type', '<div class="ee-type-toggle">'+
+      ['left','right','formula','stored','pumped'].map(t => {
+        const lbl = {left:'\ud83d\udc99 Left',right:'\ud83d\udc97 Right',formula:'\ud83c\udf7c Formula',stored:'\ud83e\udd5b Stored',pumped:'\ud83d\udca7 Pumped'}[t];
+        return '<button type="button" class="ee-type-btn'+(t===curType?' on':'')+'" data-eetype="'+t+'" onclick="_eeSelectFeedType(this)">'+lbl+'</button>';
+      }).join('')+'</div>');
+    body += '<input type="hidden" id="ee-feedtype" value="'+curType+'">';
+    if (curType==='left' || curType==='right') {
+      body += '<div style="display:flex;gap:8px">'+fld('Start time', inp('ee-time','time',e.time))+fld('End time', inp('ee-endtime','time',e.endTime||''))+'</div>';
+    } else {
+      body += fld('Time', inp('ee-time','time',e.time));
+      const curAmt = curType==='stored' ? e.storedMl : curType==='formula' ? e.formulaMl : e.pumpedMl;
+      body += fld('Amount (ml)', inp('ee-ml','number',curAmt||''));
+    }
   } else if (kind==='sleep') {
     body += '<div style="display:flex;gap:8px">'+fld('Asleep', inp('ee-start','time',e.start))+fld('Woke', inp('ee-end','time',e.end||''))+'</div>';
     body += fld('Type', sel('ee-type',['Nap','Night'], e.type||'Nap'));
@@ -3720,16 +3957,50 @@ window.editEntrySheet = function(kind, idx) {
     '<button type="button" class="cfd-btn cfd-ok">Save changes</button></div></div>';
   document.body.appendChild(ov);
   ov.querySelector('.cfd-title').textContent = cfg.label;
-  ov.querySelector('.cfd-cancel').onclick = () => closeConfirmDialog();
+  ov.querySelector('.cfd-cancel').onclick = () => {
+    // Undo any toggle-preview mutation the type buttons wrote directly onto the
+    // real entry — without this, cancelling after switching type would leave
+    // feedType pointing one way and the amount fields pointing another, a
+    // corrupted-looking state that a later unrelated save could persist.
+    if (kind==='feed' && window._eeSnapshot) {
+      Object.assign(e, window._eeSnapshot);
+      window._eeSnapshot = null; window._eeSnapshotForIdx = null;
+    }
+    closeConfirmDialog();
+  };
   ov.querySelector('.cfd-ok').onclick = () => {
     const v = id => { const el=document.getElementById(id); return el?el.value:undefined; };
     { const _d = v('ee-date') || e.date;
       const _t = v('ee-time') || v('ee-start') || '';
-      if (entryInFuture(_d, _t)) { futureEntryAlert(); return; } }
+      if (entryInFuture(_d, _t)) { futureEntryAlert(); return; }
+      const _endT = v('ee-endtime') || '';
+      if (_endT && entryInFuture(_d, _endT)) { futureEntryAlert(); return; } }
     e.date = v('ee-date') || e.date;
-    if (kind==='feed') { e.time=v('ee-time')||e.time;
-      if (e.type==='bottle') e.ml=parseInt(v('ee-ml'))||0;
-      else { e.durL=parseInt(v('ee-durL'))||0; e.durR=parseInt(v('ee-durR'))||0; } }
+    if (kind==='feed') {
+      e.time = v('ee-time') || e.time;
+      const ft = v('ee-feedtype') || e.feedType || 'left';
+      e.feedType = ft;
+      // Clear every amount/duration field first, then set only the one that
+      // matches the selected type — otherwise switching e.g. Left -> Formula
+      // would leave a stale leftMin sitting alongside the new formulaMl.
+      e.leftMin = 0; e.rightMin = 0; e.formulaMl = 0; e.storedMl = 0; e.pumpedMl = 0; e.endTime = '';
+      if (ft==='left' || ft==='right') {
+        e.endTime = v('ee-endtime') || '';
+        let durMin = 0;
+        if (e.time && e.endTime) {
+          const [sh,sm] = e.time.split(':').map(Number);
+          const [eh,em] = e.endTime.split(':').map(Number);
+          durMin = (eh*60+em) - (sh*60+sm);
+          if (durMin < 0) durMin += 1440;
+        }
+        if (ft==='left') e.leftMin = durMin; else e.rightMin = durMin;
+      } else {
+        const amt = parseInt(v('ee-ml')) || 0;
+        if (ft==='stored') e.storedMl = amt;
+        else if (ft==='formula') e.formulaMl = amt;
+        else if (ft==='pumped') e.pumpedMl = amt;
+      }
+    }
     if (kind==='sleep') { e.start=v('ee-start')||e.start; e.end=v('ee-end')||e.end; e.type=v('ee-type')||e.type; }
     if (kind==='diaper'){ e.time=v('ee-time')||e.time;
       const t=v('ee-type'); if(t){ e.wet = (t==='wet'||t==='both'); e.dirty = (t==='dirty'||t==='both'); } }
@@ -3739,11 +4010,12 @@ window.editEntrySheet = function(kind, idx) {
     if (kind==='weight') { const u=state.weightUnit||'kg'; const raw=parseFloat(v('ee-weight'))||0;
       e.grams = u==='g' ? Math.round(raw) : u==='lboz' ? Math.round(raw*453.592) : Math.round(raw*1000); }
     saveState(cfg.arr);
+    window._eeSnapshot = null; window._eeSnapshotForIdx = null;
     closeConfirmDialog();
     try { navTo(_currentPage); } catch(err){}
     toast('Updated ✓');
   };
-  ov.onclick = (ev2) => { if (ev2.target === ov) closeConfirmDialog(); };
+  ov.onclick = (ev2) => { if (ev2.target === ov) ov.querySelector('.cfd-cancel').click(); };
   requestAnimationFrame(() => ov.classList.add('show'));
 };
 
@@ -3760,7 +4032,17 @@ window.arcDotDetail = function(kind, idx) {
   const e = (state[cfg.arr]||[])[idx];
   if (!e) return;
   let detail = e.time || '';
-  if (kind==='feed') detail += e.type==='bottle' ? (' · Bottle'+(e.ml?(' · '+e.ml+'ml'):'')) : (' · Breast'+(((e.durL||0)+(e.durR||0))?(' · '+((e.durL||0)+(e.durR||0))+' min'):''));
+  if (kind==='feed') {
+    const ft = e.feedType || (e.leftMin?'left':e.rightMin?'right':e.storedMl?'stored':e.formulaMl?'formula':e.pumpedMl?'pumped':'');
+    const label = {left:'Left',right:'Right',stored:'Stored',formula:'Formula',pumped:'Pumped'}[ft] || '\u2014';
+    if (ft==='left' || ft==='right') {
+      const mins = ft==='left' ? e.leftMin : e.rightMin;
+      detail += ' \u00b7 '+label + (e.endTime ? (' \u00b7 '+e.time+'\u2013'+e.endTime) : (mins?(' \u00b7 '+mins+' min'):''));
+    } else {
+      const amt = ft==='stored'?e.storedMl:ft==='formula'?e.formulaMl:e.pumpedMl;
+      detail += ' \u00b7 '+label + (amt?(' \u00b7 '+amt+'ml'):'');
+    }
+  }
   if (kind==='sleep') detail = (e.start||'') + '–' + (e.end||'…') + (e.type?(' · '+e.type):'');
   if (kind==='diaper') { const dk = (e.wet&&e.dirty)?'Both':e.dirty?'Dirty':e.wet?'Wet':'—'; detail += ' \u00b7 ' + dk + (e.dirty && e.color && e.color!=='N/A' ? (' \u00b7 '+e.color) : ''); }
   if (kind==='meal') detail += ' · ' + (e.meal||'') + (e.grams?(' · '+e.grams+'g'):'') + (e.reaction?(' · '+e.reaction):'');
@@ -3823,7 +4105,7 @@ function dayArcHTML() {
   // stack instead of hiding each other behind one dot.
   const evs = [];
   (state.feedingLog||[]).forEach((e,i)=>{ if(e.date!==t||!mine(e)) return; const m=mins(e.time); if(m!=null) evs.push({mn:m,cls:'feed',emoji:'🍼',kind:'feed',idx:i}); });
-  (state.diaperLog||[]).forEach((e,i)=>{ if(e.date!==t||!mine(e)) return; const m=mins(e.time); if(m!=null){ const dEmoji = (e.wet&&e.dirty)?'\ud83d\udca7\ud83d\udca9':e.dirty?'\ud83d\udca9':'\ud83d\udca7'; evs.push({mn:m,cls:'diaper',emoji:dEmoji,kind:'diaper',idx:i}); } });
+  (state.diaperLog||[]).forEach((e,i)=>{ if(e.date!==t||!mine(e)) return; const m=mins(e.time); if(m!=null){ const both=!!(e.wet&&e.dirty); const dEmoji = both?'\ud83d\udca7\ud83d\udca9':e.dirty?'\ud83d\udca9':'\ud83d\udca7'; evs.push({mn:m,cls:'diaper'+(both?' diaper-both':''),emoji:dEmoji,kind:'diaper',idx:i}); } });
   (state.solidsLog||[]).forEach((e,i)=>{ if(e.date!==t||!mine(e)) return; const m=mins(e.time); if(m!=null) evs.push({mn:m,cls:'meal',emoji:'🥄',kind:'meal',idx:i}); });
   evs.sort((a,b)=>a.mn-b.mn);
   const GAP = 95;              // minutes of arc roughly one dot wide — closer than this collides
@@ -5270,6 +5552,135 @@ const FIRST_100_DAYS = [
   {week:"Weeks 13–14\n(85–100 days)",baby:"3-month milestone: full social engagement. Hand batting, bear weight on legs, mini push-ups.",feeding:"May begin 4-month sleep regression signals. Solids NOT yet (too early).",sleep:"Some babies achieve 6 hr night stretch. Naps: 3x/day (45–90 min).",parent:"Drowsy-but-awake sleep training can begin. Enjoy — hardest phase is over.",recovery:"Physical recovery largely complete. Mental health priority now.",safety:"No solids until 6 months minimom. Continue tummy time. Safe sleep still essential."},
 ];
 
+// ══════════════════════════════════════════════════════════════════════════════
+// "WHAT TO WATCH FOR" — a month-by-month (then broader age-band) guide to the
+// predictable, commonly-recurring phases parents hear about but often aren't
+// given a plain explanation of: sleep regressions, growth spurts, developmental
+// leaps, teething, separation anxiety. Deliberately self-contained — own content
+// for months 1-3 too, not a link-out to FIRST_100_DAYS, so this page reads start
+// to finish on its own. Short and scannable by design: this flags what MIGHT
+// show up, not a full operating manual (that's what First 100 Days is for).
+// ══════════════════════════════════════════════════════════════════════════════
+const PHASE_TERMS = {
+  sleepregression: {
+    label: 'Sleep regression',
+    body: 'A stretch of days to a few weeks where a baby who was sleeping reasonably well suddenly wakes more, naps shorter, or resists settling. It usually lines up with a burst of brain development — the same rewiring that\u2019s building a new skill also stirs up sleep for a while. It\u2019s not a sign that something was done wrong, and it\u2019s not usually permanent — most settle back within 2\u20134 weeks with the same routine that worked before.'
+  },
+  growthspurt: {
+    label: 'Growth spurt',
+    body: 'A short burst (often just 24\u201372 hours) where a baby feeds noticeably more often and may seem fussier or less easily settled. It\u2019s the body asking for extra fuel ahead of a jump in weight or length. Unlike a sleep regression, it\u2019s short and resolves on its own within a few days \u2014 feeding on demand through it is the normal response.'
+  },
+  developmentalleap: {
+    label: 'Developmental leap',
+    body: 'A period where a baby is visibly working on a new mental or physical skill \u2014 tracking objects, understanding cause and effect, preparing to roll or crawl. These leaps often come with a few fussy, clingy, or unsettled days right before the new skill \u201cclicks,\u201d which is why they\u2019re frequently mistaken for something being wrong. The fussiness is usually the lead-up, not the leap itself.'
+  },
+  separationanxiety: {
+    label: 'Separation anxiety',
+    body: 'Distress when a trusted caregiver leaves the room or hands baby to someone else. It typically starts once a baby understands that people who are out of sight still exist (see Object permanence) \u2014 which is exactly why it wasn\u2019t upsetting before. It\u2019s a sign of healthy attachment, not a step backward, and it usually eases with time and short, predictable separations.'
+  },
+  objectpermanence: {
+    label: 'Object permanence',
+    body: 'The understanding that something (or someone) still exists even when it can\u2019t be seen. Before this clicks, \u201cout of sight\u201d genuinely means \u201cgone\u201d to a baby \u2014 which is why peekaboo is delightful once it develops, and why a parent leaving the room can suddenly become upsetting once it does.'
+  },
+  teething: {
+    label: 'Teething',
+    body: 'The process of teeth emerging through the gums. Drooling, gum-chewing, and mild irritability in the days around a tooth appearing are well supported; fever, diarrhea, or being unwell are commonly blamed on teething but aren\u2019t well supported by evidence \u2014 those are worth mentioning to a pediatrician rather than assuming they\u2019ll pass on their own.'
+  },
+};
+
+// Each month/band: { id, label, ageLabel, watch: [{term (key into PHASE_TERMS, optional), text}], note }
+const WATCH_MONTHS = [
+  { id:'m1', label:'Month 1', ageLabel:'0\u20134 weeks', note:'The steepest adjustment for everyone \u2014 mostly reflexes and sleep in short bursts, not yet real patterns.',
+    watch:[
+      {term:'growthspurt', text:'A growth spurt is common around 7\u201310 days and again near 3 weeks \u2014 expect a day or two of extra-frequent feeding.'},
+      {text:'Day/night rhythm hasn\u2019t started yet \u2014 sleep is spread evenly across 24 hours in 2\u20133 hour stretches. This is normal, not a sign anything needs fixing.'},
+    ]},
+  { id:'m2', label:'Month 2', ageLabel:'4\u20138 weeks', note:'Often the hardest stretch emotionally \u2014 crying tends to peak here and then genuinely improves.',
+    watch:[
+      {term:'growthspurt', text:'Another growth spurt is typical around 6 weeks.'},
+      {text:'Crying and fussiness commonly peak around 6 weeks (sometimes called the \u201cPURPLE crying\u201d period) and then reliably ease after \u2014 evening fussy spells are the most common pattern.'},
+      {term:'developmentalleap', text:'Early social smiles and more alert periods are a developmental leap in progress \u2014 short unsettled patches around this are common.'},
+    ]},
+  { id:'m3', label:'Month 3', ageLabel:'8\u201312 weeks', note:'Feeding and sleep both start to feel a little more predictable this month for many families.',
+    watch:[
+      {term:'growthspurt', text:'A growth spurt is common again around 12 weeks.'},
+      {text:'Longer night stretches (4\u20136 hours) start to become possible for many babies, though plenty still wake more \u2014 both are within normal range.'},
+      {term:'developmentalleap', text:'Laughing, stronger head control, and reaching for objects are all developing now \u2014 another leap window.'},
+    ]},
+  { id:'m4', label:'Month 4', ageLabel:'~4 months', note:'The best-known regression by name \u2014 knowing it\u2019s coming makes it easier to ride out.',
+    watch:[
+      {term:'sleepregression', text:'The \u201c4-month sleep regression\u201d is one of the most consistent regressions and often the most noticeable \u2014 baby\u2019s sleep cycles are maturing to look more like adult sleep, with more waking between cycles.'},
+      {text:'Rolling (tummy to back first, usually) may start to emerge around now or in the coming weeks.'},
+    ]},
+  { id:'m5', label:'Month 5', ageLabel:'~5 months', note:'A quieter month for most families, developmentally \u2014 skills from month 4 are consolidating.',
+    watch:[
+      {term:'developmentalleap', text:'Rolling both ways and reaching more precisely for objects are common leaps around this time.'},
+      {text:'Some babies briefly wake more at night as rolling becomes possible mid-sleep \u2014 usually settles as the skill becomes automatic.'},
+    ]},
+  { id:'m6', label:'Month 6', ageLabel:'~6 months', note:'A genuinely busy month \u2014 solids, teeth, and sitting often all arrive around the same window.',
+    watch:[
+      {term:'teething', text:'Teething often begins around now, though the range is wide (anywhere from 4\u201312 months is normal).'},
+      {text:'This is generally the recommended starting window for introducing solid foods, alongside continued milk feeds.'},
+      {text:'Sitting with support, and working toward sitting unsupported, is a common skill in progress.'},
+    ]},
+  { id:'m7', label:'Month 7', ageLabel:'~7 months', note:'Mobility is often the theme \u2014 the run-up to crawling can unsettle sleep for some.',
+    watch:[
+      {term:'developmentalleap', text:'Pre-crawling movement (rocking on hands and knees, scooting, pivoting) is a common leap this month.'},
+      {term:'sleepregression', text:'A sleep dip is sometimes reported around this time, often tied to the mobility leap rather than a distinct regression.'},
+    ]},
+  { id:'m8', label:'Month 8', ageLabel:'~8 months', note:'Attachment becomes more visible now \u2014 clinginess is a sign it\u2019s working, not a setback.',
+    watch:[
+      {term:'separationanxiety', text:'Separation anxiety commonly starts to appear around now, alongside a growing sense of object permanence.'},
+      {text:'Crawling arrives for many babies around this window, though the range for this is wide and not a cause for concern on its own.'},
+    ]},
+  { id:'m9', label:'Month 9', ageLabel:'~9 months', note:'Another well-known regression window \u2014 often tangled up with new mobility and separation anxiety together.',
+    watch:[
+      {term:'sleepregression', text:'A regression is commonly reported around 8\u20139 months, frequently overlapping with separation anxiety and new mobility.'},
+      {text:'Pulling to stand at furniture is common around now.'},
+    ]},
+  { id:'m10', label:'Month 10', ageLabel:'~10 months', note:'A lot of the hard parts of month 9 continue to settle here.',
+    watch:[
+      {text:'Cruising along furniture often develops now, building toward independent steps.'},
+      {term:'objectpermanence', text:'Object permanence is well established by now \u2014 games like peekaboo and hiding toys under a cloth are usually genuinely engaging at this stage.'},
+    ]},
+  { id:'m11', label:'Month 11', ageLabel:'~11 months', note:'First-birthday anticipation aside, this is often a calmer developmental month.',
+    watch:[
+      {text:'First words or word-like sounds with real intent (not just babbling) sometimes appear around now, though the range for this is very wide.'},
+      {term:'growthspurt', text:'A growth spurt is sometimes reported approaching the 1-year mark.'},
+    ]},
+  { id:'m12', label:'Month 12', ageLabel:'~12 months', note:'A big transition month on several fronts at once \u2014 walking, weaning, and sometimes sleep together.',
+    watch:[
+      {text:'First independent steps happen for many babies within a few months either side of the 1-year mark \u2014 this is a wide, normal range, not a strict deadline.'},
+      {term:'sleepregression', text:'A regression around 12 months is common, often coinciding with the walking milestone and the transition toward one nap a day.'},
+    ]},
+  { id:'m15', label:'Months 13\u201315', ageLabel:'~13\u201315 months', note:'Mobility from month 12 keeps building; talking starts catching up.',
+    watch:[
+      {text:'Walking usually becomes steadier and more confident through this window if it started at 12 months, or may begin here if it hadn\u2019t yet.'},
+      {text:'A small vocabulary of understood (if not yet spoken) words is typical by now.'},
+    ]},
+  { id:'m18', label:'Months 16\u201318', ageLabel:'~16\u201318 months', note:'Language often takes a visible jump; independence (and its friction) starts showing up.',
+    watch:[
+      {text:'A vocabulary \u201cexplosion\u201d \u2014 a rapid jump in the number of understood and spoken words \u2014 is common somewhere in this window, though timing varies a lot.'},
+      {term:'sleepregression', text:'A regression is sometimes reported around 18 months, often tied to growing independence and the beginnings of testing limits.'},
+      {text:'Early tantrums often begin here as wanting outpaces the ability to communicate it \u2014 frustration, not defiance.'},
+    ]},
+  { id:'m24', label:'Months 19\u201324', ageLabel:'~19\u201324 months', note:'The run-up to age two \u2014 more words, more opinions, more testing of boundaries.',
+    watch:[
+      {text:'Two-word phrases and simple combinations are a common language milestone through this stretch.'},
+      {text:'Tantrums and boundary-testing typically continue and can intensify \u2014 a normal (if exhausting) part of growing autonomy, not a discipline failure.'},
+    ]},
+  { id:'y23', label:'Years 2\u20133', ageLabel:'24\u201336 months', note:'Language and independence both continue rapidly; the range between children widens noticeably.',
+    watch:[
+      {text:'Short sentences and rapidly expanding vocabulary are typical through this year.'},
+      {text:'Sleep and behavior can both be unsettled around any major change \u2014 a new sibling, starting daycare, moving house \u2014 rather than age alone.'},
+    ]},
+  { id:'y34', label:'Years 3\u20134', ageLabel:'36\u201348 months', note:'Individual personality and pace become much more visible than any single shared "phase" by this point.',
+    watch:[
+      {text:'Skills and interests diverge a lot between children now \u2014 comparisons to other kids the same age are less useful than they were as a baby.'},
+      {text:'Toilet readiness, if not already underway, commonly develops somewhere in this range, on its own timeline.'},
+    ]},
+];
+
 const BILINGUAL = {
   recommendation: "OPOL (One Parent One Language) + Time & Place supplement",
   why: [
@@ -5436,6 +5847,17 @@ function ageInWeeksLabel() {
 // Manual events live in state.calendarEvents; upcoming vaccines are woven in
 // automatically (read-only) so the calendar is a single source of "what's next".
 // ═══════════════════════════════════════════════════════════════════════════
+// Common baby/infant medications, so logging a dose is a pick from a list instead
+// of free text — avoids "Vitamin D" vs "vitamin d" vs "VitD" all being treated as
+// different medicines. Parents can still add anything not on this list.
+const COMMON_MEDS = [
+  'Vitamin D', 'Paracetamol', 'Ibuprofen', 'Probiotics', 'Gripe Water',
+  'Saline Drops', 'Oral Rehydration Solution (ORS)', 'Iron Supplement',
+  'Antihistamine', 'Antibiotic', 'Fever Reducer', 'Teething Gel', 'Eye Drops',
+];
+const DOSE_UNITS = ['ml', 'mg', 'mcg', 'drops', 'tablet', 'sachet', 'puff', 'application'];
+function allMeds() { return [...COMMON_MEDS, ...(state.customMeds||[]).map(m=>m.name)]; }
+
 const CAL_CATS = {
   appointment: { label:'Appointment', emoji:'\ud83e\ude7a', color:'#2D8F8F', deep:'#1F6E6E', bg:'#E6F5F5' },
   vaccine:     { label:'Vaccine',     emoji:'\ud83d\udc89', color:'#C4574B', deep:'#B23A2E', bg:'#FBEAE7' },
@@ -6192,6 +6614,244 @@ window._calDeleteFromSheet = function(id){
     deleteCalEvent(id); closeCalSheet();
   });
 };
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SIMPLE MODE — a stripped-back, large-type screen for a propped-up tablet, meant
+// for a caregiver/nanny who isn't using the rest of the app. Shows only what
+// matters at a glance (last feed, when the next is due, last diaper, last weight)
+// plus big tap-to-log buttons. Detail is preserved (which side, wet/dirty/both,
+// actual weight value) — it just asks for it in one big obvious step instead of
+// a full form. Writes through the SAME log paths and Firebase sync as the main
+// app, so anything logged here appears on the parents' phones immediately.
+// ══════════════════════════════════════════════════════════════════════════════
+PAGES['simple'] = function(el) {
+  function render() {
+    const feed = lastFeedInfo();
+    const rec = getRecommendations();
+    let freqH = state.feedIntervalHours;
+    if (!freqH && rec && rec.feedFreq) freqH = parseFloat((''+rec.feedFreq).match(/[\d.]+/)?.[0]||'3');
+
+    const fmtClock = (d) => { if(!d||isNaN(d)) return '\u2014'; let h=d.getHours(), m=d.getMinutes(); const ap=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12; return h+':'+String(m).padStart(2,'0')+' '+ap; };
+
+    // Next feed + how it should read (overdue / soon / countdown)
+    let nextClock = '\u2014', nextSub = '', nextTone = 'ok';
+    if (feed && feed.dt && freqH) {
+      const dueAt = new Date(feed.dt.getTime() + freqH*3600000);
+      nextClock = fmtClock(dueAt);
+      const leftMin = Math.round((dueAt - new Date())/60000);
+      if (leftMin <= 0) { nextSub = 'Due now'; nextTone = 'due'; }
+      else if (leftMin <= 20) { nextSub = 'in about '+leftMin+' min'; nextTone = 'soon'; }
+      else { const h=Math.floor(leftMin/60), m=leftMin%60; nextSub = 'in '+(h>0?h+'h '+(m>0?m+'m':''):m+'m'); }
+    } else if (!feed || !feed.dt) {
+      nextSub = 'No feeds logged yet';
+    }
+
+    // Last diaper
+    const dLogs = logsFor(state.diaperLog||[]).slice().sort((a,b)=>((b.date||'')+(b.time||'')).localeCompare((a.date||'')+(a.time||'')));
+    const lastD = dLogs[0];
+    let diaperText = 'None yet', diaperAgo = '';
+    if (lastD) {
+      const kind = (lastD.wet&&lastD.dirty) ? 'Wet + dirty' : lastD.dirty ? 'Dirty' : 'Wet';
+      diaperText = kind;
+      const dt = new Date((lastD.date||'')+'T'+(lastD.time||'00:00'));
+      if (!isNaN(dt)) { const mins = Math.floor((Date.now()-dt.getTime())/60000);
+        diaperAgo = mins < 60 ? mins+' min ago' : Math.floor(mins/60)+'h '+(mins%60)+'m ago'; }
+    }
+
+    // Last weight
+    const wLogs = logsFor(state.weightLog||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    const lastW = wLogs[0];
+    const wUnit = state.weightUnit||'kg';
+    const wText = lastW ? gramsToDisplay(lastW.grams, wUnit) : '\u2014';
+    const wDate = lastW ? formatDate(lastW.date) : 'Not logged yet';
+
+    el.innerHTML = `
+      <div class="sm-wrap">
+        <div class="sm-head">
+          <span class="sm-baby">${babyName()||'Baby'}</span>
+          <button class="sm-exit" onclick="simpleModeExitPrompt()" aria-label="Exit simple mode">\u2699</button>
+        </div>
+
+        <div class="sm-card sm-card-next sm-tone-${nextTone}">
+          <div class="sm-label">Next feed</div>
+          <div class="sm-big">${nextClock}</div>
+          <div class="sm-sub">${nextSub}</div>
+        </div>
+
+        <div class="sm-row">
+          <div class="sm-card sm-card-half">
+            <div class="sm-label">Last feed</div>
+            <div class="sm-mid">${feed && feed.dt ? fmtClock(feed.dt) : '\u2014'}</div>
+            <div class="sm-sub">${feed && feed.ago ? feed.ago : 'None yet'}${feed && feed.side ? ' \u00b7 '+feed.side : ''}</div>
+          </div>
+          <div class="sm-card sm-card-half">
+            <div class="sm-label">Last diaper</div>
+            <div class="sm-mid">${diaperText}</div>
+            <div class="sm-sub">${diaperAgo||'\u00a0'}</div>
+          </div>
+        </div>
+
+        <div class="sm-card sm-card-weight">
+          <div>
+            <div class="sm-label">Weight</div>
+            <div class="sm-sub" style="margin-top:2px">${wDate}</div>
+          </div>
+          <div class="sm-weight-val">${wText}</div>
+        </div>
+
+        <div class="sm-actions">
+          <button class="sm-btn sm-btn-feed" onclick="smLogFeed()">\ud83c\udf7c<span>Log feed</span></button>
+          <button class="sm-btn sm-btn-diaper" onclick="smLogDiaper()">\ud83d\udca7<span>Log diaper</span></button>
+          <button class="sm-btn sm-btn-weight" onclick="smLogWeight()">\u2696\ufe0f<span>Log weight</span></button>
+        </div>
+      </div>`;
+  }
+  window._smRender = render;
+  render();
+};
+
+// Step 2 of each log action: one big, obvious choice instead of a full form.
+window.smLogFeed = function() {
+  smChoiceSheet('Which side?', [
+    { label:'\ud83d\udc99 Left',   onPick:() => smAmountSheet('How many minutes?', m => smSaveFeed('left', null, m)) },
+    { label:'\ud83d\udc97 Right',  onPick:() => smAmountSheet('How many minutes?', m => smSaveFeed('right', null, m)) },
+    { label:'\ud83c\udf7c Formula', onPick:() => smAmountSheet('Formula (ml)', ml => smSaveFeed('formula', ml)) },
+    { label:'\ud83e\udd5b Stored',  onPick:() => smAmountSheet('Stored milk (ml)', ml => smSaveFeed('stored', ml)) },
+  ]);
+};
+window.smSaveFeed = function(type, ml, mins) {
+  if (!state.feedingLog) state.feedingLog = [];
+  const now = new Date();
+  const durMin = parseInt(mins) || 0;
+  // For a breast feed the caregiver enters how long it lasted; record the start
+  // time by working backwards from now, so start/end/duration are all consistent
+  // with how a timed feed from the main app looks.
+  const startD = (type==='left'||type==='right') && durMin > 0
+    ? new Date(now.getTime() - durMin*60000) : now;
+  const fmt = (d) => d.toTimeString().slice(0,5);
+  state.feedingLog.push({
+    date: today(), time: fmt(startD),
+    endTime: (type==='left'||type==='right') && durMin > 0 ? fmt(now) : '',
+    feedType: type,
+    leftMin:  type==='left'  ? durMin : 0,
+    rightMin: type==='right' ? durMin : 0,
+    formulaMl: type==='formula' ? (parseInt(ml)||0) : 0,
+    storedMl:  type==='stored'  ? (parseInt(ml)||0) : 0,
+    pumpedMl: 0, notes: '', babyIdx: logBabyIdx(),
+  });
+  saveState('feedingLog');
+  if (window._smRender) window._smRender();
+  toastSuccess('Feed logged \u2713');
+};
+window.smLogDiaper = function() {
+  smChoiceSheet('What kind?', [
+    { label:'\ud83d\udca7 Wet',          onPick:() => { nowSaveDiaper('wet');   if(window._smRender) window._smRender(); } },
+    { label:'\ud83d\udca9 Dirty',        onPick:() => { nowSaveDiaper('dirty'); if(window._smRender) window._smRender(); } },
+    { label:'\ud83d\udca7\ud83d\udca9 Both', onPick:() => { nowSaveDiaper('both');  if(window._smRender) window._smRender(); } },
+  ]);
+};
+window.smLogWeight = function() {
+  const unit = state.weightUnit||'kg';
+  smAmountSheet('Weight ('+unit+')', v => {
+    const val = parseFloat(v);
+    if (!val || val<=0) { toast('Enter a weight'); return; }
+    const grams = unit==='g' ? val : unit==='lboz' ? val*453.592 : val*1000;
+    if (!state.weightLog) state.weightLog = [];
+    const d = today(), bi = logBabyIdx();
+    const entry = { date:d, grams:Math.round(grams), notes:'', babyIdx:bi };
+    const existing = state.weightLog.findIndex(w => w.date===d && (w.babyIdx||0)===bi);
+    if (existing>=0) state.weightLog[existing]=entry; else state.weightLog.push(entry);
+    saveState('weightLog');
+    if (window._smRender) window._smRender();
+    toastSuccess('Weight logged \u2713');
+  }, true);
+};
+
+// A big-button choice sheet, sized for a tablet and for someone who isn't
+// familiar with the app — no small tap targets, no ambiguous icons.
+window.smChoiceSheet = function(title, options) {
+  let ov = document.getElementById('sm-sheet'); if (ov) ov.remove();
+  ov = document.createElement('div'); ov.id='sm-sheet'; ov.className='sm-sheet-ov';
+  ov.innerHTML = '<div class="sm-sheet"><div class="sm-sheet-title">'+title+'</div>'+
+    '<div class="sm-sheet-opts">'+options.map((o,i)=>'<button class="sm-sheet-btn" data-i="'+i+'">'+o.label+'</button>').join('')+'</div>'+
+    '<button class="sm-sheet-cancel">Cancel</button></div>';
+  document.body.appendChild(ov);
+  ov.querySelectorAll('.sm-sheet-btn').forEach(btn => {
+    btn.onclick = () => { const i=parseInt(btn.getAttribute('data-i')); smCloseSheet(); setTimeout(()=>options[i].onPick(), 60); };
+  });
+  ov.querySelector('.sm-sheet-cancel').onclick = smCloseSheet;
+  ov.onclick = (e) => { if (e.target===ov) smCloseSheet(); };
+  requestAnimationFrame(()=>ov.classList.add('show'));
+};
+window.smCloseSheet = function(){ const ov=document.getElementById('sm-sheet'); if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.remove(),180);} };
+
+// Number entry with a big on-screen keypad — avoids relying on the tablet's
+// keyboard appearing correctly, and keeps every target large.
+window.smAmountSheet = function(title, onDone, allowDecimal) {
+  let ov = document.getElementById('sm-sheet'); if (ov) ov.remove();
+  ov = document.createElement('div'); ov.id='sm-sheet'; ov.className='sm-sheet-ov';
+  const keys = ['1','2','3','4','5','6','7','8','9', allowDecimal?'.':'', '0', '\u232b'];
+  ov.innerHTML = '<div class="sm-sheet"><div class="sm-sheet-title">'+title+'</div>'+
+    '<div class="sm-amount-display" id="sm-amount">0</div>'+
+    '<div class="sm-keypad">'+keys.map(k=>k===''?'<span></span>':'<button class="sm-key" data-k="'+k+'">'+k+'</button>').join('')+'</div>'+
+    '<div class="sm-sheet-foot"><button class="sm-sheet-cancel">Cancel</button><button class="sm-sheet-ok">Save</button></div></div>';
+  document.body.appendChild(ov);
+  let buf = '';
+  const disp = ov.querySelector('#sm-amount');
+  const sync = () => { disp.textContent = buf || '0'; };
+  ov.querySelectorAll('.sm-key').forEach(k => {
+    k.onclick = () => {
+      const key = k.getAttribute('data-k');
+      if (key==='\u232b') buf = buf.slice(0,-1);
+      else if (key==='.') { if (!buf.includes('.')) buf = (buf||'0')+'.'; }
+      else { if (buf.replace('.','').length < 6) buf += key; }
+      sync();
+    };
+  });
+  ov.querySelector('.sm-sheet-cancel').onclick = smCloseSheet;
+  ov.querySelector('.sm-sheet-ok').onclick = () => { const v = buf; smCloseSheet(); setTimeout(()=>onDone(v), 60); };
+  ov.onclick = (e) => { if (e.target===ov) smCloseSheet(); };
+  requestAnimationFrame(()=>ov.classList.add('show'));
+};
+
+// Exiting is deliberately a little deliberate — a caregiver shouldn't wander
+// into the full app (or the parents' data) by mistap, but a parent shouldn't
+// be locked out either.
+window.simpleModeEnterPrompt = function() {
+  confirmDialog({
+    title: 'Turn on simple mode?',
+    body: 'The app will show only the big caregiver screen \u2014 next feed, last diaper, weight, and log buttons. Tap the \u2699 in the corner to come back.',
+    confirmLabel: 'Turn on',
+    danger: false,
+  }, () => {
+    state.simpleMode = true;
+    saveState('simpleMode');
+    applySimpleMode();
+  });
+};
+
+window.simpleModeExitPrompt = function() {
+  confirmDialog({
+    title: 'Exit simple mode?',
+    body: 'This returns to the full BabyOS app with all pages and settings.',
+    confirmLabel: 'Exit simple mode',
+    danger: false,
+  }, () => {
+    state.simpleMode = false;
+    saveState('simpleMode');
+    applySimpleMode();
+    navTo('now');
+  });
+};
+
+// Applies/removes the simple-mode shell (hides nav chrome, locks to one page).
+function applySimpleMode() {
+  const on = !!state.simpleMode;
+  document.body.classList.toggle('simple-mode', on);
+  if (on) {
+    try { navTo('simple'); } catch(e) {}
+  }
+}
 
 PAGES['now'] = function(el) {
   const hasBaby = !!state.babyDOB;
@@ -7024,16 +7684,26 @@ PAGES['dashboard'] = function(el) {
         </div>
         ${hasBaby?`<div class="card">
           <div class="card-title">Next vaccines</div>
-          ${[...VACCINES,...(state.customVaccines||[])].slice(0,5).map((v,i)=>{
-            const s=state.vaccines[i]||{};
-            const due = v.daysFromBirth!=null?new Date(new Date(state.babyDOB).getTime()+v.daysFromBirth*86400000):null;
-            const overdue = !s.given&&due&&due<new Date();
-            return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f5f5f5">
-              <div style="width:8px;height:8px;border-radius:50%;background:${s.given?'#0F6E56':overdue?'#C0392B':'#ddd'};flex-shrink:0"></div>
-              <span style="font-size:12px;flex:1">${v.name}</span>
-              <span style="font-size:11px;font-weight:600;padding:2px 6px;border-radius:6px;background:${s.given?'#E1F5EE':overdue?'#FCEBEB':'#f0f0f0'};color:${s.given?'#0F6E56':overdue?'#C0392B':'#888'}">${s.given?'✓ Done':overdue?'Overdue':v.age}</span>
-            </div>`;
-          }).join('')}
+          ${(() => {
+            // Use the SAME due-date helper as the Vaccines/Calendar pages (honors a
+            // rescheduled date set via setVaxDueDate), and only show what's actually
+            // still upcoming — a vaccine already marked given has nothing "next" about it.
+            const all = [...VACCINES,...(state.customVaccines||[])];
+            const upcoming = all.map((v,i) => ({ v, i, s: state.vaccines[i]||{}, due: vaxDueDate(v,i) }))
+              .filter(x => !x.s.given)
+              .sort((a,b) => { if(!a.due) return 1; if(!b.due) return -1; return a.due-b.due; })
+              .slice(0,5);
+            if (!upcoming.length) return '<div class="empty-state" style="padding:12px">All caught up \u2014 no upcoming vaccines</div>';
+            return upcoming.map(({v,due}) => {
+              const overdue = due && due < new Date();
+              const rescheduled = state.vaccines[all.indexOf(v)]?.dueDate;
+              return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f5f5f5">
+                <div style="width:8px;height:8px;border-radius:50%;background:${overdue?'#C0392B':'#ddd'};flex-shrink:0"></div>
+                <span style="font-size:12px;flex:1">${v.name}</span>
+                <span style="font-size:11px;font-weight:600;padding:2px 6px;border-radius:6px;background:${overdue?'#FCEBEB':rescheduled?'#EEEDFE':'#f0f0f0'};color:${overdue?'#C0392B':rescheduled?'#6544B0':'#888'} !important">${overdue?'Overdue':rescheduled?'\ud83d\udcc5 Rescheduled':(due?formatDate(ymd(due)):v.age)}</span>
+              </div>`;
+            }).join('');
+          })()}
         </div>`:`
         <div class="card" style="background:#E6F5F5;border:1px solid #9FE1CB">
           <div style="font-size:13px;font-weight:600;color:#0F6E56;margin-bottom:10px">🎂 ${babyName()?'Update '+babyName()+"'s profile":'Baby arrived?'}</div>
@@ -7816,10 +8486,15 @@ function getCanvasCtx(id) {
   return {canvas, ctx, w: cssW, h: cssH};
 }
 
-function drawBar(id, labels, datasets, yLabel) {
+function drawBar(id, labels, datasets, yLabel, opts) {
   const cc = getCanvasCtx(id); if (!cc) return;
   const {ctx, w, h} = cc;
-  const isHourly = labels.length >= 20;
+  // isHourly used to be GUESSED from bucket count (>=20 implying "24 hours"), but
+  // the Trend Explorer can legitimately have 20+ weekly/monthly buckets too, which
+  // collided with that guess and mis-rendered as an hourly axis. Callers that want
+  // the hourly axis now say so explicitly via opts.hourly; everyone else (including
+  // every pre-existing caller, unchanged) gets the normal labeled axis.
+  const isHourly = opts && opts.hourly === true;
   const pad = {t:20, r:10, b:isHourly?26:34, l:yLabel?44:34};
   const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
   const _bnt = niceTicks(0, Math.max(...datasets.flatMap(d => d.data), 1), 4);
@@ -7893,10 +8568,45 @@ function drawBar(id, labels, datasets, yLabel) {
     ctx.textAlign = 'right';
     ctx.fillText('hour →', w - pad.r, h - 1);
   } else {
+    // With few bars (the existing 4-7 bucket weekly views) every label fits and
+    // this draws all of them, unchanged. With many buckets (the Trend Explorer can
+    // have 26+ for longer ranges) drawing every label always overlapped — now we
+    // pick a stride (show every Nth label) based on the widest label, then give
+    // each SHOWN label the full stride-width it actually has available (skipping
+    // labels frees up the space those skipped bars would have used).
+    ctx.font = '9px -apple-system,sans-serif';
+    const sampleWidth = labels.reduce((mx,l) => Math.max(mx, ctx.measureText(String(l||'')).width), 0);
+    const singleBarW = groupW * 0.92;
+    let stride = 1;
+    while (sampleWidth > singleBarW * stride && stride < labels.length) stride++;
+    const availableW = singleBarW * stride; // room the shown label actually has
+    // Decide WHICH indices to draw first (every `stride`-th, plus the last), then
+    // drop the second-to-last one if it's close enough to the forced last label
+    // that they'd collide — the two-pass approach avoids the "second-to-last and
+    // last label crowd together" edge case that a pure modulo check misses.
+    const lastIdx = labels.length - 1;
+    let showIdx = labels.map((_,i)=>i).filter(i => stride===1 || i%stride===0 || i===lastIdx);
+    if (stride > 1 && showIdx.length >= 2) {
+      const prevIdx = showIdx[showIdx.length-2];
+      if ((lastIdx - prevIdx) * groupW < availableW) showIdx.splice(showIdx.length-2, 1);
+    }
+    const showSet = new Set(showIdx);
     labels.forEach((lbl, i) => {
-      if (!lbl) return;
+      if (!lbl || !showSet.has(i)) return;
       const x = pad.l + i * groupW + groupW/2;
-      ctx.fillText(String(lbl).substring(0, 9), x, h - 8);
+      let text = String(lbl);
+      if (ctx.measureText(text).width > availableW) {
+        // Shorten at a space boundary where possible ("23 Aug" -> "23") rather
+        // than an arbitrary character cut ("23 Aug" -> "23 A"), and only fall
+        // back to a hard character truncation if there's no space to trim at.
+        while (text.includes(' ') && ctx.measureText(text).width > availableW) {
+          text = text.slice(0, text.lastIndexOf(' '));
+        }
+        while (text.length > 1 && ctx.measureText(text).width > availableW) {
+          text = text.slice(0, -1);
+        }
+      }
+      ctx.fillText(text, x, h - 8);
     });
   }
 
@@ -7941,6 +8651,221 @@ function niceTicks(minV, maxV, target) {
   for (let v = lo; v <= hi + step * 1e-6; v += step) ticks.push(parseFloat(v.toFixed(decimals)));
   return {ticks, min: lo, max: hi, step, decimals};
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TREND EXPLORER — a shared long-range trend section for every log page's History
+// area. Lets the user pick a time range (1/3/6 months, 1 year, all time) and an
+// aggregation (avg/day, avg/week, avg/month, or total), and draws a bar chart of
+// however many buckets that combination produces. One implementation, reused by
+// feeding/sleep/diaper/weight/pump/meds/reading/solids so behavior stays
+// consistent — each page just supplies its log array and how to extract a number.
+// ══════════════════════════════════════════════════════════════════════════════
+const TREND_RANGES = [
+  {id:'1m', label:'1 month', shortLabel:'L1M', days:30},
+  {id:'3m', label:'3 months', shortLabel:'L3M', days:90},
+  {id:'6m', label:'6 months', shortLabel:'L6M', days:180},
+  {id:'1y', label:'1 year', shortLabel:'1Y', days:365},
+  {id:'all', label:'All time', shortLabel:'All', days:null},
+];
+const TREND_AGGS = [
+  {id:'avgday', label:'Avg / day'},
+  {id:'avgweek', label:'Avg / week'},
+  {id:'avgmonth', label:'Avg / month'},
+  {id:'total', label:'Total'},
+];
+
+// Per-page UI state, keyed by trendId, so each page's Trend Explorer remembers its
+// own range/aggregation choice independently (e.g. Feeding and Weight don't share).
+window._trendState = window._trendState || {};
+function trendState(trendId) {
+  if (!window._trendState[trendId]) window._trendState[trendId] = { range:'3m', agg:'avgday' };
+  return window._trendState[trendId];
+}
+
+// Bucket a log array into day/week/month buckets across the selected range, then
+// aggregate each bucket per the chosen mode. `getValue(entry)` extracts the number
+// to chart from one log entry (e.g. e => 1 for a count, or e => e.grams for a sum);
+// entries without a usable date are skipped.
+function computeTrend(logs, getValue, range, agg, mode) {
+  mode = mode || 'sum'; // 'sum' = countable events (feeds, diapers, ml); 'latest' = a
+                         // cumulative reading like body weight, where summing or
+                         // averaging entries within a bucket wouldn't be meaningful —
+                         // instead each bucket shows its last reading, carried forward
+                         // from the previous bucket when a period has no new entries.
+  const now = new Date(); now.setHours(0,0,0,0);
+  const rangeInfo = TREND_RANGES.find(r => r.id === range) || TREND_RANGES[1];
+  let startDate;
+  if (rangeInfo.days) { startDate = new Date(now); startDate.setDate(startDate.getDate() - rangeInfo.days + 1); }
+  else {
+    // All time: start from the earliest logged entry (or 1 year back if no logs).
+    const dates = logs.map(e => e.date).filter(Boolean).sort();
+    startDate = dates.length ? new Date(dates[0]+'T00:00:00') : new Date(now.getTime()-365*86400000);
+  }
+  const startStr = localDateStr(startDate);
+  const relevant = logs.filter(e => e.date && e.date >= startStr);
+
+  // Choose a bucket size that keeps the chart readable regardless of range: daily
+  // buckets for short ranges, weekly for medium, monthly for long spans — capped
+  // around ~26 bars so the chart never gets too dense to read.
+  const totalDays = Math.max(1, Math.round((now - startDate) / 86400000) + 1);
+  let bucketUnit = 'day';
+  if (totalDays > 26 && totalDays <= 26*7) bucketUnit = 'week';
+  else if (totalDays > 26*7) bucketUnit = 'month';
+
+  // Build ordered bucket keys + labels spanning the whole range (even empty ones,
+  // so gaps in logging show as zero rather than silently compressing the timeline).
+  const buckets = []; // {key, label, sum, count}
+  if (bucketUnit === 'day') {
+    for (let d = new Date(startDate); d <= now; d.setDate(d.getDate()+1)) {
+      const key = localDateStr(d);
+      buckets.push({ key, label: d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), sum:0, count:0 });
+    }
+  } else if (bucketUnit === 'week') {
+    let d = new Date(startDate);
+    while (d <= now) {
+      const key = localDateStr(d);
+      const label = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      buckets.push({ key, label, sum:0, count:0, weekEnd: new Date(d.getTime()+7*86400000) });
+      d.setDate(d.getDate()+7);
+    }
+  } else {
+    let d = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const endMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    while (d <= endMonth) {
+      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      buckets.push({ key, label: d.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}), sum:0, count:0,
+                      monthStart: new Date(d), monthEnd: new Date(d.getFullYear(), d.getMonth()+1, 1) });
+      d.setMonth(d.getMonth()+1);
+    }
+  }
+
+  // Assign each log entry to its bucket.
+  relevant.forEach(e => {
+    const v = getValue(e); if (v == null || isNaN(v)) return;
+    const ed = new Date(e.date+'T00:00:00');
+    let b;
+    if (bucketUnit === 'day') b = buckets.find(x => x.key === e.date);
+    else if (bucketUnit === 'week') b = buckets.slice().reverse().find(x => ed >= new Date(x.key+'T00:00:00'));
+    else b = buckets.find(x => ed >= x.monthStart && ed < x.monthEnd);
+    if (b) {
+      b.sum += v; b.count++;
+      // Track the chronologically-latest reading in this bucket (entries aren't
+      // guaranteed sorted, so compare dates rather than just overwriting).
+      if (b.lastDate == null || e.date >= b.lastDate) { b.lastDate = e.date; b.lastVal = v; }
+    }
+  });
+
+  let values;
+  if (mode === 'latest') {
+    // Carry the last known reading forward through any bucket with no new entries,
+    // so a growth line doesn't drop to zero between weigh-ins.
+    let carry = null;
+    values = buckets.map(b => { if (b.count > 0) carry = b.lastVal; return carry; });
+  } else {
+    // Apply the aggregation. "Total" sums every entry in the bucket regardless of
+    // bucket size; "avg/day|week|month" divides the bucket's sum by how many of
+    // that unit the bucket actually spans (so a partial first/last bucket near
+    // today doesn't look artificially low).
+    values = buckets.map(b => {
+      if (agg === 'total') return b.sum;
+      if (agg === 'avgday') {
+        const spanDays = bucketUnit==='day' ? 1 : bucketUnit==='week' ? 7 : new Date(b.monthEnd - b.monthStart)/86400000;
+        return b.sum / spanDays;
+      }
+      if (agg === 'avgweek') {
+        const spanWeeks = bucketUnit==='day' ? 1/7 : bucketUnit==='week' ? 1 : (new Date(b.monthEnd - b.monthStart)/86400000)/7;
+        return b.sum / spanWeeks;
+      }
+      // avgmonth
+      const spanMonths = bucketUnit==='day' ? 1/30 : bucketUnit==='week' ? 7/30 : 1;
+      return b.sum / spanMonths;
+    });
+  }
+
+  return { labels: buckets.map(b=>b.label), values, bucketUnit };
+}
+
+// Renders the Trend Explorer card HTML. `trendId` scopes this instance's state;
+// `title` is a short description of what's being charted (e.g. "Feeds").
+window._trendOpen = window._trendOpen || {};
+function trendExplorerHTML(trendId, title, hideAgg) {
+  const st = trendState(trendId);
+  const isOpen = !!window._trendOpen[trendId];
+  const rangeOptions = TREND_RANGES.map(r =>
+    `<option value="${r.id}"${st.range===r.id?' selected':''}>${r.shortLabel||r.label}</option>`).join('');
+  const aggChips = TREND_AGGS.map(a =>
+    `<button class="trend-chip trend-chip-agg${st.agg===a.id?' on':''}" onclick="setTrendAgg('${trendId}','${a.id}')">${a.label}</button>`).join('');
+  return `
+    <div class="card trend-card" style="padding:0;overflow:hidden">
+      <div onclick="toggleTrendExplorer('${trendId}')" role="button" tabindex="0" aria-expanded="${isOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTrendExplorer('${trendId}');}" style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;user-select:none;min-height:44px">
+        <div><div class="card-title" style="margin:0">Trend over time</div>
+        <div style="font-size:11.5px;color:var(--ink-3);margin-top:1px">${title}</div></div>
+        <span style="color:#767680;font-size:13px">${isOpen?'\u25be':'\u25b8'}</span>
+      </div>
+      <div style="display:${isOpen?'block':'none'};padding:0 16px 16px">
+        <div class="trend-card-head" style="margin-bottom:2px">
+          <span style="font-size:11.5px;color:var(--ink-3)">Range</span>
+          <select class="trend-range-select" onchange="setTrendRange('${trendId}',this.value)">${rangeOptions}</select>
+        </div>
+        ${hideAgg ? '' : '<div class="trend-chips" style="margin-top:10px;margin-bottom:14px">'+aggChips+'</div>'}
+        <div class="chart-wrap" style="height:170px${hideAgg?';margin-top:14px':''}"><canvas id="trend-canvas-${trendId}" style="width:100%;height:100%"></canvas></div>
+        <div id="trend-empty-${trendId}" style="display:none;text-align:center;padding:20px 12px;color:var(--ink-3);font-size:12.5px">Not enough data logged yet for this range.</div>
+      </div>
+    </div>`;
+}
+window.toggleTrendExplorer = (trendId) => {
+  window._trendOpen[trendId] = !window._trendOpen[trendId];
+  // Re-render whichever page is currently showing this trend card.
+  const el = document.getElementById('page-'+_currentPage);
+  if (el && PAGES[_currentPage]) PAGES[_currentPage](el);
+};
+
+// Draws (or redraws) the trend chart for one instance. Call after render and after
+// any range/agg change. `logs` and `getValue`/`color`/`unit` describe the metric.
+function renderTrendChart(trendId, logs, getValue, color, unit, mode) {
+  const st = trendState(trendId);
+  const { labels, values } = computeTrend(logsFor(logs||[]), getValue, st.range, st.agg, mode);
+  const canvas = document.getElementById('trend-canvas-'+trendId);
+  const emptyEl = document.getElementById('trend-empty-'+trendId);
+  if (!canvas) return;
+  const hasData = values.some(v => v != null && v > 0);
+  if (!hasData) {
+    canvas.style.display = 'none'; if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block'; if (emptyEl) emptyEl.style.display = 'none';
+  if (mode === 'latest') {
+    // A cumulative reading (e.g. weight) reads naturally as a trend LINE, not
+    // discrete bars — and leading buckets before the first-ever entry stay null
+    // (undefined on the chart) rather than drawing as a false zero.
+    const rounded = values.map(v => v == null ? null : Math.round(v*100)/100);
+    drawLine('trend-canvas-'+trendId, labels, [{label:unit, data:rounded, color}], unit, {fillZero:false});
+  } else {
+    // Round for display so avg-based values don't show long decimals.
+    const rounded = values.map(v => Math.round(v*10)/10);
+    drawBar('trend-canvas-'+trendId, labels, [{label:unit, data:rounded, color}], unit);
+  }
+}
+
+window.setTrendRange = function(trendId, range) {
+  trendState(trendId).range = range;
+  // The <select> already reflects its own value once changed by the user, so no
+  // extra DOM update needed there — just refresh the chart.
+  if (window['_refreshTrend_'+trendId]) window['_refreshTrend_'+trendId]();
+};
+window.setTrendAgg = function(trendId, agg) {
+  trendState(trendId).agg = agg;
+  // Update the chip's selected look directly (fast, no full page re-render) —
+  // previously only the chart redrew here, so the tapped chip never visibly
+  // showed as selected even though the aggregation genuinely changed.
+  const card = document.getElementById('trend-canvas-'+trendId)?.closest('.trend-card');
+  if (card) {
+    card.querySelectorAll('.trend-chip-agg').forEach(chip => {
+      chip.classList.toggle('on', chip.getAttribute('onclick')?.includes("'"+agg+"'"));
+    });
+  }
+  if (window['_refreshTrend_'+trendId]) window['_refreshTrend_'+trendId]();
+};
 
 // ── Growth chart, redesigned as a keepsake illustration rather than a spreadsheet chart:
 // a smooth hand-drawn-feeling curve, a soft feathered WHO band, and one glowing "you are here" point. ──
@@ -8337,7 +9262,7 @@ PAGES['feeding'] = function(el) {
       }
     } else {
       const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return localDateStr(d); });
-      const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
+      const labels = ['3 weeks ago','2 weeks ago','Last week','This week'];
       const sumWeek = (wS, fn) => { const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEs=localDateStr(wE); return logsFor(state.feedingLog).filter(l=>l.date>=wS&&l.date<wEs).reduce(fn,0); };
       if (metric === 'feeds') {
         return {labels, datasets:[{label:'Feeds', data:weeks.map(w=>sumWeek(w,(a)=>a+1)), color:'#2D8F8F'}], yLabel:'feeds / week'};
@@ -8409,6 +9334,7 @@ PAGES['feeding'] = function(el) {
     }
 
     el.innerHTML = `
+      ${window._pendingTimedFeed && !window._pendingTimedFeedDismissed ? renderPendingFeedReview() : ''}
       <div class="page-header">
         <h2>🍼 Feeding Log</h2>
         <p>Today: ${tf} feeds · ${tl+tr}min breast · ${tfo}ml formula${rec?' · '+rec.phase:''}</p>
@@ -8494,9 +9420,13 @@ PAGES['feeding'] = function(el) {
           ${renderFeedHistory()}
         </div>
       </div>
+
+      ${trendExplorerHTML('feed', 'Feeds logged')}
     `;
+    window._refreshTrend_feed = () => renderTrendChart('feed', state.feedingLog, e=>1, '#2D8F8F', 'feeds');
     requestAnimationFrame(() => {
       if (window.renderFeedTimer) window.renderFeedTimer();
+      window._refreshTrend_feed();
       // Restore a stopped-timer's timed values if the user hasn't saved yet, so a
       // background sync re-render can't reset Start time to "now". The guard flag
       // stops the field's own oninput handler from mistaking THIS programmatic write
@@ -8508,11 +9438,12 @@ PAGES['feeding'] = function(el) {
         const ds = document.getElementById('f-time'); if (ds) ds.value = ptf.start;
         const de = document.getElementById('f-endtime'); if (de) de.value = ptf.end;
         if (ptf.side && window.selectFeedType) selectFeedType(ptf.side);
+        const dn = document.getElementById('f-notes'); if (dn && ptf.notes && !dn.value) dn.value = ptf.notes;
         if (window.updateFeedDuration) updateFeedDuration();
         window._restoringTimedFeed = false;
       }
       const cd = getChartData(chartView, chartMetric);
-      drawBar('feed-chart', cd.labels, cd.datasets, cd.yLabel);
+      drawBar('feed-chart', cd.labels, cd.datasets, cd.yLabel, {hourly: chartView==='hourly'});
     });
   }
 
@@ -8679,6 +9610,46 @@ PAGES['feeding'] = function(el) {
     renderFeedTimer();
     if (navigator.vibrate) navigator.vibrate(15);
   };
+
+  // A compact "review & save" card shown at the very TOP of the page (above
+  // everything else) right after a feed timer is stopped. Without this, the
+  // pre-filled save button sits at the bottom of the full form, well below the
+  // stat tiles/recommendation box/chart — meaning a real screenful of scrolling,
+  // and other tappable content, stood between "stop timer" and "confirm save".
+  // Calls the SAME addFeed() the full form uses (it reads from the same
+  // pre-filled fields), so there's exactly one save path, not a duplicate.
+  function renderPendingFeedReview() {
+    const p = window._pendingTimedFeed;
+    if (!p) return '';
+    const [sh,sm] = p.start.split(':').map(Number);
+    const [eh,em] = p.end.split(':').map(Number);
+    let diff = (eh*60+em) - (sh*60+sm);
+    if (diff < 0) diff += 1440;
+    const durText = diff >= 60 ? Math.floor(diff/60)+'h'+(diff%60>0?' '+(diff%60)+'m':'') : diff+' min';
+    const sideLabel = p.side === 'left' ? '\ud83d\udc99 Left' : '\ud83d\udc97 Right';
+    return `
+    <div class="card feed-review-card">
+      <div class="feed-review-head">
+        <span class="feed-review-badge">Timer stopped</span>
+        <button class="feed-review-dismiss" onclick="dismissPendingFeedReview()" aria-label="Edit details instead">Edit details \u2192</button>
+      </div>
+      <div class="feed-review-main">
+        <span class="feed-review-side">${sideLabel}</span>
+        <span class="feed-review-dur">${durText}</span>
+      </div>
+      <div class="feed-review-times">${p.start} \u2013 ${p.end}</div>
+      <button class="feed-review-save" onclick="addFeed()">\u2713 Save this feed</button>
+    </div>`;
+  }
+  // "Edit details" doesn't discard the pre-filled values — it just hides this
+  // quick card so the full form (already pre-filled with the same start/end/side)
+  // is what's in view, for anyone who wants to add amount or notes before saving.
+  window.dismissPendingFeedReview = () => {
+    window._pendingTimedFeedDismissed = true;
+    render();
+    requestAnimationFrame(() => { document.getElementById('feed-full-form')?.scrollIntoView({behavior:'smooth', block:'start'}); });
+  };
+
   window.stopFeedTimer = () => {
     const t = state.activeFeedTimer;
     if (!t || !t.running) return;
@@ -8689,7 +9660,8 @@ PAGES['feeding'] = function(el) {
     // whole form) can restore them instead of resetting Start to "now". Without
     // this, an 8-second poll firing between stop and save silently loses the
     // real start time.
-    window._pendingTimedFeed = { start: fmt(startD), end: fmt(endD), side: t.side };
+    window._pendingTimedFeed = { start: fmt(startD), end: fmt(endD), side: t.side, notes: document.getElementById('f-notes')?.value || '' };
+    window._pendingTimedFeedDismissed = false;
     // Pre-fill the form with the timed values
     const ds = document.getElementById('f-time'); if (ds) ds.value = fmt(startD);
     const de = document.getElementById('f-endtime'); if (de) de.value = fmt(endD);
@@ -8697,9 +9669,18 @@ PAGES['feeding'] = function(el) {
     if (window.updateFeedDuration) updateFeedDuration();
     state.activeFeedTimer = { running:false };
     saveState('activeFeedTimer');
-    renderFeedTimer();
     if (navigator.vibrate) navigator.vibrate([15,40,15]);
     toast('Timer stopped — review and save');
+    // If the top-of-page review card isn't already in the DOM, this is a fresh
+    // arrival at the page (e.g. via goStopFeedTimer's navigation from Now) — do a
+    // full render so that card actually appears. If it's already there, the user
+    // was already looking at this page (possibly mid-edit elsewhere in the form),
+    // so stick to the lighter targeted DOM writes above instead of disrupting them.
+    if (!document.querySelector('.feed-review-card')) {
+      render();
+    } else {
+      renderFeedTimer();
+    }
   };
   window.addFeed = () => {
     const bi = parseInt(document.getElementById('ff-baby')?.value||'0');
@@ -8737,6 +9718,7 @@ PAGES['feeding'] = function(el) {
     if (entryInFuture(entry.date, entry.time) || (endT && endT > start && entryInFuture(entry.date, endT))) { futureEntryAlert(); return; }
     state.feedingLog.push(entry);
     window._pendingTimedFeed = null;   // consumed — don't restore onto the next feed
+    window._pendingTimedFeedDismissed = false;
     saveState('feedingLog'); render(); toastSuccess('Feed logged! 🍼');
   };
   window.quickFeed = (type, amt) => {
@@ -8784,7 +9766,7 @@ PAGES['sleep'] = function(el) {
       }
     } else {
       const weeks = Array.from({length:4},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-21+i*7); return localDateStr(d); });
-      const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
+      const labels = ['3 weeks ago','2 weeks ago','Last week','This week'];
       const avg = (wS,fn) => { const wE=new Date(wS); wE.setDate(wE.getDate()+7); const wEs=localDateStr(wE); return Math.round(logsFor(state.sleepLog).filter(l=>l.date>=wS&&l.date<wEs&&fn(l)).reduce((a,l)=>a+calcDur(l),0)/7*10)/10; };
       if (metric === 'all') {
         return {labels, datasets:[{label:'Avg hrs/day',data:weeks.map(w=>avg(w,()=>true)),color:'#185FA5'}], yLabel:'avg hours / day'};
@@ -8880,11 +9862,15 @@ PAGES['sleep'] = function(el) {
         </div>
         <div style="display:${window._sleepHistOpen?'block':'none'}">${renderSleepHistory()}</div>
       </div>
+
+      ${trendExplorerHTML('sleep', 'Hours slept')}
     `;
+    window._refreshTrend_sleep = () => renderTrendChart('sleep', state.sleepLog, e=>calcDur(e), '#534AB7', 'hours');
     requestAnimationFrame(() => {
       if (window.renderSleepTimer) window.renderSleepTimer();
+      window._refreshTrend_sleep();
       const cd = getChartData(chartView, chartMetric);
-      drawBar('sleep-chart', cd.labels, cd.datasets, cd.yLabel);
+      drawBar('sleep-chart', cd.labels, cd.datasets, cd.yLabel, {hourly: chartView==='hourly'});
     });
   }
 
@@ -9003,9 +9989,9 @@ PAGES['diaper'] = function(el) {
       ], yLabel:'count / day'};
     } else {
       const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return localDateStr(d);});
-      return {labels:['4 wks ago','3 wks ago','2 wks ago','This week'], datasets:[
-        {label:'Wet/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return logsFor(state.diaperLog).filter(l=>l.date>=wS&&l.date<localDateStr(wE)&&l.wet).length;}),color:'#185FA5'},
-        {label:'Dirty/wk',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return logsFor(state.diaperLog).filter(l=>l.date>=wS&&l.date<localDateStr(wE)&&l.dirty).length;}),color:'#0F6E56'},
+      return {labels:['3 weeks ago','2 weeks ago','Last week','This week'], datasets:[
+        {label:'Wet/week',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return logsFor(state.diaperLog).filter(l=>l.date>=wS&&l.date<localDateStr(wE)&&l.wet).length;}),color:'#185FA5'},
+        {label:'Dirty/week',data:weeks.map(wS=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);return logsFor(state.diaperLog).filter(l=>l.date>=wS&&l.date<localDateStr(wE)&&l.dirty).length;}),color:'#0F6E56'},
       ], yLabel:'count / week'};
     }
   }
@@ -9097,10 +10083,14 @@ PAGES['diaper'] = function(el) {
         </div>
         <div style="display:${window._diaperHistOpen?'block':'none'}">${renderDiaperHistory()}</div>
       </div>
+
+      ${trendExplorerHTML('diaper', 'Diaper changes')}
     `;
+    window._refreshTrend_diaper = () => renderTrendChart('diaper', state.diaperLog, e=>1, '#185FA5', 'changes');
     requestAnimationFrame(() => {
+      window._refreshTrend_diaper();
       const cd = getChartData(chartView);
-      drawBar('diaper-chart', cd.labels, cd.datasets, cd.yLabel);
+      drawBar('diaper-chart', cd.labels, cd.datasets, cd.yLabel, {hourly: chartView==='hourly'});
     });
   }
 
@@ -9172,10 +10162,10 @@ PAGES['reading'] = function(el) {
       }
     } else if (view === 'weekly') {
       const weeks=Array.from({length:4},(_,i)=>{const d=new Date();d.setDate(d.getDate()-21+i*7);return localDateStr(d);});
-      const labels = ['4 wks ago','3 wks ago','2 wks ago','This week'];
+      const labels = ['3 weeks ago','2 weeks ago','Last week','This week'];
       const sumW=(wS,fn)=>{const wE=new Date(wS);wE.setDate(wE.getDate()+7);const wEs=localDateStr(wE);return logsFor(state.readingLog).filter(l=>l.date>=wS&&l.date<wEs&&fn(l)).reduce((a,l)=>a+(parseInt(l.minutes)||0),0);};
       if (metric === 'all') {
-        return {labels, datasets:[{label:'Min/wk',data:weeks.map(w=>sumW(w,()=>true)),color:'#185FA5'}], yLabel:'minutes / week'};
+        return {labels, datasets:[{label:'Min/week',data:weeks.map(w=>sumW(w,()=>true)),color:'#185FA5'}], yLabel:'minutes / week'};
       } else {
         return {labels, datasets:[{label:metric,data:weeks.map(w=>sumW(w,matchLang)),color:metric==='Indonesian'?'#0F6E56':'#185FA5'}], yLabel:'minutes / week'};
       }
@@ -9274,10 +10264,14 @@ PAGES['reading'] = function(el) {
         </div>
         <div style="display:${window._readingHistOpen?'block':'none'}">${renderReadingHistory()}</div>
       </div>
+
+      ${trendExplorerHTML('reading', 'Minutes read')}
     `;
+    window._refreshTrend_reading = () => renderTrendChart('reading', state.readingLog, e=>parseInt(e.minutes)||0, '#0F6E56', 'minutes');
     requestAnimationFrame(() => {
+      window._refreshTrend_reading();
       const cd = getChartData(chartView, chartMetric);
-      if (cd.labels.length) drawBar('reading-chart', cd.labels, cd.datasets, cd.yLabel);
+      if (cd.labels.length) drawBar('reading-chart', cd.labels, cd.datasets, cd.yLabel, {hourly: chartView==='hourly'});
     });
   }
 
@@ -9467,6 +10461,8 @@ PAGES['weight'] = function(el) {
         </div>
         <div style="display:${window._weightHistOpen?'block':'none'}">${renderWeightHistory(unit)}</div>
       </div>
+
+      ${trendExplorerHTML('weight', 'Weight ('+(state.weightUnit==='g'?'g':state.weightUnit==='lboz'?'lb':'kg')+')', true)}
       `}
     `;
 
@@ -9480,6 +10476,14 @@ PAGES['weight'] = function(el) {
       }
       requestAnimationFrame(() => drawGrowthArt('weight-chart', cd.labels, cd.datasets[0].data, {band:band, unit: unit==='g'?'g':unit==='lboz'?'lb':'kg'}));
     }
+    // Long-range weight trend — 'latest' mode (a growth line, not a sum/average),
+    // converted to the user's current display unit so it matches the main chart above.
+    window._refreshTrend_weight = () => {
+      const u = state.weightUnit;
+      const toY = (g) => u==='g' ? g : u==='lboz' ? g/453.592 : g/1000;
+      renderTrendChart('weight', state.weightLog, e=>toY(e.grams||0), '#2D8F8F', u==='g'?'g':u==='lboz'?'lb':'kg', 'latest');
+    };
+    requestAnimationFrame(() => { if (window._refreshTrend_weight) window._refreshTrend_weight(); });
   }
 
   function renderWeightHistory(unit) {
@@ -9589,7 +10593,11 @@ PAGES['pump'] = function(el) {
       </div>
       <div style="display:${window._pumpHistOpen?'block':'none'}">${renderPumpHistory()}</div>
     </div>
+
+    ${trendExplorerHTML('pump', 'Milk pumped (ml)')}
   `;
+  window._refreshTrend_pump = () => renderTrendChart('pump', state.pumpLog, e=>parseInt(e.totalMl)||0, '#B8860B', 'ml');
+  requestAnimationFrame(() => { if (window._refreshTrend_pump) window._refreshTrend_pump(); });
   }
 
   function renderPumpHistory() {
@@ -9693,13 +10701,22 @@ PAGES['meds'] = function(el) {
     <div class="card">
       <div class="card-title">Log a dose</div>
       ${isMultiples() ? renderBabySelector(0,'setMedsBaby')+'<input type="hidden" id="meds-baby" value="0">' : ''}
-      <div class="form-field"><label class="ff-lbl">Medication</label><input type="text" id="meds-name" placeholder="e.g. Vitamin D, Paracetamol" list="meds-suggestions"><datalist id="meds-suggestions">${recentNames.map(n=>'<option value="'+n.replace(/"/g,'&quot;')+'">').join('')}</datalist></div>
-      ${recentNames.length ? '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'+recentNames.map(n=>'<button class="btn btn-outline btn-sm" onclick="document.getElementById(\'meds-name\').value='+JSON.stringify(n)+'">'+n+'</button>').join('')+'</div>' : ''}
+      <div class="form-field"><label class="ff-lbl">Medication</label>
+        <select id="meds-name" onchange="if(this.value==='__add__'){openAddMedPrompt();}">
+          ${allMeds().map(n=>'<option value="'+n.replace(/"/g,'&quot;')+'">'+n+'</option>').join('')}
+          <option value="__add__">+ Add new medicine\u2026</option>
+        </select>
+      </div>
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <div style="flex:1;min-width:0"><label class="ff-lbl">Date</label><input type="date" id="meds-date" max="${today_}" value="${today_}"></div>
         <div style="flex:1;min-width:0"><label class="ff-lbl">Time</label><input type="time" id="meds-time" value="${new Date().toTimeString().slice(0,5)}"></div>
       </div>
-      <div class="form-field"><label class="ff-lbl">Dose <span style="color:#8a8a8a;font-weight:400">(optional)</span></label><input type="text" id="meds-dose" placeholder="e.g. 5ml, 1 drop, 2.5mg"></div>
+      <div class="form-field" style="margin-bottom:10px"><label class="ff-lbl">Dose <span style="color:#8a8a8a;font-weight:400">(optional)</span></label>
+        <div style="display:flex;gap:8px">
+          <input type="number" id="meds-dose-amt" inputmode="decimal" placeholder="e.g. 5" style="flex:1;min-width:0">
+          <select id="meds-dose-unit" style="flex:1;min-width:0">${DOSE_UNITS.map(u=>'<option value="'+u+'">'+u+'</option>').join('')}</select>
+        </div>
+      </div>
       <div class="form-field"><label class="ff-lbl">Notes <span style="color:#8a8a8a;font-weight:400">(optional)</span></label><input type="text" id="meds-notes" placeholder="e.g. for fever"></div>
       <button class="btn btn-teal btn-block" onclick="addMeds()">Save dose</button>
     </div>
@@ -9711,7 +10728,13 @@ PAGES['meds'] = function(el) {
       </div>
       <div style="display:${window._medsHistOpen?'block':'none'}">${renderMedsHistory()}</div>
     </div>
+
+    ${renderMedsByMedicine()}
+
+    ${trendExplorerHTML('meds', 'Doses given')}
   `;
+  window._refreshTrend_meds = () => renderTrendChart('meds', state.medsLog, e=>1, '#C4574B', 'doses');
+  requestAnimationFrame(() => { if (window._refreshTrend_meds) window._refreshTrend_meds(); });
   }
 
   function renderMedsHistory() {
@@ -9731,23 +10754,89 @@ PAGES['meds'] = function(el) {
     return '<div class="lh-v-meds"><div class="loghist-head"><span class="lh-date">Date</span><span class="lh-time">Time</span><span class="lh-main">Medication</span><span class="lh-delh"></span></div><div class="loghist-scroll">'+rows+'</div></div>';
   }
 
+  // Per-medicine breakdown: pick a medicine that's actually been logged, see every
+  // day it was given, how many times, and the total dose (summed per unit, since
+  // ml and mg can't be added together).
+  function renderMedsByMedicine() {
+    const logs = state.medsLog || [];
+    const namesLogged = [...new Set(logs.map(l=>l.name).filter(Boolean))].sort();
+    if (!namesLogged.length) return '';
+    if (!window._medsFilterName || !namesLogged.includes(window._medsFilterName)) window._medsFilterName = namesLogged[0];
+    const sel = window._medsFilterName;
+    const matching = logs.filter(l => l.name === sel).sort((a,b) => (b.date+ (b.time||'')).localeCompare(a.date+(a.time||'')));
+
+    // Total dose per unit (e.g. "15 ml" and "3 tablet" shown separately, never summed together)
+    const totalsByUnit = {};
+    matching.forEach(l => {
+      if (l.doseAmt != null && l.doseUnit) totalsByUnit[l.doseUnit] = (totalsByUnit[l.doseUnit]||0) + l.doseAmt;
+    });
+    const totalStr = Object.keys(totalsByUnit).length
+      ? Object.entries(totalsByUnit).map(([u,v]) => (Math.round(v*100)/100)+' '+u).join(' + ')
+      : '\u2014';
+
+    const chips = namesLogged.map(n =>
+      `<button class="trend-chip${n===sel?' on':''}" onclick="window._medsFilterName='${n.replace(/'/g,"\\'")}';navTo('meds');">${n}</button>`).join('');
+
+    const rows = matching.slice(0,50).map(l => {
+      const dateShort = (l.date||'').slice(5).replace('-','/');
+      const doseStr = l.doseAmt!=null ? (l.doseAmt+' '+(l.doseUnit||'')) : (l.dose||'\u2014');
+      return `<div class="loghist-row"><span class="lh-date">${dateShort}</span><span class="lh-time">${l.time||'\u2014'}</span><span class="lh-main">${doseStr}${l.notes?' \u00b7 '+escapeHtml(l.notes):''}</span></div>`;
+    }).join('');
+
+    return `
+    <div class="card">
+      <div class="card-title" style="margin-bottom:2px">By medicine</div>
+      <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px">Pick a medicine to see when and how much you\u2019ve given</div>
+      <div class="trend-chips" style="margin-bottom:14px">${chips}</div>
+      <div class="meds-by-summary">
+        <div class="meds-by-stat"><span class="meds-by-num">${matching.length}</span><span class="meds-by-lbl">time${matching.length!==1?'s':''} given</span></div>
+        <div class="meds-by-stat"><span class="meds-by-num" style="font-size:16px">${totalStr}</span><span class="meds-by-lbl">total dose</span></div>
+      </div>
+      <div class="lh-v-medsby">
+        <div class="loghist-head"><span class="lh-date">Date</span><span class="lh-time">Time</span><span class="lh-main">Dose</span></div>
+        <div class="loghist-scroll" style="max-height:220px">${rows}</div>
+      </div>
+    </div>`;
+  }
+
   window.setMedsBaby = (i) => { const el2=document.getElementById('meds-baby'); if(el2) el2.value=i; };
   window.toggleMedsHist = () => { window._medsHistOpen = !window._medsHistOpen; render(); };
   window.addMeds = () => {
     const name = (document.getElementById('meds-name')?.value||'').trim();
-    if (!name) { toast('Enter a medication name'); return; }
+    if (!name || name === '__add__') { toast('Choose a medication'); return; }
     if (!state.medsLog) state.medsLog = [];
     if (entryInFuture(document.getElementById('meds-date')?.value||today(), document.getElementById('meds-time')?.value||'')) { futureEntryAlert(); return; }
+    const doseAmt = document.getElementById('meds-dose-amt')?.value || '';
+    const doseUnit = document.getElementById('meds-dose-unit')?.value || 'ml';
     state.medsLog.push({
       date: document.getElementById('meds-date')?.value||today(),
       time: document.getElementById('meds-time')?.value||'',
-      name, dose: document.getElementById('meds-dose')?.value||'',
+      name, doseAmt: doseAmt?parseFloat(doseAmt):null, doseUnit,
+      dose: doseAmt ? (doseAmt+' '+doseUnit) : '',   // combined string kept for the history row display
       notes: document.getElementById('meds-notes')?.value||'',
       babyIdx: parseInt(document.getElementById('meds-baby')?.value||'0'),
     });
     saveState('medsLog'); render(); toastSuccess('Dose logged 💊');
   };
   window.delMeds = (i) => { confirmDialog({title:'Delete this medication entry?', body:'This cannot be undone.'}, () => { state.medsLog.splice(i,1); saveState('medsLog'); render(); toast('Medication deleted'); }); };
+  window.openAddMedPrompt = () => {
+    promptDialog({
+      title: 'Add a new medicine',
+      body: 'This will be added to your medication list for next time too.',
+      placeholder: 'e.g. Amoxicillin',
+      confirmLabel: 'Add'
+    }, (val) => {
+      const nm = (val||'').trim();
+      if (!nm) { const sel=document.getElementById('meds-name'); if(sel) sel.value = allMeds()[0]||''; return; }
+      if (!Array.isArray(state.customMeds)) state.customMeds = [];
+      if (!allMeds().some(m => m.toLowerCase()===nm.toLowerCase())) {
+        state.customMeds.push({ id:'cm-'+Date.now().toString(36), name:nm });
+        saveState('customMeds');
+      }
+      render();
+      requestAnimationFrame(() => { const sel=document.getElementById('meds-name'); if(sel) sel.value = nm; });
+    });
+  };
 
   render();
 };
@@ -11201,9 +12290,13 @@ PAGES['solids'] = function(el) {
       </div>
       ${renderSolidsHistory(allSolids)}
     </div>
+
+    ${trendExplorerHTML('solids', 'Solid meals logged')}
   `;
 
   // Draw the daily-intake line chart (reuses the shared chart engine)
+  window._refreshTrend_solids = () => renderTrendChart('solids', state.solidsLog, e=>1, '#B8860B', 'meals');
+  requestAnimationFrame(() => { if (window._refreshTrend_solids) window._refreshTrend_solids(); });
   if (hasIntake) {
     requestAnimationFrame(() => {
       const labels = last14.map(d => { const dd=new Date(d.date+'T00:00:00'); return String(dd.getDate()).padStart(2,'0')+'/'+String(dd.getMonth()+1).padStart(2,'0'); });
@@ -12213,6 +13306,84 @@ PAGES['first100'] = function(el) {
   `;
 };
 
+// ── WHAT TO WATCH FOR (monthly phase guide) ────────────────────────────────────
+
+PAGES['watchfor'] = function(el) {
+  if (!window._watchTermOpen) window._watchTermOpen = {};
+  if (!window._watchMonthOpen) window._watchMonthOpen = {};
+
+  // Default-open whichever month roughly matches the current baby's age, so the
+  // page lands somewhere relevant instead of always starting at Month 1.
+  function currentAgeMonths() {
+    if (!state.babyDOB) return null;
+    const days = Math.floor((new Date() - new Date(state.babyDOB+'T00:00:00')) / 86400000);
+    return days / 30.44;
+  }
+  const ageM = currentAgeMonths();
+  let defaultOpenId = null;
+  if (ageM != null) {
+    const rounded = Math.round(ageM);
+    const exact = WATCH_MONTHS.find(m => m.id === 'm'+rounded);
+    if (exact) defaultOpenId = exact.id;
+    else if (rounded <= 12) defaultOpenId = WATCH_MONTHS.find(m=>m.id==='m'+Math.max(1,rounded))?.id || 'm1';
+    else if (rounded <= 15) defaultOpenId = 'm15';
+    else if (rounded <= 18) defaultOpenId = 'm18';
+    else if (rounded <= 24) defaultOpenId = 'm24';
+    else if (rounded <= 36) defaultOpenId = 'y23';
+    else defaultOpenId = 'y34';
+  }
+  if (defaultOpenId && Object.keys(window._watchMonthOpen).length === 0) {
+    window._watchMonthOpen[defaultOpenId] = true;
+  }
+
+  function render() {
+    const cards = WATCH_MONTHS.map(m => {
+      const isOpen = !!window._watchMonthOpen[m.id];
+      const isCurrent = defaultOpenId === m.id;
+      const items = m.watch.map((w,wi) => {
+        const term = w.term ? PHASE_TERMS[w.term] : null;
+        const termKey = m.id+'-'+wi;
+        const termOpen = !!window._watchTermOpen[termKey];
+        return `
+          <div class="wf-item">
+            ${term ? `<button class="wf-term-btn" onclick="event.stopPropagation();toggleWatchTerm('${termKey}')">${term.label} <span class="wf-term-chev">${termOpen?'\u25be':'\u25b8'}</span></button>` : ''}
+            <div class="wf-item-text">${w.text}</div>
+            ${term && termOpen ? `<div class="wf-term-def"><strong>${term.label}:</strong> ${term.body}</div>` : ''}
+          </div>`;
+      }).join('');
+      return `
+        <div class="card wf-card${isCurrent?' wf-card-current':''}">
+          <div onclick="toggleWatchMonth('${m.id}')" role="button" tabindex="0" aria-expanded="${isOpen?'true':'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleWatchMonth('${m.id}');}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;min-height:44px">
+            <div>
+              <div style="display:flex;align-items:center;gap:7px">
+                <span class="wf-month-label">${m.label}</span>
+                ${isCurrent?'<span class="wf-current-badge">Around now</span>':''}
+              </div>
+              <div class="wf-age-label">${m.ageLabel}</div>
+            </div>
+            <span style="color:#767680;font-size:13px">${isOpen?'\u25be':'\u25b8'}</span>
+          </div>
+          ${isOpen ? `
+            <div class="wf-note">${m.note}</div>
+            <div class="wf-list">${items}</div>
+          ` : ''}
+        </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="page-header">
+        <h2>\ud83d\udc41\ufe0f What to Watch For</h2>
+        <p>Common phases by age \u2014 sleep regressions, growth spurts, and developmental leaps, explained</p>
+      </div>
+      <div class="wf-intro">These are things that <em>commonly</em> show up around each age \u2014 not a checklist every baby follows. Skipping a phase, or hitting it early or late, is normal. Tap a month to expand it; tap an underlined term for a plain explanation of what it actually means.</div>
+      ${cards}
+    `;
+  }
+  window.toggleWatchMonth = (id) => { window._watchMonthOpen[id] = !window._watchMonthOpen[id]; render(); };
+  window.toggleWatchTerm = (key) => { window._watchTermOpen[key] = !window._watchTermOpen[key]; render(); };
+  render();
+};
+
 // ── 100 FOODS ─────────────────────────────────────────────────────────────────
 
 PAGES['milestones'] = function(el) {
@@ -12837,6 +14008,14 @@ PAGES['settings'] = function(el) {
       </div>
       <div class="settings-row" onclick="openRecoverySheet()" role="button" tabindex="0">
         <div class="settings-row-main"><div class="settings-row-lbl">Recover from a snapshot</div><div class="settings-row-sub">Roll back to an automatic recovery point</div></div>
+        <span class="settings-chev">\u203a</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Simple mode</div>
+      <div class="settings-row" onclick="simpleModeEnterPrompt()" role="button" tabindex="0">
+        <div class="settings-row-main"><div class="settings-row-lbl">Turn on simple mode</div><div class="settings-row-sub">A big-button screen for a tablet \u2014 shows next feed and lets a caregiver log feeds, diapers and weight. Everything else is hidden.</div></div>
         <span class="settings-chev">\u203a</span>
       </div>
     </div>
