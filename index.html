@@ -17918,6 +17918,11 @@ body.night-mode #wa-ov .wa-chip{background:var(--card2,#22304F);}
 #wa-ov .wa-skip div{padding:4px 0;border-bottom:1px solid rgba(150,160,235,.18);overflow-wrap:anywhere;}
 #wa-ov .wa-link{font:inherit;font-size:12.5px;font-weight:700;background:none;border:0;color:var(--link,#5B4BD6);cursor:pointer;padding:0;text-align:left;}
 #wa-ov .wa-note{font-size:11.5px;color:var(--ink-3,#6E6A92);line-height:1.45;}
+#wa-ov .wa-tplcard{border-radius:18px;background:rgba(150,160,235,.14);padding:12px 14px;}
+#wa-ov .wa-pre{margin:0 0 8px;font:inherit;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink,#2A2A33);max-height:5.6em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent);}
+#wa-ov .wa-pre.open{max-height:none;-webkit-mask-image:none;mask-image:none;}
+#wa-ov .wa-acts{display:flex;gap:8px;margin:8px 0 4px;}
+#wa-ov .wa-acts .wa-btn{padding:10px 12px;min-height:44px;font-size:14px;}
 body.simple-mode #wa-ov{display:none !important;}
 </style>
 
@@ -18033,8 +18038,9 @@ function parseNanny(text, opts) {
   return out;
 }
 
-  var TPL = 'Halo Mba Narti, mulai sekarang tolong laporan ditulis dengan format ini ya, biar gampang dicatat di aplikasi:\n\nTgl 21/10\n\nMimi\n09.49 - 10.04 = 110 ml\n10.50 - 10.55 = 60 ml\n\nPempi\n07.58 pipis\n10.00 BAB\n12.50 pipis + BAB\n\nStok ASIP\n(tetap seperti daftar kantong yang sekarang, coret yang sudah dipakai)\n\nAturan singkat:\n1. Satu baris satu kejadian, jam pakai titik (09.49).\n2. Mimi: jam mulai - jam selesai = jumlah ml. Kalau sufor, tulis "sufor" di barisnya.\n3. Pempi: tulis pipis atau BAB (atau dua-duanya). Kalau tidak ditulis, dianggap pipis.';
-  var W = window.__wa = { text:'', date:'', ftype:'stored', ddef:'wet', baby:0, items:[], skipped:[], bags:null, view:'in', skipOpen:false };
+  var TPL0 = 'Halo Mba Narti, mulai sekarang tolong laporan ditulis dengan format ini ya, biar gampang dicatat di aplikasi:\n\nTgl 21/10\n\nMimi\n09.49 - 10.04 = 110 ml\n10.50 - 10.55 = 60 ml\n\nPempi\n07.58 pipis\n10.00 BAB\n12.50 pipis + BAB\n\nStok ASIP\n(tetap seperti daftar kantong yang sekarang, coret yang sudah dipakai)\n\nAturan singkat:\n1. Satu baris satu kejadian, jam pakai titik (09.49).\n2. Mimi: jam mulai - jam selesai = jumlah ml. Kalau sufor, tulis "sufor" di barisnya.\n3. Pempi: tulis pipis atau BAB (atau dua-duanya). Kalau tidak ditulis, dianggap pipis.';
+  function tpl(){ var t = td().split('-'); return TPL0.replace('21/10', t[2] + '/' + t[1]); }
+  var W = window.__wa = { tplOpen:true, text:'', date:'', ftype:'stored', ddef:'wet', baby:0, items:[], skipped:[], bags:null, view:'in', skipOpen:false };
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function td(){ try{ return today(); }catch(e){ return new Date().toISOString().slice(0,10); } }
@@ -18086,6 +18092,11 @@ function parseNanny(text, opts) {
   function paintIn(){
     var body = $('wa-body'), foot = $('wa-foot');
     var h = '<div class="wa-intro">Copy your nanny’s report in WhatsApp, paste it here, and I will turn it into entries. You check everything before anything is saved.</div>'
+      + '<div class="wa-tplcard"><div class="wa-h" style="margin:0 0 6px">Template for your nanny <small>send it once</small></div>'
+      + '<pre class="wa-pre'+(W.tplOpen?' open':'')+'" id="wa-pre">'+esc(tpl())+'</pre>'
+      + '<button type="button" class="wa-link" id="wa-ttog">'+(W.tplOpen?'Show less':'Show the full template')+'</button>'
+      + '<div class="wa-acts"><button type="button" class="wa-btn ghost" id="wa-tcopy">Copy</button><button type="button" class="wa-btn go" id="wa-twa">Send on WhatsApp</button></div></div>'
+      + '<div class="wa-lbl" style="margin:2px 0 -6px">Then paste her report here</div>'
       + '<textarea id="wa-in" placeholder="Mimi jam 9.49 - 10.04 sbnyk 110&#10;Ganti pempi jam 07.58" aria-label="Paste the report here"></textarea>'
       + '<div><div class="wa-lbl">Date to use when a message has no date</div><input type="date" id="wa-date" max="'+td()+'" value="'+esc(W.date||td())+'"></div>'
       + '<div><div class="wa-lbl">A bottle with no detail is</div><div class="wa-seg" role="group" aria-label="Bottle type"><button type="button" data-f="stored" class="'+(W.ftype==='stored'?'on':'')+'">Stored milk</button><button type="button" data-f="formula" class="'+(W.ftype==='formula'?'on':'')+'">Formula</button></div></div>'
@@ -18093,7 +18104,6 @@ function parseNanny(text, opts) {
     if(twins()){
       h += '<div><div class="wa-lbl">This report is for</div><div class="wa-seg" role="group" aria-label="Baby">' + [0,1].map(function(i){ return '<button type="button" data-b="'+i+'" class="'+(W.baby===i?'on':'')+'">'+esc(nm(i))+'</button>'; }).join('') + '</div></div>';
     }
-    h += '<button type="button" class="wa-link" id="wa-tpl">Copy a template to send to your nanny</button>';
     body.innerHTML = h;
     foot.innerHTML = '<button type="button" class="wa-btn go" id="wa-read">Read it</button>';
     var ta = $('wa-in'); ta.value = W.text || '';
@@ -18103,11 +18113,13 @@ function parseNanny(text, opts) {
     body.querySelectorAll('[data-f]').forEach(function(b){ b.onclick = function(){ W.ftype = b.getAttribute('data-f'); body.querySelectorAll('[data-f]').forEach(function(x){ x.classList.toggle('on', x===b); }); }; });
     body.querySelectorAll('[data-d]').forEach(function(b){ b.onclick = function(){ W.ddef = b.getAttribute('data-d'); body.querySelectorAll('[data-d]').forEach(function(x){ x.classList.toggle('on', x===b); }); }; });
     body.querySelectorAll('[data-b]').forEach(function(b){ b.onclick = function(){ W.baby = +b.getAttribute('data-b'); body.querySelectorAll('[data-b]').forEach(function(x){ x.classList.toggle('on', x===b); }); }; });
-    $('wa-tpl').onclick = function(){
-      var ok = function(){ try{ toast('Template copied. Paste it into WhatsApp.'); }catch(e){} };
-      if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(TPL).then(ok).catch(function(){ fb(); }); else fb();
-      function fb(){ try{ var t = document.createElement('textarea'); t.value = TPL; t.setAttribute('readonly',''); t.style.cssText='position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(t); t.select(); t.setSelectionRange(0, TPL.length); var r = document.execCommand('copy'); t.remove(); if(r){ ok(); return; } }catch(e){} try{ toast('Could not copy. Try again.'); }catch(e){} }
+    $('wa-ttog').onclick = function(){ W.tplOpen = !W.tplOpen; $('wa-pre').classList.toggle('open', W.tplOpen); this.textContent = W.tplOpen ? 'Show less' : 'Show the full template'; };
+    $('wa-tcopy').onclick = function(){
+      var T = tpl(), ok = function(){ try{ toast('Template copied. Paste it into WhatsApp.'); }catch(e){} };
+      if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(T).then(ok).catch(function(){ fb(); }); else fb();
+      function fb(){ try{ var t = document.createElement('textarea'); t.value = T; t.setAttribute('readonly',''); t.style.cssText='position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(t); t.select(); t.setSelectionRange(0, T.length); var r = document.execCommand('copy'); t.remove(); if(r){ ok(); return; } }catch(e){} try{ toast('Could not copy. Try again.'); }catch(e){} }
     };
+    $('wa-twa').onclick = function(){ try{ window.open('https://wa.me/?text=' + encodeURIComponent(tpl()), '_blank'); }catch(e){ try{ toast('Could not open WhatsApp.'); }catch(e2){} } };
     $('wa-read').onclick = read;
   }
 
