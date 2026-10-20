@@ -17132,13 +17132,27 @@ var PUSH_WORKER_URL = 'https://babyos-alerts.dydra-nandira.workers.dev';   // yo
     if(typeof fbPatch==='function') fbPatch(path()+'/prefs', o);
   };
   window.pushTest = function(){
-    if(!PUSH_WORKER_URL){ say('Worker address is not set yet'); return; }
-    S.msg='Sending...'; paint();
-    fetch(PUSH_WORKER_URL.replace(/\/+$/,'')+'/test', { method:'POST', headers:{'Content-Type':'text/plain;charset=UTF-8'}, body:JSON.stringify({ familyId:fid(), deviceId:devId() }) })
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, j:j }; }); })
-      .then(function(x){ S.msg = x.ok ? 'Sent. It should arrive in a few seconds.' : (x.j && x.j.error==='slow down' ? 'Wait a few seconds and try again.' : 'The test did not go through. See Troubleshooting in the guide.'); paint(); })
-      .catch(function(){ S.msg='Could not reach the alert service.'; paint(); });
+    if(!PUSH_WORKER_URL){ note('Worker address is not set in the app yet.'); return; }
+    var n = 8;
+    note('Sending in '+n+' seconds. Lock your phone or go to the Home Screen now.');
+    var tick = setInterval(function(){
+      n--; if(n>0){ note('Sending in '+n+' seconds. Lock your phone or go to the Home Screen now.'); return; }
+      clearInterval(tick); note('Sending...');
+      fetch(PUSH_WORKER_URL.replace(/\/+$/,'')+'/test', { method:'POST', headers:{'Content-Type':'text/plain;charset=UTF-8'}, body:JSON.stringify({ familyId:fid(), deviceId:devId() }) })
+        .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, code:r.status, j:j||{} }; }); })
+        .then(function(x){
+          var j = x.j, m;
+          if(x.ok) m = 'Sent to the push service (status '+(j.status||'ok')+'). It should appear within seconds. If not, check iPhone Settings > Notifications > Baby OS and Focus mode.';
+          else if(j.error==='slow down') m = 'Wait a few seconds and try again.';
+          else if(x.code===404) m = 'This phone is not registered with the alert service. Turn alerts off, then on again.';
+          else if(j.status) m = 'The push service refused it (status '+j.status+(j.detail?': '+j.detail:'')+')'+(j.gone?'. This phone\u2019s alert link expired. Turn alerts off, then on again.':'. Check the keys in the Worker match the app.');
+          else m = 'The alert service had a problem'+(j.error?' ('+j.error+')':'')+' (code '+x.code+').';
+          note(m);
+        })
+        .catch(function(){ note('Could not reach the alert service. Check the Worker address in the app.'); });
+    }, 1000);
   };
+  function note(m){ S.msg = m; var e = $('push-note'); if(e) e.textContent = m; else paint(); try{ if(typeof toast==='function') toast(m.length>70 ? m.slice(0,67)+'...' : m); }catch(e2){} }
 
   function cardHTML(){
     var b = blocker();
@@ -17164,6 +17178,7 @@ var PUSH_WORKER_URL = 'https://babyos-alerts.dydra-nandira.workers.dev';   // yo
     h += '<div style="padding:4px 16px 8px;display:flex;gap:10px;flex-wrap:wrap">'
       + (PUSH_WORKER_URL ? '<button type="button" class="btn btn-primary" style="flex:1 1 160px;min-height:48px" onclick="pushTest()">Send a test alert</button>' : '')
       + '<button type="button" class="btn btn-ghost" style="flex:1 1 160px;min-height:48px" onclick="pushDisable()">Turn off on this phone</button></div>'
+      + '<div id="push-note" class="settings-row-sub" style="padding:0 16px 8px;font-weight:700">'+(S.msg||'')+'</div>'
       + '<div class="settings-row-sub" style="padding:0 16px 14px">Feed timing uses the interval you set on the Now page, or your baby’s age if none is set. Each phone has its own settings.</div>';
     return h;
   }
