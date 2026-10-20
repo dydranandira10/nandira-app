@@ -17252,6 +17252,8 @@ var PUSH_WORKER_URL = 'https://babyos-alerts.dydra-nandira.workers.dev';   // yo
 #ask-fab{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 172px);width:46px;height:46px;border-radius:50%;z-index:98;display:none;align-items:center;justify-content:center;background:var(--y,#FFC93C);color:var(--ink,#2A2A33);border:0;padding:0;cursor:pointer;box-shadow:0 6px 16px -4px rgba(40,30,90,.35),0 2px 4px rgba(40,30,90,.15);-webkit-tap-highlight-color:transparent;transition:transform .15s;}
 #ask-fab.on{display:flex;}
 #ask-fab:active{transform:scale(.92);}
+#ask-fab.drag{transition:none;will-change:transform;cursor:grabbing;box-shadow:0 12px 24px -6px rgba(40,30,90,.4),0 3px 6px rgba(40,30,90,.2);}
+#ask-fab.snap{transition:transform .24s cubic-bezier(.2,.8,.2,1);}
 #ask-fab svg{width:34px;height:34px;}
 body.simple-mode #ask-fab{display:none !important;}
 #ask-ov{position:fixed;left:0;right:0;top:0;height:100%;z-index:9000;display:none;align-items:flex-end;justify-content:center;background:rgba(20,18,45,.5);}
@@ -17297,6 +17299,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
 #ask-via{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:12px;font-weight:600;color:var(--ink-3,#6E6A92);}
 #ask-via .ask-dot{width:8px;height:8px;border-radius:50%;background:#2FB67C;flex:none;}
 #ask-via .ask-dot.warn{background:#F2994A;}
+#ask-head .ask-why{margin-top:3px;font-size:11px;font-weight:500;line-height:1.3;color:var(--ink-3,#6E6A92);word-break:break-word;}
 #ask-ov .ask-tag{font-size:11px;font-weight:700;opacity:.65;margin-bottom:4px;}
 #ask-ov .ask-b.ai .ask-tag{margin:6px 0 0;order:2;}
 </style>
@@ -17314,18 +17317,19 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     try{
       var j = JSON.parse(localStorage.getItem(SKEY) || 'null');
       if(j && Array.isArray(j.msgs)) A.msgs = j.msgs.filter(function(m){ return m && (m.role==='user'||m.role==='assistant') && typeof m.content==='string'; }).slice(-40);
-      var last = A.msgs.slice().reverse().find(function(m){ return m.via; }); if(last){ A.via = last.via; A.why = last.why || ''; }
+      var last = A.msgs.slice().reverse().find(function(m){ return m.via; }); if(last){ A.via = last.via; A.why = last.why || ''; A.model = last.model || ''; }
     }catch(e){}
   }
   function save(){
     try{
-      var keep = A.msgs.filter(function(m){ return !m.err; }).slice(-40).map(function(m){ var o = {role:m.role, content:String(m.content).slice(0,3000)}; if(m.via) o.via = m.via; if(m.why) o.why = m.why; if(m.img || m.photo) o.photo = true; return o; });
+      var keep = A.msgs.filter(function(m){ return !m.err; }).slice(-40).map(function(m){ var o = {role:m.role, content:String(m.content).slice(0,3000)}; if(m.via) o.via = m.via; if(m.why) o.why = m.why; if(m.model) o.model = m.model; if(m.img || m.photo) o.photo = true; return o; });
       if(keep.length) localStorage.setItem(SKEY, JSON.stringify({v:1, msgs:keep})); else localStorage.removeItem(SKEY);
     }catch(e){}
   }
   if(!A.msgs.length) load();
+  function prettyModel(id){ return id ? 'Gemini ' + String(id).replace(/^gemini-/,'').split('-').map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ') : 'Gemini'; }
   function viaLabel(via, why){
-    if(via==='gemini') return {t:'Powered by Gemini', warn:false};
+    if(via==='gemini') return {t:'Powered by ' + prettyModel(A.model), warn:false};
     if(via==='cloudflare' && why==='gemini_limit') return {t:'Gemini limit reached, using Cloudflare AI', warn:true};
     if(via==='cloudflare' && why) return {t:'Gemini unavailable, using Cloudflare AI', warn:true};
     if(via==='cloudflare') return {t:'Powered by Cloudflare AI', warn:false};
@@ -17333,12 +17337,14 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
   }
   function paintVia(){
     var el = $('ask-via'); if(!el) return;
+    var old = el.parentNode.querySelector('.ask-why'); if(old) old.remove();
     var v = viaLabel(A.via, A.why);
     el.innerHTML = '';
     if(!v){ el.style.display = 'none'; return; }
     el.style.display = '';
     var d = document.createElement('span'); d.className = 'ask-dot' + (v.warn ? ' warn' : ''); el.appendChild(d);
     el.appendChild(document.createTextNode(v.t));
+    if(A.why && A.detail){ var wy = document.createElement('div'); wy.className = 'ask-why'; wy.textContent = A.detail; el.parentNode.appendChild(wy); }
   }
   // ask the Worker which AI is switched on (before the first question of this visit)
   function checkVia(){
@@ -17395,7 +17401,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
       if(m.img){ var im = document.createElement('img'); im.src = m.img; im.alt = 'Attached photo'; im.className = 'ask-pic'; b.appendChild(im); }
       if(m.photo && !m.img){ var ph = document.createElement('div'); ph.className = 'ask-tag'; ph.textContent = 'Photo (not kept on this phone)'; b.appendChild(ph); }
       b.appendChild(document.createTextNode(m.content));
-      if(m.role==='assistant' && !m.err && m.via){ var tg = document.createElement('div'); tg.className = 'ask-tag'; tg.textContent = m.via==='gemini' ? 'Gemini' : (m.why ? 'Cloudflare AI (backup)' : 'Cloudflare AI'); b.appendChild(tg); }
+      if(m.role==='assistant' && !m.err && m.via){ var tg = document.createElement('div'); tg.className = 'ask-tag'; tg.textContent = m.via==='gemini' ? prettyModel(m.model) : (m.why ? 'Cloudflare AI (backup)' : 'Cloudflare AI'); b.appendChild(tg); }
       list.appendChild(b);
     });
     if(A.busy){
@@ -17460,7 +17466,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
       body: JSON.stringify({ familyId:f, question:q, history:hist, extra:extra(), image: photo ? {mime:photo.mime, data:photo.data} : undefined, tz:-new Date().getTimezoneOffset() })
     }).then(function(r){ return r.json().catch(function(){ return {ok:false,error:'ai_error'}; }); })
     .then(function(j){
-      if(j && j.ok && j.answer){ A.msgs.push({role:'assistant', content:clean(j.answer), via:j.via || null, why:j.why || ''}); if(j.via){ A.via = j.via; A.why = j.why || ''; } }
+      if(j && j.ok && j.answer){ A.msgs.push({role:'assistant', content:clean(j.answer), via:j.via || null, why:j.why || '', model:j.model || ''}); if(j.via){ A.via = j.via; A.why = j.why || ''; A.model = j.model || ''; A.detail = j.detail || ''; } }
       else A.msgs.push({role:'assistant', err:true, content: ERR[j && j.error] || ERR.ai_error});
     }).catch(function(){
       A.msgs.push({role:'assistant', err:true, content:'Could not reach the assistant. Check your connection and try again.'});
@@ -17545,29 +17551,35 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     if(pos.side==='left'){ b.style.left = EDGE + 'px'; b.style.right = 'auto'; } else { b.style.right = EDGE + 'px'; b.style.left = 'auto'; }
   }
   function drag(b){
-    var sx, sy, ox, oy, on = false, moved = false, id = null;
+    var sx, sy, ox, oy, tx = 0, ty = 0, on = false, moved = false, id = null, raf = 0;
     b.style.touchAction = 'none';
+    function paintMove(){ raf = 0; b.style.transform = 'translate3d(' + tx + 'px,' + ty + 'px,0)'; }
     b.addEventListener('pointerdown', function(e){
       if(e.button && e.button !== 0) return;
-      var r = b.getBoundingClientRect(); sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top; on = true; moved = false; id = e.pointerId;
+      b.classList.remove('snap'); b.style.transform = '';
+      var r = b.getBoundingClientRect(); sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top; tx = ty = 0; on = true; moved = false; id = e.pointerId;
       try{ b.setPointerCapture(id); }catch(x){}
     });
     b.addEventListener('pointermove', function(e){
       if(!on) return;
       var dx = e.clientX - sx, dy = e.clientY - sy;
-      if(!moved && Math.abs(dx) + Math.abs(dy) < 8) return;
-      moved = true; b.__moved = true;
+      if(!moved){ if(Math.abs(dx) + Math.abs(dy) < 5) return; moved = true; b.__moved = true; b.classList.add('drag'); }
       var L = limits(), x = Math.min(L.vw - SZ - 4, Math.max(4, ox + dx)), y = Math.min(L.maxY, Math.max(L.minY, oy + dy));
-      b.style.right = 'auto'; b.style.bottom = 'auto'; b.style.left = x + 'px'; b.style.top = y + 'px';
+      tx = x - ox; ty = y - oy;
+      if(!raf) raf = requestAnimationFrame(paintMove);   // moves with a GPU transform, no page re-layout
+      e.preventDefault();
     });
     function end(){
       if(!on) return; on = false;
       try{ b.releasePointerCapture(id); }catch(x){}
       if(!moved) return;
-      var r = b.getBoundingClientRect(), L = limits(), side = (r.left + SZ / 2) < L.vw / 2 ? 'left' : 'right';
-      try{ localStorage.setItem(PKEY, JSON.stringify({ side: side, y: r.top / L.vh })); }catch(x){}
-      place(b);
-      setTimeout(function(){ b.__moved = false; }, 350);
+      if(raf){ cancelAnimationFrame(raf); raf = 0; }
+      var L = limits(), cx = ox + tx, cy = oy + ty, side = (cx + SZ / 2) < L.vw / 2 ? 'left' : 'right';
+      var fx = side === 'left' ? EDGE : L.vw - SZ - EDGE, fy = Math.min(L.maxY, Math.max(L.minY, cy));
+      try{ localStorage.setItem(PKEY, JSON.stringify({ side: side, y: fy / L.vh })); }catch(x){}
+      b.classList.remove('drag'); b.classList.add('snap');
+      b.style.transform = 'translate3d(' + (fx - ox) + 'px,' + (fy - oy) + 'px,0)';   // glide to the edge
+      setTimeout(function(){ b.style.transition = 'none'; b.classList.remove('snap'); b.style.transform = ''; place(b); void b.offsetWidth; b.style.transition = ''; b.__moved = false; }, 250);
     }
     b.addEventListener('pointerup', end); b.addEventListener('pointercancel', end);
     window.addEventListener('resize', function(){ place(b); });
