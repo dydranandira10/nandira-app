@@ -3243,6 +3243,7 @@ html body .drawer .drawer-header{background:transparent !important;}
   <button class="nav-item" onclick="navTo('feeding')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6"/><path d="M10 2v3h4V2"/><path d="M8.5 8.5C8.5 6.6 10 5 12 5s3.5 1.6 3.5 3.5V19a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 8.5 19Z"/><path d="M8.5 12h7M8.5 16h7"/></svg></span> Feeding</button>
   <button class="nav-item" onclick="navTo('sleep')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.5A8.5 8.5 0 0 1 9.5 3.6a8.5 8.5 0 1 0 10.9 10.9Z"/></svg></span> Sleep</button>
   <button class="nav-item" onclick="navTo('diaper')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21c-3.6 0-6.5-2.9-6.5-6.4 0-4 4.2-8.4 6-10.1a.7.7 0 0 1 1 0c1.8 1.7 6 6.1 6 10.1 0 3.5-2.9 6.4-6.5 6.4Z"/></svg></span> Diaper</button>
+  <button class="nav-item" data-ask="1" onclick="navTo('ask')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12Z"/><path d="M9 11h6M9 14.5h3.5"/></svg></span> Ask BabyOS</button>
   <div class="drawer-section">Track &amp; review</div>
   <button class="nav-item" onclick="navTo('reading')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5 8.5 4 5.5 4c-1 0-2 .1-2.5.3V19c.5-.2 1.5-.3 2.5-.3 3 0 5 1 6.5 2.5 1.5-1.5 3.5-2.5 6.5-2.5 1 0 2 .1 2.5.3V4.3C20.5 4.1 19.5 4 18.5 4c-3 0-5 1-6.5 2.5Z"/><path d="M12 6.5v14.7"/></svg></span> Reading</button>
   <button class="nav-item" onclick="navTo('weight')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5.5-5.5 4 4L21 7"/><path d="M15.5 7H21v5.5"/></svg></span> Weight</button>
@@ -3291,6 +3292,7 @@ html body .drawer .drawer-header{background:transparent !important;}
   <button class="nav-item" onclick="showPage('feeding')"><span class="icon">🍼</span> Feeding</button>
   <button class="nav-item" onclick="showPage('sleep')"><span class="icon">😴</span> Sleep</button>
   <button class="nav-item" onclick="showPage('diaper')"><span class="icon">💧</span> Diaper</button>
+  <button class="nav-item" data-ask="1" onclick="showPage('ask')"><span class="icon">💬</span> Ask BabyOS</button>
   <button class="nav-item" onclick="showPage('reading')"><span class="icon">📚</span> Reading</button>
   <div class="drawer-section">Development</div>
   <button class="nav-item" onclick="showPage('milestones')"><span class="icon">⭐</span> Milestones</button>
@@ -16181,7 +16183,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function navColors(){
     ['.drawer','.desktop-sidebar'].forEach(function(sel){
       var n=0;
-      document.querySelectorAll(sel+' .nav-item').forEach(function(b){ var c=String(n%5); if(b.dataset.c!==c) b.dataset.c=c; n++; });
+      document.querySelectorAll(sel+' .nav-item').forEach(function(b){ if(b.hasAttribute('data-ask')){ if(b.dataset.c!=='3') b.dataset.c='3'; return; } var c=String(n%5); if(b.dataset.c!==c) b.dataset.c=c; n++; });
     });
   }
   var DOM={'Gross Motor':'lilac','Fine Motor':'mint','Language':'coral','Social':'pink','Cognitive':'sky','Emotional':'y'};
@@ -17242,6 +17244,134 @@ var PUSH_WORKER_URL = 'https://babyos-alerts.dydra-nandira.workers.dev';   // yo
 
   // keep this phone's record fresh (token changes, travel time zone) once per launch
   try{ if(configured() && supported() && Notification.permission==='granted') setTimeout(function(){ if(fid()) refresh(); }, 5000); }catch(e){}
+})();
+</script>
+
+<style id="v31css">
+/* Ask BabyOS chat page (new page, additive) */
+#page-ask .ask-wrap{display:flex;flex-direction:column;gap:10px;padding-bottom:110px;}
+#page-ask .ask-list{display:flex;flex-direction:column;gap:10px;}
+#page-ask .ask-list:empty{display:none;}
+#page-ask .ask-b{max-width:86%;padding:11px 14px;border-radius:20px;font-size:15px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:anywhere;color:var(--ink,#2A2A33);}
+#page-ask .ask-b.me{align-self:flex-end;background:var(--y,#FFC93C);border-bottom-right-radius:6px;}
+#page-ask .ask-b.ai{align-self:flex-start;background:rgba(150,160,235,.22);border-bottom-left-radius:6px;}
+#page-ask .ask-b.err{align-self:flex-start;background:rgba(150,160,235,.22);color:var(--ink-2,#4B4676);}
+#page-ask .ask-dots span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--ink-3,#6E6A92);animation:askdot 1.1s infinite ease-in-out;}
+#page-ask .ask-dots span:nth-child(2){animation-delay:.15s}
+#page-ask .ask-dots span:nth-child(3){animation-delay:.3s}
+@keyframes askdot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+#page-ask .ask-chips{display:flex;flex-wrap:wrap;gap:8px;}
+#page-ask .ask-chip{font:inherit;font-size:13.5px;font-weight:700;padding:8px 13px;border-radius:999px;background:rgba(150,160,235,.22);color:var(--ink,#2A2A33);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+#page-ask .ask-chip:active{transform:translateY(1px);}
+#page-ask .ask-form{display:flex;gap:8px;align-items:center;}
+#page-ask .ask-in{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border-radius:999px;background:rgba(150,160,235,.22);color:var(--ink,#2A2A33);outline:none;}
+#page-ask .ask-send{border:0;box-shadow:none;font:inherit;font-weight:800;font-size:15px;padding:12px 16px;border-radius:999px;background:var(--lilac,#AEBBFF);color:var(--ink,#2A2A33);cursor:pointer;}
+#page-ask .ask-send[disabled]{opacity:.5}
+#page-ask .ask-foot{font-size:12px;color:var(--ink-3,#6E6A92);line-height:1.4;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+#page-ask .ask-new{font:inherit;font-size:12px;font-weight:700;background:none;border:0;color:var(--link,#5B4BD6);cursor:pointer;padding:0;white-space:nowrap;}
+body.night-mode #page-ask .ask-b.ai,body.night-mode #page-ask .ask-b.err,body.night-mode #page-ask .ask-chip,body.night-mode #page-ask .ask-in{background:var(--card2,#22304F);}
+#page-ask .ask-in,#page-ask .ask-chip{box-shadow:inset 0 0 0 1.5px rgba(120,110,200,.28);}
+body.night-mode #page-ask .ask-in,body.night-mode #page-ask .ask-chip{box-shadow:none;}
+html body #page-ask #ask-in:not(#v24):not(#v24):not(#v24){width:auto;flex:1;border-radius:999px !important;background:rgba(150,160,235,.22) !important;box-shadow:inset 0 0 0 1.5px rgba(120,110,200,.35) !important;}
+html body.night-mode #page-ask #ask-in:not(#v24):not(#v24):not(#v24){background:var(--card2,#22304F) !important;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1) !important;}
+</style>
+<script id="askjs">
+/* ============================================================
+   ASK BABYOS  ·  additive new page. Read only: it never writes to your logs.
+   - Sends your question + the last few chat turns to your Worker (/ask).
+   - The Worker reads your logs, does the maths, and asks Cloudflare's built-in AI.
+   - Chat history lives in memory only (gone when you close the app).
+   ============================================================ */
+(function(){
+  var A = window.__ask = window.__ask || { msgs:[], busy:false, draft:'' };
+  function $(id){ return document.getElementById(id); }
+  function nick(){ try{ var n = (typeof babyName==='function') ? babyName() : null; return n || 'baby'; }catch(e){ return 'baby'; } }
+  function workerUrl(){ try{ return (typeof PUSH_WORKER_URL!=='undefined' && PUSH_WORKER_URL) ? String(PUSH_WORKER_URL).replace(/\/+$/,'') : ''; }catch(e){ return ''; } }
+  function fam(){ try{ return state && state.familyId; }catch(e){ return null; } }
+
+  var ERR = {
+    ai_not_enabled:'The assistant is not switched on yet. In Cloudflare, check that the babyos-alerts Worker has deployed with the AI binding.',
+    rate_limited:'That is a lot of questions for now. Try again in a little while.',
+    family_not_found:'I could not find your family data. Open Settings and check the family is connected.',
+    ai_error:'The AI had a hiccup. Try again in a moment.',
+    empty_answer:'I did not get an answer that time. Try asking again.',
+    missing:'Type a question first.'
+  };
+
+  function chips(){
+    var n = nick();
+    return ['How was today so far?','When is the next feed due?','How many wet diapers yesterday?','How did '+n+' sleep this week?','Any shots coming up?','Is '+n+' feeding more or less than last week?'];
+  }
+
+  function paint(){
+    var list = $('ask-list'); if(!list) return;
+    list.innerHTML = '';
+    A.msgs.forEach(function(m){
+      var b = document.createElement('div');
+      b.className = 'ask-b ' + (m.role==='user' ? 'me' : (m.err ? 'err' : 'ai'));
+      b.textContent = m.content;
+      list.appendChild(b);
+    });
+    if(A.busy){
+      var t = document.createElement('div'); t.className='ask-b ai'; t.setAttribute('aria-label','Thinking');
+      t.innerHTML = '<span class="ask-dots"><span></span><span></span><span></span></span>';
+      list.appendChild(t);
+    }
+    var ch = $('ask-chips'); if(ch) ch.style.display = A.msgs.length ? 'none' : 'flex';
+    var s = $('ask-send'); if(s) s.disabled = A.busy;
+    var nw = $('ask-new'); if(nw) nw.style.display = A.msgs.length ? '' : 'none';
+    try{ var last = list.lastElementChild; if(last && A.msgs.length) last.scrollIntoView({block:'nearest', behavior:'smooth'}); }catch(e){}
+  }
+
+  function send(q){
+    q = String(q||'').trim().slice(0,500);
+    if(!q || A.busy) return;
+    var base = workerUrl(), f = fam();
+    A.msgs.push({role:'user', content:q}); A.draft=''; var inp=$('ask-in'); if(inp) inp.value='';
+    if(!base || !f){ A.msgs.push({role:'assistant', err:true, content: !base ? 'The assistant needs the Worker address set in the app.' : ERR.family_not_found}); paint(); return; }
+    // last 6 real turns as context (errors are not sent)
+    var hist = A.msgs.slice(0,-1).filter(function(m){ return !m.err; }).slice(-6).map(function(m){ return {role:m.role, content:m.content}; });
+    A.busy = true; paint();
+    var ctl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+    var to = setTimeout(function(){ try{ ctl && ctl.abort(); }catch(e){} }, 45000);
+    fetch(base + '/ask', {
+      method:'POST', headers:{'Content-Type':'application/json'}, signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ familyId:f, question:q, history:hist, tz:-new Date().getTimezoneOffset() })
+    }).then(function(r){ return r.json().catch(function(){ return {ok:false,error:'ai_error'}; }); })
+    .then(function(j){
+      if(j && j.ok && j.answer) A.msgs.push({role:'assistant', content:String(j.answer)});
+      else A.msgs.push({role:'assistant', err:true, content: ERR[j && j.error] || ERR.ai_error});
+    }).catch(function(){
+      A.msgs.push({role:'assistant', err:true, content:'Could not reach the assistant. Check your connection and try again.'});
+    }).then(function(){ clearTimeout(to); A.busy=false; paint(); });
+  }
+  window.askSend = send;
+  window.askNew = function(){ if(A.busy) return; A.msgs=[]; paint(); };
+
+  PAGES['ask'] = function(el){
+    el.innerHTML =
+      '<div class="page-header"><h2>Ask BabyOS</h2><p>Ask about feeds, diapers, sleep, shots and what is coming up. Answers come from your logs.</p></div>' +
+      '<div class="ask-wrap">' +
+        '<div class="ask-list" id="ask-list" aria-live="polite"></div>' +
+        '<div class="ask-chips" id="ask-chips"></div>' +
+        '<form class="ask-form" id="ask-form" autocomplete="off">' +
+          '<input class="ask-in" id="ask-in" type="text" maxlength="500" enterkeyhint="send" placeholder="Ask anything about ' + '" aria-label="Your question">' +
+          '<button class="ask-send" id="ask-send" type="submit">Send</button>' +
+        '</form>' +
+        '<div class="ask-foot"><span>AI can be wrong, and this is not medical advice. For health worries, call your pediatrician.</span><button class="ask-new" id="ask-new" type="button">New chat</button></div>' +
+      '</div>';
+    var ch = $('ask-chips');
+    chips().forEach(function(c){
+      var b = document.createElement('button'); b.type='button'; b.className='ask-chip'; b.textContent=c;
+      b.onclick = function(){ send(c); };
+      ch.appendChild(b);
+    });
+    var inp = $('ask-in'); inp.placeholder = 'Ask about ' + nick() + '...'; inp.value = A.draft || '';
+    inp.addEventListener('input', function(){ A.draft = inp.value; });
+    $('ask-form').addEventListener('submit', function(e){ e.preventDefault(); send(inp.value); });
+    $('ask-new').onclick = window.askNew;
+    paint();
+  };
 })();
 </script>
 
