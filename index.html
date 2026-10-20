@@ -17133,24 +17133,30 @@ var PUSH_WORKER_URL = 'https://babyos-alerts.dydra-nandira.workers.dev';   // yo
   };
   window.pushTest = function(){
     if(!PUSH_WORKER_URL){ note('Worker address is not set in the app yet.'); return; }
-    var n = 8;
-    note('Sending in '+n+' seconds. Lock your phone or go to the Home Screen now.');
-    var tick = setInterval(function(){
-      n--; if(n>0){ note('Sending in '+n+' seconds. Lock your phone or go to the Home Screen now.'); return; }
-      clearInterval(tick); note('Sending...');
-      fetch(PUSH_WORKER_URL.replace(/\/+$/,'')+'/test', { method:'POST', headers:{'Content-Type':'text/plain;charset=UTF-8'}, body:JSON.stringify({ familyId:fid(), deviceId:devId() }) })
-        .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, code:r.status, j:j||{} }; }); })
-        .then(function(x){
-          var j = x.j, m;
-          if(x.ok) m = 'Sent to the push service (status '+(j.status||'ok')+'). It should appear within seconds. If not, check iPhone Settings > Notifications > Baby OS and Focus mode.';
-          else if(j.error==='slow down') m = 'Wait a few seconds and try again.';
-          else if(x.code===404) m = 'This phone is not registered with the alert service. Turn alerts off, then on again.';
-          else if(j.status) m = 'The push service refused it (status '+j.status+(j.detail?': '+j.detail:'')+')'+(j.gone?'. This phone\u2019s alert link expired. Turn alerts off, then on again.':'. Check the keys in the Worker match the app.');
-          else m = 'The alert service had a problem'+(j.error?' ('+j.error+')':'')+' (code '+x.code+').';
-          note(m);
-        })
-        .catch(function(){ note('Could not reach the alert service. Check the Worker address in the app.'); });
-    }, 1000);
+    var t0 = Date.now();
+    note('Scheduling...');
+    fetch(PUSH_WORKER_URL.replace(/\/+$/,'')+'/test', { method:'POST', headers:{'Content-Type':'text/plain;charset=UTF-8'}, body:JSON.stringify({ familyId:fid(), deviceId:devId(), delay:10 }) })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, code:r.status, j:j||{} }; }); })
+      .then(function(x){
+        var j = x.j, m;
+        if(x.ok && j.scheduled){
+          note('Test scheduled. Lock your phone now. The alert arrives in about 10 seconds.');
+          setTimeout(function(){
+            if(typeof fbRead!=='function') return;
+            fbRead('/push_sent/'+encodeURIComponent(fid())+'/test_result').then(function(res){
+              if(!res || !res.at || res.at < t0) return;
+              if(res.ok) note('Delivered to the push service (status '+res.status+'). If you did not see it, check iPhone Settings > Notifications > Baby OS and Focus mode.');
+              else note('The push service refused it (status '+res.status+(res.detail?': '+res.detail:'')+')'+(res.gone?'. This phone\u2019s alert link expired. Turn alerts off, then on again.':'. Check the keys in the Worker match the app.'));
+            });
+          }, 16000);
+          return;
+        }
+        if(j.error==='slow down') m = 'Wait a few seconds and try again.';
+        else if(x.code===404) m = 'This phone is not registered with the alert service. Turn alerts off, then on again.';
+        else m = 'The alert service had a problem'+(j.error?' ('+j.error+')':'')+' (code '+x.code+').';
+        note(m);
+      })
+      .catch(function(){ note('Could not reach the alert service. Check the Worker address in the app.'); });
   };
   function note(m){ S.msg = m; var e = $('push-note'); if(e) e.textContent = m; else paint(); try{ if(typeof toast==='function') toast(m.length>70 ? m.slice(0,67)+'...' : m); }catch(e2){} }
 
