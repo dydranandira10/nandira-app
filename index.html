@@ -17919,10 +17919,8 @@ body.night-mode #wa-ov .wa-chip{background:var(--card2,#22304F);}
 #wa-ov .wa-link{font:inherit;font-size:12.5px;font-weight:700;background:none;border:0;color:var(--link,#5B4BD6);cursor:pointer;padding:0;text-align:left;}
 #wa-ov .wa-note{font-size:11.5px;color:var(--ink-3,#6E6A92);line-height:1.45;}
 #wa-ov .wa-tplcard{border-radius:18px;background:rgba(150,160,235,.14);padding:12px 14px;}
-#wa-ov .wa-pre{margin:0 0 8px;font:inherit;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink,#2A2A33);max-height:5.6em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent);}
-#wa-ov .wa-pre.open{max-height:none;-webkit-mask-image:none;mask-image:none;}
-#wa-ov .wa-acts{display:flex;gap:8px;margin:8px 0 4px;}
-#wa-ov .wa-acts .wa-btn{padding:10px 12px;min-height:44px;font-size:14px;}
+#wa-ov .wa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+#wa-ov .wa-grid .wa-btn{padding:10px 12px;min-height:44px;font-size:14px;}
 body.simple-mode #wa-ov{display:none !important;}
 </style>
 
@@ -17942,7 +17940,7 @@ function parseNanny(text, opts) {
   var todayStr = opts.today || new Date().toISOString().slice(0, 10);
   var defDiaper = opts.defaultDiaper || 'wet';
   var defFeed = opts.defaultFeedType || 'stored';
-  var out = { feeds: [], diapers: [], stock: { bags: [], used: [], combos: [], usedCombos: [], single: null, total: 0 }, skipped: [], dates: [] };
+  var out = { feeds: [], diapers: [], weights: [], stock: { bags: [], used: [], combos: [], usedCombos: [], single: null, total: 0 }, skipped: [], dates: [] };
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
   var MONTHS = { jan:1, januari:1, january:1, feb:2, februari:2, february:2, mar:3, maret:3, march:3, apr:4, april:4, mei:5, may:5, jun:6, juni:6, june:6, jul:7, juli:7, july:7,
     agu:8, agt:8, agustus:8, aug:8, august:8, sep:9, sept:9, september:9, okt:10, oktober:10, oct:10, october:10, nov:11, november:11, des:12, desember:12, dec:12, december:12 };
@@ -17965,6 +17963,8 @@ function parseNanny(text, opts) {
       var yy = +m[3]; if (yy < 100) yy += 2000;
       setDate(validDate(yy, +m[2], +m[1])); line = m[4].trim(); if (!line) continue;
     }
+    // lines of an unfilled template ("Mimi jam __.__ - __.__ = ___ ml") carry no numbers: ignore them
+    if (/_{2,}/.test(line) && !/\d/.test(line.replace(/_+/g, '').replace(/^\s*\d{1,2}[.)]\s*/, ''))) continue;
     // date header: "Tgl 21/10", "Tanggal: 21/10/2026", "Selasa, 21 Oktober 2026"
     var dh = /^(?:(?:tgl|tanggal|date|hari)\.?\s*:?\s*)?(?:(?:senin|selasa|rabu|kamis|jumat|jum'at|sabtu|minggu|mon|tue|wed|thu|fri|sat|sun)[a-z]*\.?,?\s*)?(\d{1,2})\s*([\/\-.])\s*(\d{1,2})(?:\s*[\/\-.]\s*(\d{2,4}))?\s*$/i.exec(line);
     var hasLabel = /^(tgl|tanggal|date|hari)/i.test(line);
@@ -18009,6 +18009,16 @@ function parseNanny(text, opts) {
     var sg = /(stok|stock|sisa|total|persediaan)[^\d~]{0,30}(\d{3,5})\s*(?:ml|cc)/i.exec(line);
     if (sg && !/\d[.:]\d{2}/.test(line.replace(sg[0], ''))) { out.stock.single = +sg[2]; section = 'stock'; continue; }
 
+    // weight: "Berat badan: 5.6 kg", "BB 5600 g"
+    if (/\b(berat|bb|timbang|weight)\b/i.test(line)) {
+      var wm = /(\d{1,2}(?:[.,]\d{1,3})?|\d{3,5})\s*(kg|kilo|gr|gram|g)?(?![\d])/i.exec(line.replace(/\b(berat badan|berat|bb|timbang|weight)\b/ig, ' '));
+      if (wm) {
+        var num = parseFloat(wm[1].replace(',', '.')), unit = (wm[2] || '').toLowerCase(), grams = (unit && unit !== 'kg' && unit !== 'kilo') || (!unit && num >= 100) ? num : num * 1000;
+        grams = Math.round(grams);
+        if (grams >= 500 && grams <= 40000) out.weights.push({ date: ctx, grams: grams, src: raw }); else out.skipped.push({ line: raw, why: 'weight looks off' });
+      } else out.skipped.push({ line: raw, why: 'no weight' });
+      continue;
+    }
     // times
     line = line.replace(/[–—−]/g, '-').replace(/\b(s\/d|sd|sampai|hingga|smpe|smp)\b/gi, '-');
     var times = [], tr = /(^|[^\d.:])([01]?\d|2[0-3])[.:]([0-5]\d)(?![\d])/g, tm;
@@ -18038,9 +18048,13 @@ function parseNanny(text, opts) {
   return out;
 }
 
-  var TPL0 = 'Halo Mba Narti, mulai sekarang tolong laporan ditulis dengan format ini ya, biar gampang dicatat di aplikasi:\n\nTgl 21/10\n\nMimi\n09.49 - 10.04 = 110 ml\n10.50 - 10.55 = 60 ml\n\nPempi\n07.58 pipis\n10.00 BAB\n12.50 pipis + BAB\n\nStok ASIP\n(tetap seperti daftar kantong yang sekarang, coret yang sudah dipakai)\n\nAturan singkat:\n1. Satu baris satu kejadian, jam pakai titik (09.49).\n2. Mimi: jam mulai - jam selesai = jumlah ml. Kalau sufor, tulis "sufor" di barisnya.\n3. Pempi: tulis pipis atau BAB (atau dua-duanya). Kalau tidak ditulis, dianggap pipis.';
-  function tpl(){ var t = td().split('-'); return TPL0.replace('21/10', t[2] + '/' + t[1]); }
-  var W = window.__wa = { tplOpen:true, text:'', date:'', ftype:'stored', ddef:'wet', baby:0, items:[], skipped:[], bags:null, view:'in', skipOpen:false };
+  var TPLS = {
+    feed: ['Feed', 'Mimi jam __.__ - __.__ = ___ ml'],
+    diaper: ['Diaper', 'Pempi jam __.__ pipis'],
+    weight: ['Weight', 'Berat badan: __._ kg'],
+    stock: ['Stored milk', 'Stok ASIP\nKantong siap pakai:\n1. ___\n2. ___\n3. ___']
+  };
+  var W = window.__wa = { text:'', date:'', ftype:'stored', ddef:'wet', baby:0, items:[], skipped:[], bags:null, view:'in', skipOpen:false };
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function td(){ try{ return today(); }catch(e){ return new Date().toISOString().slice(0,10); } }
@@ -18092,11 +18106,9 @@ function parseNanny(text, opts) {
   function paintIn(){
     var body = $('wa-body'), foot = $('wa-foot');
     var h = '<div class="wa-intro">Copy your nanny’s report in WhatsApp, paste it here, and I will turn it into entries. You check everything before anything is saved.</div>'
-      + '<div class="wa-tplcard"><div class="wa-h" style="margin:0 0 6px">Template for your nanny <small>send it once</small></div>'
-      + '<pre class="wa-pre'+(W.tplOpen?' open':'')+'" id="wa-pre">'+esc(tpl())+'</pre>'
-      + '<button type="button" class="wa-link" id="wa-ttog">'+(W.tplOpen?'Show less':'Show the full template')+'</button>'
-      + '<div class="wa-acts"><button type="button" class="wa-btn ghost" id="wa-tcopy">Copy</button><button type="button" class="wa-btn go" id="wa-twa">Send on WhatsApp</button></div></div>'
-      + '<div class="wa-lbl" style="margin:2px 0 -6px">Then paste her report here</div>'
+      + '<div class="wa-tplcard"><div class="wa-h" style="margin:0 0 8px">Copy a template for your nanny <small>then paste it into WhatsApp</small></div>'
+      + '<div class="wa-grid">' + Object.keys(TPLS).map(function(k){ return '<button type="button" class="wa-btn ghost" data-tp="'+k+'">'+TPLS[k][0]+'</button>'; }).join('') + '</div></div>'
+      + '<div class="wa-lbl" style="margin:2px 0 -6px">Paste her report here</div>'
       + '<textarea id="wa-in" placeholder="Mimi jam 9.49 - 10.04 sbnyk 110&#10;Ganti pempi jam 07.58" aria-label="Paste the report here"></textarea>'
       + '<div><div class="wa-lbl">Date to use when a message has no date</div><input type="date" id="wa-date" max="'+td()+'" value="'+esc(W.date||td())+'"></div>'
       + '<div><div class="wa-lbl">A bottle with no detail is</div><div class="wa-seg" role="group" aria-label="Bottle type"><button type="button" data-f="stored" class="'+(W.ftype==='stored'?'on':'')+'">Stored milk</button><button type="button" data-f="formula" class="'+(W.ftype==='formula'?'on':'')+'">Formula</button></div></div>'
@@ -18113,13 +18125,11 @@ function parseNanny(text, opts) {
     body.querySelectorAll('[data-f]').forEach(function(b){ b.onclick = function(){ W.ftype = b.getAttribute('data-f'); body.querySelectorAll('[data-f]').forEach(function(x){ x.classList.toggle('on', x===b); }); }; });
     body.querySelectorAll('[data-d]').forEach(function(b){ b.onclick = function(){ W.ddef = b.getAttribute('data-d'); body.querySelectorAll('[data-d]').forEach(function(x){ x.classList.toggle('on', x===b); }); }; });
     body.querySelectorAll('[data-b]').forEach(function(b){ b.onclick = function(){ W.baby = +b.getAttribute('data-b'); body.querySelectorAll('[data-b]').forEach(function(x){ x.classList.toggle('on', x===b); }); }; });
-    $('wa-ttog').onclick = function(){ W.tplOpen = !W.tplOpen; $('wa-pre').classList.toggle('open', W.tplOpen); this.textContent = W.tplOpen ? 'Show less' : 'Show the full template'; };
-    $('wa-tcopy').onclick = function(){
-      var T = tpl(), ok = function(){ try{ toast('Template copied. Paste it into WhatsApp.'); }catch(e){} };
+    body.querySelectorAll('[data-tp]').forEach(function(btn){ btn.onclick = function(){
+      var k = btn.getAttribute('data-tp'), T = TPLS[k][1], ok = function(){ try{ toast(TPLS[k][0] + ' template copied'); }catch(e){} };
       if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(T).then(ok).catch(function(){ fb(); }); else fb();
       function fb(){ try{ var t = document.createElement('textarea'); t.value = T; t.setAttribute('readonly',''); t.style.cssText='position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(t); t.select(); t.setSelectionRange(0, T.length); var r = document.execCommand('copy'); t.remove(); if(r){ ok(); return; } }catch(e){} try{ toast('Could not copy. Try again.'); }catch(e){} }
-    };
-    $('wa-twa').onclick = function(){ try{ window.open('https://wa.me/?text=' + encodeURIComponent(tpl()), '_blank'); }catch(e){ try{ toast('Could not open WhatsApp.'); }catch(e2){} } };
+    }; });
     $('wa-read').onclick = read;
   }
 
@@ -18132,8 +18142,13 @@ function parseNanny(text, opts) {
     var items = [];
     r.feeds.forEach(function(f){ items.push({ kind:'feed', date:f.date, time:f.time, end:f.end, ml:f.ml, type:f.type }); });
     r.diapers.forEach(function(d){ items.push({ kind:'diaper', date:d.date, time:d.time, type:d.type, guessed:d.guessed }); });
+    (r.weights||[]).forEach(function(w){ items.push({ kind:'weight', date:w.date, grams:w.grams }); });
     items.forEach(function(it){
       it.note = ''; it.locked = false; it.on = true;
+      if(it.kind==='weight'){
+        if((state.weightLog||[]).some(function(e){ return e && e.date===it.date && (e.babyIdx||0)===W.baby; })){ it.locked = true; it.on = false; it.note = 'A weight is already logged for this day. Edit it on the Weight page.'; }
+        return;
+      }
       if(entryInFuture(it.date, it.time)){ it.locked = true; it.on = false; it.note = 'In the future, so it cannot be added'; }
       else if(exists(it.kind==='feed' ? state.feedingLog : state.diaperLog, it.date, it.time)){ it.on = false; it.note = 'Already logged at this time'; }
     });
@@ -18153,26 +18168,29 @@ function parseNanny(text, opts) {
     if(it.kind==='feed'){
       main = '<div class="wa-t">' + it.ml + ' ml · ' + esc(it.time) + (it.end ? ' to ' + esc(it.end) : '') + '</div>';
       chip = '<button type="button" class="wa-chip" data-cy="'+i+'" aria-label="Change type">' + typeLbl(it.type) + '</button>';
+    } else if(it.kind==='weight'){
+      main = '<div class="wa-t">' + (it.grams/1000).toFixed(2) + ' kg</div>'; chip = '';
     } else {
       main = '<div class="wa-t">' + esc(it.time) + '</div>';
       chip = '<button type="button" class="wa-chip" data-cy="'+i+'" aria-label="Change type">' + dtype(it.type) + '</button>';
     }
-    var sub = (it.kind==='feed' ? 'Bottle' : 'Diaper') + ' · ' + dlabel(it.date) + (it.guessed ? ' · not specified, so I used ' + dtype(it.type).toLowerCase() : '');
+    var sub = (it.kind==='feed' ? 'Bottle' : it.kind==='weight' ? 'Weight' : 'Diaper') + ' · ' + dlabel(it.date) + (it.guessed ? ' · not specified, so I used ' + dtype(it.type).toLowerCase() : '');
     return '<div class="wa-row '+(it.on?'on':'off')+'" id="wa-r'+i+'"><button type="button" class="wa-chk" role="checkbox" aria-checked="'+(it.on?'true':'false')+'" data-tk="'+i+'" '+(it.locked?'disabled':'')+'>'+(it.on?'✓':'')+'</button>'
       + '<div class="wa-main">'+main+'<div class="wa-s'+(it.note?' warn':'')+'">'+esc(it.note || sub)+'</div></div>'+(it.locked?'':chip)+'</div>';
   }
   function paintReview(){
     var body = $('wa-body'), foot = $('wa-foot');
-    var feeds = [], dia = [];
-    W.items.forEach(function(it, i){ (it.kind==='feed' ? feeds : dia).push(i); });
+    var feeds = [], dia = [], wts = [];
+    W.items.forEach(function(it, i){ (it.kind==='feed' ? feeds : it.kind==='weight' ? wts : dia).push(i); });
     var h = '';
     if(!W.items.length && !W.bags){
-      h += '<div class="wa-intro">I could not find any feeds, diapers or stock in that text. Lines like “Mimi jam 9.49 - 10.04 sbnyk 110” or “Ganti pempi jam 07.58” work.</div>';
+      h += '<div class="wa-intro">I could not find any feeds, diapers, weights or stock in that text. Lines like “Mimi jam 9.49 - 10.04 sbnyk 110” or “Ganti pempi jam 07.58” work.</div>';
     } else {
       h += '<div class="wa-intro">Here is what I found'+(twins()?' for '+esc(nm(W.baby)):'')+'. Untick anything that looks wrong. Tap a label on the right to change it.</div>';
     }
     if(feeds.length){ h += '<div class="wa-h">Bottles <small>'+feeds.length+'</small></div>' + feeds.map(function(i){ return rowHTML(W.items[i], i); }).join(''); }
     if(dia.length){ h += '<div class="wa-h">Diapers <small>'+dia.length+'</small></div>' + dia.map(function(i){ return rowHTML(W.items[i], i); }).join(''); }
+    if(wts.length){ h += '<div class="wa-h">Weight <small>'+wts.length+'</small></div>' + wts.map(function(i){ return rowHTML(W.items[i], i); }).join(''); }
     if(W.bags){
       var b = W.bags;
       var detail = b.single ? 'Total stated in the message' : (b.n + ' ready bag' + (b.n===1?'':'s') + ': ' + b.list.join(', ') + (b.used ? ' · ' + b.used + ' crossed out and left out' : '') + (b.open ? ' · ' + b.open + ' combination bag' + (b.open===1?'':'s') + ' not counted' : ''));
@@ -18206,13 +18224,15 @@ function parseNanny(text, opts) {
 
   // ---------- add: the same entry shapes the app writes
   function add(){
-    var idx = W.baby, nf = 0, nd = 0, stashChanged = false, stashLogged = false;
+    var idx = W.baby, nf = 0, nd = 0, nw = 0, stashChanged = false, stashLogged = false;
     var useStock = !!(W.bags && W.bags.on);
     try{
       if(!state.feedingLog) state.feedingLog = [];
       if(!state.diaperLog) state.diaperLog = [];
+      if(!state.weightLog) state.weightLog = [];
       W.items.forEach(function(it){
         if(!it.on || it.locked) return;
+        if(it.kind === 'weight'){ state.weightLog.push({ date: it.date, grams: it.grams, notes:'', babyIdx: idx }); nw++; return; }
         if(it.kind === 'feed'){
           state.feedingLog.push({ date: it.date, time: it.time, endTime: it.end || '', feedType: it.type, leftMin:0, rightMin:0,
             formulaMl: it.type==='formula' ? it.ml : 0, storedMl: it.type==='stored' ? it.ml : 0, pumpedMl:0, notes:'', babyIdx: idx });
@@ -18225,20 +18245,21 @@ function parseNanny(text, opts) {
         }
       });
       if(useStock){
-        var old = state.pumpedStash || 0, nw = W.bags.total;
-        if(nw < old){
+        var old = state.pumpedStash || 0, newStash = W.bags.total;
+        if(newStash < old){
           if(!state.stashLog) state.stashLog = [];
-          state.stashLog.push({ date: td(), time: new Date().toTimeString().slice(0,5), ml: old - nw, reason: 'Stock count from WhatsApp' });
+          state.stashLog.push({ date: td(), time: new Date().toTimeString().slice(0,5), ml: old - newStash, reason: 'Stock count from WhatsApp' });
           stashLogged = true;
         }
-        state.pumpedStash = nw; stashChanged = true;
+        state.pumpedStash = newStash; stashChanged = true;
       }
       if(nf) saveState('feedingLog');
       if(nd) saveState('diaperLog');
+      if(nw) saveState('weightLog');
       if(stashChanged) saveState('pumpedStash');
       if(stashLogged) saveState('stashLog');
     }catch(e){ try{ toast('Something went wrong. Please check the logs.'); }catch(e2){} return; }
-    var parts = []; if(nf) parts.push(nf + ' bottle' + (nf===1?'':'s')); if(nd) parts.push(nd + ' diaper' + (nd===1?'':'s')); if(useStock) parts.push('stash ' + fmtMl(W.bags.total) + ' ml');
+    var parts = []; if(nf) parts.push(nf + ' bottle' + (nf===1?'':'s')); if(nd) parts.push(nd + ' diaper' + (nd===1?'':'s')); if(nw) parts.push(nw + ' weight' + (nw===1?'':'s')); if(useStock) parts.push('stash ' + fmtMl(W.bags.total) + ' ml');
     W.text = ''; W.items = []; W.bags = null; window.waClose();
     try{ var pg = document.body.dataset.page, el = document.querySelector('#main-content .page'); if(pg && el && typeof PAGES!=='undefined' && PAGES[pg]) PAGES[pg](el); }catch(e){}
     try{ toastSuccess('Added ' + parts.join(', ')); }catch(e){}
