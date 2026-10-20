@@ -3223,7 +3223,7 @@ html body .drawer .drawer-header{background:transparent !important;}
   <button class="nav-item" onclick="navTo('notes')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-4-3-3 2-3-2-4 3Z"/><path d="M9 8h6M9 12h6"/></svg></span> Notes</button>
   <button class="nav-item" onclick="navTo('calendar')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/></svg></span> Calendar</button>
   <button class="nav-item" onclick="navTo('achievements')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v4a4 4 0 0 1-8 0V4Z"/><path d="M6 5H4v2a3 3 0 0 0 3 3M18 5h2v2a3 3 0 0 1-3 3"/><path d="M9 15h6M10 12v3M14 12v3M8 20h8l-1-4H9l-1 4Z"/></svg></span> Achievements</button>
-  <button class="nav-item" data-ask="1" onclick="closeDrawer();askOpen()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12Z"/><path d="M9 11h6M9 14.5h3.5"/></svg></span> <span class="ask-name">Ask BabyOS</span></button>
+  <button class="nav-item" data-ask="1" onclick="closeDrawer();askOpen()"><span class="icon"><svg viewBox="0 0 48 48" width="20" height="20" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16.5 L9 9 L18.5 12.5" stroke="currentColor" stroke-width="2.4"/><path d="M38 16.5 L39 9 L29.5 12.5" stroke="currentColor" stroke-width="2.4"/><line x1="24" y1="12" x2="24" y2="9" stroke="currentColor" stroke-width="2.3"/><circle cx="24" cy="6" r="2.6" stroke="currentColor" stroke-width="2"/><ellipse cx="24" cy="27.5" rx="17.5" ry="15" stroke="currentColor" stroke-width="2.6"/><circle cx="16.3" cy="25.5" r="6.6" stroke="currentColor" stroke-width="2.1"/><circle cx="31.7" cy="25.5" r="6.6" stroke="currentColor" stroke-width="2.1"/><path d="M13 26.5 Q16.3 21.5 19.6 26.5" stroke="currentColor" stroke-width="2.3"/><path d="M28.4 26.5 Q31.7 21.5 35 26.5" stroke="currentColor" stroke-width="2.3"/><path d="M21.3 31.3 H26.7 L24 36 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6"/></svg></span> <span class="ask-name">Hoot</span></button>
   <div id="phase-suggest"></div>
   <div id="drawer-prebirth">
   <div class="drawer-section drawer-section-toggle" id="prebirth-header" onclick="togglePrebirthSection()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePrebirthSection();}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
@@ -3281,7 +3281,7 @@ html body .drawer .drawer-header{background:transparent !important;}
   <button class="nav-item" onclick="showPage('dashboard')"><span class="icon">🏠</span> Home</button>
   <button class="nav-item" onclick="showPage('rhythm')"><span class="icon">📊</span> Insights</button>
   <button class="nav-item" onclick="showPage('notes')"><span class="icon">📝</span> Notes</button>
-  <button class="nav-item" data-ask="1" onclick="askOpen()"><span class="icon">💬</span> <span class="ask-name">Ask BabyOS</span></button>
+  <button class="nav-item" data-ask="1" onclick="askOpen()"><span class="icon"><svg viewBox="0 0 48 48" width="18" height="18" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16.5 L9 9 L18.5 12.5" stroke="currentColor" stroke-width="2.4"/><path d="M38 16.5 L39 9 L29.5 12.5" stroke="currentColor" stroke-width="2.4"/><line x1="24" y1="12" x2="24" y2="9" stroke="currentColor" stroke-width="2.3"/><circle cx="24" cy="6" r="2.6" stroke="currentColor" stroke-width="2"/><ellipse cx="24" cy="27.5" rx="17.5" ry="15" stroke="currentColor" stroke-width="2.6"/><circle cx="16.3" cy="25.5" r="6.6" stroke="currentColor" stroke-width="2.1"/><circle cx="31.7" cy="25.5" r="6.6" stroke="currentColor" stroke-width="2.1"/><path d="M13 26.5 Q16.3 21.5 19.6 26.5" stroke="currentColor" stroke-width="2.3"/><path d="M28.4 26.5 Q31.7 21.5 35 26.5" stroke="currentColor" stroke-width="2.3"/><path d="M21.3 31.3 H26.7 L24 36 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6"/></svg></span> <span class="ask-name">Hoot</span></button>
   <div class="drawer-section">Pre-Birth</div>
   <button class="nav-item" onclick="showPage('hospital-bag')"><span class="icon">🎒</span> Hospital Bag</button>
   <button class="nav-item" onclick="showPage('csection')"><span class="icon">🏥</span> C-Section Prep</button>
@@ -17248,11 +17248,11 @@ var PUSH_WORKER_URL = 'https://babyos-alerts.dydra-nandira.workers.dev';   // yo
 </script>
 
 <style id="v32css">
-/* Ask BabyOS: floating button + chat sheet (new, additive) */
+/* Hoot: floating button + chat sheet (new, additive) */
 #ask-fab{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 172px);width:46px;height:46px;border-radius:50%;z-index:98;display:none;align-items:center;justify-content:center;background:var(--y,#FFC93C);color:var(--ink,#2A2A33);border:0;padding:0;cursor:pointer;box-shadow:0 6px 16px -4px rgba(40,30,90,.35),0 2px 4px rgba(40,30,90,.15);-webkit-tap-highlight-color:transparent;transition:transform .15s;}
 #ask-fab.on{display:flex;}
 #ask-fab:active{transform:scale(.92);}
-#ask-fab svg{width:22px;height:22px;}
+#ask-fab svg{width:34px;height:34px;}
 body.simple-mode #ask-fab{display:none !important;}
 #ask-ov{position:fixed;left:0;right:0;top:0;height:100%;z-index:9000;display:none;align-items:flex-end;justify-content:center;background:rgba(20,18,45,.5);}
 #ask-ov.open{display:flex;}
@@ -17292,6 +17292,7 @@ body.night-mode #ask-ov .ask-b.ai,body.night-mode #ask-ov .ask-b.err,body.night-
 #ask-ov .ask-pic{display:block;max-width:100%;max-height:180px;border-radius:12px;margin-bottom:8px;object-fit:cover;}
 body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:var(--card2,#22304F);}
 #ask-head .ask-title{flex:1;min-width:0;}
+#ask-head .ask-owl{flex:none;width:36px;height:36px;margin-left:-4px;}
 #ask-head .ask-title h3{flex:none;}
 #ask-via{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:12px;font-weight:600;color:var(--ink-3,#6E6A92);}
 #ask-via .ask-dot{width:8px;height:8px;border-radius:50%;background:#2FB67C;flex:none;}
@@ -17477,12 +17478,12 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
   var lockPrev = null;
   function build(){
     if($('ask-ov')) return;
-    var ov = document.createElement('div'); ov.id = 'ask-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Ask BabyOS');
+    var ov = document.createElement('div'); ov.id = 'ask-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Hoot');
     ov.innerHTML =
       '<div id="ask-sheet">' +
-        '<div id="ask-head"><div class="ask-title"><h3>Ask BabyOS</h3><div id="ask-via" style="display:none"></div></div><button id="ask-x" type="button" aria-label="Close">×</button></div>' +
+        '<div id="ask-head"><div class="ask-owl"><svg viewBox="0 0 48 48" width="36" height="36" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16.5 L9 9 L18.5 12.5" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.3"/><path d="M38 16.5 L39 9 L29.5 12.5" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.3"/><line x1="24" y1="12" x2="24" y2="9" stroke="#2B2350" stroke-width="2.3"/><circle cx="24" cy="6" r="3.2" fill="#FFC93C" stroke="#2B2350" stroke-width="2"/><ellipse cx="24" cy="27.5" rx="17.5" ry="15" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.4"/><circle cx="16.3" cy="25.5" r="7.6" fill="#FFFFFF" stroke="#2B2350" stroke-width="2.1"/><circle cx="31.7" cy="25.5" r="7.6" fill="#FFFFFF" stroke="#2B2350" stroke-width="2.1"/><path d="M12.4 26.5 Q16.3 20.5 20.2 26.5" stroke="#2B2350" stroke-width="2.6"/><path d="M27.8 26.5 Q31.7 20.5 35.6 26.5" stroke="#2B2350" stroke-width="2.6"/><circle cx="11.3" cy="34" r="2.2" fill="#FFB3D1"/><circle cx="36.7" cy="34" r="2.2" fill="#FFB3D1"/><path d="M21.3 32.3 H26.7 L24 37 Z" fill="#FF8A6B" stroke="#2B2350" stroke-width="2"/></svg></div><div class="ask-title"><h3>Hoot</h3><div id="ask-via" style="display:none"></div></div><button id="ask-x" type="button" aria-label="Close">×</button></div>' +
         '<div id="ask-body">' +
-          '<div class="ask-intro" id="ask-intro">Ask about your logs (feeds, diapers, sleep, shots, notes) or for general tips. You can also attach a photo. I will say which is which.</div>' +
+          '<div class="ask-intro" id="ask-intro">Hi, I am Hoot. Ask me about your logs (feeds, diapers, sleep, shots, notes) or for general tips. You can also attach a photo. I will say which is which.</div>' +
           '<div id="ask-list" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>' +
           '<div class="ask-chips" id="ask-chips"></div>' +
         '</div>' +
@@ -17507,7 +17508,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     build();
     var ch = $('ask-chips'); ch.innerHTML = '';
     chips().forEach(function(c){ var b = document.createElement('button'); b.type='button'; b.className='ask-chip'; b.textContent=c; b.onclick=function(){ send(c); }; ch.appendChild(b); });
-    var inp = $('ask-in'); inp.placeholder = 'Ask about ' + nick() + '...'; inp.value = A.draft || '';
+    var inp = $('ask-in'); inp.placeholder = 'Ask Hoot about ' + nick() + '...'; inp.value = A.draft || '';
     $('ask-ov').classList.add('open'); fit(); checkVia();
     try{ lockPrev = document.body.style.overflow; document.body.style.overflow = 'hidden'; }catch(e){}
     paint();
@@ -17522,8 +17523,8 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
   function fab(){
     var b = $('ask-fab');
     if(!b){
-      b = document.createElement('button'); b.id='ask-fab'; b.type='button'; b.setAttribute('aria-label','Ask BabyOS');
-      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12Z"/><path d="M9 11h6M9 14.5h3.5"/></svg>';
+      b = document.createElement('button'); b.id='ask-fab'; b.type='button'; b.setAttribute('aria-label','Hoot');
+      b.innerHTML = '<svg viewBox="0 0 48 48" width="34" height="34" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16.5 L9 9 L18.5 12.5" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.3"/><path d="M38 16.5 L39 9 L29.5 12.5" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.3"/><line x1="24" y1="12" x2="24" y2="9" stroke="#2B2350" stroke-width="2.3"/><circle cx="24" cy="6" r="3.2" fill="#FFC93C" stroke="#2B2350" stroke-width="2"/><ellipse cx="24" cy="27.5" rx="17.5" ry="15" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.4"/><circle cx="16.3" cy="25.5" r="7.6" fill="#FFFFFF" stroke="#2B2350" stroke-width="2.1"/><circle cx="31.7" cy="25.5" r="7.6" fill="#FFFFFF" stroke="#2B2350" stroke-width="2.1"/><path d="M12.4 26.5 Q16.3 20.5 20.2 26.5" stroke="#2B2350" stroke-width="2.6"/><path d="M27.8 26.5 Q31.7 20.5 35.6 26.5" stroke="#2B2350" stroke-width="2.6"/><circle cx="11.3" cy="34" r="2.2" fill="#FFB3D1"/><circle cx="36.7" cy="34" r="2.2" fill="#FFB3D1"/><path d="M21.3 32.3 H26.7 L24 37 Z" fill="#FF8A6B" stroke="#2B2350" stroke-width="2"/></svg>';
       b.onclick = function(){ if(b.__moved){ b.__moved = false; return; } window.askOpen(); };
       document.body.appendChild(b);
       drag(b); place(b);
