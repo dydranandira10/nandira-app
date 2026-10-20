@@ -3223,6 +3223,7 @@ html body .drawer .drawer-header{background:transparent !important;}
   <button class="nav-item" onclick="navTo('notes')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-4-3-3 2-3-2-4 3Z"/><path d="M9 8h6M9 12h6"/></svg></span> Notes</button>
   <button class="nav-item" onclick="navTo('calendar')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 3v4M16 3v4"/></svg></span> Calendar</button>
   <button class="nav-item" onclick="navTo('achievements')"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v4a4 4 0 0 1-8 0V4Z"/><path d="M6 5H4v2a3 3 0 0 0 3 3M18 5h2v2a3 3 0 0 1-3 3"/><path d="M9 15h6M10 12v3M14 12v3M8 20h8l-1-4H9l-1 4Z"/></svg></span> Achievements</button>
+  <button class="nav-item" data-ask="1" onclick="closeDrawer();askOpen()"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12Z"/><path d="M9 11h6M9 14.5h3.5"/></svg></span> <span class="ask-name">Ask BabyOS</span></button>
   <div id="phase-suggest"></div>
   <div id="drawer-prebirth">
   <div class="drawer-section drawer-section-toggle" id="prebirth-header" onclick="togglePrebirthSection()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePrebirthSection();}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
@@ -3280,6 +3281,7 @@ html body .drawer .drawer-header{background:transparent !important;}
   <button class="nav-item" onclick="showPage('dashboard')"><span class="icon">🏠</span> Home</button>
   <button class="nav-item" onclick="showPage('rhythm')"><span class="icon">📊</span> Insights</button>
   <button class="nav-item" onclick="showPage('notes')"><span class="icon">📝</span> Notes</button>
+  <button class="nav-item" data-ask="1" onclick="askOpen()"><span class="icon">💬</span> <span class="ask-name">Ask BabyOS</span></button>
   <div class="drawer-section">Pre-Birth</div>
   <button class="nav-item" onclick="showPage('hospital-bag')"><span class="icon">🎒</span> Hospital Bag</button>
   <button class="nav-item" onclick="showPage('csection')"><span class="icon">🏥</span> C-Section Prep</button>
@@ -16181,7 +16183,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function navColors(){
     ['.drawer','.desktop-sidebar'].forEach(function(sel){
       var n=0;
-      document.querySelectorAll(sel+' .nav-item').forEach(function(b){ var c=String(n%5); if(b.dataset.c!==c) b.dataset.c=c; n++; });
+      document.querySelectorAll(sel+' .nav-item').forEach(function(b){ if(b.hasAttribute('data-ask')){ if(b.dataset.c!=='3') b.dataset.c='3'; return; } var c=String(n%5); if(b.dataset.c!==c) b.dataset.c=c; n++; });
     });
   }
   var DOM={'Gross Motor':'lilac','Fine Motor':'mint','Language':'coral','Social':'pink','Cognitive':'sky','Emotional':'y'};
@@ -17289,6 +17291,13 @@ body.night-mode #ask-ov .ask-b.ai,body.night-mode #ask-ov .ask-b.err,body.night-
 #ask-prev button{flex:none;width:30px;height:30px;border-radius:50%;border:0;background:rgba(150,160,235,.3);color:var(--ink,#2A2A33);font-size:18px;line-height:1;padding:0;cursor:pointer;}
 #ask-ov .ask-pic{display:block;max-width:100%;max-height:180px;border-radius:12px;margin-bottom:8px;object-fit:cover;}
 body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:var(--card2,#22304F);}
+#ask-head .ask-title{flex:1;min-width:0;}
+#ask-head .ask-title h3{flex:none;}
+#ask-via{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:12px;font-weight:600;color:var(--ink-3,#6E6A92);}
+#ask-via .ask-dot{width:8px;height:8px;border-radius:50%;background:#2FB67C;flex:none;}
+#ask-via .ask-dot.warn{background:#F2994A;}
+#ask-ov .ask-tag{font-size:11px;font-weight:700;opacity:.65;margin-bottom:4px;}
+#ask-ov .ask-b.ai .ask-tag{margin:6px 0 0;order:2;}
 </style>
 <script id="askjs">
 /* ============================================================
@@ -17298,7 +17307,47 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
    - Never writes to your logs. Chat history lives in memory only.
    ============================================================ */
 (function(){
-  var A = window.__ask = window.__ask || { msgs:[], busy:false, draft:'', img:null };
+  var A = window.__ask = window.__ask || { msgs:[], busy:false, draft:'', img:null, via:null, why:'' };
+  var SKEY = 'babyos_ask_chat';   // its own key: chats stay on this phone only and never touch your logs
+  function load(){
+    try{
+      var j = JSON.parse(localStorage.getItem(SKEY) || 'null');
+      if(j && Array.isArray(j.msgs)) A.msgs = j.msgs.filter(function(m){ return m && (m.role==='user'||m.role==='assistant') && typeof m.content==='string'; }).slice(-40);
+      var last = A.msgs.slice().reverse().find(function(m){ return m.via; }); if(last){ A.via = last.via; A.why = last.why || ''; }
+    }catch(e){}
+  }
+  function save(){
+    try{
+      var keep = A.msgs.filter(function(m){ return !m.err; }).slice(-40).map(function(m){ var o = {role:m.role, content:String(m.content).slice(0,3000)}; if(m.via) o.via = m.via; if(m.why) o.why = m.why; if(m.img || m.photo) o.photo = true; return o; });
+      if(keep.length) localStorage.setItem(SKEY, JSON.stringify({v:1, msgs:keep})); else localStorage.removeItem(SKEY);
+    }catch(e){}
+  }
+  if(!A.msgs.length) load();
+  function viaLabel(via, why){
+    if(via==='gemini') return {t:'Powered by Gemini', warn:false};
+    if(via==='cloudflare' && why==='gemini_limit') return {t:'Gemini limit reached, using Cloudflare AI', warn:true};
+    if(via==='cloudflare' && why) return {t:'Gemini unavailable, using Cloudflare AI', warn:true};
+    if(via==='cloudflare') return {t:'Powered by Cloudflare AI', warn:false};
+    return null;
+  }
+  function paintVia(){
+    var el = $('ask-via'); if(!el) return;
+    var v = viaLabel(A.via, A.why);
+    el.innerHTML = '';
+    if(!v){ el.style.display = 'none'; return; }
+    el.style.display = '';
+    var d = document.createElement('span'); d.className = 'ask-dot' + (v.warn ? ' warn' : ''); el.appendChild(d);
+    el.appendChild(document.createTextNode(v.t));
+  }
+  // ask the Worker which AI is switched on (before the first question of this visit)
+  function checkVia(){
+    var base = workerUrl(); if(!base || A.via) return;
+    try{
+      fetch(base + '/').then(function(r){ return r.json(); }).then(function(j){
+        if(j && (j.askProvider==='gemini' || j.askProvider==='cloudflare') && !A.via){ A.via = j.askProvider; A.why = ''; paintVia(); }
+      }).catch(function(){});
+    }catch(e){}
+  }
   function $(id){ return document.getElementById(id); }
   function nick(){ try{ var n = (typeof babyName==='function') ? babyName() : null; return n || 'baby'; }catch(e){ return 'baby'; } }
   function workerUrl(){ try{ return (typeof PUSH_WORKER_URL!=='undefined' && PUSH_WORKER_URL) ? String(PUSH_WORKER_URL).replace(/\/+$/,'') : ''; }catch(e){ return ''; } }
@@ -17343,7 +17392,9 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
       var b = document.createElement('div');
       b.className = 'ask-b ' + (m.role==='user' ? 'me' : (m.err ? 'err' : 'ai'));
       if(m.img){ var im = document.createElement('img'); im.src = m.img; im.alt = 'Attached photo'; im.className = 'ask-pic'; b.appendChild(im); }
+      if(m.photo && !m.img){ var ph = document.createElement('div'); ph.className = 'ask-tag'; ph.textContent = 'Photo (not kept on this phone)'; b.appendChild(ph); }
       b.appendChild(document.createTextNode(m.content));
+      if(m.role==='assistant' && !m.err && m.via){ var tg = document.createElement('div'); tg.className = 'ask-tag'; tg.textContent = m.via==='gemini' ? 'Gemini' : (m.why ? 'Cloudflare AI (backup)' : 'Cloudflare AI'); b.appendChild(tg); }
       list.appendChild(b);
     });
     if(A.busy){
@@ -17355,6 +17406,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     var it = $('ask-intro'); if(it) it.style.display = A.msgs.length ? 'none' : '';
     var s = $('ask-send'); if(s) s.disabled = A.busy;
     var at = $('ask-attach'); if(at) at.disabled = A.busy;
+    paintVia();
     var pv = $('ask-prev'); if(pv){
       pv.innerHTML = '';
       if(A.img){
@@ -17396,7 +17448,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     if(!q && photo) q = 'What do you see in this photo?';
     if(!q || A.busy) return;
     var base = workerUrl(), f = fam();
-    A.msgs.push({role:'user', content:q, img: photo ? photo.url : null}); A.draft=''; A.img=null; var inp=$('ask-in'); if(inp) inp.value='';
+    A.msgs.push({role:'user', content:q, img: photo ? photo.url : null}); save(); A.draft=''; A.img=null; var inp=$('ask-in'); if(inp) inp.value='';
     if(!base || !f){ A.msgs.push({role:'assistant', err:true, content: !base ? 'The assistant needs the Worker address set in the app.' : ERR.family_not_found}); paint(); return; }
     var hist = A.msgs.slice(0,-1).filter(function(m){ return !m.err; }).slice(-6).map(function(m){ return {role:m.role, content:m.content}; });
     A.busy = true; paint();
@@ -17407,14 +17459,14 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
       body: JSON.stringify({ familyId:f, question:q, history:hist, extra:extra(), image: photo ? {mime:photo.mime, data:photo.data} : undefined, tz:-new Date().getTimezoneOffset() })
     }).then(function(r){ return r.json().catch(function(){ return {ok:false,error:'ai_error'}; }); })
     .then(function(j){
-      if(j && j.ok && j.answer) A.msgs.push({role:'assistant', content:clean(j.answer)});
+      if(j && j.ok && j.answer){ A.msgs.push({role:'assistant', content:clean(j.answer), via:j.via || null, why:j.why || ''}); if(j.via){ A.via = j.via; A.why = j.why || ''; } }
       else A.msgs.push({role:'assistant', err:true, content: ERR[j && j.error] || ERR.ai_error});
     }).catch(function(){
       A.msgs.push({role:'assistant', err:true, content:'Could not reach the assistant. Check your connection and try again.'});
-    }).then(function(){ clearTimeout(to); A.busy=false; paint(); });
+    }).then(function(){ clearTimeout(to); A.busy=false; save(); paint(); });
   }
   window.askSend = send;
-  window.askNew = function(){ if(A.busy) return; A.msgs=[]; A.img=null; paint(); };
+  window.askNew = function(){ if(A.busy) return; A.msgs=[]; A.img=null; save(); paint(); };
 
   // keep the sheet inside the visible area when the iPhone keyboard opens
   function fit(){
@@ -17428,7 +17480,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     var ov = document.createElement('div'); ov.id = 'ask-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Ask BabyOS');
     ov.innerHTML =
       '<div id="ask-sheet">' +
-        '<div id="ask-head"><h3>Ask BabyOS</h3><button id="ask-x" type="button" aria-label="Close">×</button></div>' +
+        '<div id="ask-head"><div class="ask-title"><h3>Ask BabyOS</h3><div id="ask-via" style="display:none"></div></div><button id="ask-x" type="button" aria-label="Close">×</button></div>' +
         '<div id="ask-body">' +
           '<div class="ask-intro" id="ask-intro">Ask about your logs (feeds, diapers, sleep, shots, notes) or for general tips. You can also attach a photo. I will say which is which.</div>' +
           '<div id="ask-list" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>' +
@@ -17437,7 +17489,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
         '<div id="ask-foot">' +
           '<div id="ask-prev" style="display:none"></div>' +
           '<form class="ask-form" id="ask-form" autocomplete="off"><button class="ask-attach" id="ask-attach" type="button" aria-label="Attach a photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.2-2h5.6L16 6h1.5A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5Z"/><circle cx="12" cy="12.5" r="3.2"/></svg></button><input id="ask-file" type="file" accept="image/*" style="display:none"><input class="ask-in" id="ask-in" type="text" maxlength="500" enterkeyhint="send" aria-label="Your question"><button class="ask-send" id="ask-send" type="submit">Send</button></form>' +
-          '<div class="ask-note"><span>AI can be wrong and is not medical advice. Photos are sent to Google, so please do not upload private photos.</span><button class="ask-new" id="ask-new" type="button">New chat</button></div>' +
+          '<div class="ask-note"><span>AI can be wrong and is not medical advice. Chat is saved on this phone only. Photos are sent to Google, so please do not upload private photos.</span><button class="ask-new" id="ask-new" type="button">New chat</button></div>' +
         '</div>' +
       '</div>';
     document.body.appendChild(ov);
@@ -17456,7 +17508,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     var ch = $('ask-chips'); ch.innerHTML = '';
     chips().forEach(function(c){ var b = document.createElement('button'); b.type='button'; b.className='ask-chip'; b.textContent=c; b.onclick=function(){ send(c); }; ch.appendChild(b); });
     var inp = $('ask-in'); inp.placeholder = 'Ask about ' + nick() + '...'; inp.value = A.draft || '';
-    $('ask-ov').classList.add('open'); fit();
+    $('ask-ov').classList.add('open'); fit(); checkVia();
     try{ lockPrev = document.body.style.overflow; document.body.style.overflow = 'hidden'; }catch(e){}
     paint();
   };
