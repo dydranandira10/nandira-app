@@ -17280,6 +17280,15 @@ body.simple-mode #ask-fab{display:none !important;}
 html body #ask-ov #ask-in:not(#v24):not(#v24):not(#v24){flex:1;width:auto;min-width:0;border-radius:999px !important;background:rgba(150,160,235,.22) !important;box-shadow:inset 0 0 0 1.5px rgba(120,110,200,.35) !important;}
 html body.night-mode #ask-ov #ask-in:not(#v24):not(#v24):not(#v24){background:var(--card2,#22304F) !important;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1) !important;}
 body.night-mode #ask-ov .ask-b.ai,body.night-mode #ask-ov .ask-b.err,body.night-mode #ask-ov .ask-chip,body.night-mode #ask-x{background:var(--card2,#22304F);}
+#ask-ov .ask-attach{flex:none;width:44px;height:44px;border-radius:50%;border:0;padding:0;background:rgba(150,160,235,.22);color:var(--ink,#2A2A33);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+#ask-ov .ask-attach svg{width:22px;height:22px;}
+#ask-ov .ask-attach[disabled]{opacity:.5}
+#ask-prev{align-items:center;gap:10px;padding:0 0 8px;font-size:12px;line-height:1.35;color:var(--ink-2,#4B4676);}
+#ask-prev img{width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;}
+#ask-prev span{flex:1;}
+#ask-prev button{flex:none;width:30px;height:30px;border-radius:50%;border:0;background:rgba(150,160,235,.3);color:var(--ink,#2A2A33);font-size:18px;line-height:1;padding:0;cursor:pointer;}
+#ask-ov .ask-pic{display:block;max-width:100%;max-height:180px;border-radius:12px;margin-bottom:8px;object-fit:cover;}
+body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:var(--card2,#22304F);}
 </style>
 <script id="askjs">
 /* ============================================================
@@ -17289,18 +17298,21 @@ body.night-mode #ask-ov .ask-b.ai,body.night-mode #ask-ov .ask-b.err,body.night-
    - Never writes to your logs. Chat history lives in memory only.
    ============================================================ */
 (function(){
-  var A = window.__ask = window.__ask || { msgs:[], busy:false, draft:'' };
+  var A = window.__ask = window.__ask || { msgs:[], busy:false, draft:'', img:null };
   function $(id){ return document.getElementById(id); }
   function nick(){ try{ var n = (typeof babyName==='function') ? babyName() : null; return n || 'baby'; }catch(e){ return 'baby'; } }
   function workerUrl(){ try{ return (typeof PUSH_WORKER_URL!=='undefined' && PUSH_WORKER_URL) ? String(PUSH_WORKER_URL).replace(/\/+$/,'') : ''; }catch(e){ return ''; } }
   function fam(){ try{ return state && state.familyId; }catch(e){ return null; } }
 
   var ERR = {
-    ai_not_enabled:'The assistant is not switched on yet. In Cloudflare, check that the babyos-alerts Worker has deployed and has the Gemini key or the AI binding.',
+    ai_not_enabled:'The assistant is not switched on yet. In Cloudflare, check that the babyos-alerts Worker has deployed with the AI binding.',
     rate_limited:'That is a lot of questions for now. Try again in a little while.',
     family_not_found:'I could not find your family data. Open Settings and check the family is connected.',
     ai_error:'The AI had a hiccup. Try again in a moment.',
-    empty_answer:'I did not get an answer that time. Try asking again.'
+    empty_answer:'I did not get an answer that time. Try asking again.',
+    photo_needs_gemini:'Photos need Gemini. Check that the GEMINI_API_KEY secret is set in Cloudflare.',
+    bad_image:'That photo could not be used. Try another one.',
+    image_too_big:'That photo is too large. Try another one.'
   };
   function chips(){
     var n = nick();
@@ -17330,7 +17342,8 @@ body.night-mode #ask-ov .ask-b.ai,body.night-mode #ask-ov .ask-b.err,body.night-
     A.msgs.forEach(function(m){
       var b = document.createElement('div');
       b.className = 'ask-b ' + (m.role==='user' ? 'me' : (m.err ? 'err' : 'ai'));
-      b.textContent = m.content;
+      if(m.img){ var im = document.createElement('img'); im.src = m.img; im.alt = 'Attached photo'; im.className = 'ask-pic'; b.appendChild(im); }
+      b.appendChild(document.createTextNode(m.content));
       list.appendChild(b);
     });
     if(A.busy){
@@ -17341,23 +17354,57 @@ body.night-mode #ask-ov .ask-b.ai,body.night-mode #ask-ov .ask-b.err,body.night-
     var ch = $('ask-chips'); if(ch) ch.style.display = A.msgs.length ? 'none' : 'flex';
     var it = $('ask-intro'); if(it) it.style.display = A.msgs.length ? 'none' : '';
     var s = $('ask-send'); if(s) s.disabled = A.busy;
+    var at = $('ask-attach'); if(at) at.disabled = A.busy;
+    var pv = $('ask-prev'); if(pv){
+      pv.innerHTML = '';
+      if(A.img){
+        var th = document.createElement('img'); th.src = A.img.url; th.alt = 'Photo to send'; pv.appendChild(th);
+        var tx = document.createElement('span'); tx.textContent = 'Photos are sent to Google (Gemini). Please do not upload private photos.'; pv.appendChild(tx);
+        var rm = document.createElement('button'); rm.type = 'button'; rm.setAttribute('aria-label','Remove photo'); rm.textContent = '\u00d7'; rm.onclick = function(){ A.img = null; paint(); }; pv.appendChild(rm);
+        pv.style.display = 'flex';
+      } else pv.style.display = 'none';
+    }
     var nw = $('ask-new'); if(nw) nw.style.visibility = A.msgs.length ? 'visible' : 'hidden';
     var body = $('ask-body'); if(body) body.scrollTop = body.scrollHeight;
   }
 
+  // shrink to max 1024px JPEG (also drops EXIF such as GPS) before anything is sent
+  function prep(file){
+    return new Promise(function(res, rej){
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function(){
+        try{
+          var m = 1024, w = im.naturalWidth, h = im.naturalHeight, k = Math.min(1, m / Math.max(w, h));
+          var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w*k)); c.height = Math.max(1, Math.round(h*k));
+          var cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0,0,c.width,c.height); cx.drawImage(im, 0, 0, c.width, c.height);
+          var d = c.toDataURL('image/jpeg', 0.8); URL.revokeObjectURL(url);
+          res({ mime:'image/jpeg', data:d.split(',')[1], url:d });
+        }catch(e){ rej(e); }
+      };
+      im.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('img')); };
+      im.src = url;
+    });
+  }
+  function pickPhoto(file){
+    if(!file || A.busy) return;
+    prep(file).then(function(p){ A.img = p; paint(); }).catch(function(){ A.msgs.push({role:'assistant', err:true, content:ERR.bad_image}); paint(); });
+  }
+
   function send(q){
     q = String(q||'').trim().slice(0,500);
+    var photo = A.img;
+    if(!q && photo) q = 'What do you see in this photo?';
     if(!q || A.busy) return;
     var base = workerUrl(), f = fam();
-    A.msgs.push({role:'user', content:q}); A.draft=''; var inp=$('ask-in'); if(inp) inp.value='';
+    A.msgs.push({role:'user', content:q, img: photo ? photo.url : null}); A.draft=''; A.img=null; var inp=$('ask-in'); if(inp) inp.value='';
     if(!base || !f){ A.msgs.push({role:'assistant', err:true, content: !base ? 'The assistant needs the Worker address set in the app.' : ERR.family_not_found}); paint(); return; }
     var hist = A.msgs.slice(0,-1).filter(function(m){ return !m.err; }).slice(-6).map(function(m){ return {role:m.role, content:m.content}; });
     A.busy = true; paint();
     var ctl = (typeof AbortController!=='undefined') ? new AbortController() : null;
-    var to = setTimeout(function(){ try{ ctl && ctl.abort(); }catch(e){} }, 60000);
+    var to = setTimeout(function(){ try{ ctl && ctl.abort(); }catch(e){} }, 75000);
     fetch(base + '/ask', {
       method:'POST', headers:{'Content-Type':'application/json'}, signal: ctl ? ctl.signal : undefined,
-      body: JSON.stringify({ familyId:f, question:q, history:hist, extra:extra(), tz:-new Date().getTimezoneOffset() })
+      body: JSON.stringify({ familyId:f, question:q, history:hist, extra:extra(), image: photo ? {mime:photo.mime, data:photo.data} : undefined, tz:-new Date().getTimezoneOffset() })
     }).then(function(r){ return r.json().catch(function(){ return {ok:false,error:'ai_error'}; }); })
     .then(function(j){
       if(j && j.ok && j.answer) A.msgs.push({role:'assistant', content:clean(j.answer)});
@@ -17367,7 +17414,7 @@ body.night-mode #ask-ov .ask-b.ai,body.night-mode #ask-ov .ask-b.err,body.night-
     }).then(function(){ clearTimeout(to); A.busy=false; paint(); });
   }
   window.askSend = send;
-  window.askNew = function(){ if(A.busy) return; A.msgs=[]; paint(); };
+  window.askNew = function(){ if(A.busy) return; A.msgs=[]; A.img=null; paint(); };
 
   // keep the sheet inside the visible area when the iPhone keyboard opens
   function fit(){
@@ -17383,19 +17430,22 @@ body.night-mode #ask-ov .ask-b.ai,body.night-mode #ask-ov .ask-b.err,body.night-
       '<div id="ask-sheet">' +
         '<div id="ask-head"><h3>Ask BabyOS</h3><button id="ask-x" type="button" aria-label="Close">×</button></div>' +
         '<div id="ask-body">' +
-          '<div class="ask-intro" id="ask-intro">Ask about your logs (feeds, diapers, sleep, shots, notes) or for general tips. I will say which is which.</div>' +
+          '<div class="ask-intro" id="ask-intro">Ask about your logs (feeds, diapers, sleep, shots, notes) or for general tips. You can also attach a photo. I will say which is which.</div>' +
           '<div id="ask-list" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>' +
           '<div class="ask-chips" id="ask-chips"></div>' +
         '</div>' +
         '<div id="ask-foot">' +
-          '<form class="ask-form" id="ask-form" autocomplete="off"><input class="ask-in" id="ask-in" type="text" maxlength="500" enterkeyhint="send" aria-label="Your question"><button class="ask-send" id="ask-send" type="submit">Send</button></form>' +
-          '<div class="ask-note"><span>AI can be wrong and is not medical advice. For health worries, call your pediatrician.</span><button class="ask-new" id="ask-new" type="button">New chat</button></div>' +
+          '<div id="ask-prev" style="display:none"></div>' +
+          '<form class="ask-form" id="ask-form" autocomplete="off"><button class="ask-attach" id="ask-attach" type="button" aria-label="Attach a photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.2-2h5.6L16 6h1.5A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5Z"/><circle cx="12" cy="12.5" r="3.2"/></svg></button><input id="ask-file" type="file" accept="image/*" style="display:none"><input class="ask-in" id="ask-in" type="text" maxlength="500" enterkeyhint="send" aria-label="Your question"><button class="ask-send" id="ask-send" type="submit">Send</button></form>' +
+          '<div class="ask-note"><span>AI can be wrong and is not medical advice. Photos are sent to Google, so please do not upload private photos.</span><button class="ask-new" id="ask-new" type="button">New chat</button></div>' +
         '</div>' +
       '</div>';
     document.body.appendChild(ov);
     ov.addEventListener('click', function(e){ if(e.target===ov) window.askClose(); });
     $('ask-x').onclick = function(){ window.askClose(); };
     $('ask-new').onclick = window.askNew;
+    $('ask-attach').onclick = function(){ if(!A.busy) $('ask-file').click(); };
+    $('ask-file').addEventListener('change', function(){ var f = this.files && this.files[0]; this.value = ''; pickPhoto(f); });
     $('ask-form').addEventListener('submit', function(e){ e.preventDefault(); send($('ask-in').value); });
     $('ask-in').addEventListener('input', function(){ A.draft = $('ask-in').value; });
     document.addEventListener('keydown', function(e){ if(e.key==='Escape') window.askClose(); });
