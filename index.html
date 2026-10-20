@@ -17826,15 +17826,17 @@ body.night-mode .gp38 .gp-med{stroke:#5cd1c8;}
   function fam(){ try{ return state && state.familyId; }catch(e){ return null; } }
   function twins(){ try{ return (state.numberOfBabies||1) > 1; }catch(e){ return false; } }
   var ACTIONS = [
-    ['Left breast feed', '10 minutes. Change the number after min= for another length.', 'k=feed&type=left&min=10'],
-    ['Right breast feed', '10 minutes. Change the number after min= for another length.', 'k=feed&type=right&min=10'],
-    ['Formula feed', '90 ml. Change the number after ml= for another amount.', 'k=feed&type=formula&ml=90'],
-    ['Wet diaper', '', 'k=diaper&type=wet'],
-    ['Dirty diaper', '', 'k=diaper&type=dirty'],
-    ['Wet and dirty diaper', '', 'k=diaper&type=both'],
-    ['Nap just ended', '30 minutes. Change the number after min= for the length of the nap.', 'k=sleep&min=30'],
-    ['Weight', '5.5 kg. Change the number after kg= (use the Ask for Input action to be asked each time).', 'k=weight&kg=5.5'],
-    ['When was the last feed?', 'Reads out the last feed, the next one due, and the last diaper. Changes nothing.', 'k=last']
+    ['Start left feed', 'Say it when the feed begins. The app times it for you.', 'k=feed&type=left&act=start', 'Feeding, timed'],
+    ['End left feed', 'Say it when the feed ends. The real length is logged, whether 3 minutes or 30.', 'k=feed&type=left&act=end', 'Feeding, timed'],
+    ['Start right feed', 'Say it when the feed begins. The app times it for you.', 'k=feed&type=right&act=start', 'Feeding, timed'],
+    ['End right feed', 'Say it when the feed ends. The real length is logged, whether 3 minutes or 30.', 'k=feed&type=right&act=end', 'Feeding, timed'],
+    ['Log wet diaper', '', 'k=diaper&type=wet', 'Diapers'],
+    ['Log dirty diaper', '', 'k=diaper&type=dirty', 'Diapers'],
+    ['Log wet and dirty diaper', '', 'k=diaper&type=both', 'Diapers'],
+    ['Log formula feed', '90 ml. Change the number after ml= for another amount.', 'k=feed&type=formula&ml=90', 'More'],
+    ['Nap just ended', '30 minutes. Change the number after min= for the length of the nap.', 'k=sleep&min=30', 'More'],
+    ['Log weight', '5.5 kg. Change the number after kg= (use the Ask for Input action to be asked each time).', 'k=weight&kg=5.5', 'More'],
+    ['When was the last feed?', 'Reads out the last feed, the next one due, and the last diaper. Changes nothing.', 'k=last', 'More']
   ];
   function link(i){
     var a = ACTIONS[i]; return base() + '/log?t=' + encodeURIComponent(S.token) + '&' + a[2] + (twins() ? '&baby=1' : '') + (S.lang==='id' ? '&lang=id' : '');
@@ -17843,7 +17845,7 @@ body.night-mode .gp38 .gp-med{stroke:#5cd1c8;}
   function html(){
     var h = '<div class="card-title">Siri shortcuts</div>'
       + '<div class="settings-row" role="button" tabindex="0" aria-expanded="'+(S.open?'true':'false')+'" onclick="siriToggle()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();siriToggle();}">'
-      + '<div class="settings-row-main"><div class="settings-row-lbl">Log by voice</div><div class="settings-row-sub">“Hey Siri, log a feed.” Hands free, even at 3am.</div></div><span class="settings-chev">'+(S.open?'⌄':'›')+'</span></div>';
+      + '<div class="settings-row-main"><div class="settings-row-lbl">Log by voice</div><div class="settings-row-sub">“Hey Siri, start left feed.” Hands free, even at 3am.</div></div><span class="settings-chev">'+(S.open?'⌄':'›')+'</span></div>';
     if(!S.open) return h;
     if(!base()) return h + '<div class="siri-note">The Worker address is not set in the app yet.</div>';
     if(S.busy) return h + '<div class="siri-note">Getting your private link...</div>';
@@ -17852,7 +17854,9 @@ body.night-mode .gp38 .gp-med{stroke:#5cd1c8;}
     h += '<div class="settings-row stacked" role="group" aria-label="Spoken replies"><div class="settings-row-main"><div class="settings-row-lbl">Siri speaks in</div></div><div class="settings-seg">'
       + '<button type="button" class="settings-seg-btn '+(S.lang==='en'?'on':'')+'" onclick="siriLang(\'en\')">English</button>'
       + '<button type="button" class="settings-seg-btn '+(S.lang==='id'?'on':'')+'" onclick="siriLang(\'id\')">Bahasa Indonesia</button></div></div>';
+    var grp = '';
     ACTIONS.forEach(function(a,i){
+      if(a[3] !== grp){ grp = a[3]; h += '<div style="font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;opacity:.7;padding:12px 2px 2px">'+grp+'</div>'; }
       h += '<div class="settings-row" style="cursor:default"><div class="settings-row-main"><div class="settings-row-lbl">'+a[0]+'</div>'+(a[1]?'<div class="settings-row-sub">'+a[1]+'</div>':'')+'</div>'
         + '<button type="button" class="btn btn-teal btn-sm siri-copy" onclick="siriCopy('+i+')">Copy link</button></div>';
     });
@@ -17860,7 +17864,8 @@ body.night-mode .gp38 .gp-med{stroke:#5cd1c8;}
       + '<li>Tap <b>Copy link</b> above for the action you want.</li>'
       + '<li>Open <b>Shortcuts</b>, tap <b>+</b> and add the action <b>Get Contents of URL</b>. Paste the link. The first time it runs, tap <b>Always Allow</b>.</li>'
       + '<li>Add <b>Get Dictionary Value</b> for the key <b>say</b>, then <b>Speak Text</b>.</li>'
-      + '<li>Name the shortcut what you will say, like “Log left feed”. Then say “Hey Siri, log left feed”.</li></ol></div>';
+      + '<li>Name the shortcut exactly what you will say, like “Start left feed”. Then say “Hey Siri, start left feed”.</li></ol>'
+      + '<div class="siri-note" style="padding:0">Make “Start” and “End” as two separate shortcuts. If you forget to say End, the next Start replaces it, and a start older than 3 hours is ignored.</div></div>';
     if(twins()) h += '<div class="siri-note">Twins: each link ends with baby=1. Change it to baby=2 for the other baby.</div>';
     h += '<div style="padding:0 2px 12px"><button type="button" class="btn btn-ghost" style="width:100%;min-height:46px" onclick="siriReset()">Make a new link</button>'
       + '<div class="siri-note" style="padding:6px 0 0">Use this if a link was shared by mistake. Shortcuts made with the old link stop working.</div></div>';
