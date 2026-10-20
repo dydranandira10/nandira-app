@@ -18011,11 +18011,16 @@ function parseNanny(text, opts) {
 
     // weight: "Berat badan: 5.6 kg", "BB 5600 g"
     if (/\b(berat|bb|timbang|weight)\b/i.test(line)) {
+      var kg2 = /(\d{1,2})\s*(?:kg|kilo)\s*(\d{1,3})\s*(?:g|gr|gram)\b/i.exec(line);   // "4 kg 200 g"
+      if (kg2) { var g2 = (+kg2[1]) * 1000 + (+kg2[2]); if (g2 >= 1000 && g2 <= 40000) out.weights.push({ date: ctx, grams: g2, src: raw }); else out.skipped.push({ line: raw, why: 'weight looks off' }); continue; }
       var wm = /(\d{1,2}(?:[.,]\d{1,3})?|\d{3,5})\s*(kg|kilo|gr|gram|g)?(?![\d])/i.exec(line.replace(/\b(berat badan|berat|bb|timbang|weight)\b/ig, ' '));
       if (wm) {
-        var num = parseFloat(wm[1].replace(',', '.')), unit = (wm[2] || '').toLowerCase(), grams = (unit && unit !== 'kg' && unit !== 'kilo') || (!unit && num >= 100) ? num : num * 1000;
+        var unit = (wm[2] || '').toLowerCase(), inGrams = (unit && unit !== 'kg' && unit !== 'kilo');
+        // "5.600 g" and "5,600 g" use the dot or comma as a thousands mark
+        var numStr = (inGrams && /^\d{1,2}[.,]\d{3}$/.test(wm[1])) ? wm[1].replace(/[.,]/, '') : wm[1].replace(',', '.');
+        var num = parseFloat(numStr), grams = (inGrams || (!unit && num >= 100)) ? num : num * 1000;
         grams = Math.round(grams);
-        if (grams >= 500 && grams <= 40000) out.weights.push({ date: ctx, grams: grams, src: raw }); else out.skipped.push({ line: raw, why: 'weight looks off' });
+        if (grams >= 1000 && grams <= 40000) out.weights.push({ date: ctx, grams: grams, src: raw }); else out.skipped.push({ line: raw, why: 'weight looks off' });
       } else out.skipped.push({ line: raw, why: 'no weight' });
       continue;
     }
