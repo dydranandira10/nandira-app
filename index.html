@@ -17442,6 +17442,10 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
         var tx = document.createElement('span'); tx.textContent = 'Photos are sent to Google (Gemini). Please do not upload private photos.'; pv.appendChild(tx);
         var rm = document.createElement('button'); rm.type = 'button'; rm.setAttribute('aria-label','Remove photo'); rm.textContent = '\u00d7'; rm.onclick = function(){ A.img = null; paint(); }; pv.appendChild(rm);
         pv.style.display = 'flex';
+      } else if(A.paste){
+        var tx2 = document.createElement('span'); tx2.textContent = 'Log message pasted (' + window.waLines(A.paste) + ' lines). Tap Send to read it.'; pv.appendChild(tx2);
+        var rm2 = document.createElement('button'); rm2.type = 'button'; rm2.setAttribute('aria-label','Remove pasted message'); rm2.textContent = '×'; rm2.onclick = function(){ A.paste = null; paint(); }; pv.appendChild(rm2);
+        pv.style.display = 'flex';
       } else pv.style.display = 'none';
     }
     var nw = $('ask-new'); if(nw) nw.style.visibility = A.msgs.length ? 'visible' : 'hidden';
@@ -17502,7 +17506,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     try{ var body = $('ask-body'), last = $('ask-list').lastElementChild; if(body && last) body.scrollTop += last.getBoundingClientRect().top - body.getBoundingClientRect().top - 8; }catch(e){}
   }
   window.askSend = send;
-  window.askNew = function(){ if(A.busy) return; A.msgs=[]; A.img=null; save(); paint(); };
+  window.askNew = function(){ if(A.busy) return; A.msgs=[]; A.img=null; A.paste=null; save(); paint(); };
 
   // keep the sheet inside the visible area when the iPhone keyboard opens
   function fit(){
@@ -17518,7 +17522,7 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
       '<div id="ask-sheet">' +
         '<div id="ask-head"><div class="ask-owl"><svg viewBox="0 0 48 48" width="36" height="36" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16.5 L9 9 L18.5 12.5" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.3"/><path d="M38 16.5 L39 9 L29.5 12.5" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.3"/><line x1="24" y1="12" x2="24" y2="9" stroke="#2B2350" stroke-width="2.3"/><circle cx="24" cy="6" r="3.2" fill="#FFC93C" stroke="#2B2350" stroke-width="2"/><ellipse cx="24" cy="27.5" rx="17.5" ry="15" fill="#FFF6DD" stroke="#2B2350" stroke-width="2.4"/><circle cx="16.3" cy="25.5" r="7.6" fill="#FFFFFF" stroke="#2B2350" stroke-width="2.1"/><circle cx="31.7" cy="25.5" r="7.6" fill="#FFFFFF" stroke="#2B2350" stroke-width="2.1"/><path d="M12.4 26.5 Q16.3 20.5 20.2 26.5" stroke="#2B2350" stroke-width="2.6"/><path d="M27.8 26.5 Q31.7 20.5 35.6 26.5" stroke="#2B2350" stroke-width="2.6"/><circle cx="11.3" cy="34" r="2.2" fill="#FFB3D1"/><circle cx="36.7" cy="34" r="2.2" fill="#FFB3D1"/><path d="M21.3 32.3 H26.7 L24 37 Z" fill="#FF8A6B" stroke="#2B2350" stroke-width="2"/></svg></div><div class="ask-title"><h3>Hoot</h3><div id="ask-via" style="display:none"></div></div><button id="ask-x" type="button" aria-label="Close">×</button></div>' +
         '<div id="ask-body">' +
-          '<div class="ask-intro" id="ask-intro">Hi, I am Hoot. Ask me about your logs (feeds, diapers, sleep, shots, notes) or for general tips. You can also attach a photo, or paste a WhatsApp log message and I will add it once you check it. I will say which is which.</div>' +
+          '<div class="ask-intro" id="ask-intro">Hi, I am Hoot. Ask me about your logs (feeds, diapers, sleep, shots, notes) or for general tips. You can also attach a photo, or paste a WhatsApp log message, tap Send, and I will add it once you check it. I will say which is which.</div>' +
           '<div id="ask-list" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>' +
           '<div class="ask-chips" id="ask-chips"></div>' +
         '</div>' +
@@ -17546,9 +17550,16 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     $('ask-new').onclick = window.askNew;
     $('ask-attach').onclick = function(){ if(!A.busy) $('ask-file').click(); };
     $('ask-file').addEventListener('change', function(){ var f = this.files && this.files[0]; this.value = ''; pickPhoto(f); });
-    $('ask-form').addEventListener('submit', function(e){ e.preventDefault(); var v = $('ask-in').value; if(window.waDetect && window.waDetect(v)) intake(v); else send(v); });
+    $('ask-form').addEventListener('submit', function(e){
+      e.preventDefault(); var v = $('ask-in').value;
+      if(!v.trim() && A.paste){ var pz = A.paste; A.paste = null; intake(pz); return; }   // a pasted log message waits for Send
+      if(window.waDetect && window.waDetect(v)) intake(v); else send(v);
+    });
     $('ask-in').addEventListener('paste', function(e){
-      try{ var t = (e.clipboardData || window.clipboardData).getData('text'); if(t && window.waDetect && window.waDetect(t) && (/\n/.test(t.trim()) || !$('ask-in').value.trim())){ e.preventDefault(); intake(t); } }catch(x){}
+      try{
+        var t = (e.clipboardData || window.clipboardData).getData('text');
+        if(t && /\n/.test(t.trim()) && window.waDetect && window.waDetect(t)){ e.preventDefault(); A.paste = t; paint(); }   // keep the lines; show a chip; wait for Send
+      }catch(x){}
     });
     if(window.waTemplates) window.waTemplates($('ask-tpl'));
     $('ask-in').addEventListener('input', function(){ A.draft = $('ask-in').value; });
@@ -18344,7 +18355,7 @@ function parseNanny(text, opts) {
   window.waTemplates = function(box){
     if(!box || box.getAttribute('data-ready')) return; box.setAttribute('data-ready','1');
     box.innerHTML = '<div class="wa-trow"><button type="button" class="wa-tpltog" aria-expanded="false">Log templates (tap to copy) ▾</button><button type="button" class="wa-i" aria-label="How it works" aria-expanded="false">i</button></div><div class="wa-tplrow" style="display:none"></div>'
-      + '<div class="wa-pop" role="dialog" aria-label="How it works" style="display:none"><h4>How it works</h4><ol><li>Tap a template to copy it, paste it into WhatsApp and fill in the numbers.</li><li>When the message comes back, copy it and paste it here.</li><li>Check what I found, untick anything wrong, then tap Add.</li></ol><p>Works with a message from anyone. Nothing is saved until you tap Add.</p><button type="button" class="wa-gotit">Got it</button></div>';
+      + '<div class="wa-pop" role="dialog" aria-label="How it works" style="display:none"><h4>How it works</h4><ol><li>Tap a template to copy it, paste it into WhatsApp and fill in the numbers.</li><li>When the message comes back, copy it, paste it here and tap Send.</li><li>Check what I found, untick anything wrong, then tap Add.</li></ol><p>Works with a message from anyone. Nothing is saved until you tap Add.</p><button type="button" class="wa-gotit">Got it</button></div>';
     var tog = box.querySelector('.wa-tpltog'), row = box.querySelector('.wa-tplrow');
     row.innerHTML = Object.keys(TPLS).map(function(k){ return '<button type="button" class="wa-btn" data-tp="'+k+'">'+TPLS[k][0]+'</button>'; }).join('');
     tog.onclick = function(){ var open = row.style.display==='none'; row.style.display = open ? 'grid' : 'none'; tog.setAttribute('aria-expanded', open?'true':'false'); tog.textContent = 'Log templates (tap to copy) ' + (open ? '▴' : '▾'); };
