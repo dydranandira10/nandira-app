@@ -17960,6 +17960,7 @@ body.night-mode #ask-ov .wa-seg{background:var(--card2,#22304F);}
 #ask-ov .wa-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:16px;background:rgba(255,255,255,.55);}
 body.night-mode #ask-ov .wa-row{background:rgba(255,255,255,.06);}
 #ask-ov .wa-row.off{opacity:.55;}
+#ask-ov .wa-row.off.need{opacity:1;}
 #ask-ov .wa-chk{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--ink-3,#6E6A92);background:none;padding:0;cursor:pointer;color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;}
 #ask-ov .wa-row.on .wa-chk{background:var(--teal,#2D8F8F);border-color:var(--teal,#2D8F8F);}
 #ask-ov .wa-chk[disabled]{opacity:.4;cursor:default;}
@@ -17970,6 +17971,8 @@ body.night-mode #ask-ov .wa-row{background:rgba(255,255,255,.06);}
 body.night-mode #ask-ov .wa-s.warn{color:#FFC878;}
 #ask-ov .wa-chip{flex:none;border:0;border-radius:999px;padding:7px 12px;font:inherit;font-size:12px;font-weight:800;background:rgba(150,160,235,.32);color:var(--ink,#2A2A33);cursor:pointer;min-height:34px;}
 body.night-mode #ask-ov .wa-chip{background:var(--card2,#22304F);}
+#ask-ov .wa-sides{display:flex;gap:6px;flex:none;}
+#ask-ov .wa-chip.ask{box-shadow:inset 0 0 0 2px var(--y,#FFC93C);}
 #ask-ov .wa-skip{font-size:12.5px;color:var(--ink-2,#4B4676);line-height:1.5;}
 #ask-ov .wa-skip div{padding:4px 0;border-bottom:1px solid rgba(150,160,235,.18);overflow-wrap:anywhere;}
 #ask-ov .wa-link{font:inherit;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:42px;padding:9px 14px;border:0;border-radius:999px;background:rgba(150,160,235,.28);color:var(--ink,#2A2A33);cursor:pointer;text-align:left;}
@@ -17978,6 +17981,8 @@ body.night-mode #ask-ov .wa-chip{background:var(--card2,#22304F);}
 #ask-ov .wa-link,#ask-ov .wa-card .wa-btn.ghost{box-shadow:inset 0 0 0 1.5px rgba(120,110,200,.4);}
 body.night-mode #ask-ov .wa-link,body.night-mode #ask-ov .wa-card .wa-btn.ghost{background:rgba(255,255,255,.09);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28);}
 #ask-ov .wa-note{font-size:11.5px;color:var(--ink-3,#6E6A92);line-height:1.45;}
+#ask-ov .wa-note.warn{color:#B4541A;font-weight:700;}
+body.night-mode #ask-ov .wa-note.warn{color:#FFC878;}
 #ask-ov .wa-act{display:flex;gap:8px;margin-top:2px;}
 #ask-ov .wa-ok{font-weight:800;color:var(--teal,#2D8F8F);}
 #ask-ov .wa-set{display:flex;flex-direction:column;gap:10px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.4);}
@@ -18127,6 +18132,10 @@ function parseNanny(text, opts) {
       if (!times.length) { out.skipped.push({ line: raw, why: 'no time' }); continue; }
       var amt = null, a1 = /(\d{2,3})\s*(?:ml|cc)\b/i.exec(noTimes);
       if (a1) amt = +a1[1]; else { var a2 = /(?:sbnyk|sebanyak|banyak|=|:|-)\s*(\d{2,3})(?!\d)/i.exec(noTimes); if (a2) amt = +a2[1]; else { var a3 = noTimes.match(/(?:^|\s)(\d{2,3})(?=\s|$)/g); if (a3) amt = parseInt(a3[a3.length - 1], 10); } }
+      if (!amt && !/\d/.test(noTimes) && !/\b(sufor|formula|sf|asip|asi|stok|stored)\b/.test(low)) {   // times but no ml: the nanny timed a breast feed herself, side still unknown
+        out.feeds.push({ date: ctx, time: times[0], end: times[1] || '', ml: 0, type: 'breast', side: null, src: raw });
+        continue;
+      }
       if (!amt || amt < 10 || amt > 400) { out.skipped.push({ line: raw, why: amt ? 'amount looks off' : 'no amount' }); continue; }
       var ftype = /\b(sufor|formula|sf)\b/.test(low) ? 'formula' : /\b(asip|asi|stok|stored)\b/.test(low) ? 'stored' : defFeed;
       out.feeds.push({ date: ctx, time: times[0], end: times[1] || '', ml: amt, type: ftype, src: raw });
@@ -18159,6 +18168,13 @@ function parseNanny(text, opts) {
   function fmtMl(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function typeLbl(t){ return t==='formula' ? 'Formula' : 'Stored milk'; }
   function dtype(t){ return t==='both' ? 'Wet + dirty' : t==='dirty' ? 'Dirty' : 'Wet'; }
+  function dur(t, e){
+    if(!t || !e) return 0;
+    var a = t.split(':'), b = e.split(':'), d = (+b[0])*60 + (+b[1]) - ((+a[0])*60 + (+a[1]));
+    if(d < 0) d += 1440;
+    return d;
+  }
+  function sideLbl(x){ return x==='left' ? 'Left' : 'Right'; }
   function plural(n, w){ return n + ' ' + w + (n===1?'':'s'); }
 
   // ---------- does this text look like her report?
@@ -18181,17 +18197,23 @@ function parseNanny(text, opts) {
   function readInto(S){
     var r = parseNanny(S.text, { today: td(), ctxDate: S.date || td(), defaultDiaper: S.ddef, defaultFeedType: S.ftype });
     var items = [];
-    r.feeds.forEach(function(f){ items.push({ kind:'feed', date:f.date, time:f.time, end:f.end, ml:f.ml, type:f.type }); });
+    S.picks = S.picks || {};
+    r.feeds.forEach(function(f){
+      var it = { kind:'feed', date:f.date, time:f.time, end:f.end, ml:f.ml, type:f.type };
+      if(f.type==='breast'){ it.side = S.picks[f.date + '|' + f.time] || null; it.min = dur(f.time, f.end); }
+      items.push(it);
+    });
     r.diapers.forEach(function(d){ items.push({ kind:'diaper', date:d.date, time:d.time, type:d.type, guessed:d.guessed }); });
     (r.weights||[]).forEach(function(w){ items.push({ kind:'weight', date:w.date, grams:w.grams }); });
     items.forEach(function(it){
-      it.note = ''; it.locked = false; it.on = true;
+      it.note = ''; it.locked = false; it.on = true; it.need = false;
       if(it.kind==='weight'){
         if((state.weightLog||[]).some(function(e){ return e && e.date===it.date && (e.babyIdx||0)===S.baby; })){ it.locked = true; it.on = false; it.note = 'A weight is already logged for this day. Edit it on the Weight page.'; }
         return;
       }
       if(entryInFuture(it.date, it.time)){ it.locked = true; it.on = false; it.note = 'In the future, so it cannot be added'; }
       else if(exists(it.kind==='feed' ? state.feedingLog : state.diaperLog, it.date, it.time, S.baby)){ it.on = false; it.note = 'Already logged at this time'; }
+      else if(it.kind==='feed' && it.type==='breast' && !it.side){ it.on = false; it.need = true; }
     });
     var sk = r.stock, total = sk.bags.length ? sk.total : (sk.single != null ? sk.single : null);
     S.bags = null;
@@ -18202,11 +18224,11 @@ function parseNanny(text, opts) {
     S.items = items; S.skipped = r.skipped; S.skipOpen = false;
   }
   function leadText(S){
-    var nf = 0, nd = 0, nw = 0;
-    S.items.forEach(function(i){ if(i.kind==='feed') nf++; else if(i.kind==='weight') nw++; else nd++; });
-    var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nd) parts.push(plural(nd,'diaper')); if(nw) parts.push(plural(nw,'weight')); if(S.bags) parts.push('a stock count');
+    var nf = 0, nb = 0, nd = 0, nw = 0, nneed = 0;
+    S.items.forEach(function(i){ if(i.kind==='feed'){ if(i.type==='breast'){ nb++; if(i.need) nneed++; } else nf++; } else if(i.kind==='weight') nw++; else nd++; });
+    var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nb) parts.push(plural(nb,'breast feed')); if(nd) parts.push(plural(nd,'diaper')); if(nw) parts.push(plural(nw,'weight')); if(S.bags) parts.push('a stock count');
     if(!parts.length) return 'I could not find any feeds, diapers, weights or stock in that text. Lines like “Mimi jam 9.49 - 10.04 sbnyk 110” or “Ganti pempi jam 07.58” work.';
-    return 'I found ' + (parts.length>1 ? parts.slice(0,-1).join(', ') + ' and ' + parts[parts.length-1] : parts[0]) + (twins() ? ' for ' + nm(S.baby) : '') + '. Untick anything that looks wrong, then tap Add. Nothing is saved until you do.';
+    return 'I found ' + (parts.length>1 ? parts.slice(0,-1).join(', ') + ' and ' + parts[parts.length-1] : parts[0]) + (twins() ? ' for ' + nm(S.baby) : '') + '. ' + (nneed ? (nneed===1 ? 'One feed has no amount, so I took it as a breast feed. Pick left or right for it. ' : nneed + ' feeds have no amount, so I took them as breast feeds. Pick left or right for each. ') : '') + 'Untick anything that looks wrong, then tap Add. Nothing is saved until you do.';
   }
 
   // ---------- the chat message Hoot shows
@@ -18221,7 +18243,12 @@ function parseNanny(text, opts) {
   function count(S){ return S.items.filter(function(i){ return i.on && !i.locked; }).length + (S.bags && S.bags.on ? 1 : 0); }
   function rowHTML(it, i){
     var main, chip;
-    if(it.kind==='feed'){
+    if(it.kind==='feed' && it.type==='breast'){
+      main = '<div class="wa-t">' + esc(it.time) + (it.end ? ' to ' + esc(it.end) : '') + (it.min ? ' · ' + it.min + ' min' : '') + '</div>';
+      chip = it.side
+        ? '<button type="button" class="wa-chip" data-sd="'+i+'" aria-label="Change side">' + sideLbl(it.side) + '</button>'
+        : '<div class="wa-sides"><button type="button" class="wa-chip ask" data-sd="'+i+'" data-v="left">Left</button><button type="button" class="wa-chip ask" data-sd="'+i+'" data-v="right">Right</button></div>';
+    } else if(it.kind==='feed'){
       main = '<div class="wa-t">' + it.ml + ' ml · ' + esc(it.time) + (it.end ? ' to ' + esc(it.end) : '') + '</div>';
       chip = '<button type="button" class="wa-chip" data-cy="'+i+'" aria-label="Change type">' + typeLbl(it.type) + '</button>';
     } else if(it.kind==='weight'){
@@ -18230,9 +18257,9 @@ function parseNanny(text, opts) {
       main = '<div class="wa-t">' + esc(it.time) + '</div>';
       chip = '<button type="button" class="wa-chip" data-cy="'+i+'" aria-label="Change type">' + dtype(it.type) + '</button>';
     }
-    var sub = (it.kind==='feed' ? 'Bottle' : it.kind==='weight' ? 'Weight' : 'Diaper') + ' · ' + dlabel(it.date) + (it.guessed ? ' · not specified, so I used ' + dtype(it.type).toLowerCase() : '');
-    return '<div class="wa-row '+(it.on?'on':'off')+'"><button type="button" class="wa-chk" role="checkbox" aria-checked="'+(it.on?'true':'false')+'" data-tk="'+i+'" '+(it.locked?'disabled':'')+'>'+(it.on?'✓':'')+'</button>'
-      + '<div class="wa-main">'+main+'<div class="wa-s'+(it.note?' warn':'')+'">'+esc(it.note || sub)+'</div></div>'+(it.locked?'':chip)+'</div>';
+    var sub = (it.kind==='feed' ? (it.type==='breast' ? 'Breast feed' : 'Bottle') : it.kind==='weight' ? 'Weight' : 'Diaper') + ' · ' + dlabel(it.date) + (it.need ? ' · which side?' : '') + (it.kind==='feed' && it.type==='breast' && !it.end ? ' · no end time, so no length' : '') + (it.guessed ? ' · not specified, so I used ' + dtype(it.type).toLowerCase() : '');
+    return '<div class="wa-row '+(it.on?'on':'off')+(it.need?' need':'')+'"><button type="button" class="wa-chk" role="checkbox" aria-checked="'+(it.on?'true':'false')+'" data-tk="'+i+'" '+(it.locked?'disabled':'')+'>'+(it.on?'✓':'')+'</button>'
+      + '<div class="wa-main">'+main+'<div class="wa-s'+((it.note||it.need)?' warn':'')+'">'+esc(it.note || sub)+'</div></div>'+(it.locked?'':chip)+'</div>';
   }
   function seg(attr, cur, opts){ return '<div class="wa-seg" role="group">' + opts.map(function(o){ return '<button type="button" '+attr+'="'+o[0]+'" class="'+(String(cur)===String(o[0])?'on':'')+'">'+esc(o[1])+'</button>'; }).join('') + '</div>'; }
   function cardHTML(S){
@@ -18240,7 +18267,7 @@ function parseNanny(text, opts) {
     S.items.forEach(function(it, i){ (it.kind==='feed' ? feeds : it.kind==='weight' ? wts : dia).push(i); });
     var h = '';
     if(twins()) h += '<div><div class="wa-lbl">This report is for</div>' + seg('data-b', S.baby, [[0, nm(0)],[1, nm(1)]]) + '</div>';
-    if(feeds.length) h += '<div class="wa-h">Bottles <small>'+feeds.length+'</small></div>' + feeds.map(function(i){ return rowHTML(S.items[i], i); }).join('');
+    if(feeds.length) h += '<div class="wa-h">' + (S.items.some(function(x){ return x.type==='breast'; }) ? 'Feeds' : 'Bottles') + ' <small>'+feeds.length+'</small></div>' + feeds.map(function(i){ return rowHTML(S.items[i], i); }).join('');
     if(dia.length) h += '<div class="wa-h">Diapers <small>'+dia.length+'</small></div>' + dia.map(function(i){ return rowHTML(S.items[i], i); }).join('');
     if(wts.length) h += '<div class="wa-h">Weight <small>'+wts.length+'</small></div>' + wts.map(function(i){ return rowHTML(S.items[i], i); }).join('');
     if(S.bags){
@@ -18260,7 +18287,8 @@ function parseNanny(text, opts) {
         + '<div><div class="wa-lbl">A bottle with no detail is</div>' + seg('data-f', S.ftype, [['stored','Stored milk'],['formula','Formula']]) + '</div>'
         + '<div><div class="wa-lbl">A diaper with no detail is</div>' + seg('data-d', S.ddef, [['wet','Wet'],['dirty','Dirty'],['both','Both']]) + '</div></div>';
     }
-    var n = count(S);
+    var n = count(S), nn = S.items.filter(function(x){ return x.need; }).length;
+    if(nn) h += '<div class="wa-note warn">' + (nn===1 ? '1 feed needs a side' : nn + ' feeds need a side') + ' before it can be added. Tap Left or Right on the row.</div>';
     h += '<div class="wa-act"><button type="button" class="wa-btn ghost" data-no="1">Not now</button><button type="button" class="wa-btn go" data-add="1"' + (n?'':' disabled') + '>' + (n ? 'Add ' + n + ' ' + (n===1?'entry':'entries') : 'Nothing to add') + '</button></div>';
     return h;
   }
@@ -18275,7 +18303,11 @@ function parseNanny(text, opts) {
     }
     function reread(){ readInto(S); m.content = leadText(S); lead(); draw(); }
     function wire(){
-      root.querySelectorAll('[data-tk]').forEach(function(b){ b.onclick = function(){ var i = +b.getAttribute('data-tk'); if(S.items[i].locked) return; S.items[i].on = !S.items[i].on; draw(); }; });
+      root.querySelectorAll('[data-tk]').forEach(function(b){ b.onclick = function(){ var i = +b.getAttribute('data-tk'); if(S.items[i].locked) return; if(S.items[i].need) return; S.items[i].on = !S.items[i].on; draw(); }; });
+      root.querySelectorAll('[data-sd]').forEach(function(b){ b.onclick = function(){
+        var i = +b.getAttribute('data-sd'), it = S.items[i], v = b.getAttribute('data-v') || (it.side==='left' ? 'right' : 'left');
+        it.side = v; S.picks = S.picks || {}; S.picks[it.date + '|' + it.time] = v; reread();
+      }; });
       root.querySelectorAll('[data-cy]').forEach(function(b){ b.onclick = function(){
         var i = +b.getAttribute('data-cy'), it = S.items[i];
         if(it.kind==='feed') it.type = it.type==='stored' ? 'formula' : 'stored'; else { it.type = it.type==='wet' ? 'dirty' : it.type==='dirty' ? 'both' : 'wet'; it.guessed = false; }
@@ -18298,7 +18330,7 @@ function parseNanny(text, opts) {
   // ---------- add: the same entry shapes the app writes
   function add(S, m, draw, hooks){
     if(S.status!=='review') return;
-    var idx = S.baby, nf = 0, nd = 0, nw = 0, dup = 0, stashChanged = false, stashLogged = false;
+    var idx = S.baby, nf = 0, nb = 0, nd = 0, nw = 0, dup = 0, stashChanged = false, stashLogged = false;
     var useStock = !!(S.bags && S.bags.on);
     try{
       if(!state.feedingLog) state.feedingLog = [];
@@ -18309,6 +18341,13 @@ function parseNanny(text, opts) {
         if(it.kind === 'weight'){
           if(state.weightLog.some(function(e){ return e && e.date===it.date && (e.babyIdx||0)===idx; })){ dup++; return; }
           state.weightLog.push({ date: it.date, grams: it.grams, notes:'', babyIdx: idx }); nw++; return;
+        }
+        if(it.kind === 'feed' && it.type === 'breast'){
+          if(!it.side) return;
+          if(exists(state.feedingLog, it.date, it.time, idx)){ dup++; return; }
+          state.feedingLog.push({ date: it.date, time: it.time, endTime: it.end || '', feedType: it.side, leftMin: it.side==='left' ? it.min : 0, rightMin: it.side==='right' ? it.min : 0,
+            formulaMl:0, storedMl:0, pumpedMl:0, notes:'', babyIdx: idx });
+          nb++; return;
         }
         if(it.kind === 'feed'){
           if(exists(state.feedingLog, it.date, it.time, idx)){ dup++; return; }
@@ -18332,13 +18371,13 @@ function parseNanny(text, opts) {
         }
         state.pumpedStash = newStash; stashChanged = true;
       }
-      if(nf) saveState('feedingLog');
+      if(nf || nb) saveState('feedingLog');
       if(nd) saveState('diaperLog');
       if(nw) saveState('weightLog');
       if(stashChanged) saveState('pumpedStash');
       if(stashLogged) saveState('stashLog');
     }catch(e){ try{ toast('Something went wrong. Please check the logs.'); }catch(e2){} return; }
-    var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nd) parts.push(plural(nd,'diaper')); if(nw) parts.push(plural(nw,'weight')); if(useStock) parts.push('stash ' + fmtMl(S.bags.total) + ' ml');
+    var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nb) parts.push(plural(nb,'breast feed')); if(nd) parts.push(plural(nd,'diaper')); if(nw) parts.push(plural(nw,'weight')); if(useStock) parts.push('stash ' + fmtMl(S.bags.total) + ' ml');
     S.status = 'done'; S.doneText = 'Added ' + (parts.join(', ') || 'nothing new') + (dup ? ' (' + dup + ' already logged, skipped)' : '') + '.';
     m.content = S.doneText;
     draw(); if(hooks && hooks.save) hooks.save();
