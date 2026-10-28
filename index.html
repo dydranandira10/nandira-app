@@ -3136,48 +3136,41 @@ html body .drawer .drawer-header{background:transparent !important;}
     <button class="landing-btn" onclick="joinFamily()" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4)">Join existing family</button>
   </div>
 
-  <!-- Step 2: Setup form -->
+  <!-- Step 2: one-screen setup (v62) -->
   <div id="landing-step2" class="landing-card" style="display:none">
-    <div class="landing-step">Step 1 of 2 — Your family</div>
-    <div>
-      <label>Mom's name *</label>
-      <input type="text" id="l-mom" placeholder="e.g. Sarah">
-    </div>
-    <div>
-      <label>Dad's name *</label>
-      <input type="text" id="l-dad" placeholder="e.g. Budi">
-    </div>
-    <div>
-      <label>Estimated due date *</label>
-      <input type="date" id="l-edd" value="2026-06-19">
-    </div>
-    <div>
-      <label>How many babies? *</label>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px">
-        <button class="gender-btn selected" id="ln-1" onclick="setLandingBabies(1)"><div style="font-size:22px">👶</div>1 baby</button>
-        <button class="gender-btn" id="ln-2" onclick="setLandingBabies(2)"><div style="font-size:22px">👶👶</div>Twins</button>
-      </div>
-    </div>
-    <button class="landing-btn" onclick="showLandingStep(3)" style="margin-top:4px">Continue →</button>
-    <button onclick="showLandingStep(1)" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;width:100%;text-align:center;margin-top:10px;cursor:pointer;font-family:var(--font)">← Back</button>
-  </div>
-
-  <!-- Step 3: Baby details -->
-  <div id="landing-step3" class="landing-card" style="display:none">
-    <div class="landing-step" id="landing-step3-label">Step 2 of 2 — Your baby</div>
-    <!-- Per-baby name + gender fields are rendered here (one block per baby for twins) -->
+    <div class="landing-step">Set up in under a minute</div>
     <div id="landing-baby-fields"></div>
-    <div>
-      <label>Has baby arrived? If yes, enter birth date:</label>
-      <input type="date" id="l-dob">
+    <label style="margin-top:6px;display:block">Where are you?</label>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:4px 0 10px">
+      <button type="button" class="gender-btn selected" id="l-arr-0" onclick="famLandArrived(false)"><div style="font-size:20px">🤰</div>Expecting</button>
+      <button type="button" class="gender-btn" id="l-arr-1" onclick="famLandArrived(true)"><div style="font-size:20px">👶</div>Baby is here</button>
     </div>
     <div>
-      <label>Family code <span style="opacity:.6">(optional — for syncing with your partner)</span></label>
-      <input type="text" id="l-code" placeholder="Leave blank for a secure random code" autocapitalize="characters" autocomplete="off" spellcheck="false" style="letter-spacing:0;font-family:monospace">
-      <div id="l-code-err" style="font-size:12px;color:#ffd0cb;min-height:15px;margin-top:3px"></div>
+      <label id="l-date-lbl">Due date</label>
+      <input type="date" id="l-edd" value="">
+      <input type="date" id="l-dob" value="" style="display:none">
     </div>
-    <button class="landing-btn" onclick="completeLandingSetup()">🚀 Let's go!</button>
-    <button onclick="showLandingStep(2)" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;width:100%;text-align:center;margin-top:10px;cursor:pointer;font-family:var(--font)">← Back</button>
+    <div id="l-region-line" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 6px;font-size:13px;color:rgba(255,255,255,.9)"></div>
+    <div id="l-region-chips" style="display:none;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px"></div>
+    <button class="landing-btn" onclick="completeLandingSetup()" style="margin-top:6px">✨ Create my family</button>
+    <div id="l-code-err" style="font-size:12px;color:#ffd0cb;min-height:15px;margin-top:3px;text-align:center"></div>
+    <details style="margin-top:8px;color:rgba(255,255,255,.85)">
+      <summary style="cursor:pointer;font-size:13px;text-align:center;list-style:none">More options (optional)</summary>
+      <div style="margin-top:10px">
+        <label>Your name <span style="opacity:.6">(optional)</span></label>
+        <input type="text" id="l-mom" placeholder="e.g. Sarah">
+        <label style="margin-top:8px;display:block">Partner's name <span style="opacity:.6">(optional)</span></label>
+        <input type="text" id="l-dad" placeholder="e.g. Budi">
+        <label style="margin-top:8px;display:block">How many babies?</label>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px">
+          <button type="button" class="gender-btn selected" id="ln-1" onclick="setLandingBabies(1)"><div style="font-size:22px">👶</div>1 baby</button>
+          <button type="button" class="gender-btn" id="ln-2" onclick="setLandingBabies(2)"><div style="font-size:22px">👶👶</div>Twins</button>
+        </div>
+        <label style="margin-top:8px;display:block">Family code <span style="opacity:.6">(leave blank for a secure random one)</span></label>
+        <input type="text" id="l-code" placeholder="Optional" autocapitalize="characters" autocomplete="off" spellcheck="false" style="letter-spacing:0;font-family:monospace">
+      </div>
+    </details>
+    <button onclick="showLandingStep(1)" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;width:100%;text-align:center;margin-top:10px;cursor:pointer;font-family:var(--font)">← Back</button>
   </div>
 </div>
 
@@ -3749,7 +3742,7 @@ window.openRecoverySheet = function() {
   ov = document.createElement('div');
   ov.id = 'recovery-ov'; ov.className = 'sheet-ov';
   const rows = snaps.length ? snaps.map(s => {
-    const when = new Date(s.at).toLocaleString('en-GB', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const when = new Date(s.at).toLocaleString((window.appLoc ? window.appLoc() : 'en-GB'), {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
     const flag = (s.reason && s.reason.indexOf('before')===0) ? ' \u2022 safety point' : '';
     return '<button class="rec-row" onclick="restoreFromSnapshot(\''+s.id+'\')">'+
       '<span class="rec-row-main"><span class="rec-row-when">'+when+'</span>'+
@@ -3788,7 +3781,7 @@ window.restoreFromSnapshot = function(id) {
   const snap = readSnapshot(id);
   if (!snap || !snap.data) { toast('Snapshot not found'); return; }
   const snapData = snap.data;
-  const when = new Date(snap.at).toLocaleString('en-GB');
+  const when = new Date(snap.at).toLocaleString((window.appLoc ? window.appLoc() : 'en-GB'));
   const snapEntries = _countEntries(snapData);
   const nowEntries = _countEntries(state);
   confirmDialog({
@@ -4065,8 +4058,8 @@ async function joinFamily() {
 async function completeLandingSetup() {
   const momName = (document.getElementById('l-mom')?.value || '').trim();
   const dadName = (document.getElementById('l-dad')?.value || '').trim();
-  const edd = document.getElementById('l-edd')?.value || '2026-06-19';
-  if (!momName || !dadName) { landingToast('Please enter both parents\' names'); return; }
+  const edd = document.getElementById('l-edd')?.value || document.getElementById('l-dob')?.value || '';
+  if (!edd) { landingToast('Please add a due date or a birth date'); return; }
   const n = _landingNBabies || 1;
   const babyDOB = document.getElementById('l-dob')?.value || null;
   // Build babies array
@@ -4095,16 +4088,19 @@ async function completeLandingSetup() {
   } else {
     familyCode = generateFamilyCode(dadName, momName, edd);
   }
+  if (window.famPre) window.famPre();
   // Set default lists — adjust inventory + bag for multiples
   state = {
     ...state, familyId, familyCode,
     momName, dadName, edd, babyName, babyDOB,
     babyGender, numberOfBabies: n, babies,
+    ...((window.famLists && window.famLists(n, edd, babyDOB)) || {
     hospitalBagItems: getDefaultHospitalBag(n),
     csectionTasks: getDefaultCsectionTasks(n),
     pregTasks: getDefaultPregTasks(),
     inventoryItems: getDefaultInventory(n),
     keyDates: getDefaultKeyDates(edd),
+    }),
   };
   saveLocal();
 
@@ -4603,13 +4599,13 @@ function localDateStr(d) {
 function formatDate(d) {
   if (!d) return '—';
   try {
-    return new Date(d + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    return new Date(d + 'T00:00:00').toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{day:'numeric',month:'short',year:'numeric'});
   } catch(e) { return d; }
 }
-function getEDD() { return state.edd || '2026-06-19'; }
+function getEDD() { return state.edd || (state.region ? (state.babyDOB || localDateStr(new Date())) : '2026-06-19'); }
 function getDeliveryDate() {
   // Use caesarian date if set, otherwise EDD
-  return state.caesarianDate || state.edd || '2026-06-19';
+  return state.caesarianDate || state.edd || (state.region ? (state.babyDOB || localDateStr(new Date())) : '2026-06-19');
 }
 function getDueDate() {
   // For countdown purposes, use delivery date (caesarian if set)
@@ -7357,7 +7353,7 @@ window._vaxDateSave = function(i, kind) {
   if (kind === 'due') setVaxDueDate(i, val);
   else { if (!state.vaccines[i]) state.vaccines[i] = {}; state.vaccines[i].date = val; saveState('vaccines'); toast('Date given updated'); if (_currentPage === 'vaccines') navTo('vaccines'); else if (_currentPage === 'calendar') navTo('calendar'); }
 };
-function fmtVaxDateStr(d) { return d ? d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '\u2014'; }
+function fmtVaxDateStr(d) { return d ? d.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{day:'numeric',month:'short',year:'numeric'}) : '\u2014'; }
 
 // Birth day, month-by-month "monthiversaries" through the first year, and yearly
 // birthdays after — generated automatically from babyDOB so they always appear on
@@ -7736,8 +7732,8 @@ function relDayLabel(dateStr) {
   if (diff === 0) return 'Today';
   if (diff === 1) return 'Tomorrow';
   if (diff === -1) return 'Yesterday';
-  if (diff > 1 && diff < 7) return d.toLocaleDateString('en-GB',{weekday:'long'});
-  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  if (diff > 1 && diff < 7) return d.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{weekday:'long'});
+  return d.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{day:'numeric',month:'short'});
 }
 
 window.saveCalEvent = function(ev, closeAfter) {
@@ -7824,7 +7820,7 @@ window.openCalEventActions = function(id) {
         '<span class="vaxact-ico" style="background:'+cc.bg+';color:'+cc.deep+';width:44px;height:44px;font-size:20px">'+cc.emoji+'</span>'+
         '<div class="calact-head-main">'+
           '<div class="sheet-title" style="margin-bottom:2px">'+escapeHtml(ev.title)+'</div>'+
-          '<div class="calact-head-sub">'+dObj.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+(ev.time?' \u00b7 '+ev.time:'')+'</div>'+
+          '<div class="calact-head-sub">'+dObj.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{weekday:'long',day:'numeric',month:'long',year:'numeric'})+(ev.time?' \u00b7 '+ev.time:'')+'</div>'+
         '</div>'+
       '</div>'+
       '<div class="calact-details">'+
@@ -9121,7 +9117,7 @@ PAGES['dashboard'] = function(el) {
   el.innerHTML = `
     <div class="page-header">
       <h2>${hasBaby&&babyFullName()?babyEmoji()+' '+babyFullPossessive()+' Dashboard':'🍼 Baby OS'}</h2>
-      <p>${hasBaby?babyRef()+' is '+babyAgeLbl()+' · Born '+formatDate(state.babyDOB):'EDD: '+formatDate(getEDD())+' · Jakarta · Indonesian–English'}</p>
+      <p>${hasBaby?babyRef()+' is '+babyAgeLbl()+' · Born '+formatDate(state.babyDOB):'EDD: '+formatDate(getEDD())+(window.famLine ? window.famLine() : ' · Jakarta · Indonesian–English')}</p>
     </div>
 
     ${hasBaby ? achievementUnlockBannerHTML() : ''}
@@ -10269,13 +10265,13 @@ function computeTrend(logs, getValue, range, agg, mode) {
   if (bucketUnit === 'day') {
     for (let d = new Date(startDate); d <= now; d.setDate(d.getDate()+1)) {
       const key = localDateStr(d);
-      buckets.push({ key, label: d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), sum:0, count:0 });
+      buckets.push({ key, label: d.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{day:'numeric',month:'short'}), sum:0, count:0 });
     }
   } else if (bucketUnit === 'week') {
     let d = new Date(startDate);
     while (d <= now) {
       const key = localDateStr(d);
-      const label = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      const label = d.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{day:'numeric',month:'short'});
       buckets.push({ key, label, sum:0, count:0, weekEnd: new Date(d.getTime()+7*86400000) });
       d.setDate(d.getDate()+7);
     }
@@ -10284,7 +10280,7 @@ function computeTrend(logs, getValue, range, agg, mode) {
     const endMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     while (d <= endMonth) {
       const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-      buckets.push({ key, label: d.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}), sum:0, count:0,
+      buckets.push({ key, label: d.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{month:'short',year:'2-digit'}), sum:0, count:0,
                       monthStart: new Date(d), monthEnd: new Date(d.getFullYear(), d.getMonth()+1, 1) });
       d.setMonth(d.getMonth()+1);
     }
@@ -11749,7 +11745,7 @@ PAGES['reading'] = function(el) {
         const indo = days.map(d=>logsFor(state.readingLog).filter(l=>l.date===d&&l.lang==='Indonesian').reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
         const eng = days.map(d=>logsFor(state.readingLog).filter(l=>l.date===d&&l.lang==='English').reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
         const both = days.map(d=>logsFor(state.readingLog).filter(l=>l.date===d&&(l.lang==='Both'||!l.lang)).reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
-        return {labels, datasets:[{label:'🇮🇩 Indo',data:indo.map((v,i)=>v+both[i]),color:'#0F6E56'},{label:'🇬🇧 Eng',data:eng.map((v,i)=>v+both[i]),color:'#185FA5'}], yLabel:'minutes / day'};
+        return {labels, datasets:[{label:LL('Indonesian','🇮🇩 Indo'),data:indo.map((v,i)=>v+both[i]),color:'#0F6E56'},{label:LL('English','🇬🇧 Eng'),data:eng.map((v,i)=>v+both[i]),color:'#185FA5'}], yLabel:'minutes / day'};
       } else {
         const data = days.map(d=>logsFor(state.readingLog).filter(l=>l.date===d&&matchLang(l)).reduce((a,l)=>a+(parseInt(l.minutes)||0),0));
         return {labels, datasets:[{label:metric,data,color:metric==='Indonesian'?'#0F6E56':'#185FA5'}], yLabel:'minutes / day'};
@@ -11816,7 +11812,7 @@ PAGES['reading'] = function(el) {
           <datalist id="book-list">${allBooks.map(b=>`<option value="${b}">`).join('')}</datalist>
         </div>
         <div class="form-row">
-          <div class="form-field"><label>Language</label><select id="rl-lang"><option>Indonesian</option><option>English</option><option>Both</option></select></div>
+          <div class="form-field"><label>Language</label><select id="rl-lang">${(window.rlOpts && window.rlOpts()) || '<option>Indonesian</option><option>English</option><option>Both</option>'}</select></div>
           <div class="form-field"><label>Baby's response</label><select id="rl-resp"><option>Loved it</option><option>Engaged</option><option>Distracted</option><option>Fell asleep</option><option>Neutral</option></select></div>
         </div>
         <button class="btn btn-teal btn-block" onclick="addReading()">Log session</button>
@@ -11832,8 +11828,8 @@ PAGES['reading'] = function(el) {
         </div>
         <div style="display:flex;gap:5px;margin-bottom:10px">
           <button class="chart-tab ${chartMetric==='all'?'active':''}" onclick="setReadMetric('all')" style="font-size:11px">All</button>
-          <button class="chart-tab ${chartMetric==='Indonesian'?'active':''}" onclick="setReadMetric('Indonesian')" style="font-size:11px">🇮🇩 Indo</button>
-          <button class="chart-tab ${chartMetric==='English'?'active':''}" onclick="setReadMetric('English')" style="font-size:11px">🇬🇧 English</button>
+          <button class="chart-tab ${chartMetric==='Indonesian'?'active':''}" onclick="setReadMetric('Indonesian')" style="font-size:11px">${LL('Indonesian','🇮🇩 Indo')}</button>
+          <button class="chart-tab ${chartMetric==='English'?'active':''}" onclick="setReadMetric('English')" style="font-size:11px">${LL('English','🇬🇧 English')}</button>
         </div>
         <canvas id="reading-chart" height="160"></canvas>
       </div>
@@ -11845,7 +11841,7 @@ PAGES['reading'] = function(el) {
           const mins=bLogs.reduce((a,l)=>a+(parseInt(l.minutes)||0),0);
           const lang=bLogs[bLogs.length-1]?.lang||'';
           return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5">
-            <span style="font-size:20px">${lang==='Indonesian'?'🇮🇩':lang==='English'?'🇬🇧':'📚'}</span>
+            <span style="font-size:20px">${LF(lang,'🇮🇩','🇬🇧','📚')}</span>
             <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${book}</div><div style="font-size:11px;color:#767680">${bLogs.length} session${bLogs.length!==1?'s':''} · ${mins} min total</div></div>
           </div>`;
         }).join('')}
@@ -11877,7 +11873,7 @@ PAGES['reading'] = function(el) {
     let rows = '';
     logs.map((l,idx)=>({l,idx})).sort((a,b)=>{const ka=(a.l.date||'')+'T'+(a.l.time||'00:00'), kb=(b.l.date||'')+'T'+(b.l.time||'00:00');return kb.localeCompare(ka);}).slice(0,100).forEach(({l,idx})=>{
       const dateShort = (l.date||'').slice(5).replace('-','/');
-      const flag = l.lang==='Indonesian'?'🇮🇩':l.lang==='English'?'🇬🇧':'🌏';
+      const flag = LF(l.lang,'🇮🇩','🇬🇧','🌏');
       rows += '<div class="loghist-row">' +
         '<span class="lh-date">'+dateShort+'</span>' +
         '<span class="lh-dur">'+(l.minutes||0)+'m</span>' +
@@ -11948,7 +11944,7 @@ PAGES['weight'] = function(el) {
       logs.forEach(l => { const m=l.date.slice(0,7); if(!byMonth[m])byMonth[m]=[]; byMonth[m].push(l.grams); });
       const months = Object.keys(byMonth).sort().slice(-12);
       return {
-        labels: months.map(m=>{ const d=new Date(m+'-01T00:00:00'); return d.toLocaleString('en-GB',{month:'short'})+' '+m.slice(2,4); }),
+        labels: months.map(m=>{ const d=new Date(m+'-01T00:00:00'); return d.toLocaleString((window.appLoc ? window.appLoc() : 'en-GB'),{month:'short'})+' '+m.slice(2,4); }),
         datasets: [{label:'Avg weight', data:months.map(m=>{ const a=byMonth[m]; return Math.round(toY(a.reduce((x,y)=>x+y,0)/a.length)*100)/100; }), color:'#534AB7'}],
         yLabel, xLabel: 'Month',
       };
@@ -12843,7 +12839,7 @@ PAGES['calendar'] = function(el) {
       }).join('');
       return '<div class="cal-group">'+
         '<div class="cal-group-head"><span class="cal-group-rel">'+relDayLabel(date)+'</span>'+
-          '<span class="cal-group-date">'+dObj.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+'</span></div>'+
+          '<span class="cal-group-date">'+dObj.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{day:'numeric',month:'short'})+'</span></div>'+
         rows +
       '</div>';
     }).join('');
@@ -12885,7 +12881,7 @@ PAGES['calendar'] = function(el) {
           '<button class="cal-row-check on" onclick="toggleCalDone(\''+e.id+'\')" title="Restore to upcoming" aria-label="Restore"></button>'+
           '<button class="cal-row-main" onclick="openCalEventSheet(\''+e.id+'\')">'+
             '<span class="cal-row-title">'+escapeHtml(e.title)+'</span>'+
-            '<span class="cal-row-meta"><span class="cal-row-pill" style="background:'+cc.bg+' !important;color:'+cc.deep+' !important">'+cc.emoji+' '+cc.label+'</span> '+dObj.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+(e.done?' \u00b7 done':'')+'</span>'+
+            '<span class="cal-row-meta"><span class="cal-row-pill" style="background:'+cc.bg+' !important;color:'+cc.deep+' !important">'+cc.emoji+' '+cc.label+'</span> '+dObj.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{day:'numeric',month:'short'})+(e.done?' \u00b7 done':'')+'</span>'+
           '</button>'+
         '</div>';
       }).join('') + (open && pastDone.length>8 && !window._calPastExpanded ? '<button class="cal-more" onclick="_calPastExpand()">Show all '+pastDone.length+' \u203a</button>' : '') : '';
@@ -12907,7 +12903,7 @@ PAGES['calendar'] = function(el) {
     gridAll.forEach(e => { (byDateAll[e.date] = byDateAll[e.date]||[]).push(e); });
     const gm = window._calGridMonth;
     const gYear = gm.getFullYear(), gMonth = gm.getMonth();
-    const gLabel = gm.toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+    const gLabel = gm.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'), { month:'long', year:'numeric' });
     const firstDow = (new Date(gYear, gMonth, 1).getDay() + 6) % 7; // Mon=0
     const daysInMonth = new Date(gYear, gMonth+1, 0).getDate();
     const dows = ['M','T','W','T','F','S','S'];
@@ -12993,7 +12989,7 @@ PAGES['calendar'] = function(el) {
     ov.innerHTML =
       '<div class="sheet" role="dialog" aria-modal="true">'+
         '<div class="sheet-handle"></div>'+
-        '<div class="sheet-title">'+dObj.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</div>'+
+        '<div class="sheet-title">'+dObj.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</div>'+
         '<div class="vaxact-list">'+rows+'</div>'+
         '<div class="sheet-btns">'+
           '<button type="button" class="sheet-btn sheet-cancel" onclick="closeCalDaySheet()">Close</button>'+
@@ -13100,7 +13096,7 @@ function svgIcon2b(id, size){
 
 PAGES['vaccines'] = function(el) {
   if(!state.customVaccines) state.customVaccines=[];
-  const fmtVaxDate = (d) => d ? d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  const fmtVaxDate = (d) => d ? d.toLocaleDateString((window.appLoc ? window.appLoc() : 'en-GB'),{day:'numeric',month:'short',year:'numeric'}) : '—';
   function render() {
     const allVax=[...VACCINES,...(state.customVaccines||[])];
     const givenCount=allVax.filter((_,i)=>state.vaccines[i]?.given).length;
@@ -13114,7 +13110,7 @@ PAGES['vaccines'] = function(el) {
     const overdueCount = withDue.filter(x=>x.overdue).length;
     const next = withDue.filter(x=>!x.s.given && !x.overdue && x.dueDate).sort((a,b)=>a.dueDate-b.dueDate)[0];
     const R=30, C=2*Math.PI*R, dash = C*pct;
-    let html=`<div class="page-header"><h2>💉 Vaccination Schedule</h2><p>Indonesia (Kemenkes + IDAI 2024)</p></div>
+    let html=`<div class="page-header"><h2>💉 Vaccination Schedule</h2><p>${(window.vaxLabel && window.vaxLabel()) || 'Indonesia (Kemenkes + IDAI 2024)'}</p></div>
       <div class="card vax-ring-card">
         <svg width="84" height="84" viewBox="0 0 84 84" class="vax-ring">
           <circle cx="42" cy="42" r="${R}" fill="none" stroke-width="8" class="vax-ring-track"/>
@@ -13128,7 +13124,7 @@ PAGES['vaccines'] = function(el) {
           ${givenCount===allVax.length ? '<div class="vax-ring-flag done">✓ All caught up</div>' : ''}
         </div>
       </div>
-      <div class="card" style="background:#FFF9E6;border:1px solid #F0C060;margin-bottom:12px;padding:10px 14px;font-size:12px"><b>Note:</b> All vaccines recommended by Kemenkes & IDAI. Discuss any concerns with your pediatrician.</div>`;
+      <div class="card" style="background:#FFF9E6;border:1px solid #F0C060;margin-bottom:12px;padding:10px 14px;font-size:12px">${(window.vaxNote && window.vaxNote()) || '<b>Note:</b> All vaccines recommended by Kemenkes & IDAI. Discuss any concerns with your pediatrician.'}</div>`;
     allVax.forEach((v,i)=>{
       const s=state.vaccines[i]||{};
       const isCustom=i>=VACCINES.length;
@@ -13237,7 +13233,7 @@ PAGES['foods'] = function(el) {
 
     const statsEl = document.getElementById('foods-stats');
     const subEl = document.getElementById('foods-subhead');
-    if (subEl) subEl.textContent = 'Indonesia-optimised · '+done+'/100 tried';
+    if (subEl) subEl.textContent = window.famFoodsSub ? window.famFoodsSub(done) : 'Indonesia-optimised · '+done+'/100 tried';
     if (statsEl) statsEl.innerHTML = `
       <div class="grid-4">
         <div class="stat-card" style="background:#1B3A6B"><div class="val">${done}</div><div class="lbl">Tried</div></div>
@@ -14642,7 +14638,7 @@ function restoreDataPrompt() {
         // Sanity check: a real backup has at least one recognisable log array or the baby profile
         const looksLikeBackup = ['feedingLog','sleepLog','diaperLog','weightLog','babyName','milestones'].some(k => k in restored);
         if (!looksLikeBackup) { alertDialog('That file isn\u2019t a BabyOS backup', 'The file is valid JSON but doesn\u2019t contain BabyOS data. Please pick a file that BabyOS created.', {icon:'\u26a0\ufe0f'}); return; }
-        const when = parsed._exportedAt ? new Date(parsed._exportedAt).toLocaleString('en-GB') : 'unknown date';
+        const when = parsed._exportedAt ? new Date(parsed._exportedAt).toLocaleString((window.appLoc ? window.appLoc() : 'en-GB')) : 'unknown date';
         const counts = [
           (restored.feedingLog||[]).length + ' feeds',
           (restored.sleepLog||[]).length + ' sleeps',
@@ -15137,7 +15133,7 @@ PAGES['language'] = function(el) {
   const stageData = {
     '0–3 Months': {
       milestones:['Differential crying (hunger vs pain)','Quiets to familiar voice','Cooing begins (week 6–8)','Eye contact during feeding','Social smile (responsive)'],
-      parent:['Respond to EVERY vocalisation','Hold face at 20–30 cm','Use both Indonesian AND English naturally','Narrate all caregiving routines','Sing lullabies in both languages'],
+      parent:['Respond to EVERY vocalisation','Hold face at 20–30 cm',LT('Use both Indonesian AND English naturally'),'Narrate all caregiving routines','Sing lullabies in both languages'],
       reading:'Reading aloud starts at birth. Board books with high-contrast images. 5–10 min/day. Rhythm books and rhymes — phonological memory begins now.',
       redFlags:['No startle to loud sounds','No social smile by 8–10 weeks','No eye contact during feeding','No vocalisations beyond crying by 2 months'],
     },
@@ -15149,7 +15145,7 @@ PAGES['language'] = function(el) {
     },
     '6–9 Months': {
       milestones:['Canonical babbling: bababa, mamama','Responds to name reliably','Understands tone of voice','Proto-declarative pointing begins','Waves bye-bye with prompting'],
-      parent:['Follow the child\'s pointing — this IS language instruction','Expand every utterance: baby says "ba!" → "Ball! Big ball!"','Use Indonesian and English consistently'],
+      parent:['Follow the child\'s pointing — this IS language instruction','Expand every utterance: baby says "ba!" → "Ball! Big ball!"',LT('Use Indonesian and English consistently')],
       reading:'Books with flaps, textures, interactive elements. 15 min/day. Same books many times — repetition builds vocabulary.',
       redFlags:['No canonical babble by 7 months','No pointing or waving by 9 months','Doesn\'t respond to name by 9 months'],
     },
@@ -15180,12 +15176,12 @@ PAGES['language'] = function(el) {
     '3–4 Years': {
       milestones:['1,000–2,000 words combined','4–5 word sentences','Asks "why" and "how" questions','Can be understood by unfamiliar adults most of the time','5+ conversational turns'],
       parent:['Use interesting vocabulary — "enormous" not just "big"','Build narrative skills: beginning, middle, end','Both languages need rich daily exposure'],
-      reading:'Simple picture books with storylines. 30 min/day child-led selection. Author studies. Both Indonesian and English daily.',
+      reading:'Simple picture books with storylines. 30 min/day child-led selection. Author studies. ' + LT('Both Indonesian and English daily.'),
       redFlags:['Speech not understood by strangers by age 4','Not telling simple stories','Not using 4-word sentences by 3.5 years'],
     },
     '4–5 Years': {
       milestones:['2,000–4,000 words combined','Complex sentences with "because", "if", "when"','Tells full stories with beginning, middle, end','Both languages increasingly fluent'],
-      parent:['Rich conversations about ideas','Read longer books and discuss','Sustain both languages — Indonesian peer exposure critical now'],
+      parent:['Rich conversations about ideas','Read longer books and discuss',LT('Sustain both languages — Indonesian peer exposure critical now')],
       reading:'Longer picture books and early chapter books. 30–45 min/day. Text awareness. Library as family ritual.',
       redFlags:['Speech not fully intelligible by age 5','Cannot tell a simple story','Does not use complex sentences'],
     },
@@ -15194,7 +15190,7 @@ PAGES['language'] = function(el) {
   el.innerHTML = `
     <div class="page-header">
       <h2>💬 Language & Communication Roadmap</h2>
-      <p>SLP-aligned · Indonesian–English bilingual · Birth through age 5</p>
+      <p>${LT('SLP-aligned · Indonesian–English bilingual · Birth through age 5')}</p>
     </div>
     <div class="card" style="background:#FFF9E6;border:1px solid #F0C060;margin-bottom:16px;padding:10px 14px;font-size:12px">
       <b>Evidence:</b> The strongest predictors of language development are talking with children, reading aloud, responsive communication, and back-and-forth interaction. These have stronger evidence than any educational toy, app, or flashcard. Bilingual exposure does NOT cause speech delays.
@@ -15406,7 +15402,7 @@ PAGES['situations'] = function(el) {
         ${SITUATIONS.map((s,i) => `
           <div onclick="selectSit(${i})" class="card" style="cursor:pointer;border:${selected===i?'2px solid var(--teal,#2D8F8F)':'1px solid var(--hairline,#eee)'};padding:12px 14px">
             <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px">${s.title}</div>
-            <div class="ref-body" style="font-size:11px">Lead: ${s.lead}</div>
+            
           </div>
         `).join('')}
       </div>
@@ -15416,7 +15412,7 @@ PAGES['situations'] = function(el) {
       const s = SITUATIONS[selected];
       html += `<div class="card" style="border-left:3px solid var(--teal,#2D8F8F)">
         <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:4px">${s.title}</div>
-        <div class="ref-body" style="font-size:11px;margin-bottom:14px">Lead approach: ${s.lead}</div>
+        <div style="margin-bottom:12px"></div>
         ${s.steps.map((step,i) => `
           <div style="display:flex;gap:10px;margin-bottom:12px">
             <div style="width:26px;height:26px;border-radius:50%;background:${PHI_BG[step.phi]};color:${PHI_COLORS[step.phi]};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${i+1}</div>
@@ -15432,11 +15428,11 @@ PAGES['situations'] = function(el) {
 
     const c = document.getElementById('sit-content');
     if (c) c.innerHTML = html;
-    else el.innerHTML = `<div class="page-header"><h2>🧩 Situations Guide</h2><p>How all four philosophies blend in real parenting moments</p></div><div class="ref-lead">Every framework sounds tidy on paper. Real moments — a meltdown at the shoe rack, a bitten sibling — need all four at once. This is where they meet.</div><div id="sit-content">${html}</div>`;
+    else el.innerHTML = `<div class="page-header"><h2>🧩 Situations Guide</h2><p>Real moments, step by step</p></div><div class="ref-lead">Real moments, like a meltdown at the shoe rack or a bitten sibling, rarely match a single style. Each step below is tagged with the approach it comes from.</div><div id="sit-content">${html}</div>`;
   }
 
   window.selectSit = (i) => { selected = selected === i ? null : i; render(); };
-  el.innerHTML = `<div class="page-header"><h2>🧩 Situations Guide</h2><p>How all four philosophies blend in real parenting moments</p></div><div id="sit-content"></div>`;
+  el.innerHTML = `<div class="page-header"><h2>🧩 Situations Guide</h2><p>Real moments, step by step</p></div><div id="sit-content"></div>`;
   render();
 };
 
@@ -15667,7 +15663,7 @@ window.signOutOfFamily = () => {
 };
 
 PAGES['knowledge'] = function(el) {
-  const sections = [
+  const sections = (window.kbSections && window.kbSections()) || [
     {title:"🚨 Emergency Contacts",fields:['AMBULANCE (national)','Fire (113)','Police (110)','OBGYN primary','OBGYN backup','Pediatrician primary','Nearest ER (hospital 1)','Nearest ER (hospital 2)','Nearest Puskesmas','Dad\'s mom / Nenek','Mom\'s mom','Baby nurse / Suster bayi']},
     {title:"🏥 Medical Records",fields:['Mom blood type','Dad blood type','Mom allergies','Mom current medications','Mom BPJS number','Mom private insurance','Baby BPJS (after registration)','Baby blood type (once known)','Baby allergies (to update)','Pediatrician clinic address']},
     {title:"📋 Caregiver Instructions",fields:['Baby feeding schedule','Breast milk storage (room temp)','Breast milk storage (fridge)','Breast milk storage (freezer)','Safe sleep rule','Bathing temperature','Umbilical cord care','When to call doctor','Night feeding protocol','Visitor policy']},
@@ -17090,7 +17086,7 @@ var PUSH_WORKER_URL = 'https://babyos-alerts.dydra-nandira.workers.dev';   // yo
     var j = sub.toJSON();
     return { sub:{ endpoint:j.endpoint, keys:{ p256dh:j.keys.p256dh, auth:j.keys.auth } },
              tz:-new Date().getTimezoneOffset(), updated:Date.now(), label:(isIOS()?'iPhone':'Device'),
-             prefs:Object.assign({}, DEFAULTS, prefs||{}) };
+             prefs:Object.assign({}, DEFAULTS, ((window.vaxAlertsOff && window.vaxAlertsOff() && !(prefs && 'vaccine' in prefs)) ? { vaccine:false } : {}), prefs||{}) };
   }
 
   // read what Firebase has for this phone, repair if needed
@@ -17119,7 +17115,7 @@ var PUSH_WORKER_URL = 'https://babyos-alerts.dydra-nandira.workers.dev';   // yo
       return register().then(getSub).then(function(sub){
         return fbWrite(path(), record(sub, null)).then(function(ok){
           if(!ok) throw new Error('save');
-          S.enabled=true; S.prefs=Object.assign({}, DEFAULTS); S.msg=''; paint(); say('Alerts on ✓');
+          S.enabled=true; S.prefs=Object.assign({}, DEFAULTS, (window.vaxAlertsOff && window.vaxAlertsOff()) ? { vaccine:false } : {}); S.msg=''; paint(); say('Alerts on ✓');
         });
       });
     }).catch(function(){ S.msg='Could not turn on alerts. Check your connection and try again.'; paint(); });
@@ -18030,12 +18026,12 @@ function parseNanny(text, opts) {
     if (dn && MONTHS[dn[2].toLowerCase()]) { var mo = MONTHS[dn[2].toLowerCase()]; setDate(dn[3] ? validDate(+dn[3], mo, +dn[1]) : guessYear(mo, +dn[1])); section = null; sub = null; continue; }
 
     var low = line.toLowerCase();
-    var isFeedW = /\b(mimi|mimik|susu|asi|asip|sufor|formula|botol|minum|dbf)\b/.test(low);
-    var isDiaperW = /\b(pempi|pempers|pampers|popok|diaper|pipis|bab|pup|poop|berak)\b/.test(low);
+    var isFeedW = /\b(mimi|mimik|susu|asi|asip|sufor|formula|botol|minum|dbf|feed|feeds|feeding|fed|bottle|bottles|nursed|breastfed|pumped|expressed)\b/.test(low);
+    var isDiaperW = /\b(pempi|pempers|pampers|popok|diaper|diapers|nappy|nappies|pipis|bab|pup|poop|poo|poos|berak|wet|dirty|stool)\b/.test(low);
     // section headers (a line with no digits)
     if (!/\d/.test(line)) {
-      if (/^(?:ganti\s+)?(pempi|pempers|pampers|popok|diaper)[\s:]*$/.test(low)) { section = 'diaper'; sub = null; continue; }
-      if (/^(mimi|mimik|susu|minum|botol|asi)[\s:]*$/.test(low)) { section = 'feed'; sub = null; continue; }
+      if (/^(?:ganti\s+|change\s+)?(pempi|pempers|pampers|popok|diapers?|nappy|nappies)[\s:]*$/.test(low)) { section = 'diaper'; sub = null; continue; }
+      if (/^(mimi|mimik|susu|minum|botol|asi|feeds?|feeding|bottles?)[\s:]*$/.test(low)) { section = 'feed'; sub = null; continue; }
       if (/\b(stok|stock|kantong|asip|persediaan|sisa)\b/.test(low)) {
         section = 'stock';
         sub = /kombinasi|gabung|combo/.test(low) ? 'combo' : (/langsung|siap|bisa dipake|bisa dipakai|ready|utuh/.test(low) ? 'ready' : 'ready');
@@ -18080,6 +18076,7 @@ function parseNanny(text, opts) {
     }
     // times
     line = line.replace(/[–—−]/g, '-').replace(/\b(s\/d|sd|sampai|hingga|smpe|smp)\b/gi, '-');
+    line = line.replace(/(\d{1,2})([.:])(\d{2})\s*(am|pm)\b/gi, function (m0, h, sep, mi, ap) { h = (+h) % 12; if (/pm/i.test(ap)) h += 12; return pad(h) + '.' + mi; }).replace(/\b(\d{1,2})\s*(am|pm)\b/gi, function (m0, h, ap) { h = (+h) % 12; if (/pm/i.test(ap)) h += 12; return pad(h) + '.00'; });
     line = line.replace(/(\d{1,2}[.:]\d{2})\s*-\s*([01]?\d|2[0-3])(?![\d.:])(?!\s*(?:ml|cc))/gi, function (m0, a, b) { return a + ' - ' + b + '.00'; });   // "9.49 - 10"
     var toks = [], noTimes = line, tr = /(^|[^\d.:])([01]?\d|2[0-3])[.:]([0-5]\d)(?![\d])/g, tm;
     while ((tm = tr.exec(line))) { toks.push({ i: tm.index + tm[1].length, t: pad(+tm[2]) + ':' + tm[3] }); tr.lastIndex = tm.index + tm[0].length; }
@@ -18092,7 +18089,7 @@ function parseNanny(text, opts) {
 
     if (isDiaperW || (section === 'diaper' && !isFeedW)) {
       if (!times.length) { out.skipped.push({ line: raw, why: 'no time' }); continue; }
-      var dirty = /\b(bab|pup|poop|kotor|eek|berak)\b/.test(low), wet = /\b(pipis|pee|basah|kencing|bak)\b/.test(low);
+      var dirty = /\b(bab|pup|poop|poo|kotor|eek|berak|dirty|stool|soiled)\b/.test(low), wet = /\b(pipis|pee|wee|basah|kencing|bak|wet)\b/.test(low);
       var type = dirty && wet ? 'both' : dirty ? 'dirty' : wet ? 'wet' : defDiaper;
       times.forEach(function (t) { out.diapers.push({ date: ctx, time: t, type: type, src: raw, guessed: !dirty && !wet }); });
       continue;
@@ -18101,12 +18098,12 @@ function parseNanny(text, opts) {
       if (!times.length) { out.skipped.push({ line: raw, why: 'no time' }); continue; }
       var amt = null, a1 = /(\d{2,3})\s*(?:ml|cc)\b/i.exec(noTimes);
       if (a1) amt = +a1[1]; else { var a2 = /(?:sbnyk|sebanyak|banyak|=|:|-)\s*(\d{2,3})(?!\d)/i.exec(noTimes); if (a2) amt = +a2[1]; else { var a3 = noTimes.match(/(?:^|\s)(\d{2,3})(?=\s|$)/g); if (a3) amt = parseInt(a3[a3.length - 1], 10); } }
-      if (!amt && !/\d/.test(noTimes) && !/\b(sufor|formula|sf|asip|asi|stok|stored)\b/.test(low)) {   // times but no ml: the nanny timed a breast feed herself, side still unknown
+      if (!amt && !/\d/.test(noTimes) && !/\b(sufor|formula|sf|asip|asi|stok|stored|expressed|pumped|ebm)\b/.test(low)) {   // times but no ml: the nanny timed a breast feed herself, side still unknown
         out.feeds.push({ date: ctx, time: times[0], end: times[1] || '', ml: 0, type: 'breast', side: null, src: raw });
         continue;
       }
       if (!amt || amt < 10 || amt > 400) { out.skipped.push({ line: raw, why: amt ? 'amount looks off' : 'no amount' }); continue; }
-      var ftype = /\b(sufor|formula|sf)\b/.test(low) ? 'formula' : /\b(asip|asi|stok|stored)\b/.test(low) ? 'stored' : defFeed;
+      var ftype = /\b(sufor|formula|sf)\b/.test(low) ? 'formula' : /\b(asip|asi|stok|stored|expressed|pumped|ebm)\b/.test(low) ? 'stored' : defFeed;
       out.feeds.push({ date: ctx, time: times[0], end: times[1] || '', ml: amt, type: ftype, src: raw });
       continue;
     }
@@ -18196,7 +18193,7 @@ function parseNanny(text, opts) {
     var nf = 0, nb = 0, nd = 0, nw = 0, nneed = 0;
     S.items.forEach(function(i){ if(i.kind==='feed'){ if(i.type==='breast'){ nb++; if(i.need) nneed++; } else nf++; } else if(i.kind==='weight') nw++; else nd++; });
     var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nb) parts.push(plural(nb,'breast feed')); if(nd) parts.push(plural(nd,'diaper')); if(nw) parts.push(plural(nw,'weight')); if(S.bags) parts.push('a stock count');
-    if(!parts.length) return 'I could not find any feeds, diapers, weights or stock in that text. Lines like “Mimi jam 9.49 - 10.04 sbnyk 110” or “Ganti pempi jam 07.58” work.';
+    if(!parts.length) return 'I could not find any feeds, diapers, weights or stock in that text. ' + ((window.waExample && window.waExample()) || 'Lines like “Mimi jam 9.49 - 10.04 sbnyk 110” or “Ganti pempi jam 07.58” work.');
     return 'I found ' + (parts.length>1 ? parts.slice(0,-1).join(', ') + ' and ' + parts[parts.length-1] : parts[0]) + (twins() ? ' for ' + nm(S.baby) : '') + '. ' + (nneed ? (nneed===1 ? 'One feed has no amount, so I took it as a breast feed. Pick left or right for it. ' : nneed + ' feeds have no amount, so I took them as breast feeds. Pick left or right for each. ') : '') + 'Untick anything that looks wrong, then tap Add. Nothing is saved until you do.';
   }
 
@@ -18375,7 +18372,7 @@ function parseNanny(text, opts) {
     document.addEventListener('click', function(){ if(pop.style.display!=='none') popShow(false); });
     document.addEventListener('keydown', function(e){ if(e.key==='Escape' && pop.style.display!=='none'){ popShow(false); e.stopImmediatePropagation(); } }, true);
     row.querySelectorAll('[data-tp]').forEach(function(btn){ btn.onclick = function(){
-      var T = TPLS[btn.getAttribute('data-tp')][1], ok = function(){ flash(btn, '✓ Copied', false); };
+      var T = (window.waTpl ? window.waTpl(btn.getAttribute('data-tp'), TPLS[btn.getAttribute('data-tp')][1]) : TPLS[btn.getAttribute('data-tp')][1]), ok = function(){ flash(btn, '✓ Copied', false); };
       if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(T).then(ok).catch(function(){ fb(); }); else fb();
       function fb(){ try{ var t = document.createElement('textarea'); t.value = T; t.setAttribute('readonly',''); t.style.cssText='position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(t); t.select(); t.setSelectionRange(0, T.length); var r = document.execCommand('copy'); t.remove(); if(r){ ok(); return; } }catch(e){} flash(btn, 'Could not copy', true); }
     }; });
@@ -18868,6 +18865,13 @@ body.night-mode .b54-bcn{color:#B7C2DA;}
 .b54-gsw{margin-bottom:12px;}
 .b54-one{margin-bottom:12px;}
 
+/* v62: one-screen setup */
+#landing-step2 #landing-baby-fields > div{background:none !important;padding:0 !important;border-radius:0 !important;margin-bottom:8px !important;}
+#landing-step2 details > summary::-webkit-details-marker{display:none;}
+#landing-step2 details > summary::after{content:" \25BE";}
+#landing-step2 details[open] > summary::after{content:" \25B4";}
+.chart-tab:empty{display:none;}
+
 /* page colours: one per page or template */
 html:has(body[data-page="sleep"]){--ground:#B4C0FF;--dink:#0F1A4D;--blob:color-mix(in srgb,#B4C0FF 78%,#fff);--dbtn:#0F1A4D;--dbtn-t:#B4C0FF;background:#B4C0FF !important;}
 html:has(body.night-mode[data-page="sleep"]){--ground:#141A3D;--dink:#AEBBFF;--blob:color-mix(in srgb,#141A3D 82%,#fff);--dbtn:#AEBBFF;--dbtn-t:#141A3D;background:#141A3D !important;}
@@ -19134,6 +19138,457 @@ function migrate(){
 }
 
 window.BUD = { CATS: CATS, METHODS: METHODS, cat: cat, items: items, period: period, nowYM: nowYM, shiftYM: shiftYM, daysIn: daysIn, monthsWithData: monthsWithData, inventorySpent: inventorySpent, inventoryPlanned: inventoryPlanned, cfg: bcfg, generate: generate, migrate: migrate, amt: amt, dueDates: dueDates };
+})();
+
+/* v61: family profile helpers. A family with no region and no languages set is a "legacy" family
+   (set up before v61): everything keeps behaving exactly as before for them. */
+window.famLegacy = function(){ try { return !(state && (state.region || state.langs)); } catch(e){ return true; } };
+window.famLine = function(){
+  try {
+    if (window.famLegacy()) return ' \u00b7 Jakarta \u00b7 Indonesian\u2013English';
+    var out = [], r = window.REGIONS && state.region && window.REGIONS[state.region];
+    if (r && r.name) out.push(r.name);
+    if (state.langs && state.langs.length > 1) out.push(state.langs.join('\u2013'));
+    return out.length ? ' \u00b7 ' + out.join(' \u00b7 ') : '';
+  } catch(e){ return ''; }
+};
+
+/* v62: regions, vaccine presets, neutral defaults, languages, one-screen setup.
+   Rule that keeps existing families safe: nothing here changes behaviour unless state.region is set.
+   state.region is only set by the new setup screen or by the person choosing it in Settings. */
+(function(){
+  var G = window;
+  function st(){ try { return state; } catch(e){ return null; } }
+  function A(x){ return Array.isArray(x) ? x : []; }
+
+  /* ---------- regions ---------- */
+  var REGIONS = {
+    ID:  { key: 'ID',  name: 'Indonesia',      flag: '🇮🇩', cur: 'IDR', loc: 'en-GB', vax: 'ID',  vaxLabel: 'Indonesia (Kemenkes + IDAI 2024)', emerg: '118 or 119', health: 'BPJS number' },
+    US:  { key: 'US',  name: 'United States',  flag: '🇺🇸', cur: 'USD', loc: 'en-US', vax: 'US',  vaxLabel: 'United States (CDC schedule, 2025)', emerg: '911', health: 'Health insurance member ID' },
+    UK:  { key: 'UK',  name: 'United Kingdom', flag: '🇬🇧', cur: 'GBP', loc: 'en-GB', vax: 'UK',  vaxLabel: 'United Kingdom (NHS schedule from January 2026)', emerg: '999', health: 'NHS number' },
+    AU:  { key: 'AU',  name: 'Australia',      flag: '🇦🇺', cur: 'AUD', loc: 'en-AU', vax: 'AU',  vaxLabel: 'Australia (National Immunisation Program)', emerg: '000', health: 'Medicare number' },
+    WHO: { key: 'WHO', name: 'Somewhere else', flag: '🌍', cur: null,  loc: null,    vax: 'WHO', vaxLabel: 'WHO routine schedule (your country may differ)', emerg: 'your local emergency number', health: 'Health insurance or health ID number' }
+  };
+  var ORDER = ['ID', 'US', 'UK', 'AU', 'WHO'];
+  G.REGIONS = REGIONS;
+
+  function detect(){
+    var tz = '', lg = '', rg = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch(e){}
+    try { lg = String(navigator.language || ''); rg = new Intl.Locale(lg).maximize().region || ''; } catch(e){}
+    if (/^Asia\/(Jakarta|Makassar|Pontianak|Jayapura)$/.test(tz) || rg === 'ID') return 'ID';
+    if (rg === 'GB' || tz === 'Europe/London') return 'UK';
+    if (rg === 'AU' || /^Australia\//.test(tz)) return 'AU';
+    if (rg === 'US' || /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Indiana)/.test(tz) || tz === 'Pacific/Honolulu') return 'US';
+    return 'WHO';
+  }
+  G.famDetectRegion = detect;
+
+  /* ---------- who is "set up the new way" ---------- */
+  G.famNew = function(){ var s = st(); return !!(s && s.region && REGIONS[s.region]); };
+  G.famRegion = function(){ var s = st(); return (s && s.region && REGIONS[s.region]) || null; };
+  G.appLoc = function(){
+    var r = G.famRegion();
+    if (!r) return 'en-GB';
+    if (r.loc) return r.loc;
+    try { var l = String(navigator.language || 'en-GB').split('@')[0].replace('_', '-'); if (Intl.DateTimeFormat.supportedLocalesOf([l]).length) return l; } catch(e){}
+    return 'en-GB';
+  };
+
+  /* ---------- languages ---------- */
+  G.famEffLangs = function(){
+    var s = st();
+    if (s && A(s.langs).length) return s.langs.slice(0, 3);
+    if (!G.famNew()) return ['Indonesian', 'English'];
+    var k = s.region;
+    return k === 'ID' ? ['Indonesian'] : (k === 'WHO' ? [] : ['English']);
+  };
+  /* the Indonesian-English pair keeps the original rich pages and labels exactly as they were */
+  G.famIsIDEN = function(){ var L = G.famEffLangs(); return !!(L[0] === 'Indonesian' && L[1] === 'English'); };
+  /* reading-log slots: 'Indonesian' is language 1, 'English' is language 2 (stored values never change) */
+  G.LL = function(slot, legacy){
+    if (G.famIsIDEN()) return legacy;
+    var L = G.famEffLangs();
+    if (slot === 'Indonesian') return L[0] || 'Home language';
+    if (slot === 'English') return L[1] || '';
+    if (slot === 'Both') return L.length > 1 ? 'Both' : '';
+    return legacy;
+  };
+  G.LF = function(lang, a, b, other){
+    if (G.famIsIDEN()) return lang === 'Indonesian' ? a : lang === 'English' ? b : other;
+    return lang === 'Indonesian' || lang === 'English' ? '📖' : other;
+  };
+  G.LT = function(s){
+    if (G.famIsIDEN() || typeof s !== 'string') return s;
+    var L = G.famEffLangs(), a = L[0] || 'your home language', b = L[1];
+    if (/^SLP-aligned/.test(s)) return b ? 'SLP-aligned · ' + a + '–' + b + ' bilingual · Birth through age 5' : 'SLP-aligned · Birth through age 5';
+    if (b) return s.replace(/Indonesian/g, '\u0001').replace(/English/g, b).replace(/\u0001/g, a);
+    return s.replace(/Sustain both languages — Indonesian peer exposure critical now/, 'Keep talking and reading in ' + a)
+            .replace(/both Indonesian AND English/i, 'your home language')
+            .replace(/Both Indonesian and English daily\./, 'Daily, in your home language.')
+            .replace(/Indonesian and English/g, a).replace(/Indonesian/g, a).replace(/English/g, a);
+  };
+  G.rlOpts = function(){
+    if (G.famIsIDEN()) return null;
+    var L = G.famEffLangs(), h = '<option value="Indonesian">' + (L[0] || 'Home language') + '</option>';
+    if (L[1]) h += '<option value="English">' + L[1] + '</option><option value="Both">Both</option>';
+    return h;
+  };
+
+  /* ---------- text that used to say "Indonesia" ---------- */
+  G.vaxLabel = function(){ var r = G.famRegion(), s = st(); var k = s && s.vaxPreset && REGIONS[s.vaxPreset]; return k ? k.vaxLabel : null; };
+  G.vaxNote = function(){
+    var s = st(); if (!s || !s.vaxPreset || s.vaxPreset === 'ID' || !REGIONS[s.vaxPreset]) return null;
+    return '<b>Note:</b> Based on the ' + REGIONS[s.vaxPreset].vaxLabel + '. Schedules change and can differ by clinic or country, so confirm with your pediatrician or local health service.';
+  };
+  G.famFoodsSub = function(done){ var r = G.famRegion(); return r && r.key !== 'ID' ? done + '/100 tried' : 'Indonesia-optimised · ' + done + '/100 tried'; };
+  G.vaxAlertsOff = function(){ var s = st(); return !!(s && s.vaxPreset && s.vaxPreset !== 'ID'); };
+
+  /* ---------- vaccine schedules ---------- */
+  function V(name, age, d, notes, short){ return { name: name, age: age, daysFromBirth: d, notes: notes, short: short || name }; }
+  var VAXSETS = {};
+  VAXSETS.US = [
+    V('Hepatitis B (dose 1)', 'At birth', 0, 'Given within 24 hours of birth. Protects against hepatitis B.', 'HepB 1'),
+    V('RSV antibody shot', 'At birth, in RSV season', 0, 'Not a vaccine. A one-time antibody shot for babies whose mother was not vaccinated against RSV in pregnancy, usually given in the first weeks of RSV season (fall to spring). Your pediatrician will advise.', 'RSV'),
+    V('Hepatitis B (dose 2)', '1 to 2 months', 30, 'Second dose of the hepatitis B series.', 'HepB 2'),
+    V('DTaP (dose 1)', '2 months', 61, 'Protects against diphtheria, tetanus and whooping cough. Mild fever or fussiness is common.', 'DTaP 1'),
+    V('Hib (dose 1)', '2 months', 61, 'Haemophilus influenzae type b. A cause of meningitis and serious infections in babies.', 'Hib 1'),
+    V('Polio, IPV (dose 1)', '2 months', 61, 'Injected polio vaccine.', 'IPV 1'),
+    V('Pneumococcal, PCV (dose 1)', '2 months', 61, 'Protects against pneumonia, meningitis and ear infections.', 'PCV 1'),
+    V('Rotavirus (dose 1)', '2 months', 61, 'Oral vaccine against rotavirus, a common cause of severe diarrhea.', 'Rota 1'),
+    V('DTaP (dose 2)', '4 months', 122, 'Second dose in the series.', 'DTaP 2'),
+    V('Hib (dose 2)', '4 months', 122, 'Second dose in the series.', 'Hib 2'),
+    V('Polio, IPV (dose 2)', '4 months', 122, 'Second dose in the series.', 'IPV 2'),
+    V('Pneumococcal, PCV (dose 2)', '4 months', 122, 'Second dose in the series.', 'PCV 2'),
+    V('Rotavirus (dose 2)', '4 months', 122, 'Second oral dose.', 'Rota 2'),
+    V('DTaP (dose 3)', '6 months', 183, 'Third dose in the series.', 'DTaP 3'),
+    V('Hib (dose 3)', '6 months (some brands)', 183, 'Only needed with some brands of the vaccine. Your pediatrician will tell you.', 'Hib 3'),
+    V('Polio, IPV (dose 3)', '6 to 18 months', 183, 'Third dose in the series.', 'IPV 3'),
+    V('Pneumococcal, PCV (dose 3)', '6 months', 183, 'Third dose in the series.', 'PCV 3'),
+    V('Rotavirus (dose 3)', '6 months (some brands)', 183, 'Only needed with some brands of the vaccine.', 'Rota 3'),
+    V('Hepatitis B (dose 3)', '6 to 18 months', 183, 'Final dose of the hepatitis B series.', 'HepB 3'),
+    V('Influenza (flu)', 'From 6 months, every year', 183, 'Yearly. Two doses, at least 4 weeks apart, the first season.', 'Flu'),
+    V('COVID-19', 'From 6 months', 183, 'Talk to your health care provider about the current recommendation.', 'COVID'),
+    V('MMR (dose 1)', '12 months', 365, 'Measles, mumps and rubella.', 'MMR 1'),
+    V('Chickenpox, varicella (dose 1)', '12 months', 365, 'Protects against chickenpox.', 'Varicella 1'),
+    V('Hepatitis A (dose 1)', '12 months', 365, 'First of two doses, 6 months apart.', 'HepA 1'),
+    V('Hib (booster)', '12 to 15 months', 365, 'Booster dose.', 'Hib booster'),
+    V('Pneumococcal, PCV (dose 4)', '12 to 15 months', 365, 'Booster dose.', 'PCV 4'),
+    V('DTaP (dose 4)', '15 to 18 months', 456, 'Booster dose.', 'DTaP 4'),
+    V('Hepatitis A (dose 2)', '18 months', 548, 'Second dose, 6 months after the first.', 'HepA 2'),
+    V('DTaP (dose 5)', '4 to 6 years', 1461, 'Final dose before school.', 'DTaP 5'),
+    V('Polio, IPV (dose 4)', '4 to 6 years', 1461, 'Final dose before school.', 'IPV 4'),
+    V('MMR (dose 2)', '4 to 6 years', 1461, 'Second dose.', 'MMR 2'),
+    V('Chickenpox, varicella (dose 2)', '4 to 6 years', 1461, 'Second dose.', 'Varicella 2')
+  ];
+  VAXSETS.UK = [
+    V('6-in-1 (dose 1)', '8 weeks', 56, 'Protects against diphtheria, tetanus, whooping cough, polio, Hib and hepatitis B.', '6-in-1 #1'),
+    V('MenB (dose 1)', '8 weeks', 56, 'Protects against meningococcal B meningitis and sepsis. A fever is common afterwards, so ask your nurse about infant paracetamol.', 'MenB 1'),
+    V('Rotavirus (dose 1)', '8 weeks', 56, 'Oral vaccine against rotavirus, a common cause of severe diarrhoea.', 'Rota 1'),
+    V('6-in-1 (dose 2)', '12 weeks', 84, 'Second dose in the series.', '6-in-1 #2'),
+    V('MenB (dose 2)', '12 weeks', 84, 'Second dose.', 'MenB 2'),
+    V('Rotavirus (dose 2)', '12 weeks', 84, 'Second oral dose.', 'Rota 2'),
+    V('6-in-1 (dose 3)', '16 weeks', 112, 'Third dose in the series.', '6-in-1 #3'),
+    V('Pneumococcal, PCV (dose 1)', '16 weeks', 112, 'Protects against pneumonia and meningitis.', 'PCV 1'),
+    V('Pneumococcal, PCV (dose 2)', '1 year', 365, 'Booster dose.', 'PCV 2'),
+    V('MMR (dose 1)', '1 year', 365, 'Measles, mumps and rubella.', 'MMR 1'),
+    V('MenB (dose 3)', '1 year', 365, 'Booster dose.', 'MenB 3'),
+    V('6-in-1 (dose 4)', '18 months', 548, 'Booster. New 18-month appointment for children born on or after 1 July 2024.', '6-in-1 #4'),
+    V('MMR (dose 2)', '18 months', 548, 'For children born on or after 1 July 2024. Children born earlier have this dose at 3 years 4 months.', 'MMR 2'),
+    V('Flu nasal spray', 'Each autumn from age 2', 730, 'Offered every autumn to children from age 2. Check which school year or age group is eligible this year.', 'Flu'),
+    V('Pre-school booster (4-in-1)', '3 years 4 months', 1217, 'Diphtheria, tetanus, whooping cough and polio booster.', '4-in-1')
+  ];
+  VAXSETS.AU = [
+    V('Hepatitis B (birth dose)', 'At birth', 0, 'Given as soon as possible after birth.', 'HepB'),
+    V('6-in-1 (dose 1)', '2 months', 61, 'Protects against diphtheria, tetanus, whooping cough, hepatitis B, polio and Hib. Can be given from 6 weeks.', '6-in-1 #1'),
+    V('Pneumococcal (dose 1)', '2 months', 61, 'Protects against pneumonia and meningitis.', 'PCV 1'),
+    V('Rotavirus (dose 1)', '2 months', 61, 'Oral vaccine against rotavirus.', 'Rota 1'),
+    V('6-in-1 (dose 2)', '4 months', 122, 'Second dose in the series.', '6-in-1 #2'),
+    V('Pneumococcal (dose 2)', '4 months', 122, 'Second dose.', 'PCV 2'),
+    V('Rotavirus (dose 2)', '4 months', 122, 'Second oral dose.', 'Rota 2'),
+    V('6-in-1 (dose 3)', '6 months', 183, 'Third dose in the series.', '6-in-1 #3'),
+    V('Influenza (flu)', 'From 6 months, every year', 183, 'Recommended every year from 6 months. Funding differs by state and territory.', 'Flu'),
+    V('Meningococcal ACWY', '12 months', 365, 'Protects against four types of meningococcal disease.', 'MenACWY'),
+    V('MMR (dose 1)', '12 months', 365, 'Measles, mumps and rubella.', 'MMR'),
+    V('Pneumococcal (booster)', '12 months', 365, 'Booster dose.', 'PCV 3'),
+    V('MMRV (dose 2)', '18 months', 548, 'Measles, mumps, rubella and chickenpox.', 'MMRV'),
+    V('DTPa (booster)', '18 months', 548, 'Diphtheria, tetanus and whooping cough booster.', 'DTPa'),
+    V('Hib (booster)', '18 months', 548, 'Booster dose.', 'Hib'),
+    V('DTPa-IPV (4-in-1 booster)', '4 years', 1461, 'Diphtheria, tetanus, whooping cough and polio booster before school.', '4-in-1')
+  ];
+  VAXSETS.WHO = [
+    V('Hepatitis B (birth dose)', 'At birth', 0, 'As soon as possible, ideally within 24 hours.', 'HepB 0'),
+    V('BCG', 'At birth', 0, 'Tuberculosis. Recommended where TB is common, so many countries skip it.', 'BCG'),
+    V('Polio, OPV (birth dose)', 'At birth', 0, 'Only in countries with polio risk. Ask your clinic.', 'OPV 0'),
+    V('DTP-containing vaccine (dose 1)', '6 weeks', 42, 'Often a combined shot: diphtheria, tetanus, whooping cough, hepatitis B and Hib.', 'DTP 1'),
+    V('Pneumococcal, PCV (dose 1)', '6 weeks', 42, 'Protects against pneumonia and meningitis.', 'PCV 1'),
+    V('Rotavirus (dose 1)', '6 weeks', 42, 'Oral vaccine. Do not start after 24 months.', 'Rota 1'),
+    V('Polio (dose 1)', '6 weeks', 42, 'Oral or injected polio vaccine, depending on your country.', 'Polio 1'),
+    V('DTP-containing vaccine (dose 2)', '10 weeks', 70, 'At least 4 weeks after the first dose.', 'DTP 2'),
+    V('Pneumococcal, PCV (dose 2)', '10 weeks', 70, 'Second dose.', 'PCV 2'),
+    V('Rotavirus (dose 2)', '10 weeks', 70, 'Second oral dose.', 'Rota 2'),
+    V('Polio (dose 2)', '10 weeks', 70, 'Second dose.', 'Polio 2'),
+    V('DTP-containing vaccine (dose 3)', '14 weeks', 98, 'Third dose, ideally before 6 months.', 'DTP 3'),
+    V('Pneumococcal, PCV (dose 3 or booster)', '14 weeks', 98, 'Some countries give 2 doses plus a booster at 9 to 18 months.', 'PCV 3'),
+    V('Polio, injected IPV (dose 1)', '14 weeks', 98, 'Given with the third DTP dose where IPV is used.', 'IPV'),
+    V('Measles-rubella (dose 1)', '9 to 12 months', 274, 'At 9 months where measles is common, otherwise at 12 months.', 'MR 1'),
+    V('Yellow fever', '9 to 12 months', 274, 'Only in countries where yellow fever occurs.', 'YF'),
+    V('Japanese encephalitis', '9 months or older', 274, 'Only in countries where it occurs.', 'JE'),
+    V('DTP booster', '12 to 23 months', 365, 'First booster.', 'DTP booster'),
+    V('Measles-rubella (dose 2)', '15 to 18 months', 456, 'Second dose.', 'MR 2'),
+    V('DTP booster (school age)', '4 to 7 years', 1461, 'Second booster.', 'DTP booster 2')
+  ];
+  G.VAXSETS = VAXSETS;
+
+  var ID_VAX = null;
+  G.famApplyVax = function(){
+    try {
+      if (typeof VACCINES === 'undefined') return;
+      if (!ID_VAX) ID_VAX = VACCINES.slice();
+      var s = st(), want = (s && s.vaxPreset && VAXSETS[s.vaxPreset]) ? s.vaxPreset : 'ID';
+      if (G.__vaxApplied === want) return;
+      var arr = want === 'ID' ? ID_VAX : VAXSETS[want];
+      VACCINES.length = 0; Array.prototype.push.apply(VACCINES, arr);
+      G.__vaxApplied = want;
+    } catch(e){}
+  };
+  /* what the Worker needs to send the right vaccine alerts: [name, daysFromBirth, short] */
+  G.famVaxList = function(){
+    var s = st(); if (!s || !s.vaxPreset || !VAXSETS[s.vaxPreset]) return null;
+    return VAXSETS[s.vaxPreset].map(function(v){ return [v.name, v.daysFromBirth, v.short]; });
+  };
+
+  /* ---------- applying a region ---------- */
+  G.famApplyRegion = function(key, o){
+    o = o || {}; var s = st(); if (!s || !REGIONS[key]) return;
+    var r = REGIONS[key];
+    s.region = key;
+    if (!o.keepVax) s.vaxPreset = r.vax;
+    if (!s.currencyCfg) {
+      /* never re-label amounts a family already entered: freeze whatever currency they are seeing now */
+      var hasMoney = A(s.budgetItems).length || A(s.plannedItems).length || A(s.recurringItems).length || A(s.inventoryItems).some(function(i){ return i && +i.cost > 0; });
+      var code = hasMoney ? null : r.cur;
+      if (!code) { try { code = window.moneyCfg().code; } catch(e){} }
+      if (code) s.currencyCfg = { code: code };
+    }
+    G.__vaxApplied = null; G.famApplyVax();
+    s.vaxList = (s.vaxPreset && s.vaxPreset !== 'ID') ? G.famVaxList() : 'ID';   /* a string means: use the built-in Indonesian list */
+  };
+
+  /* ---------- neutral default lists for new families ---------- */
+  function uid2(){ try { return uid(); } catch(e){ return '_' + Math.random().toString(36).slice(2, 11); } }
+  var DOCS = {
+    US:  ['Photo ID', 'Health insurance card', 'Hospital pre-registration papers', 'Birth plan (if you have one)', 'Previous scan / medical records', 'Blood type card'],
+    UK:  ['Maternity notes (hand-held record)', 'Photo ID', 'Birth plan (if you have one)', 'Hospital and midwife contact numbers', 'Blood type card'],
+    AU:  ['Medicare card', 'Private health insurance card', 'Hospital admission papers', 'Maternity record (hand-held or app)', 'Photo ID'],
+    WHO: ['National ID', 'Health insurance or health card', 'Hospital registration or booking', 'Previous scan / medical records', 'Blood type card']
+  };
+  var ADMIN = {
+    US:  [['W39', 'Admin', 'Check that the hospital will file the birth certificate and Social Security number application', 'Essential'], ['W40', 'Admin', 'Add baby to your health insurance (usually a 30-day window, check your plan)', 'Essential']],
+    UK:  [['W39', 'Admin', 'Plan to register the birth (within 42 days in England, Wales and Northern Ireland, 21 days in Scotland)', 'Essential'], ['W40', 'Admin', 'Claim Child Benefit and register baby with a GP', 'Essential']],
+    AU:  [['W39', 'Admin', 'Plan to register the birth with your state or territory registry', 'Essential'], ['W40', 'Admin', 'Enrol baby in Medicare and check Family Tax Benefit', 'Essential']],
+    WHO: [['W39', 'Admin', 'Find out how to register the birth and get a birth certificate', 'Essential'], ['W40', 'Admin', 'Add baby to your health insurance or national health scheme', 'Essential']]
+  };
+  var BAGFIX = [
+    [/ \(high waist, post C-section\)/, ' (high waist)'], [/C-section scar silicone gel or tape/, 'Scar gel or tape (if you have a C-section)'],
+    [/Receiving blanket \/ bedong cloth/, 'Receiving blanket / swaddle'], [/Haaka \/ manual breast pump/, 'Manual breast pump (optional)'],
+    [/Nipple cream \(Lansinoh\)/, 'Nipple cream'], [/Barrier cream \(Sudocrem\)/, 'Barrier cream'],
+    [/^OBGYN referral letter$/, 'Referral letter from your OBGYN or midwife (if needed)']
+  ];
+  var INVFIX = [
+    [/ \(Spectra S1 or S2\)/, ''], [/ \(Boppy\)/, ''], [/Haaka \/ manual breast pump/, 'Manual breast pump'], [/ \(Pampers\)/, ''], [/ \(Water Wipes\)/, ''],
+    [/ \(Sudocrem\)/, ''], [/ \(Braun\)/, ''], [/ \(Frida NoseFrida\)/, ''], [/ \(Lansinoh\)/, ''], [/ \(Ergobaby or wrap\)/, ' or wrap']
+  ];
+  function fixText(t, list){ list.forEach(function(p){ t = t.replace(p[0], p[1]); }); return t; }
+  function keyDates(edd){
+    var add = function(d, n){ var r = new Date(d + 'T00:00:00'); r.setDate(r.getDate() + n); return localDateStr(r); };
+    return [
+      { id: uid2(), label: 'Due date', date: edd },
+      { id: uid2(), label: 'Hospital bag ready by', date: add(edd, -21) },
+      { id: uid2(), label: 'Pediatrician visit 1', date: add(edd, 7) },
+      { id: uid2(), label: '1-month check', date: add(edd, 30) },
+      { id: uid2(), label: 'Newborn vaccines', date: edd },
+      { id: uid2(), label: 'Postnatal check (about 6 weeks)', date: add(edd, 42) }
+    ];
+  }
+  G.famCsecTasks = function(n){
+    var rk = (st() && st().region) || 'WHO';
+    return getDefaultCsectionTasks(n || 1).map(function(t){
+      if (/Akta Kelahiran/.test(t.task)) t.task = 'Begin the birth registration process (birth certificate)';
+      return t;
+    });
+  };
+  /* returns the five starter lists for a new family, or null when the family is not set up the new way */
+  G.famLists = function(n, edd, dob){
+    if (!G.famNew()) return null;
+    if (dob) return { hospitalBagItems: [], csectionTasks: [], pregTasks: [], inventoryItems: [], keyDates: [] };
+    var rk = st().region;
+    var bag = getDefaultHospitalBag(n).map(function(i){ i.item = fixText(i.item, BAGFIX); return i; });
+    if (rk !== 'ID') {
+      bag = bag.filter(function(i){ return i.section !== 'Documents'; });
+      DOCS[rk].forEach(function(d){ bag.push({ id: uid2(), cat: '📄 Documents', item: d, qty: 1, pri: 'Essential', section: 'Documents', packed: false }); });
+    }
+    var preg = getDefaultPregTasks();
+    var surg = /Anesthesia|pre-op|nil-by-mouth|surgery time/i;
+    preg = preg.filter(function(t){ return !surg.test(t.task); });
+    if (rk !== 'ID') preg = preg.filter(function(t){ return !(t.cat === 'Admin' && /Akta|KK|BPJS|Dukcapil|birth certificate/i.test(t.task)); }).concat(ADMIN[rk].map(function(a){ return { id: uid2(), week: a[0], cat: a[1], task: a[2], pri: a[3], done: false }; }));
+    preg.push({ id: uid2(), week: 'W37', cat: 'Medical', task: 'Confirm your hospital arrival plan (when to leave, where to go)', pri: 'Essential', done: false });
+    preg.push({ id: uid2(), week: 'W38', cat: 'Medical', task: 'Final antenatal appointment', pri: 'Essential', done: false });
+    var inv = getDefaultInventory(n).map(function(i){ i.item = fixText(i.item, INVFIX); return i; });
+    return { hospitalBagItems: bag, csectionTasks: [], pregTasks: preg, inventoryItems: inv, keyDates: keyDates(edd) };
+  };
+
+  /* ---------- Family Knowledge Base (emergency contacts and documents) ---------- */
+  G.kbSections = function(){
+    var r = G.famRegion(); if (!r || r.key === 'ID') return null;
+    var docs = DOCS[r.key] ? ['Birth certificate', 'Health insurance registration for baby', 'Passport (if travel planned)', 'Wills / guardianship update'] : [];
+    return [
+      { title: '🚨 Emergency Contacts', fields: ['Emergency number (' + r.emerg + ')', 'OBGYN or midwife', 'OBGYN or midwife (backup)', 'Pediatrician primary', 'Nearest ER (hospital 1)', 'Nearest ER (hospital 2)', 'Grandparent or close family 1', 'Grandparent or close family 2', 'Nanny or babysitter'] },
+      { title: '🏥 Medical Records', fields: ['Parent 1 blood type', 'Parent 2 blood type', 'Parent 1 allergies', 'Parent 1 current medications', r.health + ' (parent)', 'Private insurance', r.health + ' (baby, after registration)', 'Baby blood type (once known)', 'Baby allergies (to update)', 'Pediatrician clinic address'] },
+      { title: '📋 Caregiver Instructions', fields: ['Baby feeding schedule', 'Breast milk storage (room temp)', 'Breast milk storage (fridge)', 'Breast milk storage (freezer)', 'Safe sleep rule', 'Bathing temperature', 'Umbilical cord care', 'When to call doctor', 'Night feeding protocol', 'Visitor policy'] },
+      { title: '📄 Documents Checklist', fields: docs }
+    ];
+  };
+
+
+  var CODES = { English: 'EN', Indonesian: 'ID', Spanish: 'ES', French: 'FR', German: 'DE', Portuguese: 'PT', Italian: 'IT', Dutch: 'NL', Mandarin: 'ZH', Cantonese: 'ZH', Hindi: 'HI', Arabic: 'AR', Japanese: 'JA', Korean: 'KO', Tagalog: 'TL', Vietnamese: 'VI', Turkish: 'TR', Russian: 'RU' };
+  G.famLangCode = function(i, fb){
+    if (G.famIsIDEN()) return fb;
+    var n = G.famEffLangs()[i]; if (!n) return i === 0 ? '?' : '+';
+    return CODES[n] || String(n).slice(0, 2).toUpperCase();
+  };
+
+  /* the C-section checklist is optional for families set up the new way */
+  (function(){
+    var oc = (typeof PAGES !== 'undefined') ? PAGES['csection'] : null;
+    if (!oc) return;
+    PAGES['csection'] = function(el){
+      var r = oc.apply(this, arguments);
+      try {
+        if (G.famNew() && !(state.csectionTasks || []).length) {
+          el.insertAdjacentHTML('beforeend', '<div class="card" style="margin-top:12px"><div class="card-title">Planning a C-section?</div><div class="ref-body" style="margin-bottom:10px">Add a ready-made checklist covering preparation, the day itself and recovery. Skip this if you are not planning one.</div><button type="button" class="btn btn-teal btn-block" onclick="famAddCsec()">Add the C-section checklist</button></div>');
+        }
+      } catch(e){}
+      return r;
+    };
+    G.famAddCsec = function(){
+      state.csectionTasks = G.famCsecTasks(state.numberOfBabies || 1);
+      try { saveState('csectionTasks'); } catch(e){}
+      try { navTo('csection'); } catch(e){}
+    };
+  })();
+
+  /* chat-log import: English templates for families who are not on the Indonesian setup */
+  var TPL_EN = { feed: 'Feed __.__ - __.__ = ___ ml', diaper: 'Diaper __.__ wet', weight: 'Weight: __._ kg', stock: 'Stock\n1. ___\n2. ___\n3. ___' };
+  G.waTpl = function(k, legacy){ var r = G.famRegion(); return (r && r.key !== 'ID' && TPL_EN[k]) ? TPL_EN[k] : legacy; };
+  G.waExample = function(){ var r = G.famRegion(); return (r && r.key !== 'ID') ? 'Lines like \u201cFeed 9.49 - 10.04 110 ml\u201d or \u201cDiaper 07.58 wet\u201d work.' : null; };
+  /* ---------- keep the right schedule on screen ---------- */
+  (function(){
+    var nt = G.navTo;
+    if (typeof nt === 'function') G.navTo = function(){ G.famApplyVax(); return nt.apply(this, arguments); };
+    var pa = G.proceedToApp;
+    if (typeof pa === 'function') G.proceedToApp = function(){ G.famApplyVax(); return pa.apply(this, arguments); };
+  })();
+  G.famApplyVax();
+
+  /* ---------- the one-screen setup ---------- */
+  var land = { arrived: false, region: null, more: false };
+  function el(id){ return document.getElementById(id); }
+  function chips(){
+    var h = '';
+    ORDER.forEach(function(k){
+      var r = REGIONS[k], on = land.region === k;
+      h += '<button type="button" class="gender-btn' + (on ? ' selected' : '') + '" onclick="famLandRegion(\'' + k + '\')" style="padding:8px 4px"><div>' + r.flag + '</div>' + r.name + '</button>';
+    });
+    return h;
+  }
+  function paintLand(){
+    var r = REGIONS[land.region];
+    var line = el('l-region-line'); if (line) line.innerHTML = '<span>📍 ' + r.flag + ' ' + r.name + ' · ' + (({ ID: 'Kemenkes', US: 'CDC', UK: 'NHS', AU: 'NIP', WHO: 'WHO' })[r.key]) + ' vaccine schedule' + '</span><button type="button" onclick="famLandMore(\'r\')" style="background:none;border:none;color:#fff;text-decoration:underline;font-size:13px;cursor:pointer;font-family:var(--font)">Change</button>';
+    var c = el('l-region-chips'); if (c) { c.innerHTML = chips(); c.style.display = land.showRegion ? 'grid' : 'none'; }
+    var a = el('l-arr-0'), b = el('l-arr-1'); if (a) a.classList.toggle('selected', !land.arrived); if (b) b.classList.toggle('selected', land.arrived);
+    var lbl = el('l-date-lbl'); if (lbl) lbl.textContent = land.arrived ? 'Birth date' : 'Due date';
+    var e = el('l-edd'), d = el('l-dob'); if (e) e.style.display = land.arrived ? 'none' : ''; if (d) d.style.display = land.arrived ? '' : 'none';
+  }
+  G.famLandInit = function(){
+    land.region = land.region || detect(); land.arrived = false; land.showRegion = false;
+    try { if (typeof renderLandingBabyFields === 'function') renderLandingBabyFields(); } catch(e){}
+    var e = el('l-edd'), d = el('l-dob'); if (e) e.value = ''; if (d) d.value = '';
+    paintLand();
+  };
+  G.famLandRegion = function(k){ if (REGIONS[k]) { land.region = k; land.showRegion = false; paintLand(); } };
+  G.famLandMore = function(w){ if (w === 'r') { land.showRegion = !land.showRegion; paintLand(); } };
+  G.famLandArrived = function(v){ land.arrived = !!v; paintLand(); };
+  G.famPre = function(){
+    var s = st(); if (!s) return;
+    G.famApplyRegion(land.region || detect());
+  };
+  (function(){
+    var sh = G.showLandingStep;
+    if (typeof sh === 'function') G.showLandingStep = function(n){ var r = sh.call(this, n === 3 ? 2 : n); if (n === 2) G.famLandInit(); return r; };
+  })();
+})();
+
+/* v62: Bilingual page for families who are not Indonesian + English.
+   The original rich page stays for the Indonesian + English pair and for families set up before v62. */
+(function(){
+  var G = window;
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var LANGS = ['English', 'Indonesian', 'Spanish', 'French', 'German', 'Portuguese', 'Italian', 'Dutch', 'Mandarin', 'Cantonese', 'Hindi', 'Arabic', 'Japanese', 'Korean', 'Tagalog', 'Vietnamese', 'Turkish', 'Russian'];
+  var orig = (typeof PAGES !== 'undefined') ? PAGES['bilingual'] : null;
+  if (!orig) return;
+
+  function picker(a, b){
+    return '<div class="card"><div class="card-title">Languages at home</div>' +
+      '<div class="ref-body" style="margin-bottom:10px">Tell us which languages your baby hears. The plan below adapts to them.</div>' +
+      '<div class="form-field"><label for="bil-a">Main language (the one used around you)</label><input type="text" id="bil-a" list="bil-dl" value="' + esc(a || '') + '" placeholder="e.g. English"></div>' +
+      '<div class="form-field"><label for="bil-b">Second language</label><input type="text" id="bil-b" list="bil-dl" value="' + esc(b || '') + '" placeholder="e.g. Spanish"></div>' +
+      '<datalist id="bil-dl">' + LANGS.map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+      '<button type="button" class="btn btn-teal btn-block" onclick="bilSave()">' + (b ? 'Update languages' : 'Build my plan') + '</button></div>';
+  }
+  function row(t, d){ return '<div class="ref-divider" style="padding:10px 0"><div class="ref-rule">' + t + '</div><div class="ref-body">' + d + '</div></div>'; }
+
+  function draw(el){
+    var L = G.famEffLangs(), a = L[0] || '', b = L[1] || '';
+    var A = esc(a), B = esc(b);
+    var h = '<div class="page-header"><h2>🌏 Bilingual Development Plan</h2><p>' + (b ? A + ' and ' + B + ' · One parent, one language' : 'Raising more than one language?') + '</p></div>';
+    if (!b) {
+      h += picker(a, '');
+      h += '<div class="card"><div class="ref-body">Add a second language and this page turns into a simple plan: who speaks what, how much of each language your baby needs to hear, and how to keep the smaller language alive. Children can learn two languages without delay. Mixing them is normal.</div></div>';
+      el.innerHTML = h; return;
+    }
+    h += '<div class="card" style="background:#E1F5EE;border:1px solid #9FE1CB"><div class="card-title" style="color:#085041">Recommended: one parent, one language, plus time and place</div>' +
+      '<div class="ref-body" style="color:#0B3D32">Each parent sticks to one language with the baby. Add a regular time or place for the language that gets less exposure, such as bath time, bedtime stories or weekends.</div></div>';
+    h += '<div class="card"><div class="card-title">Why this works</div>' +
+      row('Clear and predictable', 'Your baby learns who speaks which language, which makes both easier to pick up.') +
+      row(A + ' is usually the community language', 'Daycare, school, friends and media keep it going. It rarely needs protecting.') +
+      row(B + ' needs deliberate, daily exposure', 'Without it, the community language tends to take over. Plan it in rather than hoping it happens.') +
+      row('Mixing is normal', 'Bilingual children blend languages while they learn. It is not a sign of confusion or delay.') + '</div>';
+    h += '<div class="card"><div class="card-title">How much of each</div>' +
+      row('At least a fifth to a third of waking hours', 'Aim for this much exposure in ' + B + ' for functional bilingualism.') +
+      row('A good target: about 40% in ' + B, 'Spread across people, books, songs and play, not only one source.') +
+      row('Below about 20%', A + ' will usually dominate. Add time, people or media in ' + B + '.') + '</div>';
+    h += '<div class="card"><div class="card-title">In practice</div>' +
+      row('One parent speaks ' + B, 'All interaction, play and reading in ' + B + '. The other parent speaks ' + A + '.') +
+      row('Read daily in both languages', 'Use the Reading log to see how many minutes each language gets each week.') +
+      row('Name feelings in both languages', 'It builds emotional vocabulary and connects the languages to warmth.') +
+      row('Keep going through the toddler years', 'Many children answer in the community language. Keep replying in yours without correcting.') + '</div>';
+    h += picker(a, b);
+    el.innerHTML = h;
+  }
+
+  PAGES['bilingual'] = function(el){
+    if (G.famIsIDEN()) return orig(el);
+    draw(el);
+  };
+  G.bilSave = function(){
+    var a = String((document.getElementById('bil-a') || {}).value || '').trim(), b = String((document.getElementById('bil-b') || {}).value || '').trim();
+    if (!a) { try { toast('Add at least your main language'); } catch(e){} return; }
+    if (b && a.toLowerCase() === b.toLowerCase()) b = '';
+    state.langs = b ? [a, b] : [a];
+    try { saveState('langs'); } catch(e){}
+    try { navTo('bilingual'); } catch(e){}
+  };
 })();
 
 /* BabyOS v54 hero pictures drawn from live logs. Presentation only: reads state, never writes it. */
@@ -19700,7 +20155,7 @@ var IDEAS = {
   knowledge: ['Quick answer', ['Look it up fast.|Feeding, sleep and safety answers in one place.', 'Not sure?|Check here first, then ask your paediatrician.']]
 };
 H.guide = function(id){
-  var o = IDEAS[id] || IDEAS.rie, list = o[1], doy = Math.floor((nowD() - new Date(nowD().getFullYear(), 0, 0)) / DAY), p = list[doy % list.length].split('|'), W = 354;
+  var o = IDEAS[id] || IDEAS.rie, list = o[1], doy = Math.floor((nowD() - new Date(nowD().getFullYear(), 0, 0)) / DAY), p = list[doy % list.length].replace(/Daka/g, (typeof babyName === 'function' && babyName()) || 'your baby').split('|'), W = 354;
   var blend = null, hd = 'One idea a day', sb = 'Parenting, in small cards';
   if (id === 'philosophy' && window.STY57){
     var pk = window.STY57.picks();
@@ -19753,10 +20208,10 @@ H.collection = function(id){
     return stickers(si, 9, 10, 'Stage ' + (si + 1) + ' of 9', 'Language, stage by stage');
   }
   // bilingual: two speech bubbles
-  var W = 354, g = '<g transform="rotate(-4 110 90)"><path d="M40 28 H170 a22 22 0 0 1 22 22 V92 a22 22 0 0 1 -22 22 H92 L66 142 V114 H40 a22 22 0 0 1 -22 -22 V50 a22 22 0 0 1 22 -22Z" fill="#FF9C86" class="o" stroke-width="4"/></g>' + tx(104, 90, 'ID', 40, { c: 'n', f: '#3A1308' });
-  g += '<g transform="rotate(4 250 100)"><path d="M184 44 H314 a22 22 0 0 1 22 22 V108 a22 22 0 0 1 -22 22 H288 V158 L262 130 H184 a22 22 0 0 1 -22 -22 V66 a22 22 0 0 1 22 -22Z" fill="#FFD166" class="o" stroke-width="4"/></g>' + tx(250, 106, 'EN', 40, { c: 'n', f: '#3A2E00' });
+  var W = 354, g = '<g transform="rotate(-4 110 90)"><path d="M40 28 H170 a22 22 0 0 1 22 22 V92 a22 22 0 0 1 -22 22 H92 L66 142 V114 H40 a22 22 0 0 1 -22 -22 V50 a22 22 0 0 1 22 -22Z" fill="#FF9C86" class="o" stroke-width="4"/></g>' + tx(104, 90, (window.famLangCode ? window.famLangCode(0, 'ID') : 'ID'), 40, { c: 'n', f: '#3A1308' });
+  g += '<g transform="rotate(4 250 100)"><path d="M184 44 H314 a22 22 0 0 1 22 22 V108 a22 22 0 0 1 -22 22 H288 V158 L262 130 H184 a22 22 0 0 1 -22 -22 V66 a22 22 0 0 1 22 -22Z" fill="#FFD166" class="o" stroke-width="4"/></g>' + tx(250, 106, (window.famLangCode ? window.famLangCode(1, 'EN') : 'EN'), 40, { c: 'n', f: '#3A2E00' });
   g += sparkle(330, 24, 8) + sparkle(24, 150, 6);
-  return '<div class="h53-col">' + head('Two languages, one home') + svg(W, 170, g, 'Indonesian and English') + '</div>';
+  var two = !window.famEffLangs || window.famEffLangs().length > 1; return '<div class="h53-col">' + head(two ? 'Two languages, one home' : 'Words, one at a time') + svg(W, 170, g, two && window.famEffLangs ? window.famEffLangs().join(' and ') : 'Indonesian and English') + '</div>';
 };
 
 /* ---------- v55: the rest of the app ---------- */
@@ -19878,8 +20333,8 @@ H.reading = function(){
   g += '<circle cx="104" cy="92" r="' + R + '" fill="none" stroke="var(--dink)" stroke-opacity=".22" stroke-width="20"/>';
   if (f > 0) g += '<circle cx="104" cy="92" r="' + R + '" fill="none" stroke="var(--dink)" stroke-width="20" stroke-linecap="round" stroke-dasharray="' + (f * C).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 104 92)"/>';
   g += tx(104, 98, String(d.mins), 46, { c: 'n' }) + tx(104, 120, 'of ' + d.target + ' min', 13.5);
-  var rows = [['Indonesian', 'Indonesian'], ['English', 'English'], ['Both', 'Both languages']];
-  rows.forEach(function(r, i){ var y = 40 + i * 44; g += '<rect x="196" y="' + y + '" width="156" height="36" rx="18" fill="var(--dink)" fill-opacity=".14"/><circle cx="216" cy="' + (y + 18) + '" r="8" fill="' + LCOL[r[0]] + '" class="o" stroke-width="2.5"/>' + tx(232, y + 23, d.wk[r[0]] + ' min', 15, { a: 'start', c: 'n' }) + tx(344, y + 23, r[0] === 'Both' ? 'both' : r[0] === 'English' ? 'EN' : 'ID', 12.5, { a: 'end', o: .8 }); });
+  var rows = [['Indonesian', (window.LL ? LL('Indonesian', 'Indonesian') : 'Indonesian')], ['English', (window.LL ? LL('English', 'English') : 'English')], ['Both', (window.LL ? LL('Both', 'Both languages') : 'Both languages')]].filter(function(r){ return r[1] !== ''; });
+  rows.forEach(function(r, i){ var y = 40 + i * 44; g += '<rect x="196" y="' + y + '" width="156" height="36" rx="18" fill="var(--dink)" fill-opacity=".14"/><circle cx="216" cy="' + (y + 18) + '" r="8" fill="' + LCOL[r[0]] + '" class="o" stroke-width="2.5"/>' + tx(232, y + 23, d.wk[r[0]] + ' min', 15, { a: 'start', c: 'n' }) + tx(344, y + 23, r[0] === 'Both' ? 'both' : (window.famLangCode ? window.famLangCode(r[0] === 'English' ? 1 : 0, r[0] === 'English' ? 'EN' : 'ID') : (r[0] === 'English' ? 'EN' : 'ID')), 12.5, { a: 'end', o: .8 }); });
   g += tx(196, 28, 'This week', 13.5, { a: 'start', o: .85 }) + sparkle(24, 24, 7) + sparkle(340, 168, 6, '#FFD166');
   var st = d.mins >= d.target ? 'Story time done' : d.mins > 0 ? (d.target - d.mins) + ' min to go' : 'Read together today';
   var sub = 'Aim for ' + d.target + ' min a day, in either language';
@@ -20266,7 +20721,7 @@ B.guide = function(id){
   var chips = ['rie', 'montessori', 'situations', 'watchfor', 'philosophy', 'knowledge'].filter(function(k){ return k === id || guPicked(k); }).map(function(k){ return '<button type="button" class="b54-chip' + (k === id ? ' on' : '') + '" data-b54="nav|' + k + '">' + esc(GU[k]) + '</button>'; }).join('');
   var doy = Math.floor((nowD() - new Date(nowD().getFullYear(), 0, 0)) / DAY), rd = [];
   for (var i = 0; i < READ.length * 2 && rd.length < 2; i++){ var r = READ[(doy + i) % READ.length]; if (r[3] !== id && guPicked(r[3])) rd.push(r); }
-  var rows = rd.map(function(r){ return R(ic('bulb', 20), r[0].replace('Daka', nm()), r[1], r[2], 'nav|' + r[3]); }).join('');
+  var rows = rd.map(function(r){ return R(ic('bulb', 20), r[0].replace('Daka', (typeof babyName === 'function' && babyName()) || 'your baby'), r[1], r[2], 'nav|' + r[3]); }).join('');
   var big = '<div class="b54-tiles b54-3big">' + [
     { c: 'lilac', ic: 'bulb', label: 'Daily idea', act: 'guideTop' }, { c: 'yellow', ic: 'chat', label: 'Ask Hoot', act: 'hoot' }, { c: 'lilacD', ic: 'note', label: 'Notes', act: 'nav|notes' }
   ].map(function(o){ return '<button type="button" class="b54-t b54-w b54-c-' + o.c + '" data-b54="' + o.act + '"><span class="b54-wi">' + ic(o.ic, 20) + '</span><b>' + esc(o.label) + '</b></button>'; }).join('') + '</div>';
@@ -20860,8 +21315,8 @@ B.reading = function(){
     if (!tot[i]) seg = '<span class="b54-blk b54-ghost" style="height:8px"></span>';
     return '<div class="b54-dc' + (isT ? ' on' : '') + '"><div class="b54-stack" style="min-height:96px;justify-content:flex-start">' + seg + '</div><span>' + (isT ? 'Today' : wdOf(days[i])) + '</span></div>'; }).join('') + '</div>';
   var recent = lg('readingLog').filter(function(l){ return l && l.date; }).slice().sort(function(a, b){ return a.date < b.date ? 1 : -1; }).slice(0, 3);
-  var rows = recent.map(function(l){ var d = dayNum(toDay(), l.date); return R(ic('book', 20), clip(l.book || 'Reading session', 32), (parseInt(l.minutes) || 0) + ' min' + (l.lang ? ', ' + l.lang : ''), d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : d + ' days ago', 'readGo'); }).join('');
-  return tiles([{ c: 'coral', ic: 'book', label: 'Indonesian', act: 'readLog|Indonesian' }, { c: 'sky', ic: 'book', label: 'English', act: 'readLog|English' }, { c: 'lav', ic: 'book', label: 'Both', act: 'readLog|Both' }]) +
+  var rows = recent.map(function(l){ var d = dayNum(toDay(), l.date); return R(ic('book', 20), clip(l.book || 'Reading session', 32), (parseInt(l.minutes) || 0) + ' min' + (l.lang ? ', ' + LL(l.lang, l.lang) : ''), d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : d + ' days ago', 'readGo'); }).join('');
+  return tiles([{ c: 'coral', ic: 'book', label: LL('Indonesian', 'Indonesian'), act: 'readLog|Indonesian' }, { c: 'sky', ic: 'book', label: LL('English', 'English'), act: 'readLog|English' }, { c: 'lav', ic: 'book', label: LL('Both', 'Both'), act: 'readLog|Both' }].filter(function(t){ return t.label !== ''; })) +
     SH('Last 7 days', avg ? 'about ' + avg + ' min a day' : '') + chart + SH('Recent reads', '') + (rows || empty('Log the first story time'));
 };
 CFG.reading = { more: 'Log with a book, trends and tips' };
@@ -20885,6 +21340,7 @@ B.settings = function(){
     R(ic('share', 20), 'Family code', 'Tap to copy and share', code || 'Not set', 'setCopy') +
     R(ic('moon', 20), 'Theme', pref === 'auto' ? 'Dark from 7pm to 6am' : pref === 'on' ? 'Always night' : 'Always day', pref === 'auto' ? 'Auto' : pref === 'on' ? 'Night' : 'Day', 'setGo|Preferences') +
     R(ic('coin', 20), 'Currency', 'Used for every price in the app', (window.moneyCfg().code === 'CUSTOM' ? window.moneyCfg().sym : window.moneyCfg().code), 'curSet') +
+    R(ic('chat', 20), 'Region and language', 'Vaccines, documents, dates', (window.famRegion && window.famRegion() ? window.famRegion().name : 'Indonesia'), 'regSet') +
     R(ic('ruler', 20), 'Weight unit', 'Used across growth and feeding', unit, 'setGo|Preferences') +
     R(ic('cal', 20), 'Backup', bk ? 'Last saved ' + bk : 'Save a copy to your device', bk ? 'Done' : 'Not yet', 'setGo|Your data');
 };
@@ -21351,6 +21807,43 @@ ACT.gdel = function(){
 document.addEventListener('input', function(e){ var t = e.target; if (t && (t.id === 'b54-x-gcm' || t.id === 'b54-x-gdate')) gPrev(); });
 document.addEventListener('change', function(e){ var t = e.target; if (t && t.id === 'b54-x-gdate') gPrev(); });
 document.addEventListener('keydown', function(e){ var t = e.target; if (e.key === 'Enter' && t && t.id === 'b54-x-gcm' && GX){ e.preventDefault(); ACT.gsave(); } });
+
+/* v62: Settings > Region and language. Lives inside the body module so it can use the same sheets and chips. */
+ACT.regSet = function(){
+  var old = document.getElementById('b54-x'); if (old) old.remove();
+  var cur = state.region && window.REGIONS[state.region] ? state.region : 'ID';
+  var L = window.famEffLangs();
+  var list = ['ID', 'US', 'UK', 'AU', 'WHO'].map(function(k){ return [k, window.REGIONS[k].name, '', window.REGIONS[k].flag + ' ']; });
+  var h = '<div class="sheet b54-xs" role="dialog" aria-modal="true" aria-label="Region and language"><div class="sheet-handle"></div><div class="sheet-title">Region and language</div>';
+  h += '<div class="b54-hint" style="margin-top:-4px">The region sets the vaccine schedule, document lists, date format and emergency number. Nothing you have logged is changed.</div>';
+  h += '<div class="b54-lb">Region</div><div class="b54-xc" id="b54-reg-chips" style="margin-bottom:12px">' + chipSet(list, cur, 'regPick') + '</div>';
+  h += '<div class="form-field"><label for="b54-lang-a">Main language at home</label><input type="text" id="b54-lang-a" list="b54-lang-dl" value="' + esc(L[0] || '') + '" placeholder="e.g. English"></div>';
+  h += '<div class="form-field"><label for="b54-lang-b">Second language (optional)</label><input type="text" id="b54-lang-b" list="b54-lang-dl" value="' + esc(L[1] || '') + '" placeholder="Leave empty if just one"></div>';
+  h += '<datalist id="b54-lang-dl">' + ['English', 'Indonesian', 'Spanish', 'French', 'German', 'Portuguese', 'Italian', 'Dutch', 'Mandarin', 'Cantonese', 'Hindi', 'Arabic', 'Japanese', 'Korean', 'Tagalog', 'Vietnamese', 'Turkish', 'Russian'].map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>';
+  h += '<div class="b54-xb"><button type="button" class="btn btn-outline" data-b54="xClose">Cancel</button><button type="button" class="btn btn-teal" data-b54="regOk">Save</button></div></div>';
+  var ov = document.createElement('div'); ov.id = 'b54-x'; ov.className = 'sheet-ov'; ov.innerHTML = h; document.body.appendChild(ov); X = { mode: 'reg', reg: cur };
+  ov.addEventListener('click', function(e){ if (e.target === ov) ov.remove(); });
+  requestAnimationFrame(function(){ ov.classList.add('show'); });
+};
+ACT.regPick = function(k){
+  if (!X || X.mode !== 'reg' || !window.REGIONS[k]) return; X.reg = k;
+  var c = document.getElementById('b54-reg-chips');
+  if (c) c.innerHTML = chipSet(['ID', 'US', 'UK', 'AU', 'WHO'].map(function(x){ return [x, window.REGIONS[x].name, '', window.REGIONS[x].flag + ' ']; }), k, 'regPick');
+};
+ACT.regOk = function(){
+  var ov = document.getElementById('b54-x'); if (!ov || !X || X.mode !== 'reg') return;
+  var a = String((document.getElementById('b54-lang-a') || {}).value || '').trim(), b = String((document.getElementById('b54-lang-b') || {}).value || '').trim();
+  if (b && a && a.toLowerCase() === b.toLowerCase()) b = '';
+  var key = X.reg, vs = state.vaccines || {};
+  var logged = Object.keys(vs).some(function(i){ return vs[i] && (vs[i].given || vs[i].dueDate); }) || (state.customVaccines || []).length > 0;
+  var nextVax = window.REGIONS[key].vax, curVax = state.vaxPreset || 'ID', keep = logged && nextVax !== curVax;
+  window.famApplyRegion(key, { keepVax: keep });
+  if (a) state.langs = b ? [a, b] : [a];
+  persist(['region', 'vaxPreset', 'vaxList', 'currencyCfg', 'langs'], false);
+  ov.remove(); X = null;
+  ft()(keep ? 'Saved. The vaccine schedule stays as is because vaccines are already logged.' : 'Region and language saved');
+  refreshBody(); try { if (typeof navTo === 'function') navTo(pageId()); } catch(e){}
+};
 
 /* ================= v57: Hoot knows which page it was opened from ================= */
 function ageMo(){ if (!state.babyDOB) return null; return Math.max(0, (nowD() - new Date(state.babyDOB + 'T00:00:00')) / (DAY * 30.4375)); }
