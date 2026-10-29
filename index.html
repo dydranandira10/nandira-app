@@ -20523,6 +20523,7 @@ B.diaper = function(){
     return '<div class="b54-dc' + (isT ? ' on' : '') + '"><div class="b54-stack" style="min-height:84px">' + b + '</div><span>' + (isT ? 'Today' : wdOf(c.ds)) + '</span></div>';
   }).join('');
   return tiles([{ c: 'sky', ic: 'drop', label: 'Wet', act: 'diaper|wet' }, { c: 'tan', ic: 'bag', label: 'Dirty', act: 'diaper|dirty' }, { c: 'yellow', ic: 'drop', label: 'Both', act: 'diaper|both' }]) +
+    '<div style="margin-top:16px">' + R(ic('plus', 20), 'Log a diaper', 'Choose the date and time', '', 'diaperPast') + '</div>' +
     SH('Last 7 days', avg ? 'about ' + (Math.round(avg * 10) / 10) + ' a day' : '') + '<div class="b54-days">' + chart + '</div>';
 };
 CFG.diaper = { more: 'All details, charts and history' };
@@ -21843,6 +21844,54 @@ ACT.regOk = function(){
   ov.remove(); X = null;
   ft()(keep ? 'Saved. The vaccine schedule stays as is because vaccines are already logged.' : 'Region and language saved');
   refreshBody(); try { if (typeof navTo === 'function') navTo(pageId()); } catch(e){}
+};
+
+/* v63: Log a diaper change that already happened. Inlined into the body module (uses its sheets, chips and helpers). */
+function dpBabies(){
+  var n = Math.max(1, +(state.numberOfBabies || 1)), a = [];
+  for (var i = 0; i < n; i++) a.push([String(i), (typeof babyLabel === 'function' ? babyLabel(i) : 'Baby ' + (i + 1)), '#FFD98A']);
+  return a;
+}
+function dpTypes(){ return [['wet', 'Wet', '#8FD3FF'], ['dirty', 'Dirty', '#E8B877'], ['both', 'Both', '#FFD98A']]; }
+ACT.diaperPast = function(){
+  var old = document.getElementById('b54-x'); if (old) old.remove();
+  var now = nowD(), need = pickNeeded();
+  X = { mode: 'dp', type: 'wet', baby: need ? null : babyIdx() };
+  var h = '<div class="sheet b54-xs" role="dialog" aria-modal="true" aria-label="Log a diaper"><div class="sheet-handle"></div><div class="sheet-title">Log a diaper</div>';
+  h += '<div style="display:flex;gap:10px;margin-top:2px"><div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-dp-date">Date</label><input type="date" id="b54-dp-date" max="' + toDay() + '" value="' + toDay() + '"></div>' +
+    '<div class="form-field" style="width:142px;margin:0"><label for="b54-dp-time">Time</label><input type="time" id="b54-dp-time" value="' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + '"></div></div>';
+  h += '<div class="b54-lb">What was it?</div><div class="b54-xc" id="b54-dp-type">' + chipSet(dpTypes(), 'wet', 'dpType') + '</div>';
+  if (need) h += '<div class="b54-lb">Which baby?</div><div class="b54-xc" id="b54-dp-baby">' + chipSet(dpBabies(), '', 'dpBaby') + '</div>';
+  var cols = ['Mustard Yellow', 'Black/Tarry (Meconium)', 'Dark Green (Transitional)', 'Green Frothy', 'Orange/Red', 'White/Grey', 'Blood-tinged', 'N/A'];
+  h += '<div class="form-field" style="margin-top:12px"><label for="b54-dp-color">Stool colour (if dirty)</label><select id="b54-dp-color">' + cols.map(function(c){ return '<option>' + esc(c) + '</option>'; }).join('') + '</select></div>';
+  h += '<div class="form-field"><label for="b54-dp-notes">Notes</label><input type="text" id="b54-dp-notes" placeholder="Observations..."></div>';
+  h += '<div class="b54-xb"><button type="button" class="btn btn-outline" data-b54="xClose">Cancel</button><button type="button" class="btn btn-teal" data-b54="dpOk">Save</button></div></div>';
+  var ov = document.createElement('div'); ov.id = 'b54-x'; ov.className = 'sheet-ov'; ov.innerHTML = h; document.body.appendChild(ov);
+  ov.addEventListener('click', function(e){ if (e.target === ov) { ov.remove(); X = null; } });
+  requestAnimationFrame(function(){ ov.classList.add('show'); });
+};
+ACT.dpType = function(k){
+  if (!X || X.mode !== 'dp') return; X.type = k;
+  var c = document.getElementById('b54-dp-type'); if (c) c.innerHTML = chipSet(dpTypes(), k, 'dpType');
+};
+ACT.dpBaby = function(k){
+  if (!X || X.mode !== 'dp') return; X.baby = parseInt(k, 10) || 0;
+  var c = document.getElementById('b54-dp-baby'); if (c) c.innerHTML = chipSet(dpBabies(), String(X.baby), 'dpBaby');
+};
+ACT.dpOk = function(){
+  var ov = document.getElementById('b54-x'); if (!ov || !X || X.mode !== 'dp') return;
+  var date = String((document.getElementById('b54-dp-date') || {}).value || ''), time = String((document.getElementById('b54-dp-time') || {}).value || '');
+  if (!date || !/^\d{1,2}:\d{2}/.test(time)) { ft()('Pick the date and time'); return; }
+  if (X.baby == null) { ft()('Pick a baby'); return; }
+  if (mk(date, time).getTime() > nowD().getTime() + 120000) { ft()('That time is in the future'); return; }
+  var t = X.type, dirty = t === 'dirty' || t === 'both', bi = X.baby;
+  if (!Array.isArray(state.diaperLog)) state.diaperLog = [];
+  state.diaperLog.push({ date: date, time: time.padStart(5, '0'), wet: t === 'wet' || t === 'both', dirty: dirty, color: dirty ? (String((document.getElementById('b54-dp-color') || {}).value || '') || 'N/A') : 'N/A', notes: String((document.getElementById('b54-dp-notes') || {}).value || '').trim(), babyIdx: bi });
+  persist(['diaperLog'], false);
+  ov.remove(); X = null;
+  ft()((multi() ? (typeof babyLabel === 'function' ? babyLabel(bi) + ': ' : '') : '') + (t === 'wet' ? 'Wet' : t === 'dirty' ? 'Dirty' : 'Both') + ' logged for ' + (date === toDay() ? '' : dd(date) + ' ') + t12s(time));
+  try { if (typeof render === 'function') render(); } catch(e){}
+  refreshBody();
 };
 
 /* ================= v57: Hoot knows which page it was opened from ================= */
