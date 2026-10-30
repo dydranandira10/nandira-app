@@ -21894,6 +21894,79 @@ ACT.dpOk = function(){
   refreshBody();
 };
 
+/* v65: feed review without the "All details" fold. After Stop, the review card is scrolled into view, and
+   "Edit details" opens a sheet (date, times, type, amount, notes) that fills the original form and saves through addFeed(). */
+function feTypes(){ return [['left', 'Left breast', '#8FD3FF'], ['right', 'Right breast', '#FFB3C7'], ['stored', 'Stored milk', '#FFD98A'], ['formula', 'Formula', '#FFD98A']]; }
+function feBabies(){
+  var n = Math.max(1, +(state.numberOfBabies || 1)), a = [];
+  for (var i = 0; i < n; i++) a.push([String(i), (typeof babyLabel === 'function' ? babyLabel(i) : 'Baby ' + (i + 1)), '#FFD98A']);
+  return a;
+}
+function feAmt(){
+  var w = document.getElementById('b54-fe-amt'), t = X && X.mode === 'fe' ? X.type : '';
+  if (!w) return;
+  var on = t === 'stored' || t === 'formula';
+  w.style.display = on ? 'block' : 'none';
+  var l = document.getElementById('b54-fe-amtl'); if (l) l.textContent = t === 'stored' ? 'Stored milk (ml)' : 'Formula (ml)';
+}
+ACT.feedEdit = function(){
+  var old = document.getElementById('b54-x'); if (old) old.remove();
+  var g = function(id){ return document.getElementById(id); }, p = window._pendingTimedFeed || {};
+  var date = (g('f-date') && g('f-date').value) || toDay(), st = p.start || (g('f-time') && g('f-time').value) || '', en = p.end || (g('f-endtime') && g('f-endtime').value) || '';
+  var type = p.side || (g('f-ftype') && g('f-ftype').value) || '', notes = p.notes || (g('f-notes') && g('f-notes').value) || '', amt = (g('f-amount') && g('f-amount').value) || '';
+  var need = pickNeeded();
+  X = { mode: 'fe', type: type, baby: need ? null : babyIdx() };
+  var h = '<div class="sheet b54-xs" role="dialog" aria-modal="true" aria-label="Feed details"><div class="sheet-handle"></div><div class="sheet-title">Feed details</div>';
+  h += '<div style="display:flex;gap:10px"><div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-fe-date">Date</label><input type="date" id="b54-fe-date" max="' + toDay() + '" value="' + esc(date) + '"></div></div>';
+  h += '<div style="display:flex;gap:10px;margin-top:10px"><div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-fe-st">Start</label><input type="time" id="b54-fe-st" value="' + esc(st) + '"></div>' +
+    '<div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-fe-en">End</label><input type="time" id="b54-fe-en" value="' + esc(en) + '"></div></div>';
+  if (need) h += '<div class="b54-lb">Which baby?</div><div class="b54-xc" id="b54-fe-baby">' + chipSet(feBabies(), '', 'feBaby') + '</div>';
+  h += '<div class="b54-lb">Feed type</div><div class="b54-xc" id="b54-fe-type">' + chipSet(feTypes(), type, 'feType') + '</div>';
+  h += '<div class="form-field" id="b54-fe-amt" style="display:none;margin-top:12px"><label for="b54-fe-amtv" id="b54-fe-amtl">Amount (ml)</label><input type="number" inputmode="numeric" min="0" id="b54-fe-amtv" placeholder="e.g. 60" value="' + esc(amt) + '"></div>';
+  h += '<div class="form-field" style="margin-top:12px"><label for="b54-fe-notes">Notes (optional)</label><input type="text" id="b54-fe-notes" placeholder="Latch quality, mood, side started..." value="' + esc(notes) + '"></div>';
+  h += '<div class="b54-xb"><button type="button" class="btn btn-outline" data-b54="xClose">Cancel</button><button type="button" class="btn btn-teal" data-b54="feOk">Save feed</button></div></div>';
+  var ov = document.createElement('div'); ov.id = 'b54-x'; ov.className = 'sheet-ov'; ov.innerHTML = h; document.body.appendChild(ov);
+  ov.addEventListener('click', function(e){ if (e.target === ov) { ov.remove(); X = null; } });
+  feAmt();
+  requestAnimationFrame(function(){ ov.classList.add('show'); });
+};
+ACT.feType = function(k){
+  if (!X || X.mode !== 'fe') return; X.type = k;
+  var c = document.getElementById('b54-fe-type'); if (c) c.innerHTML = chipSet(feTypes(), k, 'feType');
+  feAmt();
+};
+ACT.feBaby = function(k){
+  if (!X || X.mode !== 'fe') return; X.baby = parseInt(k, 10) || 0;
+  var c = document.getElementById('b54-fe-baby'); if (c) c.innerHTML = chipSet(feBabies(), String(X.baby), 'feBaby');
+};
+ACT.feOk = function(){
+  var ov = document.getElementById('b54-x'); if (!ov || !X || X.mode !== 'fe') return;
+  var v = function(id){ return String((document.getElementById(id) || {}).value || '').trim(); }, set = function(id, val){ var e = document.getElementById(id); if (e) e.value = val; };
+  var t = X.type, amt = parseInt(v('b54-fe-amtv'), 10) || 0;
+  if (!t) { ft()('Pick a feed type'); return; }
+  if (X.baby == null) { ft()('Pick a baby'); return; }
+  if ((t === 'stored' || t === 'formula') && !(amt > 0)) { ft()('Enter the amount in ml'); return; }
+  if (!v('b54-fe-date') || !v('b54-fe-st')) { ft()('Pick the date and start time'); return; }
+  ensureHidden(['ff-baby']);
+  set('f-date', v('b54-fe-date')); set('f-time', v('b54-fe-st')); set('f-endtime', v('b54-fe-en')); set('f-notes', v('b54-fe-notes')); set('ff-baby', String(X.baby));
+  try { window._restoringTimedFeed = true; if (typeof selectFeedType === 'function') selectFeedType(t); } catch(e){} window._restoringTimedFeed = false;
+  set('f-ftype', t); set('f-amount', (t === 'stored' || t === 'formula') ? String(amt) : '');
+  var n0 = (state.feedingLog || []).length;
+  if (typeof addFeed === 'function') addFeed();
+  if ((state.feedingLog || []).length > n0) { var o = document.getElementById('b54-x'); if (o) o.remove(); X = null; refreshBody(); }
+};
+/* "Edit details" on the review card opens the sheet instead of scrolling to a form hidden under "All details" */
+document.addEventListener('click', function(e){
+  var b = e.target && e.target.closest ? e.target.closest('.feed-review-dismiss') : null; if (!b) return;
+  e.preventDefault(); e.stopImmediatePropagation(); ACT.feedEdit();
+}, true);
+/* when the review card appears (timer stopped, here or from Today), bring it into view */
+(function(){
+  var had = false, q = 0;
+  function chk(){ q = 0; var c = document.querySelector('.feed-review-card'); if (c && !had){ try { window.scrollTo(0, 0); var sc = c.closest('.page') || document.getElementById('main-content'); if (sc && sc.scrollTop) sc.scrollTop = 0; c.scrollIntoView({ block: 'start' }); } catch(e){} } had = !!c; }
+  try { new MutationObserver(function(){ if (!q) q = requestAnimationFrame(chk); }).observe(document.body, { childList: true, subtree: true }); } catch(e){}
+})();
+
 /* ================= v57: Hoot knows which page it was opened from ================= */
 function ageMo(){ if (!state.babyDOB) return null; return Math.max(0, (nowD() - new Date(state.babyDOB + 'T00:00:00')) / (DAY * 30.4375)); }
 function ageTxt(){ var m = ageMo(); if (m == null) return 'not born yet (pregnancy)'; m = Math.floor(m); return m < 1 ? 'under 1 month old' : m < 24 ? m + ' months old' : Math.floor(m / 12) + ' years old'; }
