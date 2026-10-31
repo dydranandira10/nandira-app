@@ -17456,8 +17456,15 @@ body.night-mode #ask-ov .ask-attach,body.night-mode #ask-prev button{background:
     .then(function(j){
       if(j && j.ok && j.answer){ A.msgs.push({role:'assistant', content:clean(j.answer), via:j.via || null, why:j.why || '', model:j.model || ''}); if(j.via){ A.via = j.via; A.why = j.why || ''; A.model = j.model || ''; A.detail = j.detail || ''; } }
       else A.msgs.push({role:'assistant', err:true, content: ERR[j && j.error] || ERR.ai_error});
-    }).catch(function(){
-      A.msgs.push({role:'assistant', err:true, content:'Could not reach the assistant. Check your connection and try again.'});
+    }).catch(function(e){
+      var em = {role:'assistant', err:true, content:(e && e.name==='AbortError') ? 'The assistant took too long to answer. Try again in a moment.' : 'Could not reach the assistant. Check your connection and try again.'};
+      A.msgs.push(em);
+      try{
+        var c2 = (typeof AbortController!=='undefined') ? new AbortController() : null, t2 = setTimeout(function(){ try{ c2 && c2.abort(); }catch(x){} }, 8000);
+        fetch(base + '/', {cache:'no-store', signal: c2 ? c2.signal : undefined}).then(function(r){ return r.json(); }).then(function(j){
+          em.content += (j && j.ok) ? '\n\nCheck: the assistant server is online' + (j.askProvider ? ' (' + j.askProvider + (j.fallbackAvailable ? ', backup on' : '') + ')' : '') + ', so this one answer failed. Try again.' : '\n\nCheck: the assistant server replied with a problem.';
+        }).catch(function(){ em.content += '\n\nCheck: this phone cannot reach the assistant server right now.'; }).then(function(){ clearTimeout(t2); save(); paint(); });
+      }catch(x){}
     }).then(function(){ clearTimeout(to); A.busy=false; save(); paint(); });
   }
   // a pasted log message is read on this phone (no AI, no network) and shown as a check-then-add card
@@ -22104,6 +22111,7 @@ ACT.slOk = function(){
 /* the bottom timer bar hides itself while the page's own big timer is on screen */
 window.v66OwnVisible = function(which){
   try {
+    if (document.querySelector('#ask-ov.open,.sheet-ov.show,#b54-x,#b54-ask')) return true;   /* a chat or sheet is open: keep the bar out of its way */
     var sel = which === 'sleep' ? '[data-b54-clock="sleep"]' : '[data-b54-clock="feed"],.nfl-stop';
     var els = document.querySelectorAll(sel), H = window.innerHeight || 800;
     for (var i = 0; i < els.length; i++){ var r = els[i].getBoundingClientRect(); if (r.width && r.bottom > 70 && r.top < H - 130) return true; }
