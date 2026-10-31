@@ -18693,6 +18693,29 @@ html body .now-hero:not(.feeding-live) .d-count{display:flex !important;flex-dir
 html body .now-hero:not(.feeding-live) .d-count .d-times{order:-1;margin:0 0 10px;justify-content:center;}
 .b54-now{margin-top:22px;}
 
+/* v68: Today band */
+.b54-day{margin:2px 2px 4px;}
+.b54-dband{position:relative;height:48px;border-radius:16px;overflow:hidden;background:linear-gradient(90deg,#1B2140 0%,#2A2E55 16%,#8A6D9E 25%,#D98E7A 31%,#7FC0D6 42%,#57A88C 58%,#7FC0D6 66%,#C98A5E 76%,#4A4E82 83%,#1B2140 100%);}
+.b54-dquiet{opacity:.45;}
+.b54-day .b54-dsl{display:block;position:absolute;top:5px;bottom:5px;background:rgba(201,184,255,.62);border:1.5px solid rgba(255,255,255,.75);border-radius:9px;box-sizing:border-box;}
+.b54-dopen{background:rgba(201,184,255,.85);}
+.b54-day .b54-dd{position:absolute;display:block;width:11px;height:11px;min-height:0;max-height:none;padding:0;margin:0;flex:none;border-radius:50%;transform:translate(-50%,-50%);border:2px solid #fff;box-sizing:border-box;}
+.b54-df{background:#FF7A5C;}.b54-dd2{background:#2F9BE8;}.b54-dfo{background:#2FB872;}
+.b54-day .b54-dnow{display:block;position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;border-radius:2px;background:#FFD166;box-shadow:0 0 0 1px rgba(0,0,0,.25);}
+.b54-daxis{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;opacity:.62;margin:6px 4px 0;}
+.b54-dleg{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 4px 0;font-size:13px;font-weight:700;}
+.b54-dlg{display:inline-flex;align-items:center;gap:7px;}
+.b54-day .b54-dlg .b54-dd{position:static;transform:none;display:inline-block;}
+.b54-dlg b{opacity:.75;font-weight:800;}
+.b54-dsw{display:inline-block;width:16px;height:11px;border-radius:5px;background:rgba(201,184,255,.9);border:1.5px solid #8F7BE0;box-sizing:border-box;flex:none;}
+
+.b54-cn{font-size:12.5px;font-weight:800;color:var(--ink-3);line-height:1;min-height:14px;}
+.b54-dc.on .b54-cn{color:#E9A400;}
+body.night-mode .b54-cn{color:#A9B4CC;}body.night-mode .b54-dc.on .b54-cn{color:#FFD166;}
+.b54-sx{display:block;font-style:normal;font-size:12px;font-weight:700;opacity:.8;margin-top:2px;}
+.b54-day .b54-em{position:absolute;transform:translate(-50%,-50%);font-size:14px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.45));}
+.b54-lem{display:inline-block;font-size:15px;line-height:1;}
+
 /* v56: budget, the expense tracker */
 .b54-cur{display:block;width:100%;margin:14px 0 0;border:0;border-radius:16px;background:var(--v24t);color:var(--ink);font:inherit;font-size:14px;font-weight:600;padding:11px 14px;text-align:left;cursor:pointer;}
 .b54-cur u{text-decoration:none;font-weight:800;color:var(--dink);}
@@ -19770,6 +19793,7 @@ function sleepSegs(){
   out.sort(function(x, y){ return x.a - y.a; });
   return { segs: out, open: open, s0: s0 };
 }
+window.__sleepSegs = sleepSegs;
 H.sleep = function(){
   var r = sleepSegs(), now = nowD(), tot = 0, e0 = new Date(r.s0.getTime() + DAY);
   r.segs = r.segs.map(function(s){ return { a: s.a < r.s0 ? r.s0 : s.a, b: s.b > e0 ? e0 : s.b, type: s.type }; }).filter(function(s){ return s.b > s.a; });
@@ -20469,7 +20493,14 @@ function tiles(list){ return '<div class="b54-tiles">' + list.map(T).join('') + 
 function SH(t, m){ return '<div class="b54-sh"><span>' + esc(t) + '</span>' + (m ? '<em>' + esc(m) + '</em>' : '') + '</div>'; }
 function R(icon, title, sub, tag, act){ return '<div class="b54-r"' + (act ? ' data-b54="' + act + '" role="button" tabindex="0"' : '') + '><span class="b54-ri">' + icon + '</span><span class="b54-rt"><b>' + esc(title) + '</b><i>' + esc(sub) + '</i></span>' + (tag ? '<em>' + esc(tag) + '</em>' : '') + '</div>'; }
 function stat3(a, b, c){ return '<div class="b54-stat3">' + [a, b, c].map(function(x){ return '<div><b class="n">' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></div>'; }).join('') + '</div>'; }
-function bigTiles(list){ return '<div class="b54-tiles b54-big">' + list.map(function(x){ return '<div class="b54-t b54-c-' + x.c + ' b54-stat">' + ic(x.ic, 20) + '<b class="n">' + esc(x.v) + '</b><i>' + esc(x.l) + '</i></div>'; }).join('') + '</div>'; }
+function cn(v){ return '<b class="b54-cn n">' + (v === '' || v == null ? '&nbsp;' : esc(String(v))) + '</b>'; }
+function sleepCountTxt(){
+  var td = toDay(), n = 0, ni = 0;
+  lg('sleepLog').forEach(function(l){ if (l && l.date === td && l.start && l.end){ if (String(l.type || '').toLowerCase().indexOf('night') >= 0) ni++; else n++; } });
+  var p = []; if (n) p.push(n + (n === 1 ? ' nap' : ' naps')); if (ni) p.push(ni + (ni === 1 ? ' night sleep' : ' night sleeps'));
+  return p.join(' · ');
+}
+function bigTiles(list){ return '<div class="b54-tiles b54-big">' + list.map(function(x){ return '<div class="b54-t b54-c-' + x.c + ' b54-stat">' + ic(x.ic, 20) + '<b class="n">' + esc(x.v) + '</b><i>' + esc(x.l) + '</i>' + (x.x ? '<i class="b54-sx">' + esc(x.x) + '</i>' : '') + '</div>'; }).join('') + '</div>'; }
 function empty(t){ return '<div class="b54-empty">' + esc(t) + '</div>'; }
 
 /* ---------- shared data ---------- */
@@ -20530,7 +20561,7 @@ B.diaper = function(){
     for (k = 0; k < c.both; k++) b += '<span class="b54-blk b54-both" style="height:' + bh + 'px"></span>';
     for (k = 0; k < c.wet; k++) b += '<span class="b54-blk" style="height:' + bh + 'px;background:#8FD3FF"></span>';
     if (isT) b += '<span class="b54-blk b54-ghost" style="height:' + bh + 'px"></span>';
-    return '<div class="b54-dc' + (isT ? ' on' : '') + '"><div class="b54-stack" style="min-height:84px">' + b + '</div><span>' + (isT ? 'Today' : wdOf(c.ds)) + '</span></div>';
+    return '<div class="b54-dc' + (isT ? ' on' : '') + '">' + cn(c.n || '–') + '<div class="b54-stack" style="min-height:84px">' + b + '</div><span>' + (isT ? 'Today' : wdOf(c.ds)) + '</span></div>';
   }).join('');
   return tiles([{ c: 'sky', ic: 'drop', label: 'Wet', act: 'diaper|wet' }, { c: 'tan', ic: 'bag', label: 'Dirty', act: 'diaper|dirty' }, { c: 'yellow', ic: 'drop', label: 'Both', act: 'diaper|both' }]) +
     '<div style="margin-top:16px">' + R(ic('plus', 20), 'Log a diaper', 'Choose the date and time', '', 'diaperPast') + '</div>' +
@@ -20555,7 +20586,7 @@ B.sleep = function(){
   var mx = Math.max.apply(null, hrs.concat([8]));
   h += SH('This week', avg ? 'about ' + hmShort(avg) + ' a day' : '') + '<div class="b54-days b54-pills">' + days.map(function(ds, i){
     var v = hrs[i], isT = i === 6, hh = 30 + Math.round(v / mx * 34);
-    return '<div class="b54-dc' + (isT ? ' on' : '') + '"><div class="b54-stack"><span class="b54-pill' + (isT ? ' today' : '') + '" style="height:' + (v ? hh : 26) + 'px"></span></div><span>' + (isT ? 'Today' : wdOf(ds)) + '</span></div>';
+    return '<div class="b54-dc' + (isT ? ' on' : '') + '">' + cn(v ? (Math.round(v * 10) / 10) + 'h' : '–') + '<div class="b54-stack"><span class="b54-pill' + (isT ? ' today' : '') + '" style="height:' + (v ? hh : 26) + 'px"></span></div><span>' + (isT ? 'Today' : wdOf(ds)) + '</span></div>';
   }).join('') + '</div>';
   return h;
 };
@@ -20566,8 +20597,8 @@ B.dashboard = function(){
   var days = recentDays(7), L = lg('feedingLog'), cnt = days.map(function(ds){ return L.filter(function(l){ return l.date === ds; }).length; });
   var wk = cnt.slice(0, 6).filter(function(v){ return v > 0; }), avg = wk.length ? wk.reduce(function(a, b){ return a + b; }, 0) / wk.length : 0, mx = Math.max.apply(null, cnt.concat([4]));
   var dn = lg('diaperLog').filter(function(l){ return l.date === toDay(); }).length;
-  var bars = days.map(function(ds, i){ var isT = i === 6; return '<div class="b54-dc' + (isT ? ' on' : '') + '"><div class="b54-stack" style="min-height:96px;justify-content:flex-start"><span class="b54-bar' + (isT ? ' today' : '') + '" style="height:' + Math.max(8, Math.round(cnt[i] / mx * 88)) + 'px"></span></div><span>' + (isT ? 'Today' : wdOf(ds)) + '</span></div>'; }).join('');
-  return bigTiles([{ c: 'coral', ic: 'bottle', v: String(todayFeeds().length), l: 'Feeds today' }, { c: 'sky', ic: 'drop', v: String(dn), l: 'Diapers' }, { c: 'lav', ic: 'moon', v: hmShort(sleepToday()), l: 'Sleep today' }]) +
+  var bars = days.map(function(ds, i){ var isT = i === 6; return '<div class="b54-dc' + (isT ? ' on' : '') + '">' + cn(cnt[i] || '–') + '<div class="b54-stack" style="min-height:96px;justify-content:flex-start"><span class="b54-bar' + (isT ? ' today' : '') + '" style="height:' + Math.max(8, Math.round(cnt[i] / mx * 88)) + 'px"></span></div><span>' + (isT ? 'Today' : wdOf(ds)) + '</span></div>'; }).join('');
+  return bigTiles([{ c: 'coral', ic: 'bottle', v: String(todayFeeds().length), l: 'Feeds today' }, { c: 'sky', ic: 'drop', v: String(dn), l: 'Diapers' }, { c: 'lav', ic: 'moon', v: hmShort(sleepToday()), l: 'Sleep today', x: sleepCountTxt() }]) +
     SH('Feeds per day', avg ? 'about ' + Math.round(avg) + ' a day' : '') + '<div class="b54-days">' + bars + '</div>';
 };
 CFG.dashboard = { more: 'All details' };
@@ -20633,7 +20664,7 @@ CFG.solids = { more: 'All details, planner and history' };
 B.rhythm = function(){
   var days = recentDays(7), prev = recentDays(14).slice(0, 7), h = '', rows = '';
   var td = toDay(), fT = todayFeeds().length, dT = lg('diaperLog').filter(function(l){ return l.date === td; }).length;
-  h += bigTiles([{ c: 'coral', ic: 'bottle', v: String(fT), l: 'Feeds' }, { c: 'lav', ic: 'moon', v: hmShort(sleepToday()), l: 'Sleep' }, { c: 'sky', ic: 'drop', v: String(dT), l: 'Diapers' }]);
+  h += bigTiles([{ c: 'coral', ic: 'bottle', v: String(fT), l: 'Feeds' }, { c: 'lav', ic: 'moon', v: hmShort(sleepToday()), l: 'Sleep', x: sleepCountTxt() }, { c: 'sky', ic: 'drop', v: String(dT), l: 'Diapers' }]);
   var L = lg('sleepLog'), longest = function(ds){ return Math.max.apply(null, [0].concat(L.filter(function(l){ return ds.indexOf(l.date) >= 0; }).map(sleepH))); };
   var a = longest(days), b = longest(prev);
   if (a > 0){ var diff = Math.round((a - b) * 60); rows += R(ic('moon', 20), 'Longest sleep is ' + hmShort(a), b > 0 ? (diff === 0 ? 'Same as last week' : (diff > 0 ? 'Up ' : 'Down ') + Math.abs(diff) + ' minutes on last week') : 'First week of data', b > 0 ? (diff > 0 ? 'Better' : (diff < 0 ? 'Shorter' : 'Steady')) : 'New'); }
@@ -20919,18 +20950,41 @@ ACT.formOk = function(){
   var cb = o._fcb; if (cb(vals) !== false) o.remove();
 };
 function dayBars(cnt, mx, labels, todayIdx){
-  return '<div class="b54-days">' + cnt.map(function(v, i){ var isT = i === todayIdx; return '<div class="b54-dc' + (isT ? ' on' : '') + '"><div class="b54-stack" style="min-height:96px;justify-content:flex-start"><span class="b54-bar' + (isT ? ' today' : '') + '" style="height:' + Math.max(8, Math.round(v / mx * 88)) + 'px"></span></div><span>' + (isT ? 'Today' : labels[i]) + '</span></div>'; }).join('') + '</div>';
+  return '<div class="b54-days">' + cnt.map(function(v, i){ var isT = i === todayIdx; return '<div class="b54-dc' + (isT ? ' on' : '') + '">' + cn(v || '–') + '<div class="b54-stack" style="min-height:96px;justify-content:flex-start"><span class="b54-bar' + (isT ? ' today' : '') + '" style="height:' + Math.max(8, Math.round(v / mx * 88)) + 'px"></span></div><span>' + (isT ? 'Today' : labels[i]) + '</span></div>'; }).join('') + '</div>';
 }
 
 /* TODAY */
+/* TODAY: one 24 hour band with sleep, feeds, wet and dirty diapers and (once solids are logged) food */
+function dayBand(){
+  var td = toDay(), s0 = mk(td, '00:00'), now = nowD();
+  var pc = function(d){ return Math.max(0, Math.min(100, (d - s0) / DAY * 100)); };
+  var mins = function(t){ var m = String(t || '').match(/^(\d{1,2}):(\d{2})/); return m ? (+m[1]) * 60 + (+m[2]) : null; };
+  var onDay = function(k){ return lg(k).filter(function(l){ return l && l.date === td && mins(l.time) != null; }); };
+  var feeds = onDay('feedingLog'), dia = onDay('diaperLog'), sol = onDay('solidsLog'), solids = lg('solidsLog').length > 0;
+  var wet = dia.filter(function(l){ return l.wet || !l.dirty; }), dirty = dia.filter(function(l){ return l.dirty; });
+  var segs = (window.__sleepSegs ? window.__sleepSegs().segs : []);
+  var lanes = solids ? [18, 39, 61, 82] : [24, 50, 76], H = solids ? 76 : 60;
+  var em = function(list, ch, lane){ return list.map(function(l){ return '<span class="b54-em" style="left:' + (mins(l.time) / 1440 * 100).toFixed(2) + '%;top:' + lane + '%">' + ch + '</span>'; }).join(''); };
+  var spans = segs.map(function(s){ var a = pc(s.a), w = Math.max(1.2, pc(s.b) - a); return '<i class="b54-dsl' + (s.open ? ' b54-dopen' : '') + '" style="left:' + a.toFixed(2) + '%;width:' + w.toFixed(2) + '%"></i>'; }).join('');
+  var nothing = !segs.length && !feeds.length && !dia.length && !sol.length;
+  var sleepMs = segs.reduce(function(a, s){ return a + (s.b - s.a); }, 0), nS = segs.length;
+  var leg = function(ch, label, n){ return '<span class="b54-dlg"><span class="b54-lem">' + ch + '</span>' + label + ' <b class="n">' + n + '</b></span>'; };
+  var h = SH('Your day', '24 hours');
+  h += '<div class="b54-day" role="img" aria-label="Today around the clock: ' + feeds.length + ' feeds, ' + wet.length + ' wet and ' + dirty.length + ' dirty diapers' + (solids ? ', ' + sol.length + ' food' : '') + ', ' + hmShort(sleepMs / 3600000) + ' sleep">';
+  h += '<div class="b54-dband' + (nothing ? ' b54-dquiet' : '') + '" style="height:' + H + 'px">' + spans + em(feeds, '\ud83c\udf7c', lanes[0]) + em(wet, '\ud83d\udca7', lanes[1]) + em(dirty, '\ud83d\udca9', lanes[2]) + (solids ? em(sol, '\ud83e\udd63', lanes[3]) : '') + '<i class="b54-dnow" style="left:' + pc(now).toFixed(2) + '%"></i></div>';
+  h += '<div class="b54-daxis"><span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>12a</span></div>';
+  h += '<div class="b54-dleg"><span class="b54-dlg"><i class="b54-dsw"></i>Sleep <b class="n">' + hmShort(sleepMs / 3600000) + (nS ? ' · ' + nS : '') + '</b></span>' + leg('\ud83c\udf7c', 'Feeds', feeds.length) + leg('\ud83d\udca7', 'Wet', wet.length) + leg('\ud83d\udca9', 'Dirty', dirty.length) + (solids ? leg('\ud83e\udd63', 'Food', sol.length) : '') + '</div>';
+  if (nothing) h += '<div class="b54-hint" style="text-align:center;margin-top:6px">Nothing logged yet today</div>';
+  return h + '</div>';
+}
 B.now = function(){
   if (!state.babyDOB) return '';
   var days = recentDays(7), L = lg('feedingLog'), cnt = days.map(function(ds){ return L.filter(function(l){ return l.date === ds; }).length; });
   var wk = cnt.slice(0, 6).filter(function(v){ return v > 0; }), avg = wk.length ? wk.reduce(function(a, b){ return a + b; }, 0) / wk.length : 0, mx = Math.max.apply(null, cnt.concat([4]));
   var dn = lg('diaperLog').filter(function(l){ return l.date === toDay(); }).length, ws = weightsAll();
-  var tl = [{ c: 'coral', ic: 'bottle', v: String(todayFeeds().length), l: 'Feeds today', a: 'feeding' }, { c: 'sky', ic: 'drop', v: String(dn), l: 'Diapers', a: 'diaper' }, { c: 'lav', ic: 'moon', v: hmShort(sleepToday()), l: 'Sleep today', a: 'sleep' }, { c: 'mint', ic: 'ruler', v: ws.length ? fmtKg(ws[ws.length - 1].g) : '–', l: 'Last weight', a: 'weight' }];
-  return '<div class="b54-tiles b54-two">' + tl.map(function(x){ return '<button type="button" class="b54-t b54-stat b54-go b54-c-' + x.c + '" data-b54="nav|' + x.a + '">' + ic(x.ic, 20) + '<b class="n">' + esc(x.v) + '</b><i>' + esc(x.l) + '</i></button>'; }).join('') + '</div>' +
-    SH('This week', 'Feeds per day') + dayBars(cnt, mx, days.map(wdOf), 6);
+  var tl = [{ c: 'coral', ic: 'bottle', v: String(todayFeeds().length), l: 'Feeds today', a: 'feeding' }, { c: 'sky', ic: 'drop', v: String(dn), l: 'Diapers', a: 'diaper' }, { c: 'lav', ic: 'moon', v: hmShort(sleepToday()), l: 'Sleep today', x: sleepCountTxt(), a: 'sleep' }, { c: 'mint', ic: 'ruler', v: ws.length ? fmtKg(ws[ws.length - 1].g) : '–', l: 'Last weight', a: 'weight' }];
+  return '<div class="b54-tiles b54-two">' + tl.map(function(x){ return '<button type="button" class="b54-t b54-stat b54-go b54-c-' + x.c + '" data-b54="nav|' + x.a + '">' + ic(x.ic, 20) + '<b class="n">' + esc(x.v) + '</b><i>' + esc(x.l) + '</i>' + (x.x ? '<i class="b54-sx">' + esc(x.x) + '</i>' : '') + '</button>'; }).join('') + '</div>' +
+    dayBand();
 };
 
 /* NOTES */
@@ -21063,7 +21117,7 @@ B.budget = function(){
   /* day by day */
   if (!all && P.total > 0){
     var mx = Math.max.apply(null, P.byDay.concat([1])), td = ym === now ? parseInt(toDay().slice(8, 10), 10) : 0, pk = P.byDay.indexOf(mx) + 1;
-    h += SH('Day by day', 'Peak ' + pk + ' ' + monthShort(ym));
+    h += SH('Day by day', 'Peak ' + pk + ' ' + monthShort(ym) + ', ' + fmtMoney(mx, { compact: true }));
     h += '<div class="b54-dd" role="img" aria-label="Spending per day">' + P.byDay.map(function(v, i){ return '<span class="b54-dcol' + (v ? '' : ' z') + (i + 1 === td ? ' today' : '') + '"><i style="height:' + (v ? Math.max(6, Math.round(v / mx * 82)) : 3) + 'px"></i></span>'; }).join('') + '</div><div class="b54-dax"><span>1</span><span>8</span><span>15</span><span>22</span><span>' + P.nd + '</span></div>';
   }
   /* the log */
@@ -21319,7 +21373,7 @@ B.reading = function(){
   var avg = past.length ? Math.round(past.reduce(function(a, b){ return a + b; }, 0) / past.length) : 0;
   var chart = '<div class="b54-days">' + wk.map(function(o, i){ var isT = i === 6, seg = ['Indonesian', 'English', 'Both'].map(function(k){ return o[k] ? '<span class="b54-blk" style="height:' + Math.max(5, Math.round(o[k] / mx * 88)) + 'px;background:' + LC[k] + '"></span>' : ''; }).join('');
     if (!tot[i]) seg = '<span class="b54-blk b54-ghost" style="height:8px"></span>';
-    return '<div class="b54-dc' + (isT ? ' on' : '') + '"><div class="b54-stack" style="min-height:96px;justify-content:flex-start">' + seg + '</div><span>' + (isT ? 'Today' : wdOf(days[i])) + '</span></div>'; }).join('') + '</div>';
+    return '<div class="b54-dc' + (isT ? ' on' : '') + '">' + cn(tot[i] ? tot[i] + 'm' : '–') + '<div class="b54-stack" style="min-height:96px;justify-content:flex-start">' + seg + '</div><span>' + (isT ? 'Today' : wdOf(days[i])) + '</span></div>'; }).join('') + '</div>';
   var recent = lg('readingLog').filter(function(l){ return l && l.date; }).slice().sort(function(a, b){ return a.date < b.date ? 1 : -1; }).slice(0, 3);
   var rows = recent.map(function(l){ var d = dayNum(toDay(), l.date); return R(ic('book', 20), clip(l.book || 'Reading session', 32), (parseInt(l.minutes) || 0) + ' min' + (l.lang ? ', ' + LL(l.lang, l.lang) : ''), d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : d + ' days ago', 'readGo'); }).join('');
   return tiles([{ c: 'coral', ic: 'book', label: LL('Indonesian', 'Indonesian'), act: 'readLog|Indonesian' }, { c: 'sky', ic: 'book', label: LL('English', 'English'), act: 'readLog|English' }, { c: 'lav', ic: 'book', label: LL('Both', 'Both'), act: 'readLog|Both' }].filter(function(t){ return t.label !== ''; })) +
@@ -21983,7 +22037,12 @@ window.b54SleepStop = function(){
   var t = sleepRunning(); if (!t) return;
   var sd = new Date(t.start), ed = nowD(), hr = sd.getHours();
   var type = (S && S.sleepType) ? (S.sleepType === 'Night' ? 'Night' : 'Day nap') : ((hr >= 19 || hr < 6) ? 'Night' : 'Day nap');
-  if (typeof stopSleepTimer === 'function') stopSleepTimer();
+  /* stop the timer directly: stopSleepTimer only exists once the Sleep page has been opened this session */
+  if (window._sleepTimerInterval){ clearInterval(window._sleepTimerInterval); window._sleepTimerInterval = null; }
+  state.activeSleepTimer = { running: false, stoppedAt: Date.now() };
+  try { saveState('activeSleepTimer'); } catch(e){}
+  try { if (typeof renderSleepTimer === 'function') renderSleepTimer(); } catch(e){}
+  try { if (navigator.vibrate) navigator.vibrate([15, 40, 15]); } catch(e){}
   window._pendingSleep = { date: dstr(sd), start: pad(sd.getHours()) + ':' + pad(sd.getMinutes()), end: pad(ed.getHours()) + ':' + pad(ed.getMinutes()), type: type, quality: 'Good', notes: '', baby: pickNeeded() ? null : babyIdx() };
   setTimeout(function(){ refreshBody(); ACT.sleepEdit(); }, 60);
 };
