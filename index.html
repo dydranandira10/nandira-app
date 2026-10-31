@@ -16730,9 +16730,9 @@ body.v15-min #v23-mini,body:has(.bottom-nav.v15-min) #v23-mini{bottom:calc(52px 
     el.addEventListener('click',function(e){
       var st=el.getAttribute('data-k');
       if(e.target.closest('.m-s')){ e.stopPropagation();
-        try{ if(st==='sleep'){ if(typeof navTo==='function') navTo('sleep'); setTimeout(function(){ if(window.stopSleepTimer) window.stopSleepTimer(); },80); } else if(typeof goStopFeedTimer==='function') goStopFeedTimer(); }catch(x){}
+        try{ if(st==='sleep'){ if(window.b54SleepStop) window.b54SleepStop(); else { if(typeof navTo==='function') navTo('sleep'); setTimeout(function(){ if(window.stopSleepTimer) window.stopSleepTimer(); },80); } } else if(typeof goStopFeedTimer==='function') goStopFeedTimer(); }catch(x){}
         return; }
-      try{ if(st==='sleep'){ if(typeof navTo==='function') navTo('sleep'); } else if(typeof goViewFeedTimer==='function') goViewFeedTimer(); }catch(x){}
+      try{ var own=document.body.getAttribute('data-page')===(st==='sleep'?'sleep':'feeding'); if(own){ var c=document.querySelector(st==='sleep'?'[data-b54-clock=sleep]':'[data-b54-clock=feed]'); if(c) c.scrollIntoView({block:'center',behavior:'smooth'}); } else if(st==='sleep'){ if(typeof navTo==='function') navTo('sleep'); } else if(typeof goViewFeedTimer==='function') goViewFeedTimer(); }catch(x){}
     });
     document.body.appendChild(el); return el;
   }
@@ -16743,7 +16743,7 @@ body.v15-min #v23-mini,body:has(.bottom-nav.v15-min) #v23-mini{bottom:calc(52px 
       var pg=document.body.getAttribute('data-page');
       var f=state.activeFeedTimer&&state.activeFeedTimer.running&&state.activeFeedTimer.start?state.activeFeedTimer:null;
       var sl=state.activeSleepTimer&&state.activeSleepTimer.running&&state.activeSleepTimer.start?state.activeSleepTimer:null;
-      var on=(f&&pg!=='now'&&pg!=='feeding')?'feed':(sl&&pg!=='now'&&pg!=='sleep')?'sleep':'';
+      var on=(f&&sl)?(f.start>=sl.start?'feed':'sleep'):f?'feed':sl?'sleep':''; if(on&&window.v66OwnVisible&&window.v66OwnVisible(on)) on='';
       if(!on){ if(el) el.classList.remove('show'); return; }
       var e=mk(), t=on==='feed'?f:sl;
       e.setAttribute('data-k',on);
@@ -19752,11 +19752,21 @@ function sleepSegs(){
     if (!l || !l.date || !l.start) return;
     var a = mk(l.date, l.start), b;
     if (isNaN(a)) return;
-    if (!l.end){ b = now; if (a <= now) open = { a: a, type: l.type }; }
-    else { b = mk(l.date, l.end); if (b <= a) b = new Date(b.getTime() + DAY); }
+    if (!l.end) return; /* no end time: length unknown, so it is neither ongoing nor counted (the timer is what says baby is asleep now) */
+    b = mk(l.date, l.end); if (b <= a) b = new Date(b.getTime() + DAY);
     var ca = Math.max(a, s0), cb = Math.min(b, s1, now);
-    if (cb > ca) out.push({ a: ca, b: cb, type: String(l.type || '').toLowerCase(), open: !l.end });
+    if (cb > ca) out.push({ a: ca, b: cb, type: String(l.type || '').toLowerCase(), open: false });
   });
+  var tm = state.activeSleepTimer;
+  if (tm && tm.running && tm.start){
+    var ta = new Date(tm.start), th = ta.getHours();
+    if (!isNaN(ta) && ta <= now){
+      var tt = (th >= 19 || th < 6) ? 'night' : 'nap';
+      open = { a: ta, type: tt };
+      var ca2 = Math.max(ta, s0), cb2 = Math.min(s1, now);
+      if (cb2 > ca2) out.push({ a: ca2, b: cb2, type: tt, open: true });
+    }
+  }
   out.sort(function(x, y){ return x.a - y.a; });
   return { segs: out, open: open, s0: s0 };
 }
@@ -20534,6 +20544,7 @@ B.sleep = function(){
   var days = recentDays(7), L = lg('sleepLog'), hrs = days.map(function(ds){ return L.filter(function(l){ return l.date === ds; }).reduce(function(a, l){ return a + sleepH(l); }, 0); });
   var wk = hrs.slice(0, 6).filter(function(v){ return v > 0; }), avg = wk.length ? wk.reduce(function(a, b){ return a + b; }, 0) / wk.length : 0;
   var aw = lastWake();
+  if (window._pendingSleep && !t) h += R(ic('plus', 20), 'Unsaved sleep', window._pendingSleep.start + ' to ' + window._pendingSleep.end + ', tap to save', 'Save', 'sleepEdit');
   h += '<div class="b54-seg"><button type="button" class="' + (type === 'Nap' ? 'on' : '') + '" data-b54="sleepType|Nap">' + ic('sun', 18) + ' Nap</button><button type="button" class="' + (type === 'Night' ? 'on' : '') + '" data-b54="sleepType|Night">' + ic('moon', 18) + ' Night</button></div>';
   if (t){
     h += '<div class="b54-run b54-c-lav"><div class="b54-run-top">Sleeping since ' + esc(new Date(t.start).toTimeString().slice(0, 5)) + '</div><div class="b54-run-t n" data-b54-clock="sleep">' + mmss(Date.now() - t.start) + '</div><button type="button" class="b54-run-b" data-b54="sleepStop">Stop and review</button></div>';
@@ -20805,12 +20816,6 @@ ACT.diaper = function(t){
 };
 ACT.sleepType = function(t){ S.sleepType = t; refreshBody(); };
 ACT.sleepStart = function(){ if (typeof startSleepTimer === 'function'){ startSleepTimer(); setTimeout(refreshBody, 40); } };
-ACT.sleepStop = function(){
-  if (typeof stopSleepTimer === 'function') stopSleepTimer();
-  var st = document.getElementById('s-type'), type = S.sleepType || '';
-  if (st && type) st.value = type === 'Night' ? 'Night' : (st.querySelector('option[value="Day nap"]') ? 'Day nap' : 'Nap');
-  setTimeout(function(){ refreshBody(); openMore('#sleep-full-form', '#s-start'); }, 60);
-};
 ACT.sleepPast = function(){ openMore('#sleep-full-form', '#s-start'); };
 ACT.weightAdd = function(){ openMore('Log weight', '#w-val'); };
 ACT.growth = function(kind){
@@ -21966,6 +21971,86 @@ document.addEventListener('click', function(e){
   function chk(){ q = 0; var c = document.querySelector('.feed-review-card'); if (c && !had){ try { window.scrollTo(0, 0); var sc = c.closest('.page') || document.getElementById('main-content'); if (sc && sc.scrollTop) sc.scrollTop = 0; c.scrollIntoView({ block: 'start' }); } catch(e){} } had = !!c; }
   try { new MutationObserver(function(){ if (!q) q = requestAnimationFrame(chk); }).observe(document.body, { childList: true, subtree: true }); } catch(e){}
 })();
+
+/* v66: sleep review without the "All details" fold, usable from any page (the bottom timer bar calls b54SleepStop). */
+function slTypes(){ return [['Day nap', 'Nap', '#C9B8FF'], ['Night', 'Night', '#8FA2FF']]; }
+function slBabies(){
+  var n = Math.max(1, +(state.numberOfBabies || 1)), a = [];
+  for (var i = 0; i < n; i++) a.push([String(i), (typeof babyLabel === 'function' ? babyLabel(i) : 'Baby ' + (i + 1)), '#FFD98A']);
+  return a;
+}
+window.b54SleepStop = function(){
+  var t = sleepRunning(); if (!t) return;
+  var sd = new Date(t.start), ed = nowD(), hr = sd.getHours();
+  var type = (S && S.sleepType) ? (S.sleepType === 'Night' ? 'Night' : 'Day nap') : ((hr >= 19 || hr < 6) ? 'Night' : 'Day nap');
+  if (typeof stopSleepTimer === 'function') stopSleepTimer();
+  window._pendingSleep = { date: dstr(sd), start: pad(sd.getHours()) + ':' + pad(sd.getMinutes()), end: pad(ed.getHours()) + ':' + pad(ed.getMinutes()), type: type, quality: 'Good', notes: '', baby: pickNeeded() ? null : babyIdx() };
+  setTimeout(function(){ refreshBody(); ACT.sleepEdit(); }, 60);
+};
+ACT.sleepStop = function(){ window.b54SleepStop(); };
+ACT.sleepEdit = function(){
+  var p = window._pendingSleep; if (!p) return;
+  var old = document.getElementById('b54-x'); if (old) old.remove();
+  X = { mode: 'sl', type: p.type, baby: p.baby };
+  var h = '<div class="sheet b54-xs" role="dialog" aria-modal="true" aria-label="Sleep details"><div class="sheet-handle"></div><div class="sheet-title">Sleep details</div>';
+  h += '<div class="b54-lb" style="margin-top:2px">Type</div><div class="b54-xc" id="b54-sl-type">' + chipSet(slTypes(), p.type, 'slType') + '</div>';
+  if (p.baby == null) h += '<div class="b54-lb">Which baby?</div><div class="b54-xc" id="b54-sl-baby">' + chipSet(slBabies(), '', 'slBaby') + '</div>';
+  h += '<div style="display:flex;gap:10px;margin-top:12px"><div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-sl-date">Date started</label><input type="date" id="b54-sl-date" max="' + toDay() + '" value="' + esc(p.date) + '"></div></div>';
+  h += '<div style="display:flex;gap:10px;margin-top:10px"><div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-sl-st">Fell asleep</label><input type="time" id="b54-sl-st" value="' + esc(p.start) + '"></div>' +
+    '<div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-sl-en">Woke up</label><input type="time" id="b54-sl-en" value="' + esc(p.end) + '"></div></div>';
+  h += '<div class="form-field" style="margin-top:12px"><label for="b54-sl-q">Quality</label><select id="b54-sl-q">' + ['Excellent', 'Good', 'Fair', 'Poor'].map(function(q){ return '<option' + (q === p.quality ? ' selected' : '') + '>' + q + '</option>'; }).join('') + '</select></div>';
+  h += '<div class="form-field"><label for="b54-sl-notes">Notes (optional)</label><input type="text" id="b54-sl-notes" placeholder="Settled quickly..." value="' + esc(p.notes) + '"></div>';
+  h += '<div class="b54-xb"><button type="button" class="btn btn-outline" data-b54="slDiscard">Discard</button><button type="button" class="btn btn-teal" data-b54="slOk">Save sleep</button></div></div>';
+  var ov = document.createElement('div'); ov.id = 'b54-x'; ov.className = 'sheet-ov'; ov.innerHTML = h; document.body.appendChild(ov);
+  ov.addEventListener('click', function(e){ if (e.target === ov) { slKeep(); ov.remove(); X = null; } });
+  requestAnimationFrame(function(){ ov.classList.add('show'); });
+};
+function slKeep(){
+  var p = window._pendingSleep; if (!p) return;
+  var v = function(id){ return String((document.getElementById(id) || {}).value || ''); };
+  if (v('b54-sl-date')) p.date = v('b54-sl-date'); if (v('b54-sl-st')) p.start = v('b54-sl-st'); if (v('b54-sl-en')) p.end = v('b54-sl-en');
+  p.type = X && X.mode === 'sl' ? X.type : p.type; p.quality = v('b54-sl-q') || p.quality; p.notes = v('b54-sl-notes'); if (X && X.mode === 'sl') p.baby = X.baby;
+  try { refreshBody(); } catch(e){}
+}
+ACT.slType = function(k){
+  if (!X || X.mode !== 'sl') return; X.type = k;
+  var c = document.getElementById('b54-sl-type'); if (c) c.innerHTML = chipSet(slTypes(), k, 'slType');
+};
+ACT.slBaby = function(k){
+  if (!X || X.mode !== 'sl') return; X.baby = parseInt(k, 10) || 0;
+  var c = document.getElementById('b54-sl-baby'); if (c) c.innerHTML = chipSet(slBabies(), String(X.baby), 'slBaby');
+};
+ACT.slDiscard = function(){
+  var ov = document.getElementById('b54-x'); if (ov) ov.remove(); X = null; window._pendingSleep = null; refreshBody(); ft()('Sleep discarded');
+};
+ACT.slOk = function(){
+  var ov = document.getElementById('b54-x'); if (!ov || !X || X.mode !== 'sl') return;
+  var v = function(id){ return String((document.getElementById(id) || {}).value || '').trim(); };
+  var date = v('b54-sl-date'), st = v('b54-sl-st'), en = v('b54-sl-en');
+  if (!date || !st) { ft()('Add the date and when baby fell asleep'); return; }
+  if (!en) { ft()('Add when baby woke up'); return; }
+  if (X.baby == null) { ft()('Pick a baby'); return; }
+  if (en === st) { ft()('Start and end are the same'); return; }
+  var a = mk(date, st), b = mk(date, en); if (b <= a) b = new Date(b.getTime() + DAY);
+  if (b - a > 20 * 3600000) { ft()('That sleep is over 20 hours, please check the times'); return; }
+  if (a.getTime() > nowD().getTime() + 120000 || b.getTime() > nowD().getTime() + 120000) { ft()('That time is in the future'); return; }
+  if (!Array.isArray(state.sleepLog)) state.sleepLog = [];
+  state.sleepLog.push({ date: date, start: st, end: en, type: X.type || 'Night', quality: v('b54-sl-q') || 'Good', notes: v('b54-sl-notes'), babyIdx: X.baby });
+  persist(['sleepLog'], false);
+  window._pendingSleep = null; ov.remove(); X = null;
+  ft()('Sleep logged');
+  try { if (typeof render === 'function') render(); } catch(e){}
+  refreshBody();
+};
+/* the bottom timer bar hides itself while the page's own big timer is on screen */
+window.v66OwnVisible = function(which){
+  try {
+    var sel = which === 'sleep' ? '[data-b54-clock="sleep"]' : '[data-b54-clock="feed"],.nfl-stop';
+    var els = document.querySelectorAll(sel), H = window.innerHeight || 800;
+    for (var i = 0; i < els.length; i++){ var r = els[i].getBoundingClientRect(); if (r.width && r.bottom > 70 && r.top < H - 130) return true; }
+  } catch(e){}
+  return false;
+};
 
 /* ================= v57: Hoot knows which page it was opened from ================= */
 function ageMo(){ if (!state.babyDOB) return null; return Math.max(0, (nowD() - new Date(state.babyDOB + 'T00:00:00')) / (DAY * 30.4375)); }
