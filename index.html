@@ -17973,7 +17973,7 @@ body.night-mode #ask-tpl .wa-pop{background:var(--card2,#22304F);box-shadow:0 10
 #ask-tpl .wa-pop .wa-gotit{flex:none;width:100%;font:inherit;font-weight:800;font-size:14px;min-height:40px;border:0;border-radius:999px;background:var(--teal,#2D8F8F);color:#fff;cursor:pointer;}
 
 #ask-tpl .wa-tpltog{font:inherit;font-size:12.5px;font-weight:700;background:none;border:0;color:var(--link,#5B4BD6);cursor:pointer;padding:2px 0;}
-#ask-tpl .wa-tplrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px;}
+#ask-tpl .wa-tplrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(74px,1fr));gap:6px;margin-top:6px;}
 #ask-tpl .wa-btn{flex:none;font:inherit;font-weight:800;font-size:12.5px;padding:8px 4px;border-radius:999px;border:0;cursor:pointer;min-height:38px;background:rgba(150,160,235,.28);color:var(--ink,#2A2A33);}
 #ask-tpl .wa-btn.done{background:var(--teal,#2D8F8F);color:#fff;}
 #ask-tpl .wa-btn.bad{background:#C0504D;color:#fff;}
@@ -17997,7 +17997,7 @@ function parseNanny(text, opts) {
   var todayStr = opts.today || new Date().toISOString().slice(0, 10);
   var defDiaper = opts.defaultDiaper || 'wet';
   var defFeed = opts.defaultFeedType || 'stored';
-  var out = { feeds: [], diapers: [], weights: [], stock: { bags: [], used: [], combos: [], usedCombos: [], single: null, total: 0 }, skipped: [], dates: [] };
+  var out = { feeds: [], diapers: [], weights: [], sleeps: [], stock: { bags: [], used: [], combos: [], usedCombos: [], single: null, total: 0 }, skipped: [], dates: [] };
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
   var MONTHS = { jan:1, januari:1, january:1, feb:2, februari:2, february:2, mar:3, maret:3, march:3, apr:4, april:4, mei:5, may:5, jun:6, juni:6, june:6, jul:7, juli:7, july:7,
     agu:8, agt:8, agustus:8, aug:8, august:8, sep:9, sept:9, september:9, okt:10, oktober:10, oct:10, october:10, nov:11, november:11, des:12, desember:12, dec:12, december:12 };
@@ -18007,7 +18007,8 @@ function parseNanny(text, opts) {
     return s > addDay(todayStr, 1) ? validDate(ty - 1, m, d) : s;
   }
   function addDay(s, n) { var t = new Date(s + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); }
-  var ctx = opts.ctxDate || todayStr, section = null, sub = null;
+  var ctx = opts.ctxDate || todayStr, section = null, sub = null, sleepHint = '';
+  function hintOf(s) { return /\b(malam|night|overnight)\b/.test(s) ? 'night' : /\b(siang|sore|pagi|nap|naps|napped)\b/.test(s) ? 'nap' : ''; }
   function setDate(s) { if (s) { ctx = s; if (out.dates.indexOf(s) < 0) out.dates.push(s); } }
 
   var lines = String(text || '').replace(/[‎‏‪-‮⁦-⁩]/g, '').replace(/ /g, ' ').replace(/\r/g, '').split('\n');
@@ -18035,8 +18036,11 @@ function parseNanny(text, opts) {
     var low = line.toLowerCase();
     var isFeedW = /\b(mimi|mimik|susu|asi|asip|sufor|formula|botol|minum|dbf|feed|feeds|feeding|fed|bottle|bottles|nursed|breastfed|pumped|expressed)\b/.test(low);
     var isDiaperW = /\b(pempi|pempers|pampers|popok|diaper|diapers|nappy|nappies|pipis|bab|pup|poop|poo|poos|berak|wet|dirty|stool)\b/.test(low);
+    var isSleepW = /\b(tidur|tdr|bobo|bobok|nap|naps|napped|napping|sleep|sleeps|slept|sleeping|asleep)\b/.test(low);
+    var isWokeW = /\b(bangun|terbangun|bgn|woke|wake|woken|awake)\b/.test(low);
     // section headers (a line with no digits)
     if (!/\d/.test(line)) {
+      if (/^(?:tidur|tdr|bobo|bobok|nap|naps|sleep|sleeps)(?:\s+(?:siang|sore|malam|pagi|night))?[\s:]*$/.test(low)) { section = 'sleep'; sub = null; sleepHint = hintOf(low); continue; }
       if (/^(?:ganti\s+|change\s+)?(pempi|pempers|pampers|popok|diapers?|nappy|nappies)[\s:]*$/.test(low)) { section = 'diaper'; sub = null; continue; }
       if (/^(mimi|mimik|susu|minum|botol|asi|feeds?|feeding|bottles?)[\s:]*$/.test(low)) { section = 'feed'; sub = null; continue; }
       if (/\b(stok|stock|kantong|asip|persediaan|sisa)\b/.test(low)) {
@@ -18094,6 +18098,18 @@ function parseNanny(text, opts) {
     var times = toks.map(function (x) { return x.t; });
     noTimes = line.replace(/(^|[^\d.:])([01]?\d|2[0-3])[.:]([0-5]\d)(?![\d])/g, '$1 ').replace(/\bjam\s*([01]?\d|2[0-3])(?![\d.:])(?:\s*-\s*([01]?\d|2[0-3])(?![\d.:]))?/ig, ' ');
 
+    if (isWokeW && !isFeedW && !isDiaperW && !isSleepW && times.length) {
+      var wk = false;
+      for (var si = out.sleeps.length - 1; si >= 0; si--) { if (!out.sleeps[si].end && out.sleeps[si].date === ctx) { out.sleeps[si].end = times[0]; wk = true; break; } }
+      if (!wk) out.skipped.push({ line: raw, why: 'woke up, but no sleep start to match' });
+      continue;
+    }
+    if ((isSleepW && !isDiaperW && (!isFeedW || /^\s*(?:\d{1,2}[.)]\s*)?(?:tidur|tdr|bobo|bobok|nap|sleep|slept)/.test(low))) || (section === 'sleep' && !isFeedW && !isDiaperW && !isWokeW)) {
+      if (!times.length) { out.skipped.push({ line: raw, why: 'no time' }); continue; }
+      var hint = hintOf(low) || (isSleepW ? '' : sleepHint);
+      out.sleeps.push({ date: ctx, start: times[0], end: times[1] || '', hint: hint, src: raw });
+      continue;
+    }
     if (isDiaperW || (section === 'diaper' && !isFeedW)) {
       if (!times.length) { out.skipped.push({ line: raw, why: 'no time' }); continue; }
       var dirty = /\b(bab|pup|poop|poo|kotor|eek|berak|dirty|stool|soiled)\b/.test(low), wet = /\b(pipis|pee|wee|basah|kencing|bak|wet)\b/.test(low);
@@ -18123,6 +18139,7 @@ function parseNanny(text, opts) {
   var TPLS = {
     feed: ['Feed', 'Mimi jam __.__ - __.__ = ___ ml'],
     diaper: ['Diaper', 'Pempi jam __.__ pipis'],
+    sleep: ['Sleep', 'Tidur jam __.__ - __.__'],
     weight: ['Weight', 'Berat badan: __._ kg'],
     stock: ['Stored milk', 'Stok ASIP\nKantong siap pakai:\n1. ___\n2. ___\n3. ___']
   };
@@ -18147,6 +18164,7 @@ function parseNanny(text, opts) {
     if(d < 0) d += 1440;
     return d;
   }
+  function durTxt(m){ return m>=60 ? Math.floor(m/60)+'h'+(m%60?' '+(m%60)+'m':'') : m+' min'; }
   function sideLbl(x){ return x==='left' ? 'Left' : 'Right'; }
   function plural(n, w){ return n + ' ' + w + (n===1?'':'s'); }
 
@@ -18154,12 +18172,12 @@ function parseNanny(text, opts) {
   window.waDetect = function(text){
     text = String(text||'');
     if(text.length < 6 || text.length > 6000) return false;
-    if(!/mimi|pempi|pipis|\bbab\b|berat|\bbb\b|stok|stock|asip|kantong/i.test(text)) return false;
+    if(!/mimi|pempi|pipis|\bbab\b|berat|\bbb\b|stok|stock|asip|kantong|tidur|bobo|bangun|\bnaps?\b|\bslept\b/i.test(text)) return false;
     if(!/\n/.test(text.trim()) && /\?\s*$/.test(text.trim())) return false;      // a one-line question goes to Hoot
     try{
       var r = parseNanny(text, { today: td(), ctxDate: td(), defaultDiaper: 'wet', defaultFeedType: 'stored' });
       var sk = r.stock || { bags:[], single:null };
-      return (r.feeds.length + r.diapers.length + (r.weights||[]).length) > 0 || sk.bags.length > 0 || sk.single != null;
+      return (r.feeds.length + r.diapers.length + (r.sleeps||[]).length + (r.weights||[]).length) > 0 || sk.bags.length > 0 || sk.single != null;
     }catch(e){ return false; }
   };
 
@@ -18177,11 +18195,19 @@ function parseNanny(text, opts) {
       items.push(it);
     });
     r.diapers.forEach(function(d){ items.push({ kind:'diaper', date:d.date, time:d.time, type:d.type, guessed:d.guessed }); });
+    (r.sleeps||[]).forEach(function(s){ var hr = +String(s.start).slice(0,2), tp = S.picks && S.picks['sl|' + s.date + '|' + s.start]; items.push({ kind:'sleep', date:s.date, time:s.start, end:s.end, type: tp || (s.hint==='night' ? 'Night' : s.hint==='nap' ? 'Day nap' : ((hr>=19 || hr<5) ? 'Night' : 'Day nap')) }); });
     (r.weights||[]).forEach(function(w){ items.push({ kind:'weight', date:w.date, grams:w.grams }); });
     items.forEach(function(it){
       it.note = ''; it.locked = false; it.on = true; it.need = false;
       if(it.kind==='weight'){
         if((state.weightLog||[]).some(function(e){ return e && e.date===it.date && (e.babyIdx||0)===S.baby; })){ it.locked = true; it.on = false; it.note = 'A weight is already logged for this day. Edit it on the Weight page.'; }
+        return;
+      }
+      if(it.kind==='sleep'){
+        if(!it.end){ it.locked = true; it.on = false; it.note = 'No wake-up time in the message, so it was left out'; return; }
+        if(it.end===it.time || dur(it.time, it.end) > 1200){ it.locked = true; it.on = false; it.note = 'The start and end times look off, so it was left out'; return; }
+        if(entryInFuture(it.date, it.time)){ it.locked = true; it.on = false; it.note = 'In the future, so it cannot be added'; return; }
+        if((state.sleepLog||[]).some(function(e){ return e && e.date===it.date && String(e.start||'')===it.time && (e.babyIdx||0)===S.baby; })){ it.on = false; it.note = 'Already logged at this time'; }
         return;
       }
       if(entryInFuture(it.date, it.time)){ it.locked = true; it.on = false; it.note = 'In the future, so it cannot be added'; }
@@ -18197,10 +18223,10 @@ function parseNanny(text, opts) {
     S.items = items; S.skipped = r.skipped; S.skipOpen = false;
   }
   function leadText(S){
-    var nf = 0, nb = 0, nd = 0, nw = 0, nneed = 0;
-    S.items.forEach(function(i){ if(i.kind==='feed'){ if(i.type==='breast'){ nb++; if(i.need) nneed++; } else nf++; } else if(i.kind==='weight') nw++; else nd++; });
-    var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nb) parts.push(plural(nb,'breast feed')); if(nd) parts.push(plural(nd,'diaper')); if(nw) parts.push(plural(nw,'weight')); if(S.bags) parts.push('a stock count');
-    if(!parts.length) return 'I could not find any feeds, diapers, weights or stock in that text. ' + ((window.waExample && window.waExample()) || 'Lines like “Mimi jam 9.49 - 10.04 sbnyk 110” or “Ganti pempi jam 07.58” work.');
+    var nf = 0, nb = 0, nd = 0, nw = 0, ns = 0, nneed = 0;
+    S.items.forEach(function(i){ if(i.kind==='feed'){ if(i.type==='breast'){ nb++; if(i.need) nneed++; } else nf++; } else if(i.kind==='weight') nw++; else if(i.kind==='sleep') ns++; else nd++; });
+    var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nb) parts.push(plural(nb,'breast feed')); if(nd) parts.push(plural(nd,'diaper')); if(ns) parts.push(plural(ns,'sleep')); if(nw) parts.push(plural(nw,'weight')); if(S.bags) parts.push('a stock count');
+    if(!parts.length) return 'I could not find any feeds, diapers, sleep, weights or stock in that text. ' + ((window.waExample && window.waExample()) || 'Lines like “Mimi jam 9.49 - 10.04 sbnyk 110” or “Ganti pempi jam 07.58” work.');
     return 'I found ' + (parts.length>1 ? parts.slice(0,-1).join(', ') + ' and ' + parts[parts.length-1] : parts[0]) + (twins() ? ' for ' + nm(S.baby) : '') + '. ' + (nneed ? (nneed===1 ? 'One feed has no amount, so I took it as a breast feed. Pick left or right for it. ' : nneed + ' feeds have no amount, so I took them as breast feeds. Pick left or right for each. ') : '') + 'Untick anything that looks wrong, then tap Add. Nothing is saved until you do.';
   }
 
@@ -18224,24 +18250,28 @@ function parseNanny(text, opts) {
     } else if(it.kind==='feed'){
       main = '<div class="wa-t">' + it.ml + ' ml · ' + esc(it.time) + (it.end ? ' to ' + esc(it.end) : '') + '</div>';
       chip = '<button type="button" class="wa-chip" data-cy="'+i+'" aria-label="Change type">' + typeLbl(it.type) + '</button>';
+    } else if(it.kind==='sleep'){
+      main = '<div class="wa-t">' + esc(it.time) + (it.end ? ' to ' + esc(it.end) + ' · ' + durTxt(dur(it.time, it.end)) : ' · no wake-up time') + '</div>';
+      chip = '<button type="button" class="wa-chip" data-cy="'+i+'" aria-label="Change type">' + (it.type==='Night' ? 'Night' : 'Nap') + '</button>';
     } else if(it.kind==='weight'){
       main = '<div class="wa-t">' + (it.grams/1000).toFixed(2) + ' kg</div>'; chip = '';
     } else {
       main = '<div class="wa-t">' + esc(it.time) + '</div>';
       chip = '<button type="button" class="wa-chip" data-cy="'+i+'" aria-label="Change type">' + dtype(it.type) + '</button>';
     }
-    var sub = (it.kind==='feed' ? (it.type==='breast' ? 'Breast feed' : 'Bottle') : it.kind==='weight' ? 'Weight' : 'Diaper') + ' · ' + dlabel(it.date) + (it.need ? ' · which side?' : '') + (it.kind==='feed' && it.type==='breast' && !it.end ? ' · no end time, so no length' : '') + (it.guessed ? ' · not specified, so I used ' + dtype(it.type).toLowerCase() : '');
+    var sub = (it.kind==='feed' ? (it.type==='breast' ? 'Breast feed' : 'Bottle') : it.kind==='weight' ? 'Weight' : it.kind==='sleep' ? (it.type==='Night' ? 'Night sleep' : 'Nap') : 'Diaper') + ' · ' + dlabel(it.date) + (it.need ? ' · which side?' : '') + (it.kind==='feed' && it.type==='breast' && !it.end ? ' · no end time, so no length' : '') + (it.guessed ? ' · not specified, so I used ' + dtype(it.type).toLowerCase() : '');
     return '<div class="wa-row '+(it.on?'on':'off')+(it.need?' need':'')+'"><button type="button" class="wa-chk" role="checkbox" aria-checked="'+(it.on?'true':'false')+'" data-tk="'+i+'" '+(it.locked?'disabled':'')+'>'+(it.on?'✓':'')+'</button>'
       + '<div class="wa-main">'+main+'<div class="wa-s'+((it.note||it.need)?' warn':'')+'">'+esc(it.note || sub)+'</div></div>'+(it.locked?'':chip)+'</div>';
   }
   function seg(attr, cur, opts){ return '<div class="wa-seg" role="group">' + opts.map(function(o){ return '<button type="button" '+attr+'="'+o[0]+'" class="'+(String(cur)===String(o[0])?'on':'')+'">'+esc(o[1])+'</button>'; }).join('') + '</div>'; }
   function cardHTML(S){
-    var feeds = [], dia = [], wts = [];
-    S.items.forEach(function(it, i){ (it.kind==='feed' ? feeds : it.kind==='weight' ? wts : dia).push(i); });
+    var feeds = [], dia = [], wts = [], slp = [];
+    S.items.forEach(function(it, i){ (it.kind==='feed' ? feeds : it.kind==='weight' ? wts : it.kind==='sleep' ? slp : dia).push(i); });
     var h = '';
     if(twins()) h += '<div><div class="wa-lbl">This report is for</div>' + seg('data-b', S.baby, [[0, nm(0)],[1, nm(1)]]) + '</div>';
     if(feeds.length) h += '<div class="wa-h">' + (S.items.some(function(x){ return x.type==='breast'; }) ? 'Feeds' : 'Bottles') + ' <small>'+feeds.length+'</small></div>' + feeds.map(function(i){ return rowHTML(S.items[i], i); }).join('');
     if(dia.length) h += '<div class="wa-h">Diapers <small>'+dia.length+'</small></div>' + dia.map(function(i){ return rowHTML(S.items[i], i); }).join('');
+    if(slp.length) h += '<div class="wa-h">Sleep <small>'+slp.length+'</small></div>' + slp.map(function(i){ return rowHTML(S.items[i], i); }).join('');
     if(wts.length) h += '<div class="wa-h">Weight <small>'+wts.length+'</small></div>' + wts.map(function(i){ return rowHTML(S.items[i], i); }).join('');
     if(S.bags){
       var b = S.bags;
@@ -18283,7 +18313,7 @@ function parseNanny(text, opts) {
       }; });
       root.querySelectorAll('[data-cy]').forEach(function(b){ b.onclick = function(){
         var i = +b.getAttribute('data-cy'), it = S.items[i];
-        if(it.kind==='feed') it.type = it.type==='stored' ? 'formula' : 'stored'; else { it.type = it.type==='wet' ? 'dirty' : it.type==='dirty' ? 'both' : 'wet'; it.guessed = false; }
+        if(it.kind==='sleep'){ it.type = it.type==='Night' ? 'Day nap' : 'Night'; S.picks = S.picks || {}; S.picks['sl|' + it.date + '|' + it.time] = it.type; } else if(it.kind==='feed') it.type = it.type==='stored' ? 'formula' : 'stored'; else { it.type = it.type==='wet' ? 'dirty' : it.type==='dirty' ? 'both' : 'wet'; it.guessed = false; }
         draw();
       }; });
       var ts = root.querySelector('[data-ts]'); if(ts) ts.onclick = function(){ S.bags.on = !S.bags.on; draw(); };
@@ -18303,17 +18333,23 @@ function parseNanny(text, opts) {
   // ---------- add: the same entry shapes the app writes
   function add(S, m, draw, hooks){
     if(S.status!=='review') return;
-    var idx = S.baby, nf = 0, nb = 0, nd = 0, nw = 0, dup = 0, stashChanged = false, stashLogged = false;
+    var idx = S.baby, nf = 0, nb = 0, nd = 0, nw = 0, ns = 0, dup = 0, stashChanged = false, stashLogged = false;
     var useStock = !!(S.bags && S.bags.on);
     try{
       if(!state.feedingLog) state.feedingLog = [];
       if(!state.diaperLog) state.diaperLog = [];
       if(!state.weightLog) state.weightLog = [];
+      if(!state.sleepLog) state.sleepLog = [];
       S.items.forEach(function(it){
         if(!it.on || it.locked) return;
         if(it.kind === 'weight'){
           if(state.weightLog.some(function(e){ return e && e.date===it.date && (e.babyIdx||0)===idx; })){ dup++; return; }
           state.weightLog.push({ date: it.date, grams: it.grams, notes:'', babyIdx: idx }); nw++; return;
+        }
+        if(it.kind === 'sleep'){
+          if(!it.end) return;
+          if(state.sleepLog.some(function(e){ return e && e.date===it.date && String(e.start||'')===it.time && (e.babyIdx||0)===idx; })){ dup++; return; }
+          state.sleepLog.push({ date: it.date, start: it.time, end: it.end, type: it.type, quality:'Good', notes:'', babyIdx: idx }); ns++; return;
         }
         if(it.kind === 'feed' && it.type === 'breast'){
           if(!it.side) return;
@@ -18347,10 +18383,11 @@ function parseNanny(text, opts) {
       if(nf || nb) saveState('feedingLog');
       if(nd) saveState('diaperLog');
       if(nw) saveState('weightLog');
+      if(ns) saveState('sleepLog');
       if(stashChanged) saveState('pumpedStash');
       if(stashLogged) saveState('stashLog');
     }catch(e){ try{ toast('Something went wrong. Please check the logs.'); }catch(e2){} return; }
-    var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nb) parts.push(plural(nb,'breast feed')); if(nd) parts.push(plural(nd,'diaper')); if(nw) parts.push(plural(nw,'weight')); if(useStock) parts.push('stash ' + fmtMl(S.bags.total) + ' ml');
+    var parts = []; if(nf) parts.push(plural(nf,'bottle')); if(nb) parts.push(plural(nb,'breast feed')); if(nd) parts.push(plural(nd,'diaper')); if(ns) parts.push(plural(ns,'sleep')); if(nw) parts.push(plural(nw,'weight')); if(useStock) parts.push('stash ' + fmtMl(S.bags.total) + ' ml');
     S.status = 'done'; S.doneText = 'Added ' + (parts.join(', ') || 'nothing new') + (dup ? ' (' + dup + ' already logged, skipped)' : '') + '.';
     m.content = S.doneText;
     draw(); if(hooks && hooks.save) hooks.save();
@@ -19509,7 +19546,7 @@ window.famLine = function(){
   })();
 
   /* chat-log import: English templates for families who are not on the Indonesian setup */
-  var TPL_EN = { feed: 'Feed __.__ - __.__ = ___ ml', diaper: 'Diaper __.__ wet', weight: 'Weight: __._ kg', stock: 'Stock\n1. ___\n2. ___\n3. ___' };
+  var TPL_EN = { feed: 'Feed __.__ - __.__ = ___ ml', diaper: 'Diaper __.__ wet', weight: 'Weight: __._ kg', stock: 'Stock\n1. ___\n2. ___\n3. ___', sleep: 'Sleep __.__ - __.__' };
   G.waTpl = function(k, legacy){ var r = G.famRegion(); return (r && r.key !== 'ID' && TPL_EN[k]) ? TPL_EN[k] : legacy; };
   G.waExample = function(){ var r = G.famRegion(); return (r && r.key !== 'ID') ? 'Lines like \u201cFeed 9.49 - 10.04 110 ml\u201d or \u201cDiaper 07.58 wet\u201d work.' : null; };
   /* ---------- keep the right schedule on screen ---------- */
