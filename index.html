@@ -3322,6 +3322,38 @@ html body .drawer .drawer-header{background:transparent !important;}
 // ══════════════════════════════════════════════════════════════════════════════
 
 
+// v72: like fbRead, but a failed request returns undefined (fbRead returns null for both
+// "nothing there" and "could not read", which let a bad connection overwrite the cloud).
+async function fbReadStrict(path) {
+  try {
+    const r = await fetch(FB_URL + path + '.json', { cache: 'no-store' });
+    if (!r.ok) return undefined;
+    return await r.json();
+  } catch(e) { return undefined; }
+}
+function _v72Arr(x) { return Array.isArray(x) ? x : (x && typeof x === 'object' ? Object.values(x) : []); }
+// Which synced lists hold entries the cloud copy does not have?
+function v72Missing(remote) {
+  const out = [];
+  for (const k of LOG_ARRAY_KEYS.concat(['deletedIds'])) {
+    const mine = state[k];
+    if (!Array.isArray(mine) || !mine.length) continue;
+    const rem = _v72Arr(remote && remote[k]);
+    if (k === 'deletedIds') { const s = new Set(rem); if (mine.some(x => !s.has(x))) out.push(k); continue; }
+    const seen = new Set(rem.map(entrySig));
+    if (mine.some(e => !seen.has(entrySig(e)))) out.push(k);
+  }
+  return out;
+}
+// Push back anything this phone has that the cloud lost (a stale phone can overwrite a list).
+async function v72Heal(remote) {
+  const fid = state.familyId; if (!fid) return [];
+  const ks = v72Missing(remote); if (!ks.length) return [];
+  const patch = {}; ks.forEach(k => { patch[k] = state[k]; });
+  const ok = await fbPatch('/families/' + fid + '/state', patch);
+  if (ok) { _lastSyncHash = ''; window._v72Healed = ks; return ks; }
+  return [];
+}
 async function fbRead(path) {
   try {
     const r = await fetch(FB_URL + path + '.json');
@@ -3374,7 +3406,8 @@ async function syncFromCloud() {
   if (!fid) return;
   setSyncStatus('syncing');
   try {
-    const remote = await fbRead('/families/' + fid + '/state');
+    const remote = await fbReadStrict('/families/' + fid + '/state');
+    if (remote === undefined) { setSyncStatus('error'); return; }
     // If nothing in Firebase yet, push local state up
     if (!remote) {
       await fbWrite('/families/' + fid + '/state', state);
@@ -3402,6 +3435,7 @@ async function syncFromCloud() {
     // version back up so both devices and the cloud converge on de-duplicated data.
     const removedDupes = (typeof dedupeAllLogs === 'function') ? dedupeAllLogs() : 0;
     saveLocal();
+    try { v72Heal(remote); } catch(e) {}
     if (removedDupes > 0 && state.familyId) {
       // Push the cleaned full state up so the cloud stops serving duplicates.
       fbPatch('/families/' + state.familyId + '/state', state).then(()=>{ _lastSyncHash=''; });
@@ -3501,9 +3535,16 @@ async function pushToCloud(key, value) {
   const fid = state.familyId;
   if (!fid) return;
   setSyncStatus('syncing');
-  const ok = await fbPatch('/families/' + fid + '/state', {[key]: value});
+  let val = value;
+  if (LOG_ARRAY_KEYS.includes(key) && Array.isArray(value)) {
+    const rem = await fbReadStrict('/families/' + fid + '/state/' + key);
+    if (rem === undefined) { setSyncStatus('error'); return false; }   // could not check the cloud copy; the sync loop pushes later
+    if (rem) val = unionLogArrays(Array.isArray(state[key]) ? state[key] : value, _v72Arr(rem), new Set(state.deletedIds || []));
+  }
+  const ok = await fbPatch('/families/' + fid + '/state', {[key]: val});
   setSyncStatus(ok ? 'synced' : 'error');
   if (ok) _lastSyncHash = ''; // force next poll to re-compare
+  return ok;
 }
 
 function setSyncStatus(status) {
@@ -3675,7 +3716,22 @@ function migrateData() {
 }
 
 function saveLocal() {
-  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(state)); } catch(e) {}
+  let s; try { s = JSON.stringify(state); } catch(e) { return; }
+  try { localStorage.setItem(LOCAL_KEY, s); window._v72LocalFail = false; return; } catch(e) {}
+  // storage is full: recovery snapshots are the only thing that can be dropped safely
+  try {
+    const idx = _snapIndex().slice().sort((a, b) => a.at.localeCompare(b.at));
+    let n = 0, ok = false;
+    for (const old of idx) {
+      try { localStorage.removeItem(old.key); } catch(e) {}
+      n++;
+      try { localStorage.setItem(LOCAL_KEY, s); ok = true; break; } catch(e) {}
+    }
+    if (n) _writeSnapIndex(idx.slice(n));
+    if (ok) { window._v72LocalFail = false; return; }
+  } catch(e) {}
+  window._v72LocalFail = true;
+  if (!window._v72Warned) { window._v72Warned = true; try { toast('This phone is out of storage, so it may not keep today\u2019s entries. They are still saved to the cloud.'); } catch(e) {} }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -3687,7 +3743,7 @@ function saveLocal() {
 // ══════════════════════════════════════════════════════════════════════════════
 const SNAP_PREFIX = 'babyos_snap_';
 const SNAP_INDEX_KEY = 'babyos_snap_index';
-const SNAP_MAX = 14;   // keep the most recent 14 snapshots
+const SNAP_MAX = 4;   // keep the most recent 14 snapshots
 
 function _snapIndex() {
   try { return JSON.parse(localStorage.getItem(SNAP_INDEX_KEY) || '[]'); } catch(e) { return []; }
@@ -15534,6 +15590,10 @@ PAGES['settings'] = function(el) {
         <div class="settings-row-main"><div class="settings-row-lbl">Change family code</div><div class="settings-row-sub">Pick your own, or shuffle to a new random one</div></div>
         <span class="settings-chev">\u203a</span>
       </div>
+      <div class="settings-row" onclick="syncCheck()" role="button" tabindex="0">
+        <div class="settings-row-main"><div class="settings-row-lbl">Check sync</div><div class="settings-row-sub">Compare this phone with the cloud and repair any gaps</div></div>
+        <span class="settings-chev">\u203a</span>
+      </div>
     </div>
 
     <div class="card">
@@ -15592,6 +15652,23 @@ PAGES['settings'] = function(el) {
   `;
 };
 
+window.syncCheck = async () => {
+  const fid = state.familyId;
+  if (!fid) { toast('This phone is not signed in to a family'); return; }
+  toast('Checking\u2026');
+  const remote = await fbReadStrict('/families/' + fid + '/state');
+  if (remote === undefined) { alertDialog('Cannot reach the cloud', 'This phone could not read the family data. Check the internet connection and try again.', { icon:'\u26a0\ufe0f', okLabel:'OK' }); return; }
+  const rows = [['diaperLog','Diapers'],['feedingLog','Feeds'],['sleepLog','Sleep']];
+  const before = rows.map(x => [x[1], (state[x[0]]||[]).length, _v72Arr(remote && remote[x[0]]).length]);
+  window._v72Healed = null; _lastSyncHash = '';
+  await syncFromCloud();
+  const healed = await v72Heal(await fbReadStrict('/families/' + fid + '/state'));
+  const lines = rows.map((x, i) => before[i][0] + ': phone ' + before[i][1] + ', cloud ' + before[i][2] + ' \u2192 now ' + (state[x[0]]||[]).length);
+  const body = 'Family code ' + (state.familyCode || '\u2014') + '. Both phones must show the same code.\n\n' + lines.join('\n') + '\n\n' + (healed.length ? 'Sent this phone\u2019s missing entries back to the cloud.' : 'Nothing was missing in the cloud.') + (window._v72LocalFail ? '\n\nThis phone is out of storage.' : '');
+  alertDialog('Sync check', body, { icon:'\ud83d\udd04', okLabel:'Done' });
+  try { document.querySelector('#confirm-dialog .cfd-body').style.whiteSpace = 'pre-line'; } catch(e) {}
+  try { if (typeof PAGES !== 'undefined' && PAGES[_currentPage]) PAGES[_currentPage](document.getElementById('page-' + _currentPage)); } catch(e) {}
+};
 window.copyFamilyCode = () => {
   const code = state.familyCode;
   if (!code) { toast('No family code yet'); return; }
