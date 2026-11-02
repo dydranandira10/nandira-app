@@ -19113,6 +19113,34 @@ body.night-mode[data-page="bilingual"]{--ground:#12203A;--dink:#F5F0E6;--blob:co
 html:has(body[data-page="growth"]){--ground:#A5EBC9;--dink:#0B2A1C;--blob:color-mix(in srgb,#A5EBC9 78%,#fff);--dbtn:#0B2A1C;--dbtn-t:#A5EBC9;background:#A5EBC9 !important;}
 html:has(body.night-mode[data-page="growth"]){--ground:#0E2A20;--dink:#7FE3B4;--blob:color-mix(in srgb,#0E2A20 82%,#fff);--dbtn:#7FE3B4;--dbtn-t:#0E2A20;background:#0E2A20 !important;}
 body.night-mode[data-page="growth"]{--ground:#0E2A20;--dink:#7FE3B4;--blob:color-mix(in srgb,#0E2A20 82%,#fff);--dbtn:#7FE3B4;--dbtn-t:#0E2A20;}
+
+body.simple-mode .desktop-sidebar{display:none !important;}
+body.simple-mode #v23-mini{display:none !important;}
+.sm-hr{display:flex;align-items:center;gap:10px;}
+.sm-lang{display:flex;background:var(--card2,rgba(0,0,0,.07)) !important;border:2px solid var(--line,transparent);border-radius:999px;padding:3px;gap:2px;}
+.sm-lang button{border:0;background:none;padding:9px 15px;border-radius:999px;font-family:var(--font-display,var(--font));font-weight:800;font-size:15px;color:var(--ink-3,#767680);cursor:pointer;min-width:46px;}
+.sm-lang button.on{background:var(--y,#FFD166) !important;color:var(--on,#1d1a33) !important;}
+.sm-btn-sleep,body.night-mode .sm-btn-sleep{background:var(--lilac,#C5B8FF) !important;}
+@media (min-width:640px){.sm-actions{display:grid;grid-template-columns:1fr 1fr;}}
+.sm-card-sleep.run,body.night-mode .sm-card.sm-card-sleep.run{background:var(--lilac,#C5B8FF) !important;}
+.sm-card-timer,body.night-mode .sm-card.sm-card-timer{background:var(--coral,#FF8F80) !important;}
+.sm-card-sleep.run .sm-label,.sm-card-sleep.run .sm-clock,.sm-card-timer .sm-label,.sm-card-timer .sm-clock,body.night-mode .sm-card-sleep.run .sm-label,body.night-mode .sm-card-sleep.run .sm-clock,body.night-mode .sm-card-timer .sm-label,body.night-mode .sm-card-timer .sm-clock{color:var(--on,#1d1a33) !important;}
+.sm-clock{font-family:var(--font-display,var(--font));font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:4px;}
+.sm-cbtns{display:flex;gap:10px;margin-top:14px;}
+.sm-cbtn{flex:1;border:0;border-radius:999px;padding:18px 12px;font-family:var(--font-display,var(--font));font-size:19px;font-weight:800;color:#fff;background:var(--on,#1d1a33);cursor:pointer;}
+.sm-cbtn.sec{background:rgba(255,255,255,.6);color:var(--on,#1d1a33);}
+.sm-cbtn.sm-x{flex:0 0 62px;padding:18px 0;}
+.sm-sub-in{display:block;font-size:15px;font-weight:600;opacity:.7;margin-top:4px;}
+.sm-sheet .sm-time-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.sm-sheet .sm-time-row label{font-size:22px !important;font-weight:800 !important;color:var(--ink) !important;margin:0 !important;}
+.sm-sheet .sm-time-in{font-family:var(--font-display,var(--font)) !important;font-size:30px !important;font-weight:800 !important;padding:10px 12px !important;height:auto !important;border-radius:22px !important;border:2px solid var(--line,#E0DCCF) !important;background:var(--card2,#F2EFE7) !important;color:var(--ink) !important;width:250px !important;text-align:center;box-sizing:border-box;}
+.sm-time-sum{min-height:46px;text-align:center;font-size:18px;font-weight:700;color:var(--ink-2);margin:6px 0 14px;}
+.sm-time-sum.err{color:#C0392B;}
+.sm-alt{width:100%;margin:0 0 12px;background:none;border:2px dashed var(--line,#B9B3A0);border-radius:999px;padding:15px;font-family:var(--font-display,var(--font));font-size:18px;font-weight:800;color:var(--ink);cursor:pointer;}
+
+.sm-time-in::-webkit-calendar-picker-indicator{display:none;}
+.sm-cbtn,body.night-mode .sm-cbtn{background:var(--on,#1d1a33) !important;color:#fff !important;}
+.sm-cbtn.sec,body.night-mode .sm-cbtn.sec{background:rgba(255,255,255,.6) !important;color:var(--on,#1d1a33) !important;}
 </style>
 <script id="p53js">
 /* BabyOS v56: money. One place that knows the currency, formats amounts, reads what people type,
@@ -22431,6 +22459,427 @@ function start(){
 }
 window.b54Refresh = refreshBody;
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+
+/* v73: Simple mode gets sleep (timer + past sleep), start/end times for sleep and feeds, and an English / Indonesian button. */
+(function(){
+  'use strict';
+  var LKEY = 'babyos_simple_lang';
+  function getLang(){
+    try { var v = localStorage.getItem(LKEY); if (v === 'id' || v === 'en') return v; } catch(e){}
+    try { if (/^id$|indo/i.test(String((window.state && state.region) || ''))) return 'id'; } catch(e){}
+    return 'en';
+  }
+  var LANG = getLang();
+  var T = {
+    en: {
+      nextFeed:'Next feed', lastFeed:'Last feed', lastDiaper:'Last diaper', lastSleep:'Last sleep', weight:'Weight',
+      none:'None yet', noFeeds:'No feeds logged yet', notLogged:'Not logged yet', dueNow:'Due now',
+      inMin:'in about {n} min', inHM:'in {h}h {m}m', inH:'in {h}h', inM:'in {m}m',
+      agoNow:'just now', agoMin:'{n} min ago', agoHM:'{h}h {m}m ago',
+      sLeft:'left side', sRight:'right side', sFormula:'formula', sStored:'stored milk', sBoth:'both sides',
+      wet:'Wet', dirty:'Dirty', both:'Wet + dirty', nap:'Nap', night:'Night sleep',
+      bFeed:'Log feed', bDiaper:'Log diaper', bSleep:'Log sleep', bWeight:'Log weight',
+      cancel:'Cancel', save:'Save', which:'Which side?', left:'Left', right:'Right', formula:'Formula', stored:'Stored milk',
+      mins:'How many minutes?', fMl:'Formula (ml)', sMl:'Stored milk (ml)', wt:'Weight ({u})',
+      altTimes:'Enter start and end time', altWhen:'Set a different time',
+      kind:'What kind?', diaperPast:'Log a past diaper', diaperPastSub:'Choose the time it happened', diaperWhen:'When was the diaper?',
+      tStart:'Start', tEnd:'End', tAt:'Time',
+      today:'Today', yesterday:'Yesterday', to:'to',
+      errFuture:'That time has not happened yet', errLong:'That is too long, please check the times', errSame:'Start and end are the same',
+      errNeed:'Enter an amount first',
+      feedTimes:'Feed times', feedWhen:'When was the feed?', sleepTimes:'Sleep times', sleepPast:'Log a past sleep',
+      sleepTitle:'Sleep', sleepNow:'Baby is asleep now', sleepNowSub:'Starts the timer', sleepPastSub:'Enter when it started and ended',
+      wokeNow:'Woke up now', setTimes:'Change times', discard:'Discard timer',
+      sleepingSince:'Sleeping since {t}', feedingSince:'Feeding since {t}', finishFeed:'Finish feed',
+      discardTitle:'Discard this timer?', discardBody:'Nothing will be logged.', discardOk:'Discard',
+      tooShort:'Under a minute, so nothing was logged',
+      okFeed:'Feed logged ✓', okSleep:'Sleep logged ✓', okWeight:'Weight logged ✓', okDiaper:'Diaper logged ✓', timerOn:'Sleep timer started',
+      enterW:'Enter a weight',
+      exitAria:'Exit simple mode', exitTitle:'Exit simple mode?', exitBody:'This returns to the full BabyOS app with all pages and settings.', exitOk:'Exit simple mode',
+      baby:'Baby', timerRunning:'Timer already running. It may be on another phone.'
+    },
+    id: {
+      nextFeed:'Susu berikutnya', lastFeed:'Susu terakhir', lastDiaper:'Popok terakhir', lastSleep:'Tidur terakhir', weight:'Berat badan',
+      none:'Belum ada', noFeeds:'Belum ada catatan susu', notLogged:'Belum dicatat', dueNow:'Sudah waktunya',
+      inMin:'sekitar {n} menit lagi', inHM:'{h} jam {m} mnt lagi', inH:'{h} jam lagi', inM:'{m} mnt lagi',
+      agoNow:'baru saja', agoMin:'{n} menit lalu', agoHM:'{h} jam {m} mnt lalu',
+      sLeft:'sisi kiri', sRight:'sisi kanan', sFormula:'susu formula', sStored:'ASI perah', sBoth:'kedua sisi',
+      wet:'Pipis', dirty:'BAB', both:'Pipis + BAB', nap:'Tidur siang', night:'Tidur malam',
+      bFeed:'Catat susu', bDiaper:'Catat popok', bSleep:'Catat tidur', bWeight:'Catat berat badan',
+      cancel:'Batal', save:'Simpan', which:'Pilih jenis susu', left:'Kiri', right:'Kanan', formula:'Susu formula', stored:'ASI perah',
+      mins:'Berapa menit?', fMl:'Susu formula (ml)', sMl:'ASI perah (ml)', wt:'Berat badan ({u})',
+      altTimes:'Isi jam mulai dan selesai', altWhen:'Ubah jamnya',
+      kind:'Jenis popok?', diaperPast:'Catat popok yang sudah lewat', diaperPastSub:'Pilih jam kejadiannya', diaperWhen:'Jam berapa ganti popok?',
+      tStart:'Mulai', tEnd:'Selesai', tAt:'Jam',
+      today:'Hari ini', yesterday:'Kemarin', to:'sampai',
+      errFuture:'Jam itu belum terjadi', errLong:'Terlalu lama, mohon cek jamnya', errSame:'Jam mulai dan selesai sama',
+      errNeed:'Isi jumlahnya dulu',
+      feedTimes:'Jam menyusu', feedWhen:'Jam berapa minum susu?', sleepTimes:'Jam tidur', sleepPast:'Catat tidur yang sudah lewat',
+      sleepTitle:'Tidur', sleepNow:'Bayi tidur sekarang', sleepNowSub:'Memulai timer', sleepPastSub:'Isi jam mulai dan bangun',
+      wokeNow:'Bangun sekarang', setTimes:'Ubah jam', discard:'Batalkan timer',
+      sleepingSince:'Tidur sejak {t}', feedingSince:'Menyusu sejak {t}', finishFeed:'Selesai menyusu',
+      discardTitle:'Batalkan timer ini?', discardBody:'Tidak ada yang dicatat.', discardOk:'Batalkan',
+      tooShort:'Kurang dari semenit, jadi tidak dicatat',
+      okFeed:'Susu tercatat ✓', okSleep:'Tidur tercatat ✓', okWeight:'Berat badan tercatat ✓', okDiaper:'Popok tercatat ✓', timerOn:'Timer tidur dimulai',
+      enterW:'Isi berat badan',
+      exitAria:'Keluar dari mode sederhana', exitTitle:'Keluar dari mode sederhana?', exitBody:'Kembali ke aplikasi BabyOS lengkap dengan semua halaman dan pengaturan.', exitOk:'Keluar',
+      baby:'Bayi', timerRunning:'Timer sudah berjalan. Mungkin ada di ponsel lain.'
+    }
+  };
+  function t(k, a){
+    var s = T[LANG] && T[LANG][k]; if (s == null) s = T.en[k]; if (s == null) s = k;
+    if (a) for (var i in a) s = s.split('{' + i + '}').join(a[i]);
+    return s;
+  }
+  function p2(n){ return String(n).padStart(2, '0'); }
+  function hm(d){ return p2(d.getHours()) + ':' + p2(d.getMinutes()); }
+  function clock(d){
+    if (!d || isNaN(d)) return '—';
+    if (LANG === 'id') return p2(d.getHours()) + '.' + p2(d.getMinutes());
+    var h = d.getHours(), m = d.getMinutes(), ap = h >= 12 ? 'PM' : 'AM'; h = h % 12; if (h === 0) h = 12;
+    return h + ':' + p2(m) + ' ' + ap;
+  }
+  function durTxt(m){
+    m = Math.max(0, Math.round(m)); var h = Math.floor(m / 60), r = m % 60;
+    if (LANG === 'id') return h > 0 ? h + ' j' + (r ? ' ' + r + ' mnt' : '') : m + ' mnt';
+    return h > 0 ? h + 'h' + (r ? ' ' + r + 'm' : '') : m + 'm';
+  }
+  function agoTxt(d){
+    if (!d || isNaN(d)) return '';
+    var m = Math.floor((Date.now() - d.getTime()) / 60000);
+    if (m < 1) return t('agoNow');
+    if (m < 60) return t('agoMin', { n: m });
+    return t('agoHM', { h: Math.floor(m / 60), m: m % 60 });
+  }
+  function dayWord(d){
+    var n = new Date(), a = localDateStr(d), b = localDateStr(n), y = localDateStr(new Date(n.getTime() - 86400000));
+    if (a === b) return t('today'); if (a === y) return t('yesterday');
+    return d.toLocaleDateString(LANG === 'id' ? 'id-ID' : 'en-GB', { day: 'numeric', month: 'short' });
+  }
+  function mkAt(base, hhmm){ var a = String(hhmm).split(':'); var d = new Date(base.getTime()); d.setHours(+a[0], +a[1], 0, 0); return d; }
+  // start/end typed as clock times -> real dates. Start is the latest such time that is not in the future;
+  // end is the first such time after the start (so a night sleep can cross midnight).
+  function resolveRange(s, e){
+    var now = new Date(), sd = mkAt(now, s);
+    if (sd.getTime() > now.getTime() + 60000) sd = new Date(sd.getTime() - 86400000);
+    var ed = mkAt(sd, e);
+    if (ed.getTime() <= sd.getTime()) ed = new Date(ed.getTime() + 86400000);
+    if (ed.getTime() === sd.getTime()) return { err: t('errSame') };
+    if (ed.getTime() > now.getTime() + 60000) return { err: t('errFuture') };
+    if ((ed - sd) > 20 * 3600000) return { err: t('errLong') };
+    return { s: sd, e: ed };
+  }
+  function resolveOne(s){
+    var now = new Date(), sd = mkAt(now, s);
+    if (sd.getTime() > now.getTime() + 60000) sd = new Date(sd.getTime() - 86400000);
+    return { s: sd };
+  }
+  function bi(){ return typeof logBabyIdx === 'function' ? logBabyIdx() : 0; }
+
+  // ---------- sheets
+  function openSheet(inner){
+    var ov = document.getElementById('sm-sheet'); if (ov) ov.remove();
+    ov = document.createElement('div'); ov.id = 'sm-sheet'; ov.className = 'sm-sheet-ov';
+    ov.innerHTML = '<div class="sm-sheet">' + inner + '</div>';
+    document.body.appendChild(ov);
+    ov.onclick = function(e){ if (e.target === ov) window.smCloseSheet(); };
+    requestAnimationFrame(function(){ ov.classList.add('show'); });
+    return ov;
+  }
+  window.smChoiceSheet = function(title, options){
+    var ov = openSheet('<div class="sm-sheet-title">' + title + '</div><div class="sm-sheet-opts">' +
+      options.map(function(o, i){ return '<button class="sm-sheet-btn" data-i="' + i + '">' + o.label + (o.sub ? '<small class="sm-sub-in">' + o.sub + '</small>' : '') + '</button>'; }).join('') +
+      '</div><button class="sm-sheet-cancel">' + t('cancel') + '</button>');
+    ov.querySelectorAll('.sm-sheet-btn').forEach(function(btn){
+      btn.onclick = function(){ var i = parseInt(btn.getAttribute('data-i')); window.smCloseSheet(); setTimeout(function(){ options[i].onPick(); }, 60); };
+    });
+    ov.querySelector('.sm-sheet-cancel').onclick = window.smCloseSheet;
+  };
+  window.smAmountSheet = function(title, onDone, allowDecimal, alt){
+    var keys = ['1','2','3','4','5','6','7','8','9', allowDecimal ? '.' : '', '0', '⌫'];
+    var ov = openSheet('<div class="sm-sheet-title">' + title + '</div><div class="sm-amount-display" id="sm-amount">0</div>' +
+      '<div class="sm-keypad">' + keys.map(function(k){ return k === '' ? '<span></span>' : '<button class="sm-key" data-k="' + k + '">' + k + '</button>'; }).join('') + '</div>' +
+      (alt ? '<button class="sm-alt">' + alt.label + '</button>' : '') +
+      '<div class="sm-sheet-foot"><button class="sm-sheet-cancel">' + t('cancel') + '</button><button class="sm-sheet-ok">' + t('save') + '</button></div>');
+    var buf = '', disp = ov.querySelector('#sm-amount');
+    function sync(){ disp.textContent = buf || '0'; }
+    ov.querySelectorAll('.sm-key').forEach(function(k){
+      k.onclick = function(){
+        var key = k.getAttribute('data-k');
+        if (key === '⌫') buf = buf.slice(0, -1);
+        else if (key === '.') { if (buf.indexOf('.') < 0) buf = (buf || '0') + '.'; }
+        else if (buf.replace('.', '').length < 6) buf += key;
+        sync();
+      };
+    });
+    ov.querySelector('.sm-sheet-cancel').onclick = window.smCloseSheet;
+    ov.querySelector('.sm-sheet-ok').onclick = function(){ var v = buf; window.smCloseSheet(); setTimeout(function(){ onDone(v); }, 60); };
+    if (alt) ov.querySelector('.sm-alt').onclick = function(){ if (alt.needAmount && !(parseFloat(buf) > 0)) { toast(t('errNeed')); return; } var v = buf; window.smCloseSheet(); setTimeout(function(){ alt.fn(v); }, 60); };
+  };
+  // big start / end (or single time) entry with a live summary of what will be saved
+  function timesSheet(cfg){
+    var range = cfg.mode !== 'single';
+    var ov = openSheet('<div class="sm-sheet-title">' + cfg.title + '</div>' +
+      '<div class="sm-time-row"><label for="sm-t1">' + (range ? t('tStart') : t('tAt')) + '</label><input type="time" class="sm-time-in" id="sm-t1" value="' + (cfg.start || '') + '"></div>' +
+      (range ? '<div class="sm-time-row"><label for="sm-t2">' + t('tEnd') + '</label><input type="time" class="sm-time-in" id="sm-t2" value="' + (cfg.end || '') + '"></div>' : '') +
+      '<div class="sm-time-sum" id="sm-tsum"></div>' +
+      '<div class="sm-sheet-foot"><button class="sm-sheet-cancel">' + t('cancel') + '</button><button class="sm-sheet-ok">' + t('save') + '</button></div>');
+    var i1 = ov.querySelector('#sm-t1'), i2 = ov.querySelector('#sm-t2'), sum = ov.querySelector('#sm-tsum');
+    function calc(){
+      var a = i1.value, b = i2 ? i2.value : '';
+      if (!a || (range && !b)) return { err: '' };
+      return range ? resolveRange(a, b) : resolveOne(a);
+    }
+    function paint(){
+      var r = calc(); sum.className = 'sm-time-sum' + (r.err ? ' err' : '');
+      if (r.err !== undefined && r.err !== null && !r.s) { sum.textContent = r.err; return; }
+      sum.textContent = range ? dayWord(r.s) + ' ' + clock(r.s) + ' ' + t('to') + ' ' + clock(r.e) + ' (' + durTxt((r.e - r.s) / 60000) + ')' : dayWord(r.s) + ' ' + clock(r.s);
+    }
+    ['input', 'change'].forEach(function(ev){ i1.addEventListener(ev, paint); if (i2) i2.addEventListener(ev, paint); });
+    paint();
+    ov.querySelector('.sm-sheet-cancel').onclick = window.smCloseSheet;
+    ov.querySelector('.sm-sheet-ok').onclick = function(){
+      var r = calc();
+      if (!r.s) { toast(r.err || t('errNeed')); return; }
+      window.smCloseSheet(); setTimeout(function(){ cfg.onSave(r); }, 60);
+    };
+  }
+
+  // ---------- saving
+  function rerender(){ if (window._smRender) window._smRender(); }
+  function pushFeed(type, ml, startD, endD){
+    if (!state.feedingLog) state.feedingLog = [];
+    var breast = (type === 'left' || type === 'right'), mins = breast && endD ? Math.max(1, Math.round((endD - startD) / 60000)) : 0;
+    state.feedingLog.push({
+      date: localDateStr(startD), time: hm(startD), endTime: breast && endD ? hm(endD) : '', feedType: type,
+      leftMin: type === 'left' ? mins : 0, rightMin: type === 'right' ? mins : 0,
+      formulaMl: type === 'formula' ? (parseInt(ml) || 0) : 0, storedMl: type === 'stored' ? (parseInt(ml) || 0) : 0,
+      pumpedMl: 0, notes: '', babyIdx: bi()
+    });
+    saveState('feedingLog'); rerender(); toastSuccess(t('okFeed'));
+  }
+  window.smSaveFeed = function(type, ml, mins){
+    var now = new Date(), m = parseInt(mins) || 0, breast = (type === 'left' || type === 'right');
+    if (breast && m > 0) pushFeed(type, ml, new Date(now.getTime() - m * 60000), now); else pushFeed(type, ml, now, null);
+  };
+  function pushSleep(sd, ed){
+    if (!state.sleepLog) state.sleepLog = [];
+    var hr = sd.getHours();
+    state.sleepLog.push({ date: localDateStr(sd), start: hm(sd), end: hm(ed), type: (hr >= 19 || hr < 6) ? 'Night' : 'Day nap', quality: 'Good', notes: '', babyIdx: bi() });
+    saveState('sleepLog'); toastSuccess(t('okSleep'));
+  }
+  function stopSleepState(){ state.activeSleepTimer = { running: false, stoppedAt: Date.now() }; saveState('activeSleepTimer'); try { window._pendingSleep = null; } catch(e){} }
+  function stopFeedState(){ state.activeFeedTimer = { running: false, stoppedAt: Date.now() }; saveState('activeFeedTimer'); }
+  function sleepRunning(){ var x = state.activeSleepTimer; return x && x.running ? x : null; }
+  function feedRunning(){ var x = state.activeFeedTimer; return x && x.running ? x : null; }
+
+  // ---------- flows
+  window.smLogFeed = function(){
+    function breast(side){
+      window.smAmountSheet(t('mins'), function(m){ window.smSaveFeed(side, null, m); }, false, {
+        label: '⏰ ' + t('altTimes'),
+        fn: function(){
+          var n = new Date();
+          timesSheet({ title: t('feedTimes'), start: hm(new Date(n.getTime() - 20 * 60000)), end: hm(n), onSave: function(r){ pushFeed(side, null, r.s, r.e); } });
+        }
+      });
+    }
+    function bottle(type, title){
+      window.smAmountSheet(title, function(ml){ window.smSaveFeed(type, ml); }, false, {
+        label: '⏰ ' + t('altWhen'), needAmount: true,
+        fn: function(ml){ timesSheet({ title: t('feedWhen'), mode: 'single', start: hm(new Date()), onSave: function(r){ pushFeed(type, ml, r.s, null); } }); }
+      });
+    }
+    window.smChoiceSheet(t('which'), [
+      { label: '💙 ' + t('left'), onPick: function(){ breast('left'); } },
+      { label: '💗 ' + t('right'), onPick: function(){ breast('right'); } },
+      { label: '🍼 ' + t('formula'), onPick: function(){ bottle('formula', t('fMl')); } },
+      { label: '🥛 ' + t('stored'), onPick: function(){ bottle('stored', t('sMl')); } }
+    ]);
+  };
+  function saveDiaper(type, at){
+    if (!state.diaperLog) state.diaperLog = [];
+    var n = at || new Date();
+    state.diaperLog.push({ date: localDateStr(n), time: hm(n), wet: type === 'wet' || type === 'both', dirty: type === 'dirty' || type === 'both', color: type !== 'wet' ? 'Mustard Yellow' : 'N/A', notes: '', babyIdx: bi() });
+    saveState('diaperLog'); rerender(); toastSuccess(t('okDiaper'));
+  }
+  function diaperKinds(pick){
+    return [
+      { label: '\ud83d\udca7 ' + t('wet'), onPick: function(){ pick('wet'); } },
+      { label: '\ud83d\udca9 ' + t('dirty'), onPick: function(){ pick('dirty'); } },
+      { label: '\ud83d\udca7\ud83d\udca9 ' + t('both'), onPick: function(){ pick('both'); } }
+    ];
+  }
+  window.smLogDiaper = function(){
+    var opts = diaperKinds(function(k){ saveDiaper(k); });
+    opts.push({ label: '\u23f0 ' + t('diaperPast'), sub: t('diaperPastSub'), onPick: function(){
+      window.smChoiceSheet(t('kind'), diaperKinds(function(k){
+        timesSheet({ title: t('diaperWhen'), mode: 'single', start: hm(new Date()), onSave: function(r){ saveDiaper(k, r.s); } });
+      }));
+    } });
+    window.smChoiceSheet(t('kind'), opts);
+  };
+  window.smLogWeight = function(){
+    var unit = state.weightUnit || 'kg';
+    window.smAmountSheet(t('wt', { u: unit }), function(v){
+      var val = parseFloat(v);
+      if (!val || val <= 0) { toast(t('enterW')); return; }
+      var grams = unit === 'g' ? val : unit === 'lboz' ? val * 453.592 : val * 1000;
+      if (!state.weightLog) state.weightLog = [];
+      var d = today(), b = bi(), entry = { date: d, grams: Math.round(grams), notes: '', babyIdx: b };
+      var ex = state.weightLog.findIndex(function(w){ return w.date === d && (w.babyIdx || 0) === b; });
+      if (ex >= 0) state.weightLog[ex] = entry; else state.weightLog.push(entry);
+      saveState('weightLog'); rerender(); toastSuccess(t('okWeight'));
+    }, true);
+  };
+  function startSleep(){
+    if (sleepRunning()) { toast(t('timerRunning')); rerender(); return; }
+    state.activeSleepTimer = { running: true, start: Date.now() }; saveState('activeSleepTimer');
+    rerender(); toastSuccess(t('timerOn'));
+  }
+  function wokeNow(){
+    var x = sleepRunning(); if (!x) return;
+    var sd = new Date(x.start), ed = new Date();
+    stopSleepState();
+    if (ed - sd < 60000) { toast(t('tooShort')); rerender(); return; }
+    pushSleep(sd, ed); rerender();
+  }
+  function sleepTimes(){
+    var x = sleepRunning(); if (!x) return;
+    timesSheet({ title: t('sleepTimes'), start: hm(new Date(x.start)), end: hm(new Date()), onSave: function(r){ stopSleepState(); pushSleep(r.s, r.e); rerender(); } });
+  }
+  function discard(which){
+    confirmDialog({ title: t('discardTitle'), body: t('discardBody'), confirmLabel: t('discardOk'), cancelLabel: t('cancel'), danger: true }, function(){
+      if (which === 'feed') stopFeedState(); else stopSleepState(); rerender();
+    });
+  }
+  window.smLogSleep = function(){
+    var past = { label: '🕐 ' + t('sleepPast'), sub: t('sleepPastSub'), onPick: function(){
+      var n = new Date();
+      timesSheet({ title: t('sleepPast'), start: hm(new Date(n.getTime() - 3600000)), end: hm(n), onSave: function(r){ pushSleep(r.s, r.e); rerender(); } });
+    } };
+    if (sleepRunning()) {
+      window.smChoiceSheet(t('sleepTitle'), [
+        { label: '☀️ ' + t('wokeNow'), onPick: wokeNow },
+        { label: '⏰ ' + t('setTimes'), onPick: sleepTimes },
+        { label: '🗑️ ' + t('discard'), onPick: function(){ discard('sleep'); } }
+      ]);
+    } else {
+      window.smChoiceSheet(t('sleepTitle'), [
+        { label: '😴 ' + t('sleepNow'), sub: t('sleepNowSub'), onPick: startSleep }, past
+      ]);
+    }
+  };
+  function finishFeed(){
+    var x = feedRunning(); if (!x) return;
+    var sd = new Date(x.start), ed = new Date(), side = x.side === 'right' ? 'right' : 'left';
+    stopFeedState();
+    if (ed - sd < 60000) { toast(t('tooShort')); rerender(); return; }
+    pushFeed(side, null, sd, ed);
+  }
+  function feedTimes(){
+    var x = feedRunning(); if (!x) return; var side = x.side === 'right' ? 'right' : 'left';
+    timesSheet({ title: t('feedTimes'), start: hm(new Date(x.start)), end: hm(new Date()), onSave: function(r){ stopFeedState(); pushFeed(side, null, r.s, r.e); } });
+  }
+  window._smAct = { woke: wokeNow, sleepTimes: sleepTimes, discardSleep: function(){ discard('sleep'); }, finishFeed: finishFeed, feedTimes: feedTimes, discardFeed: function(){ discard('feed'); } };
+  window.smSetLang = function(v){ LANG = v === 'id' ? 'id' : 'en'; try { localStorage.setItem(LKEY, LANG); } catch(e){} rerender(); };
+
+  // ---------- page
+  var tick = null;
+  function hms(ms){ var s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return h + ':' + p2(m) + ':' + p2(s % 60); }
+  function startTick(){
+    if (tick) clearInterval(tick);
+    tick = setInterval(function(){
+      var a = document.getElementById('sm-sl-clock'), b = document.getElementById('sm-fd-clock');
+      if (!a && !b) { clearInterval(tick); tick = null; return; }
+      var s = sleepRunning(), f = feedRunning();
+      if (a && s) a.textContent = hms(Date.now() - s.start);
+      if (b && f) b.textContent = hms(Date.now() - f.start);
+    }, 1000);
+  }
+  function sideTxt(s){ return s === 'left side' ? t('sLeft') : s === 'right side' ? t('sRight') : s === 'formula' ? t('sFormula') : s === 'stored milk' ? t('sStored') : s === 'both sides' ? t('sBoth') : s; }
+
+  PAGES['simple'] = function(el){
+    function render(){
+      var feed = lastFeedInfo(), rec = getRecommendations();
+      var freqH = state.feedIntervalHours;
+      if (!freqH && rec && rec.feedFreq) freqH = parseFloat((String(rec.feedFreq).match(/[\d.]+/) || ['3'])[0]);
+      var nextClock = '—', nextSub = '', tone = 'ok';
+      if (feed && feed.dt && freqH) {
+        var due = new Date(feed.dt.getTime() + freqH * 3600000); nextClock = clock(due);
+        var left = Math.round((due - new Date()) / 60000);
+        if (left <= 0) { nextSub = t('dueNow'); tone = 'due'; }
+        else if (left <= 20) { nextSub = t('inMin', { n: left }); tone = 'soon'; }
+        else { var h = Math.floor(left / 60), m = left % 60; nextSub = h > 0 ? (m > 0 ? t('inHM', { h: h, m: m }) : t('inH', { h: h })) : t('inM', { m: m }); }
+      } else nextSub = t('noFeeds');
+
+      var dl = logsFor(state.diaperLog || []).slice().sort(function(a, b){ return ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')); });
+      var ld = dl[0], dTxt = t('none'), dAgo = '';
+      if (ld) { dTxt = (ld.wet && ld.dirty) ? t('both') : ld.dirty ? t('dirty') : t('wet'); dAgo = agoTxt(new Date((ld.date || '') + 'T' + (ld.time || '00:00'))); }
+
+      // last finished sleep
+      var ls = null, lsEnd = null;
+      logsFor(state.sleepLog || []).forEach(function(e){
+        if (!e || !e.end || !e.start || !e.date) return;
+        var s0 = new Date(e.date + 'T' + e.start + ':00'), e0 = new Date(e.date + 'T' + e.end + ':00'); if (isNaN(s0) || isNaN(e0)) return;
+        if (e0 <= s0) e0 = new Date(e0.getTime() + 86400000);
+        if (!lsEnd || e0 > lsEnd) { lsEnd = e0; ls = { s: s0, e: e0, type: e.type }; }
+      });
+
+      var wl = logsFor(state.weightLog || []).slice().sort(function(a, b){ return (b.date || '').localeCompare(a.date || ''); });
+      var lw = wl[0], unit = state.weightUnit || 'kg';
+      var wText = lw ? gramsToDisplay(lw.grams, unit) : '—';
+      var wDate = lw ? new Date(lw.date + 'T12:00:00').toLocaleDateString(LANG === 'id' ? 'id-ID' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : t('notLogged');
+
+      var sr = sleepRunning(), fr = feedRunning();
+      var feedCard = fr ? '<div class="sm-card sm-card-timer sm-run-feed"><div class="sm-label">🍼 ' + t('feedingSince', { t: clock(new Date(fr.start)) }) + ' · ' + (fr.side === 'right' ? t('right') : t('left')) + '</div>' +
+        '<div class="sm-clock" id="sm-fd-clock">' + hms(Date.now() - fr.start) + '</div>' +
+        '<div class="sm-cbtns"><button class="sm-cbtn" data-sm="finishFeed">' + t('finishFeed') + '</button><button class="sm-cbtn sec" data-sm="feedTimes">' + t('setTimes') + '</button><button class="sm-cbtn sec sm-x" data-sm="discardFeed" aria-label="' + t('discard') + '">✕</button></div></div>' : '';
+      var sleepCard = sr
+        ? '<div class="sm-card sm-card-sleep run"><div class="sm-label">😴 ' + t('sleepingSince', { t: clock(new Date(sr.start)) }) + '</div>' +
+          '<div class="sm-clock" id="sm-sl-clock">' + hms(Date.now() - sr.start) + '</div>' +
+          '<div class="sm-cbtns"><button class="sm-cbtn" data-sm="woke">' + t('wokeNow') + '</button><button class="sm-cbtn sec" data-sm="sleepTimes">' + t('setTimes') + '</button><button class="sm-cbtn sec sm-x" data-sm="discardSleep" aria-label="' + t('discard') + '">✕</button></div></div>'
+        : '<div class="sm-card sm-card-sleep"><div class="sm-label">' + t('lastSleep') + '</div>' +
+          '<div class="sm-mid">' + (ls ? durTxt((ls.e - ls.s) / 60000) + ' · ' + (ls.type === 'Night' ? t('night') : t('nap')) : t('none')) + '</div>' +
+          '<div class="sm-sub">' + (ls ? clock(ls.s) + ' ' + t('to') + ' ' + clock(ls.e) + ' · ' + agoTxt(ls.e) : ' ') + '</div></div>';
+
+      var pill = '<div class="sm-lang" role="group" aria-label="Language"><button type="button" data-sm="lang-en" class="' + (LANG === 'en' ? 'on' : '') + '">EN</button><button type="button" data-sm="lang-id" class="' + (LANG === 'id' ? 'on' : '') + '">ID</button></div>';
+      el.innerHTML =
+        '<div class="sm-wrap"><div class="sm-head"><span class="sm-baby">' + (babyName() || t('baby')) + '</span>' +
+        '<div class="sm-hr">' + pill + '<button class="sm-exit" onclick="simpleModeExitPrompt()" aria-label="' + t('exitAria') + '">⚙</button></div></div>' +
+        '<div class="sm-card sm-card-next sm-tone-' + tone + '"><div class="sm-label">' + t('nextFeed') + '</div><div class="sm-big">' + nextClock + '</div><div class="sm-sub">' + nextSub + '</div></div>' +
+        feedCard +
+        '<div class="sm-row"><div class="sm-card sm-card-half"><div class="sm-label">' + t('lastFeed') + '</div><div class="sm-mid">' + (feed && feed.dt ? clock(feed.dt) : '—') + '</div>' +
+        '<div class="sm-sub">' + (feed && feed.dt ? agoTxt(feed.dt) : t('none')) + (feed && feed.side ? ' · ' + sideTxt(feed.side) : '') + '</div></div>' +
+        '<div class="sm-card sm-card-half"><div class="sm-label">' + t('lastDiaper') + '</div><div class="sm-mid">' + dTxt + '</div><div class="sm-sub">' + (dAgo || ' ') + '</div></div></div>' +
+        sleepCard +
+        '<div class="sm-card sm-card-weight"><div><div class="sm-label">' + t('weight') + '</div><div class="sm-sub" style="margin-top:2px">' + wDate + '</div></div><div class="sm-weight-val">' + wText + '</div></div>' +
+        '<div class="sm-actions"><button class="sm-btn sm-btn-feed" onclick="smLogFeed()">🍼<span>' + t('bFeed') + '</span></button>' +
+        '<button class="sm-btn sm-btn-diaper" onclick="smLogDiaper()">💧<span>' + t('bDiaper') + '</span></button>' +
+        '<button class="sm-btn sm-btn-sleep" onclick="smLogSleep()">😴<span>' + t('bSleep') + '</span></button>' +
+        '<button class="sm-btn sm-btn-weight" onclick="smLogWeight()">⚖️<span>' + t('bWeight') + '</span></button></div></div>';
+      el.querySelectorAll('[data-sm]').forEach(function(b){
+        b.onclick = function(){
+          var k = b.getAttribute('data-sm');
+          if (k === 'lang-en') window.smSetLang('en'); else if (k === 'lang-id') window.smSetLang('id'); else if (window._smAct[k]) window._smAct[k]();
+        };
+      });
+      if (sr || fr) startTick();
+    }
+    window._smRender = render;
+    render();
+  };
+
+  window.simpleModeExitPrompt = function(){
+    confirmDialog({ title: t('exitTitle'), body: t('exitBody'), confirmLabel: t('exitOk'), cancelLabel: t('cancel'), danger: false }, function(){
+      state.simpleMode = false; saveState('simpleMode'); applySimpleMode(); navTo('now');
+    });
+  };
+
+  // the base page may already have drawn before this script ran
+  function boot(){ try { var el = document.getElementById('page-simple'); if (el && document.body.classList.contains('simple-mode') && el.children.length) PAGES['simple'](el); } catch(e){} }
+  setTimeout(boot, 0); setTimeout(boot, 600);
 })();
 
 </script>
