@@ -19139,6 +19139,10 @@ body.simple-mode #v23-mini{display:none !important;}
 .sm-alt{width:100%;margin:0 0 12px;background:none;border:2px dashed var(--line,#B9B3A0);border-radius:999px;padding:15px;font-family:var(--font-display,var(--font));font-size:18px;font-weight:800;color:var(--ink);cursor:pointer;}
 
 .sm-time-in::-webkit-calendar-picker-indicator{display:none;}
+.sm-sheet .sm-time-in{-webkit-appearance:none !important;appearance:none !important;display:block !important;height:68px !important;line-height:68px !important;padding:0 12px !important;text-align:center !important;min-width:0;}
+.sm-time-in::-webkit-date-and-time-value{text-align:center !important;margin:0 auto !important;min-height:1.2em;}
+.sm-time-in::-webkit-datetime-edit{display:flex !important;justify-content:center;align-items:center;width:100%;padding:0;}
+.sm-time-in::-webkit-datetime-edit-fields-wrapper{display:flex;justify-content:center;align-items:center;padding:0;}
 .sm-cbtn,body.night-mode .sm-cbtn{background:var(--on,#1d1a33) !important;color:#fff !important;}
 .sm-cbtn.sec,body.night-mode .sm-cbtn.sec{background:rgba(255,255,255,.6) !important;color:var(--on,#1d1a33) !important;}
 </style>
@@ -21556,6 +21560,7 @@ B.settings = function(){
 CFG.settings = { more: 'All settings', open: true };
 ACT.setGo = function(t){ openMore(t); };
 ACT.setCopy = function(){ if (typeof copyFamilyCode === 'function') copyFamilyCode(); };
+P.palette = 'M12 3a9 9 0 1 0 0 18c1.100 0 1.800-.8 1.800-1.700 0-.5-.3-.9-.5-1.300-.3-.4-.5-.8-.5-1.300 0-1 .8-1.700 1.800-1.700H17a4 4 0 0 0 4-4c0-4.400-4-8-9-8zM7.500 11h.01M10 7.500h.01M14.500 7.500h.01';
 /* ================= v57: PARENTING STYLES, pick a mix and get a plan ================= */
 var STY = [
   { id: 'resp', n: 'Responsive (RIE-inspired)', s: 'Responsive', col: '#7FE3B4', ic: 'leaf', short: 'Treat your baby as a capable person. Watch, listen, then respond.', lean: 'follows your baby’s cues', gift: 'calm, respectful care',
@@ -21598,6 +21603,11 @@ var STY = [
     fit: 'You love nature, music and a calm, homey pace.', watch: 'Some Waldorf communities discourage vaccines or early reading. Follow your paediatrician on health.',
     p: { feed: ['Make meals a calm ritual with a song and the same rhythm each day.'], sleep: ['A warm, repeated bedtime song and a dim room.'], soothe: ['Hum, sing and rock, keeping your voice soft and low.'], play: ['Offer simple natural toys, songs and finger games, with time outdoors every day.'], rhythm: ['Build a day and week rhythm that alternates quiet time and outings.'], limits: ['Guide through rhythm and imitation. Baby learns by watching what you do.'], carers: ['Share songs and rituals with carers so the rhythm stays the same.'] },
     tr: ['Pick one lullaby and sing it at every sleep.', 'Go outside daily for 20 minutes, at the same time if you can.', 'Add a weekly rhythm: one outing, one baking day.', 'Offer simple props (a cloth, a wooden spoon) for imaginative play.'] },
+  { id: 'reggio', n: 'Reggio Emilia-inspired', s: 'Reggio Emilia', col: '#E3B98F', ic: 'palette', short: 'Your child is a curious explorer. Set up a lovely space, then watch and follow their interests.', lean: 'follows curiosity and exploration', gift: 'curiosity and creativity',
+    day: ['Offer a few simple, real things to explore (a cloth, a wooden spoon, a mirror) and watch what baby does.', 'Talk about what baby notices and give them plenty of unhurried time.', 'Keep a bright, tidy corner with natural light that invites exploring.'],
+    fit: 'You enjoy exploring, art and asking questions with your child, and like a beautiful, calm space.', watch: 'Reggio Emilia is a preschool approach, so this is an early-years adaptation. Safe sleep and feeding guidance still come first, and small objects need close supervision.',
+    p: { feed: ['From about 6 months, let baby look at, touch and taste soft foods at their own pace. Mess is part of learning.'], sleep: ['Keep the sleep space calm, simple and the same every time. Save exploring for awake time. Safe sleep rules come first.'], soothe: ['Slow down and follow what baby is looking at (a window, a mirror, a face) and name it softly together.'], play: ['Offer a few real or natural things in a basket and watch what baby does with them.', 'When ready, add simple art: big paper with baby-safe paint, or water and sensory play.'], rhythm: ['Leave long, unhurried stretches to explore. Fewer activities, more time.'], limits: ['Let the space do the teaching: set it up safely so you can say yes to most things, and redirect calmly to other materials.'], carers: ['Share short notes or photos of what baby explored today so carers can build on it.'] },
+    tr: ['Hang a safe mirror at floor level and let baby look and reach for 10 minutes.', 'Put two or three safe, different textures in a basket and watch what baby chooses.', 'Offer a few real objects (a wooden spoon, a metal bowl) and let baby explore while you stay close.', 'Offer big paper and baby-safe paint, or water play, and just watch. Take a photo to share.'] },
   { id: 'sci', n: 'Evidence-first (developmental science)', s: 'Evidence-first', col: '#6AA8FF', ic: 'bulb', short: 'Follow the research: serve and return, safe sleep, play as learning.', lean: 'follows the research', gift: 'safety and evidence',
     day: ['Talk, sing and read daily, and answer when baby babbles (serve and return).', 'Follow safe sleep and vaccine guidance from your paediatrician.', 'Daily tummy time and floor play.'],
     fit: 'You like knowing why, and checking advice against evidence.', watch: 'Research gives averages, not your baby. Use it as a guide, not a test.',
@@ -21621,6 +21631,11 @@ var TENS = {
   'attach+vill': ['One main carer or many?', 'Let one or two people be the main attachment figures and give others clear roles.'],
   'mont+wald': ['Real objects or imagination?', 'Combine them: real tools for daily living and open-ended materials for imaginative play.'],
   'sci+wald': ['Evidence or tradition?', 'Keep health and safety evidence-led and enjoy the rhythm, nature and songs.'],
+  'mont+reggio': ['Prepared tray or open exploration?', 'Set up the space with a few materials, then follow what baby does with them. Both start from watching the child.'],
+  'reggio+wald': ['Natural materials or imagination?', 'Use natural, open-ended things and let imagination lead. Add art and sensory play alongside songs and rhythm.'],
+  'reggio+resp': ['Observe or document?', 'Both begin with watching. Add a few photos or short notes of what baby explores and share them with carers.'],
+  'led+reggio': ['Cues or curiosity?', 'Follow baby’s cues for feeding and sleep, and their curiosity for play. Both let baby lead.'],
+  'reggio+vill': ['One explorer, many helpers', 'Keep a shared note of what baby explored so every carer can build on it.'],
   'gentle+rout': ['Flexible or predictable?', 'Keep the day predictable and bring empathy to the moments when it does not go to plan.']
 };
 var BANDS = [[3, 'First 3 months', 'Newborn months: feed on demand, sleep safely, and enjoy your baby. Habits come later.'], [6, '4 to 6 months', 'Awake windows grow and play begins. A good time for a gentle rhythm and tummy time.'], [12, '7 to 12 months', 'Solids, crawling and separation worries. Safety set-up and short goodbye rituals matter.'], [999, '13 months and up', 'Toddler independence: choices, limits and big feelings.']];
@@ -21767,6 +21782,7 @@ var SIT = {
     rout: 'Run the checklist in order: hungry, tired, wet, wind, too hot or cold. Then soothe.',
     led: 'Offer what baby seems to ask for: a feed, a cuddle or quiet. Let baby show you which.',
     wald: 'Dim the lights, hum or sing softly and keep stimulation low. A warm, steady rhythm calms.',
+    reggio: 'Get curious about what baby is looking at or reaching for. Check the basics, then change the scene (a window, a mirror, fresh air) and stay close.',
     sci: 'Soothe first. Responding does not spoil a baby. Try holding, rocking, white noise or a walk.',
     vill: 'Hand baby to another trusted adult. A fresh pair of arms and a rested carer often settles it.' } },
   bed: { t: 'Fighting sleep', m: [0, 12], s: {
@@ -21778,6 +21794,7 @@ var SIT = {
     rout: 'Keep nap and bedtime windows steady and start the wind-down at the same time each day.',
     led: 'Follow sleepy signs rather than the clock and offer sleep when baby shows tired cues.',
     wald: 'Dim lights, a lullaby and the same quiet ritual every evening.',
+    reggio: 'Dim the room and keep the sleep space simple. Save exploring for the day and use the same quiet ritual each night.',
     sci: 'Safe sleep first: firm, flat surface, on the back, nothing loose. Consistent cues help.',
     vill: 'Write the bedtime steps down so any carer does them the same way.' } },
   fuss: { t: 'Evening fussiness', m: [0, 6], s: {
@@ -21789,6 +21806,7 @@ var SIT = {
     rout: 'Plan a calm window before the usual fussy hour: feed, change, dim the lights.',
     led: 'Offer a feed, a cuddle or quiet and see what baby takes.',
     wald: 'A warm bath, low light and soft singing, at the same time each evening.',
+    reggio: 'Change the view: a window, a mirror or a short walk. Offer one simple thing to look at and see what catches baby’s interest.',
     sci: 'Fussiness often peaks around 6 weeks and then eases. If crying is extreme or comes with fever, call the paediatrician.',
     vill: 'Tag team: one carer takes the fussy hour while the other rests.' } },
   feed: { t: 'Refusing a feed or bottle', m: [0, 12], s: {
@@ -21800,6 +21818,7 @@ var SIT = {
     rout: 'Check the timing. Baby may be tired or not yet hungry, so keep the usual spacing.',
     led: 'Trust the cues. If baby refuses and seems well, try again when cues return.',
     wald: 'Warm, quiet, unhurried feeding with no screens.',
+    reggio: 'Try a calmer moment and a new position. Let baby look at and touch the bottle first, and tell your paediatrician if intake drops.',
     sci: 'Refusing several feeds in a row, fewer wet diapers or fever means a call to the paediatrician.',
     vill: 'Ask another carer to offer it. Some babies take a bottle better from someone else.' } },
   tant: { t: 'Tantrums', m: [12, 60], s: {
@@ -21811,6 +21830,7 @@ var SIT = {
     rout: 'Prevent what you can: meals and naps on time and a warning before transitions.',
     led: 'Where it is safe, stay near and let the storm pass without fixing it.',
     wald: 'Shift the mood with a song or a short story. Keep your voice low and your pace slow.',
+    reggio: 'Stay close and name it. Wonder what set it off (tired, blocked, too much), then offer a different material or space to try again.',
     sci: 'Tantrums are normal and peak around 2 to 3 years. Keep them safe, stay calm and talk after.',
     vill: 'Agree one response with every carer, and hand over if you are running thin.' } },
   no: { t: 'Saying no to everything', m: [12, 60], s: {
@@ -21822,6 +21842,7 @@ var SIT = {
     rout: 'Predictable routines mean fewer battles. Give a heads up before changes.',
     led: 'Pick your battles and say yes to everything that is safe.',
     wald: 'Turn it into rhythm or play with a song, imitation or a game.',
+    reggio: 'Treat the no as baby having ideas. Offer two real choices and let them try it their way when it is safe.',
     sci: 'Independence is developing. Offer choices and avoid power struggles.',
     vill: 'Agree a few shared rules with every carer.' } },
   hit: { t: 'Hitting, biting or throwing', m: [12, 60], s: {
@@ -21833,6 +21854,7 @@ var SIT = {
     rout: 'Spot the triggers, like tired or hungry, and head them off.',
     led: 'Step in for safety only, then help them find words.',
     wald: 'Redirect into movement, like stomping or pushing a heavy basket.',
+    reggio: 'Block gently and say what you see ("You wanted that."). Show a safe way (gentle touch) and offer something to channel it, like clay or a drum.',
     sci: 'It is common and developmental. A calm, consistent response works better than punishment.',
     vill: 'Use the same words and response with every carer.' } }
 };
@@ -22117,6 +22139,21 @@ function feAmt(){
   w.style.display = on ? 'block' : 'none';
   var l = document.getElementById('b54-fe-amtl'); if (l) l.textContent = t === 'stored' ? 'Stored milk (ml)' : 'Formula (ml)';
 }
+/* v78: duration in minutes sits between Start and End and stays in step with both */
+function feMin(t){ var m = /^(\d{1,2}):(\d{2})/.exec(t || ''); return m ? (+m[1]) * 60 + (+m[2]) : null; }
+function feHM(n){ n = ((n % 1440) + 1440) % 1440; return ('0' + Math.floor(n / 60)).slice(-2) + ':' + ('0' + (n % 60)).slice(-2); }
+function feDur(st, en){ var a = feMin(st), b = feMin(en); if (a == null || b == null) return ''; var d = b - a; if (d < 0) d += 1440; return String(d); }
+function feLink(){
+  var st = document.getElementById('b54-fe-st'), en = document.getElementById('b54-fe-en'), du = document.getElementById('b54-fe-du');
+  if (!st || !en || !du) return;
+  function fromTimes(){ du.value = feDur(st.value, en.value); }
+  function fromDur(){
+    var d = parseInt(du.value, 10); if (!(d >= 0)) return; if (d > 240){ d = 240; du.value = '240'; }
+    var a = feMin(st.value), b = feMin(en.value);
+    if (a != null) en.value = feHM(a + d); else if (b != null) st.value = feHM(b - d);
+  }
+  ['input', 'change'].forEach(function(ev){ st.addEventListener(ev, fromTimes); en.addEventListener(ev, fromTimes); du.addEventListener(ev, fromDur); });
+}
 ACT.feedEdit = function(){
   var old = document.getElementById('b54-x'); if (old) old.remove();
   var g = function(id){ return document.getElementById(id); }, p = window._pendingTimedFeed || {};
@@ -22126,8 +22163,9 @@ ACT.feedEdit = function(){
   X = { mode: 'fe', type: type, baby: need ? null : babyIdx() };
   var h = '<div class="sheet b54-xs" role="dialog" aria-modal="true" aria-label="Feed details"><div class="sheet-handle"></div><div class="sheet-title">Feed details</div>';
   h += '<div style="display:flex;gap:10px"><div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-fe-date">Date</label><input type="date" id="b54-fe-date" max="' + toDay() + '" value="' + esc(date) + '"></div></div>';
-  h += '<div style="display:flex;gap:10px;margin-top:10px"><div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-fe-st">Start</label><input type="time" id="b54-fe-st" value="' + esc(st) + '"></div>' +
-    '<div class="form-field" style="flex:1;min-width:0;margin:0"><label for="b54-fe-en">End</label><input type="time" id="b54-fe-en" value="' + esc(en) + '"></div></div>';
+  h += '<div style="display:flex;gap:8px;margin-top:10px"><div class="form-field" style="flex:1.15;min-width:0;margin:0"><label for="b54-fe-st">Start</label><input type="time" id="b54-fe-st" value="' + esc(st) + '"></div>' +
+    '<div class="form-field" style="flex:.8;min-width:0;margin:0"><label for="b54-fe-du">Mins</label><input type="number" inputmode="numeric" min="0" max="240" id="b54-fe-du" placeholder="min" style="text-align:center" value="' + esc(feDur(st, en)) + '"></div>' +
+    '<div class="form-field" style="flex:1.15;min-width:0;margin:0"><label for="b54-fe-en">End</label><input type="time" id="b54-fe-en" value="' + esc(en) + '"></div></div>';
   if (need) h += '<div class="b54-lb">Which baby?</div><div class="b54-xc" id="b54-fe-baby">' + chipSet(feBabies(), '', 'feBaby') + '</div>';
   h += '<div class="b54-lb">Feed type</div><div class="b54-xc" id="b54-fe-type">' + chipSet(feTypes(), type, 'feType') + '</div>';
   h += '<div class="form-field" id="b54-fe-amt" style="display:none;margin-top:12px"><label for="b54-fe-amtv" id="b54-fe-amtl">Amount (ml)</label><input type="number" inputmode="numeric" min="0" id="b54-fe-amtv" placeholder="e.g. 60" value="' + esc(amt) + '"></div>';
@@ -22135,7 +22173,7 @@ ACT.feedEdit = function(){
   h += '<div class="b54-xb"><button type="button" class="btn btn-outline" data-b54="xClose">Cancel</button><button type="button" class="btn btn-teal" data-b54="feOk">Save feed</button></div></div>';
   var ov = document.createElement('div'); ov.id = 'b54-x'; ov.className = 'sheet-ov'; ov.innerHTML = h; document.body.appendChild(ov);
   ov.addEventListener('click', function(e){ if (e.target === ov) { ov.remove(); X = null; } });
-  feAmt();
+  feAmt(); feLink();
   requestAnimationFrame(function(){ ov.classList.add('show'); });
 };
 ACT.feType = function(k){
@@ -22652,7 +22690,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
     if (!state.feedingLog) state.feedingLog = [];
     var breast = (type === 'left' || type === 'right'), mins = breast && endD ? Math.max(1, Math.round((endD - startD) / 60000)) : 0;
     state.feedingLog.push({
-      date: localDateStr(startD), time: hm(startD), endTime: breast && endD ? hm(endD) : '', feedType: type,
+      date: localDateStr(startD), time: hm(startD), endTime: endD ? hm(endD) : '', feedType: type,
       leftMin: type === 'left' ? mins : 0, rightMin: type === 'right' ? mins : 0,
       formulaMl: type === 'formula' ? (parseInt(ml) || 0) : 0, storedMl: type === 'stored' ? (parseInt(ml) || 0) : 0,
       pumpedMl: 0, notes: '', babyIdx: bi()
@@ -22687,8 +22725,8 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
     }
     function bottle(type, title){
       window.smAmountSheet(title, function(ml){ window.smSaveFeed(type, ml); }, false, {
-        label: '⏰ ' + t('altWhen'), needAmount: true,
-        fn: function(ml){ timesSheet({ title: t('feedWhen'), mode: 'single', start: hm(new Date()), onSave: function(r){ pushFeed(type, ml, r.s, null); } }); }
+        label: '⏰ ' + t('altTimes'), needAmount: true,
+        fn: function(ml){ var n = new Date(); timesSheet({ title: t('feedTimes'), start: hm(new Date(n.getTime() - 20 * 60000)), end: hm(n), onSave: function(r){ pushFeed(type, ml, r.s, r.e); } }); }
       });
     }
     window.smChoiceSheet(t('which'), [
