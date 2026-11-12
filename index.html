@@ -19329,6 +19329,31 @@ body.v82 .b54-seg button.on{background:var(--v-acc) !important;color:var(--v-acc
 body.v82 .d-tlh b,body.v82 .b54-sh span{letter-spacing:-.01em !important;}
 body.v82 .v24-more{border-radius:26px !important;font-weight:700 !important;}
 body.v82 .b54-stat b.n{font-size:19px !important;letter-spacing:-.03em !important;white-space:nowrap;}
+
+/* Now: live feed lives inside the feeding card */
+body.v82 #page-now .now-feeding-live{display:none !important;}
+.n82-lk{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.04em;opacity:.85;}
+.n82-dot{width:9px;height:9px;border-radius:5px;background:currentColor;display:block;animation:n82p 1.4s ease-in-out infinite;}
+@keyframes n82p{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.n82-dot{animation:none;}}
+.n82-lt{font-family:var(--font-display);font-weight:600;font-size:64px;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:10px 0 4px;}
+.n82-ls{font-size:13px;opacity:.75;}
+.n82-stop{flex:1.4;background:var(--v-acc);color:var(--v-acct);}
+
+/* review cards land below the sticky header, not under it */
+body.v82 .feed-review-card,body.v82 .sleep-review-card,body.v82 [class*="review-card"]{scroll-margin-top:84px;}
+body.v82[data-page="now"]:has(#page-now .n82-live) #v23-mini{display:none !important;}
+
+/* floating bottom bar, as in earlier versions */
+#nav82{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));height:68px;padding:0 8px;border:0;border-radius:34px;align-items:center;box-shadow:0 10px 30px rgba(40,25,30,.18);max-width:520px;}
+body.v82.night-mode #nav82{background:#2A2631;box-shadow:0 10px 30px rgba(0,0,0,.45);}
+.n82-nv span{height:28px;}
+.n82-plus{width:50px;height:50px;border-radius:25px;}
+body.v82 #main-content{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px)) !important;}
+html:has(body.v82){scroll-padding-bottom:calc(110px + env(safe-area-inset-bottom,0px));}
+/* Hoot floats above the bar, bottom right */
+html body.v82 #ask-fab,html body.v82.lk #ask-fab{position:fixed !important;top:auto !important;left:auto !important;right:16px !important;bottom:calc(92px + env(safe-area-inset-bottom,0px)) !important;width:54px !important;height:54px !important;z-index:99 !important;box-shadow:0 8px 22px rgba(40,25,30,.22) !important;opacity:1 !important;}
+body.v82[data-page="simple"] #ask-fab{display:none !important;}
 </style>
 <script id="p53js">
 /* BabyOS v56: money. One place that knows the currency, formats amounts, reads what people type,
@@ -23129,7 +23154,8 @@ var IC = {
   diaper: '<path d="M3.500 6.500h17v3.200a8.500 8.500 0 0 1-6.300 8.200h-4.400A8.500 8.500 0 0 1 3.500 9.700z"/><path d="M3.500 9.500c3 .200 5 2.200 5.300 5M20.500 9.500c-3 .200-5 2.200-5.300 5"/>',
   cam: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.500"/>',
   x: '<path d="M6 6l12 12M18 6L6 18"/>',
-  chev: '<path d="M9 6l6 6-6 6"/>'
+  chev: '<path d="M9 6l6 6-6 6"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="3" fill="currentColor" stroke="none"/>'
 };
 function pageIcon(id, s){ try { var v = (typeof svgIcon === 'function') ? svgIcon(id, s || 22) : ''; if (v) return v; } catch(e){} return I(IC.grow, s); }
 var LAB = { keyDates: 'Key dates', calendar: 'Calendar', simple: 'Simple Mode', settings: 'Settings', now: 'Now', dashboard: 'Home', 'preg-tasks': 'Tasks', 'hospital-bag': 'Hospital bag', growth: 'Growth', watchfor: 'Watch for', achievements: 'Achievements', rhythm: 'Insights', meds: 'Medicine', pump: 'Pumping', philosophy: 'Our way', first100: '100 Days' };
@@ -23212,15 +23238,20 @@ function syncNow(){
   var hi = txt(page, '.now-greet-text') || 'Hello', p = photo();
   var ring = dc.querySelector('.d-ring'), lf = null, ls = null, ld = null, ts = null;
   try { lf = lastFeedInfo(); } catch(e){} try { ls = lastSleepInfo(); } catch(e){} try { ld = lastDiaperInfo(); } catch(e){} try { ts = todaySummary(); } catch(e){}
-  var cs = dc.querySelector('.d-cs'), h = '';
+  var cs = dc.querySelector('.d-cs'), h = '', live = page.querySelector('.now-feeding-live');
   h += '<div class="n82-greet"><div><div class="n82-hi">' + esc(hi) + '!</div><div class="n82-sub">' + esc(nm) + ' is ' + esc(ageTxt()) + '</div></div><button type="button" class="n82-ph" onclick="v82Photo()" aria-label="Photo">' + (p ? '<img alt="" src="' + p + '">' : '<span>' + esc(nm.charAt(0)) + '</span>') + '<i>' + I(IC.cam, 14) + '</i></button></div>';
   function ln(a, b){ return b ? '<div class="n82-ln"><span>' + a + '</span><b>' + esc(b) + '</b></div>' : ''; }
+  if (live){
+    var lab = txt(live, '.nfl-label'), side = (lab.split('\u00b7')[1] || '').replace(/[^A-Za-z ]/g, '').trim(), since = txt(live, '.nfl-since').replace(/^since\s*/i, '');
+    h += '<div class="n82-feed n82-live"><div class="n82-lk"><i class="n82-dot"></i>FEEDING NOW' + (side ? ' \u00b7 ' + esc(side.toUpperCase()) + ' SIDE' : '') + '</div><div class="n82-lt" id="n82-lt">' + esc(txt(live, '.nfl-time') || '00:00') + '</div><div class="n82-ls">Started ' + esc(since) + (ts ? ' \u00b7 ' + ts.feeds + ' feed' + (ts.feeds === 1 ? '' : 's') + ' today' : '') + '</div><div class="n82-fb"><button type="button" class="n82-stop" onclick="goStopFeedTimer()">' + I(IC.stop, 18) + 'Stop feed</button><button type="button" class="n82-b2" onclick="goViewFeedTimer()">Details</button></div></div>';
+  } else
   h += '<div class="n82-feed" data-d="' + esc(dc.getAttribute('data-d') || '') + '"><div class="n82-frow"><div class="n82-ring">' + (ring ? ring.outerHTML : '') + '<div class="n82-rt"><b>' + esc(txt(dc, '.d-num')) + '</b><span>' + esc(txt(dc, '.d-cl')) + '</span></div></div><div class="n82-fi"><div class="n82-fk">' + I(IC.bottle, 15) + 'FEEDING</div><div class="n82-fn">' + (cs ? cs.innerHTML : '') + '</div>' + ln('Last feed', lf ? lf.ago + ' ago' : 'None yet') + ln('Side', lf && lf.side ? lf.side : '') + ln('Today', ts ? ts.feeds + ' feed' + (ts.feeds === 1 ? '' : 's') : '') + '</div></div><div class="n82-fb"><button type="button" class="n82-b1" onclick="v8Act(\'feed\')">' + I(IC.play, 15) + 'Log a feed</button><button type="button" class="n82-b2" onclick="v82Go(\'feeding\')">Feeding page</button></div></div>';
   function mini(cls, ic, lab, v, s, act){ return '<button type="button" class="n82-m ' + cls + '" onclick="' + act + '">' + I(ic, 24) + '<span><em>' + lab + '</em><b>' + esc(v) + '</b>' + (s ? '<i>' + esc(s) + '</i>' : '') + '</span></button>'; }
   h += '<div class="n82-two">' + mini('n82-sl', IC.moon, 'Last sleep', ls ? ls.ago + ' ago' : 'None yet', ts ? (Math.round(ts.sleepH * 10) / 10) + 'h today' : '', "v8Act('sleep')") + mini('n82-di', IC.diaper, 'Last diaper', ld ? ld.ago + ' ago' : 'None yet', ts ? ts.diapers + ' today' : '', "v8Act('diaper')") + '</div>';
   if (box.__h !== h){ box.innerHTML = h; box.__h = h; }
 }
 window.v82SyncNow = syncNow;
+setInterval(function(){ try { var a = document.getElementById('n82-lt'), b = document.getElementById('now-live-timer'); if (a && b && a.textContent !== b.textContent) a.textContent = b.textContent; if (document.body.dataset.page === 'now'){ var p = document.getElementById('page-now'); if (p && !!p.querySelector('.now-feeding-live') !== !!a) syncNow(); } } catch(e){} }, 1000);
 var _now = PAGES.now; PAGES.now = function(el){ var r = _now.apply(this, arguments); try { syncNow(); setTimeout(syncNow, 60); setTimeout(syncNow, 400); } catch(e){} return r; };
 setInterval(function(){ try { if (document.body.dataset.page === 'now') syncNow(); } catch(e){} }, 5000);
 try { renderNav(document.body.dataset.page || 'now'); if (document.body.dataset.page === 'now') setTimeout(syncNow, 100); } catch(e){}
