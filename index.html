@@ -19354,6 +19354,9 @@ html:has(body.v82){scroll-padding-bottom:calc(110px + env(safe-area-inset-bottom
 /* Hoot floats above the bar, bottom right */
 html body.v82 #ask-fab,html body.v82.lk #ask-fab{position:fixed !important;top:auto !important;left:auto !important;right:16px !important;bottom:calc(92px + env(safe-area-inset-bottom,0px)) !important;width:54px !important;height:54px !important;z-index:99 !important;box-shadow:0 8px 22px rgba(40,25,30,.22) !important;opacity:1 !important;}
 body.v82[data-page="simple"] #ask-fab{display:none !important;}
+
+.p82-btn{position:relative;}
+.p82-in{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0;}
 </style>
 <script id="p53js">
 /* BabyOS v56: money. One place that knows the currency, formats amounts, reads what people type,
@@ -23211,11 +23214,28 @@ window.v82Log = function(){
 function bIdx(){ try { return typeof currentBabyIdx === 'number' ? currentBabyIdx : 0; } catch(e){ return 0; } }
 function photo(){ try { return (state.babyPhotos && state.babyPhotos[bIdx()]) || ''; } catch(e){ return ''; } }
 function setPhoto(v){ try { if (!state.babyPhotos || typeof state.babyPhotos !== 'object') state.babyPhotos = {}; if (v) state.babyPhotos[bIdx()] = v; else delete state.babyPhotos[bIdx()]; saveState('babyPhotos'); } catch(e){} syncNow(); }
-window.v82PhotoPick = function(){
-  var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
-  inp.onchange = function(){ var f = inp.files && inp.files[0]; if (!f) return; var rd = new FileReader(); rd.onload = function(){ var im = new Image(); im.onload = function(){ var S = 320, c = document.createElement('canvas'); c.width = S; c.height = S; var m = Math.min(im.width, im.height), sx = (im.width - m) / 2, sy = (im.height - m) / 2; c.getContext('2d').drawImage(im, sx, sy, m, m, 0, 0, S, S); var out = ''; try { out = c.toDataURL('image/jpeg', .8); } catch(e){} if (out){ setPhoto(out); closePhoto(); if (typeof toast === 'function') toast('Photo saved'); } }; im.src = rd.result; }; rd.readAsDataURL(f); };
-  inp.click();
+function v82Toast(m){ try { if (typeof toast === 'function') toast(m); } catch(e){} }
+window.v82PhotoFile = function(inp){
+  var f = inp && inp.files && inp.files[0]; if (!f) return;
+  var lbl = document.querySelector('#ph82 .p82-btn span'); if (lbl) lbl.textContent = 'Saving photo\u2026';
+  var url = ''; try { url = URL.createObjectURL(f); } catch(e){}
+  var im = new Image();
+  im.onload = function(){
+    try {
+      var S = 360, c = document.createElement('canvas'); c.width = S; c.height = S;
+      var m = Math.min(im.naturalWidth, im.naturalHeight), sx = (im.naturalWidth - m) / 2, sy = (im.naturalHeight - m) / 2;
+      c.getContext('2d').drawImage(im, sx, sy, m, m, 0, 0, S, S);
+      var out = c.toDataURL('image/jpeg', .8);
+      if (url) URL.revokeObjectURL(url);
+      if (out && out.indexOf('data:image/jpeg') === 0){ setPhoto(out); closePhoto(); v82Toast('Photo saved'); }
+      else { v82Toast('Could not use that photo. Try another one.'); v82Photo(); }
+    } catch(e){ v82Toast('Could not use that photo. Try another one.'); v82Photo(); }
+  };
+  im.onerror = function(){ v82Toast('Could not open that photo. Try another one.'); v82Photo(); };
+  if (url) im.src = url;
+  else { var rd = new FileReader(); rd.onload = function(){ im.src = rd.result; }; rd.readAsDataURL(f); }
 };
+window.v82PhotoPick = function(){ var i = document.querySelector('#ph82 .p82-in'); if (i) i.click(); };
 function closePhoto(){ var s = document.getElementById('ph82'); if (s) s.remove(); }
 window.v82PhotoClose = closePhoto;
 window.v82PhotoRemove = function(){ setPhoto(''); closePhoto(); };
@@ -23223,7 +23243,7 @@ window.v82Photo = function(){
   closePhoto(); var p = photo(), nm = '';
   try { nm = babyName() || 'Baby'; } catch(e){ nm = 'Baby'; }
   var d = document.createElement('div'); d.id = 'ph82';
-  d.innerHTML = '<div class="l82-scrim" onclick="v82PhotoClose()"></div><div class="l82-sheet" role="dialog" aria-label="Photo"><i class="l82-grab"></i><div class="p82-top">' + (p ? '<img class="p82-img" alt="" src="' + p + '">' : '<span class="p82-img p82-none">' + esc(nm.charAt(0)) + '</span>') + '<div class="l82-h">' + esc(nm) + '’s photo</div><div class="p82-s">Shown on Now. Saved with your family data, never sent to Hoot.</div></div><button type="button" class="p82-btn" onclick="v82PhotoPick()">' + I(IC.cam, 20) + (p ? 'Change photo' : 'Choose a photo') + '</button>' + (p ? '<button type="button" class="p82-btn p82-rm" onclick="v82PhotoRemove()">Remove photo</button>' : '') + '</div>';
+  d.innerHTML = '<div class="l82-scrim" onclick="v82PhotoClose()"></div><div class="l82-sheet" role="dialog" aria-label="Photo"><i class="l82-grab"></i><div class="p82-top">' + (p ? '<img class="p82-img" alt="" src="' + p + '">' : '<span class="p82-img p82-none">' + esc(nm.charAt(0)) + '</span>') + '<div class="l82-h">' + esc(nm) + '’s photo</div><div class="p82-s">Shown on Now. Saved with your family data, never sent to Hoot.</div></div><label class="p82-btn">' + I(IC.cam, 20) + '<span>' + (p ? 'Change photo' : 'Choose a photo') + '</span><input class="p82-in" type="file" accept="image/*" onchange="v82PhotoFile(this)"></label>' + (p ? '<button type="button" class="p82-btn p82-rm" onclick="v82PhotoRemove()">Remove photo</button>' : '') + '</div>';
   (document.getElementById('app') || document.body).appendChild(d);
 };
 
