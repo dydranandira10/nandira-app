@@ -23481,9 +23481,8 @@ var K = {
       S.type = type;
       return lab('Type') + seg('type', [['left', 'Left'], ['right', 'Right'], ['stored', 'Stored'], ['formula', 'Formula']], type) +
         '<div class="v86-row">' + dateF('v86-date') + '</div>' +
-        '<div class="v86-row">' + timeF('v86-st', 'Start') + '<span class="v86-only" data-for="breast">' + timeF('v86-en', 'End', '') + '</span></div>' +
-        '<div class="v86-only" data-for="breast">' + durLine() + '</div>' +
-        '<div class="v86-only" data-for="bottle">' + lab('Amount', '<b id="v86-stash"></b>') + stepper('v86-amt', amt, 'ml', 10) + '</div>' +
+        '<div class="v86-row">' + timeF('v86-st', 'Start') + timeF('v86-en', 'End', '') + '</div>' + durLine() +
+        '<div class="v86-only" data-for="bottle">' + lab('Amount', '<b id="v86-stash"></b>') + stepper('v86-amt', amt, 'ml', 5) + '</div>' +
         babies() + note('Latch, mood, spit-up...');
     },
     sync: function(){ var b = S.type === 'stored' || S.type === 'formula'; show('breast', !b); show('bottle', b); var st = $('v86-stash'); if (st) st.textContent = S.type === 'stored' ? 'Stash ' + (state.pumpedStash || 0) + ' ml' : ''; },
@@ -23491,7 +23490,7 @@ var K = {
       var t = S.type, amt = parseInt(v('v86-amt'), 10) || 0, bottle = t === 'stored' || t === 'formula';
       if (bottle && !(amt > 0)) return 'Enter the amount in ml';
       if (!v('v86-date') || !v('v86-st')) return 'Pick the date and start time';
-      set('f-date', v('v86-date')); set('f-time', v('v86-st')); set('f-endtime', bottle ? '' : v('v86-en')); set('f-notes', v('v86-note')); set('ff-baby', String(S.baby));
+      set('f-date', v('v86-date')); set('f-time', v('v86-st')); set('f-endtime', v('v86-en')); set('f-notes', v('v86-note')); set('ff-baby', String(S.baby));
       try { window._restoringTimedFeed = true; if (typeof selectFeedType === 'function') selectFeedType(t); } catch(e){} window._restoringTimedFeed = false;
       set('f-ftype', t); set('f-amount', bottle ? String(amt) : '');
       return call('addFeed', 'feedingLog');
