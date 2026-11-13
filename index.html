@@ -19373,6 +19373,15 @@ html body.v82 .b54-hoot .b54-ht b{font-size:13px;font-weight:700;white-space:now
 html body.v82 .b54-hoot .b54-ht i,html body.v82 .b54-hoot > svg:last-child{display:none !important;}
 html body.v82 .b54-hoot .b54-hi svg,html body.v82 .b54-hoot .b54-hi img{width:22px !important;height:22px !important;}
 html body.v82 .b54-hoot{display:flex !important;width:max-content;}
+/* v87: quick feed timers on Now */
+.n82-fb3 button{flex:1 1 0;position:relative;}
+.n82-fb3 .n82-b1{flex:1 1 0;}
+.n82-tm{background:rgba(255,255,255,.55);color:inherit;}
+.n82-tm.sg{background:#fff;box-shadow:inset 0 0 0 2px var(--v-acc);}
+.n82-tm em{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-style:normal;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:9px;background:var(--v-acc);color:var(--v-acct);white-space:nowrap;}
+body.night-mode .n82-tm{background:rgba(255,255,255,.08);}
+body.night-mode .n82-tm.sg{background:rgba(255,255,255,.16);}
+.n82-more{display:block;margin:10px 0 -4px auto;border:0;background:none;color:inherit;opacity:.7;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:4px 2px;}
 
 /* ===== v86 log sheet ===== */
 body.v86-open{overflow:hidden;}
@@ -19458,6 +19467,21 @@ html body #v86x .v86-sheet .v86-step .v86-sv input{background-color:transparent 
 .v86-warn{font-size:12.5px;font-weight:600;color:#B3262E;margin:8px 2px 0;}
 .v86-warn:empty{display:none;}
 body.night-mode .v86-warn{color:#FF9B9B;}
+
+/* v87: the same Log bar on every log page */
+body.v82 .v87-gone{display:none !important;}
+.v87-log{display:flex;align-items:center;gap:14px;width:100%;box-sizing:border-box;min-height:72px;margin:0 0 12px;padding:12px 16px;border:0;border-radius:24px;background:var(--v-acc,#2B2430);color:var(--v-acct,#fff);font-family:inherit;text-align:left;cursor:pointer;box-shadow:var(--v-sh);}
+.v87-pl{flex:0 0 44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);}
+body.night-mode .v87-pl{background:rgba(0,0,0,.10);}
+.v87-tx{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.v87-tx b{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.01em;line-height:1.15;}
+.v87-tx i{font-style:normal;font-size:13px;font-weight:500;opacity:.72;}
+.v87-log:active{transform:scale(.985);}
+.b54-tiles.v87-n1{grid-template-columns:1fr !important;}
+.b54-tiles.v87-n2{grid-template-columns:1fr 1fr !important;}
+body.night-mode .n82-b1 svg, body.night-mode .n82-b1 svg *, body.night-mode .v87-pl svg, body.night-mode .v87-pl svg *{stroke:currentColor !important;color:inherit !important;}
+body.night-mode .v87-log, body.night-mode .v87-log b, body.night-mode .v87-log i{color:var(--v-acct,#2A2026) !important;}
+html body.night-mode .page .v87-log .v87-pl svg, html body.night-mode .page .v87-log .v87-pl svg path{stroke:#2A2026 !important;}
 </style>
 <script id="p53js">
 /* BabyOS v56: money. One place that knows the currency, formats amounts, reads what people type,
@@ -23313,7 +23337,7 @@ window.v82Log = function(){
   (document.getElementById('app') || document.body).appendChild(d);
 };
 
-var LOGAT = { feeding: '[data-b54^="feedStart"]', sleep: '[data-b54^="sleepType"]', diaper: '[data-b54^="diaper|"]', solids: '[data-b54^="meal"], [data-b54^="solid"], .b54-tiles .b54-t, .btn-teal', pump: '[data-b54="pumpLog"]', weight: '[data-b54="weightAdd"]', meds: '[data-b54="medLog"]', reading: '[data-b54^="readLog"]', notes: '[data-b54^="noteNew"]', milestones: '[data-b54="milDone"]' };
+var LOGAT = { feeding: '.v87-log', sleep: '.v87-log', diaper: '.v87-log', solids: '[data-b54^="meal"], [data-b54^="solid"], .b54-tiles .b54-t, .btn-teal', pump: '.v87-log', weight: '.v87-log', growth: '.v87-log', meds: '.v87-log', reading: '.v87-log', notes: '.v87-log', milestones: '[data-b54="milDone"]' };
 function placeHoot(id){
   var pg = document.getElementById('page-' + id); if (!pg) return;
   var hb = pg.querySelector('.b54-hoot'); if (!hb) return;
@@ -23396,12 +23420,21 @@ function syncNow(){
     var lab = txt(live, '.nfl-label'), side = (lab.split('\u00b7')[1] || '').replace(/[^A-Za-z ]/g, '').trim(), since = txt(live, '.nfl-since').replace(/^since\s*/i, '');
     h += '<div class="n82-feed n82-live"><div class="n82-lk"><i class="n82-dot"></i>FEEDING NOW' + (side ? ' \u00b7 ' + esc(side.toUpperCase()) + ' SIDE' : '') + '</div><div class="n82-lt" id="n82-lt">' + esc(txt(live, '.nfl-time') || '00:00') + '</div><div class="n82-ls">Started ' + esc(since) + (ts ? ' \u00b7 ' + ts.feeds + ' feed' + (ts.feeds === 1 ? '' : 's') + ' today' : '') + '</div><div class="n82-fb"><button type="button" class="n82-stop" onclick="goStopFeedTimer()">' + I(IC.stop, 18) + 'Stop feed</button><button type="button" class="n82-b2" onclick="goViewFeedTimer()">Details</button></div></div>';
   } else
-  h += '<div class="n82-feed" data-d="' + esc(dc.getAttribute('data-d') || '') + '"><div class="n82-frow"><div class="n82-ring">' + (ring ? ring.outerHTML : '') + '<div class="n82-rt"><b>' + esc(txt(dc, '.d-num')) + '</b><span>' + esc(txt(dc, '.d-cl')) + '</span></div></div><div class="n82-fi"><div class="n82-fk">' + I(IC.bottle, 15) + 'FEEDING</div><div class="n82-fn">' + (cs ? cs.innerHTML : '') + '</div>' + ln('Last feed', lf ? lf.ago + ' ago' : 'None yet') + ln('Side', lf && lf.side ? lf.side : '') + ln('Today', ts ? ts.feeds + ' feed' + (ts.feeds === 1 ? '' : 's') : '') + '</div></div><div class="n82-fb"><button type="button" class="n82-b1" onclick="v86Open(\'feed\')">' + I(IC.plus, 15) + 'Log a feed</button><button type="button" class="n82-b2" onclick="v82Go(\'feeding\')">Feeding page</button></div></div>';
+  h += '<div class="n82-feed" data-d="' + esc(dc.getAttribute('data-d') || '') + '"><div class="n82-frow"><div class="n82-ring">' + (ring ? ring.outerHTML : '') + '<div class="n82-rt"><b>' + esc(txt(dc, '.d-num')) + '</b><span>' + esc(txt(dc, '.d-cl')) + '</span></div></div><div class="n82-fi"><div class="n82-fk">' + I(IC.bottle, 15) + 'FEEDING</div><div class="n82-fn">' + (cs ? cs.innerHTML : '') + '</div>' + ln('Last feed', lf ? lf.ago + ' ago' : 'None yet') + ln('Side', lf && lf.side ? lf.side : '') + ln('Today', ts ? ts.feeds + ' feed' + (ts.feeds === 1 ? '' : 's') : '') + '</div></div><div class="n82-fb n82-fb3">' + ['left', 'right'].map(function(sd){ var sg = sd === v82Sugg(); return '<button type="button" class="n82-tm' + (sg ? ' sg' : '') + '" onclick="v82FeedGo(\'' + sd + '\')">' + (sg ? '<em>Suggested</em>' : '') + I(IC.play, 15) + (sd === 'left' ? 'Left' : 'Right') + '</button>'; }).join('') + '<button type="button" class="n82-b1" onclick="v86Open(\'feed\')">' + I(IC.plus, 15) + 'Log</button></div><button type="button" class="n82-more" onclick="v82Go(\'feeding\')">Feeding page \u203a</button></div>';
   function mini(cls, ic, lab, v, s, act){ return '<button type="button" class="n82-m ' + cls + '" onclick="' + act + '">' + I(ic, 24) + '<span><em>' + lab + '</em><b>' + esc(v) + '</b>' + (s ? '<i>' + esc(s) + '</i>' : '') + '</span></button>'; }
   h += '<div class="n82-two">' + mini('n82-sl', IC.moon, 'Last sleep', ls ? ls.ago + ' ago' : 'None yet', ts ? (Math.round(ts.sleepH * 10) / 10) + 'h today' : '', "v86Open('sleep')") + mini('n82-di', IC.diaper, 'Last diaper', ld ? ld.ago + ' ago' : 'None yet', ts ? ts.diapers + ' today' : '', "v86Open('diaper')") + '</div>';
   if (box.__h !== h){ box.innerHTML = h; box.__h = h; }
 }
 window.v82SyncNow = syncNow;
+window.v82Sugg = function(){
+  try {
+    var bi = typeof currentBabyIdx === 'number' ? currentBabyIdx : 0, now = Date.now(), multi = (state.babies || []).length > 1;
+    var br = (state.feedingLog || []).filter(function(l){ return l.date && ((+l.leftMin || 0) || (+l.rightMin || 0)) && (!multi || (+l.babyIdx || 0) === bi); })
+      .map(function(l){ return { l: l, d: new Date(l.date + 'T' + (l.time || '00:00')).getTime() }; }).filter(function(x){ return !isNaN(x.d) && x.d <= now; }).sort(function(a, b){ return b.d - a.d; });
+    return !br.length ? 'left' : ((+br[0].l.leftMin) ? 'right' : 'left');
+  } catch(e){ return 'left'; }
+};
+window.v82FeedGo = function(side){ var f = window.nowStartTimerFromForm || window.startFeedTimer; if (typeof f !== 'function') return; f(side); setTimeout(function(){ try { syncNow(); } catch(e){} }, 120); };
 setInterval(function(){ try { var a = document.getElementById('n82-lt'), b = document.getElementById('now-live-timer'); if (a && b && a.textContent !== b.textContent) a.textContent = b.textContent; if (document.body.dataset.page === 'now'){ var p = document.getElementById('page-now'); if (p && !!p.querySelector('.now-feeding-live') !== !!a) syncNow(); } } catch(e){} }, 1000);
 var _now = PAGES.now; PAGES.now = function(el){ var r = _now.apply(this, arguments); try { syncNow(); setTimeout(syncNow, 60); setTimeout(syncNow, 400); } catch(e){} return r; };
 setInterval(function(){ try { if (document.body.dataset.page === 'now') syncNow(); } catch(e){} }, 5000);
@@ -23519,6 +23552,24 @@ var K = {
       set('w-date', v('v86-date')); set('w-val', v('v86-w')); set('w-oz', v('v86-oz')); set('w-notes', v('v86-note')); set('w-baby', String(S.baby));
       return call('addWeight', 'weightLog', true);
     } },
+  growth: { t: 'Log a measurement', c: 'grow', page: 'growth', save: 'Save measurement',
+    body: function(o){
+      S.type = o.type === 'head' ? 'head' : 'length';
+      return lab('Measure') + seg('type', [['length', 'Length'], ['head', 'Head']], S.type) +
+        '<div class="v86-row">' + dateF('v86-date') + '</div>' + lab('Size', '<b id="v86-gl"></b>') +
+        '<div class="v86-row"><label class="v86-f v86-big"><span>cm</span><input id="v86-cm" type="number" inputmode="decimal" step="0.1"></label></div>' + babies();
+    },
+    sync: function(){ var i = $('v86-cm'), l = $('v86-gl'), lg = last(state.growthLog, function(x){ return x.type === S.type; }); if (i) i.placeholder = S.type === 'head' ? 'e.g. 41' : 'e.g. 63'; if (l) l.textContent = lg ? 'Last ' + lg.cm + ' cm' : ''; },
+    run: function(){
+      var c = parseFloat(v('v86-cm'));
+      if (!(c >= 20 && c <= 130)) return 'That looks off, please check';
+      if (!Array.isArray(state.growthLog)) state.growthLog = [];
+      state.growthLog.push({ date: v('v86-date') || today(), type: S.type, cm: c, babyIdx: S.baby });
+      if (typeof saveState === 'function') saveState('growthLog');
+      toastMsg((S.type === 'head' ? 'Head ' : 'Length ') + c + ' cm saved');
+      setTimeout(function(){ try { if (document.body.dataset.page === 'growth') showPage('growth'); } catch(e){} }, 30);
+      return 'ok';
+    } },
   meds: { t: 'Log a dose', c: 'meds', page: 'meds', save: 'Save dose',
     body: function(){
       var sel = $('meds-name'), un = $('meds-dose-unit'), lm = last(state.medsLog);
@@ -23627,7 +23678,8 @@ var ROUTE = {
   medLog: function(){ open('meds'); },
   readLog: function(l){ open('reading', { lang: l }); },
   readGo: function(){ open('reading'); },
-  noteNew: function(t){ open('note', { tag: t }); }
+  noteNew: function(t){ open('note', { tag: t }); },
+  growth: function(k){ open('growth', { type: k }); }
 };
 document.addEventListener('click', function(e){
   var t = e.target && e.target.closest ? e.target.closest('[data-b54]') : null; if (!t) return;
@@ -23645,6 +23697,57 @@ function hideForms(){
 window.v86HideForms = hideForms;
 try { new MutationObserver(function(){ if (!hideForms.q) hideForms.q = requestAnimationFrame(function(){ hideForms.q = 0; hideForms(); }); }).observe(document.getElementById('main-content') || document.body, { childList: true, subtree: true }); } catch(e){}
 hideForms();
+})();
+
+/* ===== v87: one entry point per log page. Every log page opens with the same "Log a ..." bar right under the header,
+   and it always opens the same sheet. Quick "right now" buttons (timers, Wet/Dirty/Both, bags) stay below it. ===== */
+(function(){
+var P = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+var BAR = {
+  feeding: ['feed', 'Log a feed', 'Breast or bottle'],
+  sleep: ['sleep', 'Log a sleep', 'Nap or night'],
+  diaper: ['diaper', 'Log a diaper', 'Wet, dirty or both'],
+  pump: ['pump', 'Log a pump', 'Left, right and amount'],
+  weight: ['weight', 'Log weight', 'Any date'],
+  growth: ['growth', 'Log a measurement', 'Length or head'],
+  meds: ['meds', 'Log a dose', 'Medicine and amount'],
+  reading: ['reading', 'Log reading', 'Indonesian, English or both'],
+  notes: ['note', 'Write a note', 'Question, symptom, memory']
+};
+/* the old entry points that the bar replaces */
+var OLD = {
+  feeding: '[data-b54="bottleAsk"]', sleep: '[data-b54="sleepPast"]', diaper: '[data-b54="diaperPast"]', pump: '[data-b54="pumpLog"]',
+  weight: '[data-b54="weightAdd"]', growth: '.b54-tiles [data-b54^="growth|"]', meds: '[data-b54="medLog"]', reading: '[data-b54^="readLog"]', notes: '[data-b54^="noteNew"]'
+};
+function tidy(id){
+  var pg = document.getElementById('page-' + id), box = pg && pg.querySelector('.b54'); if (!box) return;
+  var b = BAR[id];
+  if (!box.querySelector(':scope > .v87-log')){
+    var el = document.createElement('button'); el.type = 'button'; el.className = 'v87-log v87-' + id; el.setAttribute('data-v87', b[0]);
+    el.innerHTML = '<span class="v87-pl">' + P + '</span><span class="v87-tx"><b>' + b[1] + '</b><i>' + b[2] + '</i></span>';
+    var grab = box.querySelector(':scope > .b54-grab');
+    box.insertBefore(el, grab ? grab.nextSibling : box.firstChild);
+  }
+  box.querySelectorAll(OLD[id]).forEach(function(o){
+    if (o.classList.contains('v87-gone')) return;
+    var t = o.closest('.b54-tiles');
+    if (t){
+      var keep = [].filter.call(t.children, function(c){ return !c.matches(OLD[id]) && !c.classList.contains('v87-gone'); });
+      if (!keep.length) t.classList.add('v87-gone');
+      else { o.classList.add('v87-gone'); t.classList.add('v87-n' + Math.min(keep.length, 3)); }
+      return;
+    }
+    var row = o; while (row.parentElement && row.parentElement !== box) row = row.parentElement;
+    if (row !== box) row.classList.add('v87-gone');
+  });
+}
+function run(){ var id = document.body.dataset.page; if (BAR[id]) tidy(id); }
+document.addEventListener('click', function(e){
+  var t = e.target && e.target.closest ? e.target.closest('[data-v87]') : null; if (!t) return;
+  e.preventDefault(); if (window.v86Open) v86Open(t.getAttribute('data-v87'), {});
+});
+try { new MutationObserver(function(){ if (!run.q) run.q = requestAnimationFrame(function(){ run.q = 0; run(); }); }).observe(document.getElementById('main-content') || document.body, { childList: true, subtree: true }); } catch(e){}
+window.v87Tidy = run; run();
 })();
 
 </script>
