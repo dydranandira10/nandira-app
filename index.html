@@ -19373,6 +19373,91 @@ html body.v82 .b54-hoot .b54-ht b{font-size:13px;font-weight:700;white-space:now
 html body.v82 .b54-hoot .b54-ht i,html body.v82 .b54-hoot > svg:last-child{display:none !important;}
 html body.v82 .b54-hoot .b54-hi svg,html body.v82 .b54-hoot .b54-hi img{width:22px !important;height:22px !important;}
 html body.v82 .b54-hoot{display:flex !important;width:max-content;}
+
+/* ===== v86 log sheet ===== */
+body.v86-open{overflow:hidden;}
+.v86-ov{position:fixed;inset:0;z-index:3100;}
+.v86-scrim{position:absolute;inset:0;background:rgba(15,12,18,.5);animation:v86f .18s ease both;}
+.v86-sheet{--k:#FF9B85;position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;max-height:92vh;display:flex;flex-direction:column;background:var(--v-bg,#FFF9F1);color:var(--v-ink,#2B2430);border-radius:28px 28px 0 0;padding:10px 18px calc(16px + env(safe-area-inset-bottom,0px));animation:v86u .22s ease both;font-family:'DM Sans',sans-serif;}
+@keyframes v86u{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes v86f{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.v86-sheet,.v86-scrim{animation:none;}}
+.v86-feed{--k:#FF9B85}.v86-sleep{--k:#C5B8FF}.v86-dia{--k:#A9DAFF}.v86-pump{--k:#FFB5C8}.v86-grow{--k:#9EE0D2}.v86-meds{--k:#C9D6F2}.v86-read{--k:#C5B8FF}.v86-note{--k:#EADFCF}
+.v86-grab{display:block;width:38px;height:4px;border-radius:2px;background:var(--v-line,#EFE6DA);margin:0 auto 10px;flex:none;}
+.v86-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;flex:none;}
+.v86-t{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px;}
+.v86-dot{width:12px;height:12px;border-radius:6px;background:var(--k);display:block;}
+.v86-x{width:38px;height:38px;border-radius:19px;border:0;background:var(--v-card,#fff);color:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.v86-body{overflow-y:auto;overscroll-behavior:contain;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+.v86-lab{font-size:12.5px;font-weight:600;color:var(--v-mu,#7F7680);margin:14px 2px 7px;display:flex;justify-content:space-between;gap:8px;}
+.v86-lab span,.v86-lab b{font-weight:600;}
+.v86-seg{display:flex;gap:4px;background:var(--v-card,#fff);border-radius:16px;padding:4px;}
+.v86-seg button{flex:1;min-height:40px;border:0;border-radius:12px;background:transparent;color:var(--v-mu,#7F7680);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:0 6px;}
+.v86-seg button.on{background:var(--k);color:#2B2430;font-weight:700;}
+.v86-wrap{flex-wrap:wrap;background:transparent;padding:0;gap:7px;}
+.v86-wrap button{flex:none;background:var(--v-card,#fff);padding:0 14px;min-height:38px;border-radius:19px;}
+.v86-row{display:flex;gap:8px;margin-top:10px;}
+.v86-row > *{flex:1;min-width:0;}
+.v86-row > .v86-only{display:flex;}
+.v86-row > .v86-only > *{flex:1;}
+.v86-f{display:block;margin-top:10px;}
+.v86-row .v86-f{margin-top:0;}
+.v86-f > span{display:block;font-size:12.5px;font-weight:600;color:var(--v-mu,#7F7680);margin:0 2px 6px;}
+.v86-f input,.v86-f select,.v86-f textarea{width:100%;box-sizing:border-box;height:46px;border-radius:14px;border:0;background:var(--v-card,#fff);color:var(--v-ink,#2B2430);font-family:inherit;font-size:15px;font-weight:600;padding:0 12px;-webkit-appearance:none;appearance:none;}
+.v86-f textarea{height:auto;min-height:100px;padding:12px;font-weight:500;line-height:1.4;resize:none;}
+.v86-f select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237F7680' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.v86-f input:focus,.v86-f select:focus,.v86-f textarea:focus{outline:2px solid var(--k);outline-offset:0;}
+.v86-big input{height:56px;font-family:var(--font-display);font-weight:800;font-size:26px;}
+.v86-note input{font-weight:500;}
+.v86-step{display:flex;align-items:center;justify-content:space-between;background:var(--v-card,#fff);border-radius:18px;padding:8px;}
+.v86-step button{width:46px;height:46px;border-radius:23px;border:0;background:var(--v-line,#F4EEE6);color:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;}
+.v86-sv{display:flex;align-items:baseline;justify-content:center;gap:4px;min-width:0;}
+.v86-sv input{width:110px;border:0;background:transparent;text-align:center;font-family:var(--font-display);font-weight:800;font-size:36px;letter-spacing:-.02em;color:inherit;padding:0;-moz-appearance:textfield;}
+.v86-sv input::-webkit-outer-spin-button,.v86-sv input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.v86-sv i{font-style:normal;font-size:15px;font-weight:600;color:var(--v-mu,#7F7680);}
+.v86-dur{display:flex;align-items:center;justify-content:center;gap:6px;min-height:22px;margin-top:10px;font-size:14px;font-weight:600;color:var(--v-ink,#2B2430);}
+.v86-dur:empty{min-height:0;margin:0;}
+.v86-dur b{font-weight:800;}
+.v86-btns{display:flex;gap:10px;margin-top:14px;flex:none;}
+.v86-btns button{height:52px;border-radius:26px;border:0;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;}
+.v86-cancel{flex:1;background:var(--v-card,#fff);color:var(--v-ink,#2B2430);}
+.v86-save{flex:1.6;background:var(--v-acc,#2B2430);color:var(--v-acct,#fff);}
+/* old in-page log forms (kept for saving, hidden from view) */
+body.v82 .v86-old{display:none !important;}
+
+/* ===== the app's other sheets, restyled to match ===== */
+body.v82 .sheet-ov .sheet{background:var(--v-bg) !important;color:var(--v-ink) !important;border-radius:28px 28px 0 0 !important;font-family:'DM Sans',sans-serif;}
+body.v82 .sheet-ov .sheet-title{font-family:var(--font-display) !important;font-weight:800 !important;font-size:24px !important;letter-spacing:-.01em;color:var(--v-ink) !important;}
+body.v82 .sheet-ov .form-field label,body.v82 .sheet-ov .b54-lb{font-size:12.5px !important;font-weight:600 !important;color:var(--v-mu) !important;text-transform:none !important;letter-spacing:0 !important;}
+body.v82 .sheet-ov .form-field input,body.v82 .sheet-ov .form-field select,body.v82 .sheet-ov .form-field textarea,body.v82 .sheet-ov input[type=number],body.v82 .sheet-ov input[type=text],body.v82 .sheet-ov input[type=date],body.v82 .sheet-ov input[type=time]{background:var(--v-card) !important;border:0 !important;border-radius:14px !important;color:var(--v-ink) !important;min-height:46px;font-weight:600;}
+body.v82 .sheet-ov .b54-xb{display:flex;gap:10px;}
+body.v82 .sheet-ov .b54-xb .btn{height:52px !important;border-radius:26px !important;font-weight:700 !important;}
+body.v82 .sheet-ov .b54-xb .btn-outline{background:var(--v-card) !important;color:var(--v-ink) !important;border:0 !important;flex:1;}
+body.v82 .sheet-ov .b54-xb .btn-teal{background:var(--v-acc) !important;color:var(--v-acct) !important;border:0 !important;flex:1.6;}
+body.v82 .sheet-ov .b54-xc button,body.v82 .sheet-ov .b54-chip{border-radius:19px !important;}
+body.v82 .sheet-ov .sheet-handle{background:var(--v-line) !important;}
+
+/* win over the app's general input styles */
+html body #v86x .v86-sheet .v86-f input,html body #v86x .v86-sheet .v86-f select,html body #v86x .v86-sheet .v86-f textarea{background-color:var(--v-card,#fff) !important;border:0 !important;border-radius:14px !important;box-shadow:none !important;color:var(--v-ink,#2B2430) !important;height:46px !important;min-height:46px !important;font-size:15px !important;font-weight:600 !important;padding:0 12px !important;margin:0 !important;width:100% !important;}
+html body #v86x .v86-sheet .v86-f textarea{height:auto !important;min-height:104px !important;padding:12px !important;font-weight:500 !important;}
+html body #v86x .v86-sheet .v86-f select{padding-right:32px !important;}
+html body #v86x .v86-sheet .v86-big input{height:56px !important;font-family:var(--font-display) !important;font-weight:800 !important;font-size:26px !important;}
+html body #v86x .v86-sheet .v86-note input{font-weight:500 !important;}
+html body #v86x .v86-sheet .v86-sv input{background:transparent !important;border:0 !important;box-shadow:none !important;width:110px !important;height:52px !important;min-height:0 !important;padding:0 !important;margin:0 !important;text-align:center !important;font-family:var(--font-display) !important;font-weight:800 !important;font-size:36px !important;color:var(--v-ink,#2B2430) !important;}
+html body #v86x .v86-sheet .v86-seg button{white-space:nowrap;}
+html body #v86x .v86-sheet .v86-step .v86-sv input{background-color:transparent !important;background-image:none !important;}
+/* the app's global input rule paints var(--v24s/--v24t); point those at the sheet's own colours */
+#v86x .v86-sheet{--v24s:var(--v-card,#fff);--v24t:var(--v-card,#fff);}
+#v86x .v86-sv{--v24s:transparent;--v24t:transparent;}
+
+/* stool colour swatches */
+.v86-sw{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.v86-sw button{min-height:58px;border:0;border-radius:14px;background:var(--v-card,#fff);color:var(--v-ink,#2B2430);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;padding:6px 2px;box-shadow:inset 0 0 0 2px transparent;}
+.v86-sw button i{width:18px;height:18px;border-radius:9px;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);}
+.v86-sw button.on{box-shadow:inset 0 0 0 2px var(--v-ink,#2B2430);font-weight:700;}
+.v86-warn{font-size:12.5px;font-weight:600;color:#B3262E;margin:8px 2px 0;}
+.v86-warn:empty{display:none;}
+body.night-mode .v86-warn{color:#FF9B9B;}
 </style>
 <script id="p53js">
 /* BabyOS v56: money. One place that knows the currency, formats amounts, reads what people type,
@@ -23311,9 +23396,9 @@ function syncNow(){
     var lab = txt(live, '.nfl-label'), side = (lab.split('\u00b7')[1] || '').replace(/[^A-Za-z ]/g, '').trim(), since = txt(live, '.nfl-since').replace(/^since\s*/i, '');
     h += '<div class="n82-feed n82-live"><div class="n82-lk"><i class="n82-dot"></i>FEEDING NOW' + (side ? ' \u00b7 ' + esc(side.toUpperCase()) + ' SIDE' : '') + '</div><div class="n82-lt" id="n82-lt">' + esc(txt(live, '.nfl-time') || '00:00') + '</div><div class="n82-ls">Started ' + esc(since) + (ts ? ' \u00b7 ' + ts.feeds + ' feed' + (ts.feeds === 1 ? '' : 's') + ' today' : '') + '</div><div class="n82-fb"><button type="button" class="n82-stop" onclick="goStopFeedTimer()">' + I(IC.stop, 18) + 'Stop feed</button><button type="button" class="n82-b2" onclick="goViewFeedTimer()">Details</button></div></div>';
   } else
-  h += '<div class="n82-feed" data-d="' + esc(dc.getAttribute('data-d') || '') + '"><div class="n82-frow"><div class="n82-ring">' + (ring ? ring.outerHTML : '') + '<div class="n82-rt"><b>' + esc(txt(dc, '.d-num')) + '</b><span>' + esc(txt(dc, '.d-cl')) + '</span></div></div><div class="n82-fi"><div class="n82-fk">' + I(IC.bottle, 15) + 'FEEDING</div><div class="n82-fn">' + (cs ? cs.innerHTML : '') + '</div>' + ln('Last feed', lf ? lf.ago + ' ago' : 'None yet') + ln('Side', lf && lf.side ? lf.side : '') + ln('Today', ts ? ts.feeds + ' feed' + (ts.feeds === 1 ? '' : 's') : '') + '</div></div><div class="n82-fb"><button type="button" class="n82-b1" onclick="v8Act(\'feed\')">' + I(IC.play, 15) + 'Log a feed</button><button type="button" class="n82-b2" onclick="v82Go(\'feeding\')">Feeding page</button></div></div>';
+  h += '<div class="n82-feed" data-d="' + esc(dc.getAttribute('data-d') || '') + '"><div class="n82-frow"><div class="n82-ring">' + (ring ? ring.outerHTML : '') + '<div class="n82-rt"><b>' + esc(txt(dc, '.d-num')) + '</b><span>' + esc(txt(dc, '.d-cl')) + '</span></div></div><div class="n82-fi"><div class="n82-fk">' + I(IC.bottle, 15) + 'FEEDING</div><div class="n82-fn">' + (cs ? cs.innerHTML : '') + '</div>' + ln('Last feed', lf ? lf.ago + ' ago' : 'None yet') + ln('Side', lf && lf.side ? lf.side : '') + ln('Today', ts ? ts.feeds + ' feed' + (ts.feeds === 1 ? '' : 's') : '') + '</div></div><div class="n82-fb"><button type="button" class="n82-b1" onclick="v86Open(\'feed\')">' + I(IC.plus, 15) + 'Log a feed</button><button type="button" class="n82-b2" onclick="v82Go(\'feeding\')">Feeding page</button></div></div>';
   function mini(cls, ic, lab, v, s, act){ return '<button type="button" class="n82-m ' + cls + '" onclick="' + act + '">' + I(ic, 24) + '<span><em>' + lab + '</em><b>' + esc(v) + '</b>' + (s ? '<i>' + esc(s) + '</i>' : '') + '</span></button>'; }
-  h += '<div class="n82-two">' + mini('n82-sl', IC.moon, 'Last sleep', ls ? ls.ago + ' ago' : 'None yet', ts ? (Math.round(ts.sleepH * 10) / 10) + 'h today' : '', "v8Act('sleep')") + mini('n82-di', IC.diaper, 'Last diaper', ld ? ld.ago + ' ago' : 'None yet', ts ? ts.diapers + ' today' : '', "v8Act('diaper')") + '</div>';
+  h += '<div class="n82-two">' + mini('n82-sl', IC.moon, 'Last sleep', ls ? ls.ago + ' ago' : 'None yet', ts ? (Math.round(ts.sleepH * 10) / 10) + 'h today' : '', "v86Open('sleep')") + mini('n82-di', IC.diaper, 'Last diaper', ld ? ld.ago + ' ago' : 'None yet', ts ? ts.diapers + ' today' : '', "v86Open('diaper')") + '</div>';
   if (box.__h !== h){ box.innerHTML = h; box.__h = h; }
 }
 window.v82SyncNow = syncNow;
@@ -23321,6 +23406,245 @@ setInterval(function(){ try { var a = document.getElementById('n82-lt'), b = doc
 var _now = PAGES.now; PAGES.now = function(el){ var r = _now.apply(this, arguments); try { syncNow(); setTimeout(syncNow, 60); setTimeout(syncNow, 400); } catch(e){} return r; };
 setInterval(function(){ try { if (document.body.dataset.page === 'now') syncNow(); } catch(e){} }, 5000);
 try { renderNav(document.body.dataset.page || 'now'); if (document.body.dataset.page === 'now') setTimeout(syncNow, 100); } catch(e){}
+})();
+
+/* ===== v86: one log sheet for every log. Same layout everywhere: date and time, type, the one detail that matters, note, Save.
+   It fills each page's original form and saves through the original add function, so stored records keep exactly the same shape. ===== */
+(function(){
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function today(){ var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function nowT(){ var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function I(d, s){ return '<svg width="' + (s || 18) + '" height="' + (s || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
+var IX = { x: '<path d="M6 6l12 12M18 6L6 18"/>', minus: '<path d="M6 12h12"/>', plus: '<path d="M12 6v12M6 12h12"/>', clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>' };
+function toastMsg(m){ try { if (typeof toast === 'function') toast(m); } catch(e){} }
+function multi(){ return (+(state.numberOfBabies || 1)) > 1; }
+function bIdx(){ try { return typeof currentBabyIdx === 'number' ? currentBabyIdx : 0; } catch(e){ return 0; } }
+function bLabel(i){ try { return typeof babyLabel === 'function' ? babyLabel(i) : 'Baby ' + (i + 1); } catch(e){ return 'Baby ' + (i + 1); } }
+function last(arr, fn){ arr = Array.isArray(arr) ? arr : []; for (var i = arr.length - 1; i >= 0; i--){ var x = arr[i]; if (x && (x.babyIdx || 0) === bIdx() && (!fn || fn(x))) return x; } return null; }
+function mins(t){ var m = /^(\d{1,2}):(\d{2})/.exec(t || ''); return m ? (+m[1]) * 60 + (+m[2]) : null; }
+function durTxt(a, b){ a = mins(a); b = mins(b); if (a == null || b == null) return ''; var d = b - a; if (d < 0) d += 1440; if (!d) return ''; var h = Math.floor(d / 60), m = d % 60; return h ? h + 'h' + (m ? ' ' + m + 'm' : '') : m + ' min'; }
+
+/* ---------- widgets ---------- */
+var S = null; // current sheet state
+function seg(name, opts, cur, wrap){ return '<div class="v86-seg' + (wrap ? ' v86-wrap' : '') + '" data-seg="' + name + '">' + opts.map(function(o){ return '<button type="button" class="' + (String(o[0]) === String(cur) ? 'on' : '') + '" data-v86="seg|' + name + '|' + esc(o[0]) + '">' + esc(o[1]) + '</button>'; }).join('') + '</div>'; }
+function lab(t, extra){ return '<div class="v86-lab">' + t + (extra ? '<span>' + extra + '</span>' : '') + '</div>'; }
+function dateF(id, v){ return '<label class="v86-f"><span>Date</span><input type="date" id="' + id + '" max="' + today() + '" value="' + esc(v || today()) + '"></label>'; }
+function timeF(id, l, v){ return '<label class="v86-f"><span>' + l + '</span><input type="time" id="' + id + '" value="' + esc(v == null ? nowT() : v) + '"></label>'; }
+function stepper(id, v, unit, step){ return '<div class="v86-step"><button type="button" data-v86="step|' + id + '|-' + step + '" aria-label="Less">' + I(IX.minus, 20) + '</button><div class="v86-sv"><input id="' + id + '" type="number" inputmode="decimal" value="' + esc(v) + '"><i>' + esc(unit) + '</i></div><button type="button" data-v86="step|' + id + '|' + step + '" aria-label="More">' + I(IX.plus, 20) + '</button></div>'; }
+function note(ph, v){ return '<label class="v86-f v86-note"><span>Note</span><input type="text" id="v86-note" placeholder="' + esc(ph || 'Optional') + '" value="' + esc(v || '') + '"></label>'; }
+function babies(){ if (!multi()) return ''; var n = +(state.numberOfBabies || 1), o = []; for (var i = 0; i < n; i++) o.push([i, bLabel(i)]); return lab('Baby') + seg('baby', o, bIdx()); }
+function durLine(){ return '<div class="v86-dur" id="v86-dur"></div>'; }
+function v(id){ var e = $(id); return e ? String(e.value || '').trim() : ''; }
+
+/* ---------- the nine logs ---------- */
+var K = {
+  feed: { t: 'Log a feed', c: 'feed', page: 'feeding', save: 'Save feed',
+    body: function(o){
+      var lb = last(state.feedingLog, function(x){ return +x.formulaMl > 0 || +x.storedMl > 0; });
+      var type = o.type || '', amt = o.amt || (lb ? (+lb.formulaMl || +lb.storedMl) : 90);
+      if (!type){ var lf = last(state.feedingLog); type = lf && (lf.feedType === 'left') ? 'right' : 'left'; }
+      S.type = type;
+      return lab('Type') + seg('type', [['left', 'Left'], ['right', 'Right'], ['stored', 'Stored'], ['formula', 'Formula']], type) +
+        '<div class="v86-row">' + dateF('v86-date') + '</div>' +
+        '<div class="v86-row">' + timeF('v86-st', 'Start') + '<span class="v86-only" data-for="breast">' + timeF('v86-en', 'End', '') + '</span></div>' +
+        '<div class="v86-only" data-for="breast">' + durLine() + '</div>' +
+        '<div class="v86-only" data-for="bottle">' + lab('Amount', '<b id="v86-stash"></b>') + stepper('v86-amt', amt, 'ml', 10) + '</div>' +
+        babies() + note('Latch, mood, spit-up...');
+    },
+    sync: function(){ var b = S.type === 'stored' || S.type === 'formula'; show('breast', !b); show('bottle', b); var st = $('v86-stash'); if (st) st.textContent = S.type === 'stored' ? 'Stash ' + (state.pumpedStash || 0) + ' ml' : ''; },
+    run: function(){
+      var t = S.type, amt = parseInt(v('v86-amt'), 10) || 0, bottle = t === 'stored' || t === 'formula';
+      if (bottle && !(amt > 0)) return 'Enter the amount in ml';
+      if (!v('v86-date') || !v('v86-st')) return 'Pick the date and start time';
+      set('f-date', v('v86-date')); set('f-time', v('v86-st')); set('f-endtime', bottle ? '' : v('v86-en')); set('f-notes', v('v86-note')); set('ff-baby', String(S.baby));
+      try { window._restoringTimedFeed = true; if (typeof selectFeedType === 'function') selectFeedType(t); } catch(e){} window._restoringTimedFeed = false;
+      set('f-ftype', t); set('f-amount', bottle ? String(amt) : '');
+      return call('addFeed', 'feedingLog');
+    } },
+  sleep: { t: 'Log a sleep', c: 'sleep', page: 'sleep', save: 'Save sleep',
+    body: function(o){
+      var h = new Date().getHours(); S.type = o.type || (h >= 19 || h < 6 ? 'Night' : 'Day nap'); S.q = 'Good';
+      return lab('Type') + seg('type', [['Day nap', 'Nap'], ['Night', 'Night']], S.type) +
+        '<div class="v86-row">' + dateF('v86-date') + '</div>' +
+        '<div class="v86-row">' + timeF('v86-st', 'Fell asleep', '') + timeF('v86-en', 'Woke up', '') + '</div>' + durLine() +
+        lab('How was it') + seg('q', [['Excellent', 'Great'], ['Good', 'Good'], ['Fair', 'Fair'], ['Poor', 'Poor']], S.q) + babies() + note('Where, how it went...');
+    },
+    run: function(){
+      if (!v('v86-st')) return 'Add the time he fell asleep';
+      set('s-date', v('v86-date')); set('s-start', v('v86-st')); set('s-end', v('v86-en')); set('s-type', S.type); set('s-qual', S.q); set('s-notes', v('v86-note')); set('s-baby', String(S.baby));
+      return call('addSleep', 'sleepLog');
+    } },
+  diaper: { t: 'Log a diaper', c: 'dia', page: 'diaper', save: 'Save diaper',
+    body: function(o){
+      S.type = o.type || 'wet';
+      S.col = 'Mustard Yellow';
+      var cols = [['Mustard Yellow', 'Mustard', '#E3B23C'], ['Dark Green (Transitional)', 'Dark green', '#4F6B2E'], ['Green Frothy', 'Frothy green', '#8DB04A'], ['Orange/Red', 'Orange', '#E0773A'], ['Black/Tarry (Meconium)', 'Black', '#2B2420'], ['White/Grey', 'Pale', '#D9D6CF'], ['Blood-tinged', 'Blood', '#B3262E']];
+      return lab('Type') + seg('type', [['wet', 'Wet'], ['dirty', 'Dirty'], ['both', 'Both']], S.type) +
+        '<div class="v86-row">' + dateF('v86-date') + timeF('v86-t', 'Time') + '</div>' +
+        '<div class="v86-only" data-for="dirty">' + lab('Stool colour') + '<div class="v86-sw">' + cols.map(function(c){ return '<button type="button" class="' + (c[0] === S.col ? 'on' : '') + '" data-v86="seg|col|' + esc(c[0]) + '"><i style="background:' + c[2] + '"></i>' + esc(c[1]) + '</button>'; }).join('') + '</div><div class="v86-warn" id="v86-warn"></div></div>' +
+        babies() + note('Rash, smell, anything unusual...');
+    },
+    sync: function(){ show('dirty', S.type !== 'wet'); var w = $('v86-warn'); if (w) w.textContent = /Black|White|Blood/.test(S.col || '') ? 'Worth mentioning to your paediatrician, especially if it happens again.' : ''; },
+    run: function(){
+      var t = S.type, dirty = t !== 'wet';
+      set('d-date', v('v86-date')); set('d-time', v('v86-t')); set('d-wet', t === 'dirty' ? 'No' : 'Yes'); set('d-dirty', dirty ? 'Yes' : 'No'); set('d-color', dirty ? (S.col || 'Mustard Yellow') : 'N/A'); set('d-notes', v('v86-note')); set('d-baby', String(S.baby));
+      return call('addDiaper', 'diaperLog');
+    } },
+  pump: { t: 'Log a pump', c: 'pump', page: 'pump', save: 'Save pump',
+    body: function(){
+      var lp = last(state.pumpLog);
+      return '<div class="v86-row">' + dateF('v86-date') + timeF('v86-t', 'Time') + '</div>' +
+        lab('Left') + stepper('v86-l', lp ? lp.leftMl || 0 : 0, 'ml', 10) + lab('Right') + stepper('v86-r', lp ? lp.rightMl || 0 : 0, 'ml', 10) +
+        '<div class="v86-dur" id="v86-tot"></div>' + babies() + note('How it went...');
+    },
+    sync: function(){ var e = $('v86-tot'); if (e){ var t = (parseInt(v('v86-l'), 10) || 0) + (parseInt(v('v86-r'), 10) || 0); e.textContent = t ? 'Total ' + t + ' ml, added to the stash' : ''; } },
+    run: function(){
+      set('pump-date', v('v86-date')); set('pump-time', v('v86-t')); set('pump-left', v('v86-l')); set('pump-right', v('v86-r')); set('pump-notes', v('v86-note')); set('pump-baby', String(S.baby));
+      return call('addPump', 'pumpLog');
+    } },
+  weight: { t: 'Log weight', c: 'grow', page: 'weight', save: 'Save weight',
+    body: function(){
+      var u = state.weightUnit || 'kg', lw = last(state.weightLog), hint = '';
+      try { if (lw && typeof gramsToDisplay === 'function') hint = 'Last ' + gramsToDisplay(lw.grams, u) + ', ' + new Date(lw.date + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); } catch(e){}
+      var ul = u === 'g' ? 'g' : u === 'lboz' ? 'lb' : 'kg';
+      return '<div class="v86-row">' + dateF('v86-date') + '</div>' + lab('Weight', esc(hint)) +
+        '<div class="v86-row"><label class="v86-f v86-big"><span>' + ul + '</span><input id="v86-w" type="number" inputmode="decimal" step="0.01" placeholder="' + (u === 'g' ? 'e.g. 7300' : 'e.g. 7.3') + '"></label>' +
+        (u === 'lboz' ? '<label class="v86-f v86-big"><span>oz</span><input id="v86-oz" type="number" inputmode="decimal" placeholder="0"></label>' : '') + '</div>' +
+        babies() + note('After a feed, at the clinic...');
+    },
+    run: function(){
+      if (!v('v86-w') && !v('v86-oz')) return 'Enter a weight';
+      set('w-date', v('v86-date')); set('w-val', v('v86-w')); set('w-oz', v('v86-oz')); set('w-notes', v('v86-note')); set('w-baby', String(S.baby));
+      return call('addWeight', 'weightLog', true);
+    } },
+  meds: { t: 'Log a dose', c: 'meds', page: 'meds', save: 'Save dose',
+    body: function(){
+      var sel = $('meds-name'), un = $('meds-dose-unit'), lm = last(state.medsLog);
+      var names = sel ? [].map.call(sel.options, function(x){ return [x.value, x.textContent]; }) : [['Vitamin D', 'Vitamin D']];
+      var units = un ? [].map.call(un.options, function(x){ return x.value; }) : ['ml', 'mg', 'drops'];
+      var cur = lm ? lm.name : names[0][0];
+      return '<label class="v86-f"><span>Medicine</span><select id="v86-med">' + names.map(function(n){ return '<option value="' + esc(n[0]) + '"' + (n[0] === cur ? ' selected' : '') + '>' + esc(n[1]) + '</option>'; }).join('') + '</select></label>' +
+        '<div class="v86-row">' + dateF('v86-date') + timeF('v86-t', 'Time') + '</div>' +
+        '<div class="v86-row"><label class="v86-f v86-big"><span>Dose</span><input id="v86-dose" type="number" inputmode="decimal" placeholder="e.g. 5" value="' + esc(lm && lm.doseAmt != null ? lm.doseAmt : '') + '"></label>' +
+        '<label class="v86-f"><span>Unit</span><select id="v86-unit">' + units.map(function(u){ return '<option' + (lm && lm.doseUnit === u ? ' selected' : '') + '>' + esc(u) + '</option>'; }).join('') + '</select></label></div>' +
+        babies() + note('For fever, after vaccines...');
+    },
+    run: function(){
+      if (v('v86-med') === '__add__'){ close(); try { openAddMedPrompt(); } catch(e){} return 'skip'; }
+      set('meds-name', v('v86-med')); set('meds-date', v('v86-date')); set('meds-time', v('v86-t')); set('meds-dose-amt', v('v86-dose')); set('meds-dose-unit', v('v86-unit')); set('meds-notes', v('v86-note')); set('meds-baby', String(S.baby));
+      return call('addMeds', 'medsLog');
+    } },
+  reading: { t: 'Log reading', c: 'read', page: 'reading', save: 'Save reading',
+    body: function(o){
+      S.lang = o.lang || (last(state.readingLog) || {}).lang || 'English'; S.resp = '';
+      return lab('Language') + seg('lang', [['Indonesian', 'Indonesian'], ['English', 'English'], ['Both', 'Both']], S.lang) +
+        '<div class="v86-row">' + dateF('v86-date') + '</div>' + lab('How long') + stepper('v86-min', 10, 'min', 5) +
+        '<label class="v86-f"><span>Book</span><input type="text" id="v86-book" placeholder="Optional, e.g. Goodnight Moon"></label>' +
+        lab('How did he respond', 'optional') + seg('resp', [['Loved it', 'Loved it'], ['Engaged', 'Engaged'], ['Distracted', 'Distracted'], ['Fell asleep', 'Fell asleep']], '', true);
+    },
+    run: function(){
+      set('rl-date', v('v86-date')); set('rl-min', v('v86-min')); set('rl-book', v('v86-book')); set('rl-lang', S.lang);
+      var r = $('rl-resp'); if (r){ r.value = S.resp; if (S.resp && r.value !== S.resp) r.value = S.resp; }
+      return call('addReading', 'readingLog');
+    } },
+  note: { t: 'New note', c: 'note', page: 'notes', save: 'Save note',
+    body: function(o){
+      S.tag = o.tag || 'general';
+      return lab('Type') + seg('tag', [['general', 'General'], ['doctor', 'For doctor'], ['symptom', 'Symptom'], ['memory', 'Memory'], ['todo', 'To-do']], S.tag, true) +
+        '<label class="v86-f"><span>Note</span><textarea id="v86-text" rows="4" placeholder="A question, a symptom, a small memory..."></textarea></label>';
+    },
+    run: function(){
+      if (!v('v86-text')) return 'Write something first';
+      window._notesTag = S.tag; set('note-input', $('v86-text').value);
+      return call('addNote', 'notesLog');
+    } }
+};
+function show(k, on){ var b = $('v86x'); if (!b) return; b.querySelectorAll('.v86-only[data-for="' + k + '"]').forEach(function(e){ e.style.display = on ? '' : 'none'; }); }
+function set(id, val){ var e = $(id); if (!e && /-baby$/.test(id)){ e = document.createElement('input'); e.type = 'hidden'; e.id = id; (document.querySelector('.page.active') || document.body).appendChild(e); } if (!e) return; if (e.tagName === 'SELECT' && val !== '' && ![].some.call(e.options, function(o){ return o.value === val; })){ var o = document.createElement('option'); o.value = o.textContent = val; e.appendChild(o); } e.value = val; }
+function call(fn, key, replaces){
+  var n0 = (state[key] || []).length, h0 = JSON.stringify(state[key] || []).length;
+  if (typeof window[fn] !== 'function') return 'Could not save, please try again';
+  window[fn]();
+  var n1 = (state[key] || []).length, h1 = JSON.stringify(state[key] || []).length;
+  return (n1 > n0 || (replaces && h1 !== h0)) ? 'ok' : 'stay';
+}
+function durSync(){ var d = $('v86-dur'); if (!d) return; var t = durTxt(v('v86-st'), v('v86-en')); d.innerHTML = t ? I(IX.clock, 16) + 'Duration: <b>' + t + '</b>' : ''; }
+
+/* ---------- open, close, save ---------- */
+function close(){ var o = $('v86x'); if (o) o.remove(); S = null; try { document.body.classList.remove('v86-open'); } catch(e){} }
+function open(kind, o){
+  var k = K[kind]; if (!k) return; o = o || {};
+  close(); try { var x = $('b54-x'); if (x) x.remove(); if (window.v82LogClose) v82LogClose(); } catch(e){}
+  S = { kind: kind, baby: bIdx(), from: document.body.dataset.page };
+  var body = k.body(o);
+  var d = document.createElement('div'); d.id = 'v86x'; d.className = 'v86-ov';
+  d.innerHTML = '<div class="v86-scrim" data-v86="close"></div><div class="v86-sheet v86-' + k.c + '" role="dialog" aria-modal="true" aria-label="' + esc(k.t) + '"><i class="v86-grab"></i>' +
+    '<div class="v86-top"><span class="v86-t"><i class="v86-dot"></i>' + esc(k.t) + '</span><button type="button" class="v86-x" data-v86="close" aria-label="Close">' + I(IX.x, 18) + '</button></div>' +
+    '<div class="v86-body">' + body + '</div><div class="v86-btns"><button type="button" class="v86-cancel" data-v86="close">Cancel</button><button type="button" class="v86-save" data-v86="save">' + esc(k.save) + '</button></div></div>';
+  document.body.appendChild(d); document.body.classList.add('v86-open');
+  if (k.sync) k.sync(); durSync();
+  d.addEventListener('input', function(){ if (S && K[S.kind].sync) K[S.kind].sync(); durSync(); });
+  d.addEventListener('change', function(){ if (S && K[S.kind].sync) K[S.kind].sync(); durSync(); });
+}
+window.v86Open = open; window.v86Close = close;
+function save(){
+  if (!S) return; var k = K[S.kind], from = S.from, hop = from !== k.page;
+  var go = function(){
+    var r = 'stay';
+    try { r = k.run(); } catch(e){ r = 'Could not save, please try again'; }
+    if (r === 'skip') return;
+    if (r === 'ok'){ close(); if (hop){ try { showPage(from); } catch(e){} } return; }
+    if (r !== 'stay') toastMsg(r);
+    if (hop){ try { showPage(from); } catch(e){} }
+  };
+  if (hop){ try { showPage(k.page); } catch(e){} setTimeout(go, 120); } else go();
+}
+document.addEventListener('click', function(e){
+  var t = e.target && e.target.closest ? e.target.closest('[data-v86]') : null; if (!t || !S) return;
+  var a = t.getAttribute('data-v86').split('|');
+  if (a[0] === 'close'){ close(); return; }
+  if (a[0] === 'save'){ save(); return; }
+  if (a[0] === 'seg'){
+    var name = a[1], val = a.slice(2).join('|'), box = t.parentElement, wasOn = t.classList.contains('on');
+    if (name === 'resp' && wasOn){ t.classList.remove('on'); S.resp = ''; return; }
+    box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b === t); });
+    if (name === 'baby') S.baby = parseInt(val, 10) || 0; else S[name] = val;
+    if (K[S.kind].sync) K[S.kind].sync(); return;
+  }
+  if (a[0] === 'step'){ var inp = $(a[1]); if (!inp) return; var n = (parseFloat(inp.value) || 0) + parseFloat(a[2]); inp.value = Math.max(0, Math.round(n)); if (K[S.kind].sync) K[S.kind].sync(); }
+});
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && S) close(); });
+
+/* ---------- every way into a log now opens the sheet ---------- */
+var ROUTE = {
+  bottleAsk: function(){ var lb = last(state.feedingLog, function(x){ return +x.formulaMl > 0 || +x.storedMl > 0; }); open('feed', { type: lb && +lb.storedMl > 0 ? 'stored' : 'formula' }); },
+  sleepPast: function(){ open('sleep'); },
+  diaperPast: function(){ open('diaper'); },
+  pumpLog: function(){ open('pump'); },
+  weightAdd: function(){ open('weight'); },
+  medLog: function(){ open('meds'); },
+  readLog: function(l){ open('reading', { lang: l }); },
+  readGo: function(){ open('reading'); },
+  noteNew: function(t){ open('note', { tag: t }); }
+};
+document.addEventListener('click', function(e){
+  var t = e.target && e.target.closest ? e.target.closest('[data-b54]') : null; if (!t) return;
+  var a = (t.getAttribute('data-b54') || '').split('|'), f = ROUTE[a[0]]; if (!f) return;
+  e.preventDefault(); e.stopImmediatePropagation(); f(a[1]);
+}, true);
+window.v86Route = ROUTE;
+
+/* old in-page "Log a ..." forms stay in the page (the sheet saves through them) but are hidden */
+var FORMS = ['f-date', 's-date', 'd-date', 'pump-date', 'w-date', 'meds-date', 'rl-date', 'note-input'];
+function hideForms(){
+  document.querySelectorAll('.v86-old').forEach(function(c){ if (/review/.test(c.className) || c.querySelector('[class*="review"]')) c.classList.remove('v86-old'); });
+  FORMS.forEach(function(id){ var i = $(id); if (!i) return; var c = i.closest('.card'); if (!c || c.classList.contains('v86-old') || /review/.test(c.className) || c.querySelector('[class*="review"]')) return; c.classList.add('v86-old'); });
+}
+window.v86HideForms = hideForms;
+try { new MutationObserver(function(){ if (!hideForms.q) hideForms.q = requestAnimationFrame(function(){ hideForms.q = 0; hideForms(); }); }).observe(document.getElementById('main-content') || document.body, { childList: true, subtree: true }); } catch(e){}
+hideForms();
 })();
 
 </script>
