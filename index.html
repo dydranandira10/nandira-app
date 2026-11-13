@@ -23749,6 +23749,24 @@ document.addEventListener('click', function(e){
 try { new MutationObserver(function(){ if (!run.q) run.q = requestAnimationFrame(function(){ run.q = 0; run(); }); }).observe(document.getElementById('main-content') || document.body, { childList: true, subtree: true }); } catch(e){}
 window.v87Tidy = run; run();
 })();
+/* v88: "Last sleep" picked the first sleep of the day, because sleeps have start/end but no time,
+   so every sleep that day looked like 12:00. Now it uses each sleep's real end time (overnight aware). */
+(function(){
+  function endOf(e){
+    if (!e || !e.date) return null;
+    var st = (e.start || e.time || '12:00').slice(0, 5), en = (e.end || st).slice(0, 5);
+    var s = new Date(e.date + 'T' + st + ':00'), d = new Date(e.date + 'T' + en + ':00');
+    if (isNaN(s) || isNaN(d)) return null;
+    if (d < s) d = new Date(d.getTime() + 864e5);
+    return d;
+  }
+  window.lastSleepInfo = function(){
+    var L = (typeof logsFor === 'function' ? logsFor(state.sleepLog) : state.sleepLog) || [], lim = Date.now() + 5 * 60000, best = null, bt = -Infinity;
+    L.forEach(function(e){ var d = endOf(e); if (d && d.getTime() <= lim && d.getTime() > bt){ bt = d.getTime(); best = { e: e, d: d }; } });
+    if (!best) return null;
+    return { ago: _agoText(best.d), type: best.e.type || '' };
+  };
+})();
 
 </script>
 </body>
